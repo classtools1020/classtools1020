@@ -10,15 +10,14 @@
 body{background:#0B1D3A;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(1px 1px at 10% 20%,#FFD700 100%,transparent),radial-gradient(1.5px 1.5px at 50% 10%,#fff 100%,transparent),radial-gradient(1px 1px at 70% 40%,#FFD700 100%,transparent),radial-gradient(1px 1px at 90% 80%,#fff 100%,transparent);pointer-events:none;z-index:0}
 .container{position:relative;z-index:1;width:100%;max-width:900px;padding:16px}
-h1{text-align:center;font-size:1.9em;font-weight:900;margin:8px 0 4px;background:linear-gradient(135deg,#FF6B35,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h1{text-align:center;font-size:1.8em;font-weight:900;margin:8px 0 4px;background:linear-gradient(135deg,#FF6B35,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .subtitle{text-align:center;color:#4FC3F7;font-size:1em;margin-bottom:10px}
-/* Tabs */
-.tabs{display:flex;justify-content:center;gap:8px;margin-bottom:12px}
-.tab{padding:10px 20px;border-radius:30px;border:2px solid #2A5A8A;background:#1A3A6A;font-family:'Noto Sans TC',sans-serif;font-size:1em;font-weight:700;color:#B0C4DE;cursor:pointer;transition:all .3s}
+.tabs{display:flex;justify-content:center;gap:8px;margin-bottom:10px}
+.tab{padding:10px 18px;border-radius:30px;border:2px solid #2A5A8A;background:#1A3A6A;font-family:'Noto Sans TC',sans-serif;font-size:.95em;font-weight:700;color:#B0C4DE;cursor:pointer;transition:all .3s}
 .tab.active{background:linear-gradient(135deg,#FF6B35,#FF8F60);color:#fff;border-color:transparent}
 canvas{width:100%;max-width:700px;height:auto;display:block;margin:0 auto;border-radius:16px;background:#112D5A;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
-.controls{display:flex;justify-content:center;gap:12px;margin:14px 0;flex-wrap:wrap}
-.btn{padding:12px 28px;border:none;border-radius:50px;font-family:'Noto Sans TC',sans-serif;font-size:1em;font-weight:700;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:6px}
+.controls{display:flex;justify-content:center;gap:10px;margin:14px 0;flex-wrap:wrap}
+.btn{padding:12px 26px;border:none;border-radius:50px;font-family:'Noto Sans TC',sans-serif;font-size:1em;font-weight:700;cursor:pointer;transition:all .3s}
 .btn:hover{transform:translateY(-2px)}
 .btn:active{transform:translateY(0)}
 .btn-next{background:linear-gradient(135deg,#FF6B35,#FF8F60);color:#fff}
@@ -37,15 +36,15 @@ canvas{width:100%;max-width:700px;height:auto;display:block;margin:0 auto;border
 </head>
 <body>
 <div class="container">
-  <h1>🔄 外角和 = 360°</h1>
-  <p class="subtitle">不管幾邊形，外角轉一圈，永遠 360°！</p>
+  <h1>🚗 外角和 = 360°</h1>
+  <p class="subtitle">小車車跑一圈，撕下外角拼起來！</p>
   <div class="tabs">
     <div class="tab active" onclick="switchShape(3)">🔺 三角形</div>
     <div class="tab" onclick="switchShape(4)">🔷 四邊形</div>
     <div class="tab" onclick="switchShape(5)">⬠ 五邊形</div>
   </div>
   <div class="progress-bar" id="progressBar"></div>
-  <canvas id="c" width="700" height="500"></canvas>
+  <canvas id="c" width="700" height="520"></canvas>
   <div class="info-card" id="infoCard">
     <div class="step-label" id="stepLabel"></div>
     <div class="step-text" id="stepText"></div>
@@ -58,120 +57,201 @@ canvas{width:100%;max-width:700px;height:auto;display:block;margin:0 auto;border
 </div>
 <script>
 const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
-const W=700,H=500;
-if(!ctx.roundRect){ctx.roundRect=function(x,y,w,h,r){if(typeof r==='number')r=[r,r,r,r];this.moveTo(x+r[0],y);this.lineTo(x+w-r[1],y);this.quadraticCurveTo(x+w,y,x+w,y+r[1]);this.lineTo(x+w,y+h-r[2]);this.quadraticCurveTo(x+w,y+h,x+w-r[2],y+h);this.lineTo(x+r[3],y+h);this.quadraticCurveTo(x,y+h,x,y+h-r[3]);this.lineTo(x,y+r[0]);this.quadraticCurveTo(x,y,x+r[0],y);this.closePath()}}
+const W=700,H=520;
 
-const extColors=['#FF6B35','#4FC3F7','#FFD700','#00E676','#FF2D95'];
+const extC=['#FF6B35','#4FC3F7','#FFD700','#00E676','#FF2D95'];
 const colShape='#00C9A7';
 
-// Shape definitions
+// Assembly circle position
+const AX=580,AY=130,AR=65;
+
 const SHAPES={
-  3:{name:'三角形',icon:'🔺',verts:[{x:350,y:70},{x:120,y:400},{x:580,y:400}]},
-  4:{name:'四邊形',icon:'🔷',verts:[{x:180,y:80},{x:560,y:110},{x:600,y:390},{x:120,y:400}]},
-  5:{name:'五邊形',icon:'⬠',verts:[{x:350,y:55},{x:580,y:180},{x:510,y:420},{x:190,y:420},{x:120,y:180}]},
+  3:{name:'三角形',icon:'🔺',verts:[{x:280,y:100},{x:80,y:400},{x:480,y:400}]},
+  4:{name:'四邊形',icon:'🔷',verts:[{x:140,y:100},{x:460,y:120},{x:480,y:400},{x:80,y:390}]},
+  5:{name:'五邊形',icon:'⬠',verts:[{x:280,y:75},{x:480,y:190},{x:420,y:410},{x:140,y:410},{x:80,y:190}]},
 };
 
-let curN=3,step=0,anim=0,animId=null,animLoop=null;
+let curN=3,step=0,anim=0,animId=null;
 
-// Each shape has N+4 steps:
-// 0: show shape
-// 1: explain exterior angle concept
-// 2..N+1: show each exterior angle one by one
-// N+2: collect all exterior angles, animate walking/rotating
-// N+3: conclusion = 360°
-function totalSteps(){return curN+4;}
-
-function getSteps(){
-  const n=curN,s=SHAPES[n];
-  const steps=[
-    {label:`${s.icon} 開始`,text:`這是一個${s.name}！\n它有 ${n} 個頂點`,border:'#00C9A7'},
-    {label:'什麼是外角？',text:'在每個頂點，把一條邊延長\n延長線和另一條邊之間的角\n就是「外角」！',border:'#FFD700'},
-  ];
+// Compute exterior (turning) angles for the polygon
+function computeExteriors(verts){
+  const n=verts.length,result=[];
   for(let i=0;i<n;i++){
-    steps.push({label:`第 ${i+1} 個外角`,text:`在頂點 ${String.fromCharCode(65+i)} 的外角\n把邊延長，看看外角有多大！`,border:extColors[i]});
+    const prev=verts[(i-1+n)%n],cur=verts[i],next=verts[(i+1)%n];
+    const inA=Math.atan2(cur.y-prev.y,cur.x-prev.x);
+    const outA=Math.atan2(next.y-cur.y,next.x-cur.x);
+    let ext=Math.PI-angleBetween(inA,outA);
+    // For convex polygon, exterior = PI - interior
+    // Turning angle = PI - interior angle
+    // Actually let's compute turning angle directly
+    let turn=outA-inA;
+    while(turn>Math.PI)turn-=2*Math.PI;
+    while(turn<-Math.PI)turn+=2*Math.PI;
+    // For clockwise polygon, turning angle is negative (turn right)
+    // We want the magnitude
+    const extAngle=Math.abs(turn);
+    // The arc at the vertex goes from the extension of incoming edge to the outgoing edge
+    result.push({vertex:cur,inAngle:inA,outAngle:outA,extAngle,turnAngle:turn});
   }
-  steps.push({label:'🔄 轉一圈！',text:`沿著${s.name}走一圈⋯\n每到一個頂點就轉一個外角\n走完一圈，你轉了多少度？`,border:'#FF6B35'});
-  steps.push({label:'🎉 結論',text:'',border:'#00E676'});
-  return steps;
+  return result;
 }
+
+function angleBetween(a,b){let d=b-a;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d;}
 
 function lerp(a,b,t){return a+(b-a)*t}
+function lerpPt(a,b,t){return{x:lerp(a.x,b.x,t),y:lerp(a.y,b.y,t)}}
 
-// Compute exterior angle direction at vertex i
-function getExteriorAngle(verts,i){
-  const n=verts.length;
-  const prev=verts[(i-1+n)%n];
-  const cur=verts[i];
-  const next=verts[(i+1)%n];
-  // Direction from prev to cur (incoming)
-  const inAngle=Math.atan2(cur.y-prev.y,cur.x-prev.x);
-  // Direction from cur to next (outgoing)
-  const outAngle=Math.atan2(next.y-cur.y,next.x-cur.x);
-  // Extension of incoming edge: same direction as inAngle
-  const extStart=inAngle; // direction of extension (same as incoming)
-  const extEnd=outAngle; // direction of outgoing edge
-  // Exterior angle is measured from the extension to the outgoing edge
-  // We want the angle swept clockwise (for a clockwise polygon)
-  let ext=outAngle-inAngle;
-  // Normalize
-  while(ext>Math.PI)ext-=Math.PI*2;
-  while(ext<-Math.PI)ext+=Math.PI*2;
-  return{inAngle,outAngle,ext,extStart,extEnd};
+// Total steps: 0=intro, 1=explain, 2..N+1=collect each angle, N+2=assembled, N+3=conclusion
+function totalSteps(){return curN+4;}
+
+function getStepsText(){
+  const s=SHAPES[curN],n=curN;
+  const arr=[
+    {label:`${s.icon} 出發！`,text:`這是一個${s.name}！\n小車車準備出發跑一圈 🚗💨`,border:'#00C9A7'},
+    {label:'什麼是外角？',text:'小車車跑到轉角時\n要「轉彎」的角度 = 外角！\n每個轉角都轉一點點⋯',border:'#FFD700'},
+  ];
+  for(let i=0;i<n;i++){
+    arr.push({label:`🚗 第 ${i+1} 個轉彎`,text:`小車車到了頂點 ${String.fromCharCode(65+i)}！\n轉彎！外角被撕下來\n飛到右邊的圓圈裡！`,border:extC[i]});
+  }
+  arr.push({label:'🔄 拼起來！',text:`所有外角拼在一起⋯\n剛好變成一個完整的圓！\n一個圓 = 360°`,border:'#FF6B35'});
+  arr.push({label:'🎉 結論',text:'',border:'#00E676'});
+  return arr;
 }
 
-function drawShape(verts,alpha){
+// Draw the polygon
+function drawPoly(verts,alpha){
   ctx.globalAlpha=alpha;ctx.beginPath();
-  verts.forEach((v,i)=>{if(i===0)ctx.moveTo(v.x,v.y);else ctx.lineTo(v.x,v.y);});
+  verts.forEach((v,i)=>{i?ctx.lineTo(v.x,v.y):ctx.moveTo(v.x,v.y);});
   ctx.closePath();ctx.strokeStyle=colShape;ctx.lineWidth=4;ctx.stroke();ctx.globalAlpha=1;
 }
 
-function drawVertices(verts,alpha){
+function drawVerts(verts,alpha){
   const n=verts.length;
+  const cx=verts.reduce((s,v)=>s+v.x,0)/n,cy=verts.reduce((s,v)=>s+v.y,0)/n;
   verts.forEach((v,i)=>{
     ctx.globalAlpha=alpha;
-    ctx.beginPath();ctx.arc(v.x,v.y,7,0,Math.PI*2);ctx.fillStyle=extColors[i%5];ctx.fill();
-    ctx.font='bold 20px "Noto Sans TC"';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillStyle=extColors[i%5];
-    // Offset label outward from center
-    const cx=verts.reduce((s,v)=>s+v.x,0)/n;
-    const cy=verts.reduce((s,v)=>s+v.y,0)/n;
-    const dx=v.x-cx,dy=v.y-cy;
-    const dist=Math.sqrt(dx*dx+dy*dy)||1;
-    ctx.fillText(String.fromCharCode(65+i),v.x+dx/dist*25,v.y+dy/dist*25);
+    ctx.beginPath();ctx.arc(v.x,v.y,6,0,Math.PI*2);ctx.fillStyle=extC[i];ctx.fill();
+    const dx=v.x-cx,dy=v.y-cy,d=Math.sqrt(dx*dx+dy*dy)||1;
+    ctx.font='bold 18px "Noto Sans TC"';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=extC[i];ctx.fillText(String.fromCharCode(65+i),v.x+dx/d*22,v.y+dy/d*22);
     ctx.globalAlpha=1;
   });
 }
 
-function drawExtension(verts,i,progress,alpha){
-  const n=verts.length;
-  const prev=verts[(i-1+n)%n],cur=verts[i];
-  const dx=cur.x-prev.x,dy=cur.y-prev.y;
-  const len=Math.sqrt(dx*dx+dy*dy);
-  const ux=dx/len,uy=dy/len;
-  const extLen=80*progress;
-  ctx.globalAlpha=alpha;
-  ctx.beginPath();ctx.setLineDash([8,6]);
-  ctx.moveTo(cur.x,cur.y);
-  ctx.lineTo(cur.x+ux*extLen,cur.y+uy*extLen);
-  ctx.strokeStyle=extColors[i%5];ctx.lineWidth=3;ctx.stroke();
-  ctx.setLineDash([]);ctx.globalAlpha=1;
-  return{ex:cur.x+ux*extLen,ey:cur.y+uy*extLen};
+// Draw car at position (x,y) facing angle
+function drawCar(x,y,angle,alpha){
+  ctx.globalAlpha=alpha;ctx.save();ctx.translate(x,y);ctx.rotate(angle);
+  // Car body
+  ctx.fillStyle='#FF4444';
+  ctx.beginPath();
+  ctx.moveTo(18,0);ctx.lineTo(-12,-10);ctx.quadraticCurveTo(-16,0,-12,10);ctx.closePath();
+  ctx.fill();
+  // Windshield
+  ctx.fillStyle='#4FC3F7';
+  ctx.beginPath();ctx.arc(6,0,5,0,Math.PI*2);ctx.fill();
+  // Eye
+  ctx.fillStyle='#fff';
+  ctx.beginPath();ctx.arc(8,-1,2.5,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#000';
+  ctx.beginPath();ctx.arc(9,-1,1.2,0,Math.PI*2);ctx.fill();
+  // Wheels
+  ctx.fillStyle='#333';
+  ctx.fillRect(-10,-12,8,3);ctx.fillRect(-10,9,8,3);
+  ctx.restore();ctx.globalAlpha=1;
 }
 
-function drawExteriorArc(verts,i,alpha,radius){
-  radius=radius||35;
-  const n=verts.length;
-  const prev=verts[(i-1+n)%n],cur=verts[i],next=verts[(i+1)%n];
-  const inAngle=Math.atan2(cur.y-prev.y,cur.x-prev.x);
-  const outAngle=Math.atan2(next.y-cur.y,next.x-cur.x);
-  // The exterior angle arc goes from inAngle (extension direction) to outAngle
-  // We draw it as a colored arc
+// Draw exterior angle arc at a vertex
+function drawExtArc(ext,idx,alpha,radius){
+  radius=radius||30;
+  const v=ext.vertex;
+  // The exterior angle is between the extension of incoming edge and the outgoing edge
+  // Extension direction = inAngle (same direction as incoming)
+  // Outgoing direction = outAngle
+  // We draw an arc from inAngle to outAngle (the exterior angle side)
+  const startA=ext.inAngle;
+  const endA=ext.outAngle;
   ctx.globalAlpha=alpha;
-  ctx.beginPath();ctx.moveTo(cur.x,cur.y);
-  // Determine sweep direction
-  ctx.arc(cur.x,cur.y,radius,inAngle,outAngle,false);
+  ctx.beginPath();ctx.moveTo(v.x,v.y);
+  // Determine if we go CW or CCW
+  // The exterior angle is on the "outside" of the polygon
+  // For our clockwise polygons, exterior is on the left side of travel
+  ctx.arc(v.x,v.y,radius,startA,endA);
   ctx.closePath();
-  ctx.fillStyle=extColors[i%5];ctx.fill();
+  ctx.fillStyle=extC[idx];ctx.fill();
+  ctx.strokeStyle=extC[idx];ctx.lineWidth=2;ctx.stroke();
+  ctx.globalAlpha=1;
+}
+
+// Draw extension line at vertex
+function drawExtLine(verts,idx,alpha){
+  const n=verts.length;
+  const prev=verts[(idx-1+n)%n],cur=verts[idx];
+  const dx=cur.x-prev.x,dy=cur.y-prev.y;
+  const len=Math.sqrt(dx*dx+dy*dy);
+  ctx.globalAlpha=alpha;
+  ctx.beginPath();ctx.setLineDash([8,6]);
+  ctx.moveTo(cur.x,cur.y);ctx.lineTo(cur.x+dx/len*70,cur.y+dy/len*70);
+  ctx.strokeStyle=extC[idx];ctx.lineWidth=3;ctx.stroke();
+  ctx.setLineDash([]);ctx.globalAlpha=1;
+}
+
+// Draw the assembly circle outline + collected sectors
+function drawAssembly(collectedAngles,exts,highlight){
+  // Circle outline
+  ctx.beginPath();ctx.arc(AX,AY,AR,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=2;ctx.stroke();
+  // Label
+  ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='bold 14px "Noto Sans TC"';
+  ctx.textAlign='center';ctx.fillText('外角拼圖',AX,AY-AR-10);
+
+  // Draw collected sectors
+  let accumulated=0;
+  for(let i=0;i<collectedAngles;i++){
+    const ext=exts[i];
+    const startA=-Math.PI/2+accumulated; // Start from top
+    const endA=startA+ext.extAngle;
+    ctx.beginPath();ctx.moveTo(AX,AY);
+    ctx.arc(AX,AY,AR,startA,endA);ctx.closePath();
+    ctx.fillStyle=extC[i];
+    ctx.globalAlpha=highlight===i?0.9:0.7;
+    ctx.fill();
+    ctx.strokeStyle='#112D5A';ctx.lineWidth=2;ctx.stroke();
+    ctx.globalAlpha=1;
+    // Angle label inside sector
+    const midA=(startA+endA)/2;
+    const lx=AX+Math.cos(midA)*(AR*0.6);
+    const ly=AY+Math.sin(midA)*(AR*0.6);
+    ctx.fillStyle='#fff';ctx.font='bold 11px "Noto Sans TC"';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(Math.round(ext.extAngle*180/Math.PI)+'°',lx,ly);
+    accumulated+=ext.extAngle;
+  }
+}
+
+// Draw a flying sector (from vertex to assembly circle)
+function drawFlyingSector(ext,idx,collectedBefore,exts,progress){
+  // Start position: at the vertex
+  // End position: in the assembly circle
+  const startPos={x:ext.vertex.x,y:ext.vertex.y};
+  const endPos={x:AX,y:AY};
+  const pos=lerpPt(startPos,endPos,progress);
+
+  // Start radius small, end radius = AR
+  const r=lerp(30,AR,progress);
+  // Start angle: from the actual ext angle orientation
+  // End angle: positioned in the assembly circle
+  let accum=0;
+  for(let i=0;i<collectedBefore;i++)accum+=exts[i].extAngle;
+  const targetStart=-Math.PI/2+accum;
+  const targetEnd=targetStart+ext.extAngle;
+
+  const curStart=lerp(ext.inAngle,targetStart,progress);
+  const curEnd=lerp(ext.outAngle,targetEnd,progress);
+
+  ctx.globalAlpha=0.8;
+  ctx.beginPath();ctx.moveTo(pos.x,pos.y);
+  ctx.arc(pos.x,pos.y,r,curStart,curEnd);ctx.closePath();
+  ctx.fillStyle=extC[idx];ctx.fill();
+  ctx.strokeStyle='#112D5A';ctx.lineWidth=2;ctx.stroke();
   ctx.globalAlpha=1;
 }
 
@@ -180,137 +260,151 @@ function drawLabel(x,y,text,color,size,alpha){
   ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,x,y);ctx.globalAlpha=1;
 }
 
-// Walking arrow animation
-function drawWalkingArrow(verts,progress){
-  const n=verts.length;
-  // Progress 0→1 goes around the full polygon
-  const totalLen=[];
-  let total=0;
-  for(let i=0;i<n;i++){
-    const next=verts[(i+1)%n];
-    const dx=next.x-verts[i].x,dy=next.y-verts[i].y;
-    const l=Math.sqrt(dx*dx+dy*dy);
-    totalLen.push(l);total+=l;
-  }
-  const targetDist=progress*total;
-  let accum=0,seg=0;
-  for(let i=0;i<n;i++){
-    if(accum+totalLen[i]>=targetDist){seg=i;break;}
-    accum+=totalLen[i];
-  }
-  const segProgress=(targetDist-accum)/totalLen[seg];
-  const cur=verts[seg],next=verts[(seg+1)%n];
-  const px=lerp(cur.x,next.x,segProgress);
-  const py=lerp(cur.y,next.y,segProgress);
-  const angle=Math.atan2(next.y-cur.y,next.x-cur.x);
-
-  // Draw arrow
-  ctx.save();ctx.translate(px,py);ctx.rotate(angle);
-  ctx.beginPath();ctx.moveTo(15,0);ctx.lineTo(-8,-8);ctx.lineTo(-8,8);ctx.closePath();
-  ctx.fillStyle='#FF6B35';ctx.fill();
-  ctx.restore();
-
-  // Draw trail
-  ctx.beginPath();ctx.moveTo(verts[0].x,verts[0].y);
-  for(let i=0;i<=seg;i++){
-    ctx.lineTo(verts[(i+1)%n].x,verts[(i+1)%n].y);
-  }
-  if(segProgress<1)ctx.lineTo(px,py);
-  ctx.strokeStyle='rgba(255,107,53,0.5)';ctx.lineWidth=6;ctx.stroke();
-
-  // Show cumulative rotation
-  const completedAngles=seg+(segProgress>.5?1:0);
-  if(completedAngles>0){
-    drawLabel(350,50,`已轉 ${completedAngles} 個外角...`,'#FFD700',20,1);
-  }
-}
-
 function render(){
   ctx.clearRect(0,0,W,H);
   const verts=SHAPES[curN].verts;
   const n=curN;
   const T=totalSteps();
+  const exts=computeExteriors(verts);
 
   if(step===0){
-    // Just shape
-    drawShape(verts,1);drawVertices(verts,1);
+    // Intro: show polygon + car at vertex 0
+    drawPoly(verts,1);drawVerts(verts,1);
+    const dir=Math.atan2(verts[1].y-verts[0].y,verts[1].x-verts[0].x);
+    drawCar(verts[0].x,verts[0].y,dir,1);
+    drawAssembly(0,exts,-1);
+    // Cute text
+    drawLabel(verts[0].x,verts[0].y-30,'🚗 出發！','#FFD700',16,0.7+0.3*Math.sin(Date.now()/500));
+    requestAnimationFrame(render);
   }
   else if(step===1){
-    // Explain exterior angle - show one example
-    drawShape(verts,1);drawVertices(verts,1);
-    drawExtension(verts,0,anim,1);
-    drawExteriorArc(verts,0,0.5*anim,40);
-    // Label
-    if(anim>0.3){
+    // Explain: show one exterior angle example with extension line
+    drawPoly(verts,1);drawVerts(verts,1);
+    drawExtLine(verts,0,anim);
+    drawExtArc(exts[0],0,0.5*anim,35);
+    const dir=Math.atan2(verts[1].y-verts[0].y,verts[1].x-verts[0].x);
+    drawCar(verts[0].x,verts[0].y,dir,1);
+    drawAssembly(0,exts,-1);
+    if(anim>0.5){
       const prev=verts[n-1],cur=verts[0];
-      const dx=cur.x-prev.x,dy=cur.y-prev.y;
-      const len=Math.sqrt(dx*dx+dy*dy);
-      drawLabel(cur.x+dx/len*55,cur.y+dy/len*55-20,'← 外角',extColors[0],18,anim);
+      const dx=cur.x-prev.x,dy=cur.y-prev.y,len=Math.sqrt(dx*dx+dy*dy);
+      drawLabel(cur.x+dx/len*55,cur.y+dy/len*55,'← 外角','#FF6B35',16,anim);
+      drawLabel(cur.x+dx/len*40,cur.y+dy/len*40+20,'(轉彎的角度)','#B0C4DE',13,anim);
     }
   }
-  else if(step>=2&&step<2+n){
-    // Show exterior angle one by one
-    const showIdx=step-2;
-    drawShape(verts,1);drawVertices(verts,1);
-    // Show all previous exterior angles
-    for(let i=0;i<showIdx;i++){
-      drawExtension(verts,i,1,0.7);
-      drawExteriorArc(verts,i,0.4,35);
+  else if(step>=2 && step<2+n){
+    // Collect each exterior angle
+    const idx=step-2; // which angle we're collecting (0-based)
+
+    drawPoly(verts,0.7);drawVerts(verts,0.8);
+    drawAssembly(idx,exts,-1); // show previously collected
+
+    // Show extension lines for completed angles
+    for(let i=0;i<idx;i++){
+      drawExtLine(verts,i,0.4);
+      drawExtArc(exts[i],i,0.15,30);
     }
-    // Animate current one
-    drawExtension(verts,showIdx,anim,1);
-    drawExteriorArc(verts,showIdx,0.5*anim,40);
-    // Pulse current
-    if(anim>=1){
-      const pulse=0.4+0.15*Math.sin(Date.now()/400);
-      drawExteriorArc(verts,showIdx,pulse,42);
-      requestAnimationFrame(render);
+
+    // Current angle animation
+    if(anim<0.35){
+      // Phase 1: car drives to vertex
+      const fromV=verts[(idx-1+n)%n];
+      const toV=verts[idx];
+      const t=anim/0.35;
+      const carPos=lerpPt(fromV,toV,t);
+      const dir=Math.atan2(toV.y-fromV.y,toV.x-fromV.x);
+      drawCar(carPos.x,carPos.y,dir,1);
+    }
+    else if(anim<0.55){
+      // Phase 2: car at vertex, exterior angle appears
+      const t=(anim-0.35)/0.2;
+      const dir=Math.atan2(verts[(idx+1)%n].y-verts[idx].y,verts[(idx+1)%n].x-verts[idx].x);
+      // Car turns
+      const inDir=Math.atan2(verts[idx].y-verts[(idx-1+n)%n].y,verts[idx].x-verts[(idx-1+n)%n].x);
+      const carAngle=lerp(inDir,dir,t);
+      drawCar(verts[idx].x,verts[idx].y,carAngle,1);
+      drawExtLine(verts,idx,t);
+      drawExtArc(exts[idx],idx,0.6*t,35);
+      // "轉彎！" label
+      drawLabel(verts[idx].x,verts[idx].y-35,'轉彎！🔄',extC[idx],16,t);
+    }
+    else{
+      // Phase 3: exterior angle flies to assembly circle
+      const t=(anim-0.55)/0.45;
+      const dir=Math.atan2(verts[(idx+1)%n].y-verts[idx].y,verts[(idx+1)%n].x-verts[idx].x);
+      drawCar(verts[idx].x,verts[idx].y,dir,1);
+      drawExtLine(verts,idx,1-t*0.5);
+
+      // Draw the flying sector
+      drawFlyingSector(exts[idx],idx,idx,exts,t);
+
+      // At vertex, fading arc
+      drawExtArc(exts[idx],idx,0.3*(1-t),30);
     }
   }
-  else if(step===2+n){
-    // Walking animation - all exterior angles shown, arrow walks around
-    drawShape(verts,0.5);drawVertices(verts,0.8);
-    // All exterior angles
+  else if(step===T-2){
+    // All collected - show the completed circle with highlight
+    drawPoly(verts,0.4);drawVerts(verts,0.5);
+
+    // Show all extension lines faintly
     for(let i=0;i<n;i++){
-      drawExtension(verts,i,1,0.6);
-      drawExteriorArc(verts,i,0.4,35);
+      drawExtLine(verts,i,0.25);
     }
-    // Walking arrow
-    if(anim<=1){
-      drawWalkingArrow(verts,anim);
-    }
-    // At end, show "轉了一圈！"
-    if(anim>=0.95){
-      drawLabel(350,250,'🔄 轉了一整圈！','#00E676',28,1);
-      drawLabel(350,285,'= 360°','#FFD700',32,1);
-    }
+
+    // Car back at start
+    const dir=Math.atan2(verts[1].y-verts[0].y,verts[1].x-verts[0].x);
+    drawCar(verts[0].x,verts[0].y,dir,0.8);
+    drawLabel(verts[0].x,verts[0].y-30,'跑完一圈了！','#00E676',16,1);
+
+    // Assembly circle - all collected with pulse
+    drawAssembly(n,exts,-1);
+
+    // Highlight: pulsing glow
+    const pulse=0.3+0.15*Math.sin(Date.now()/400);
+    ctx.beginPath();ctx.arc(AX,AY,AR+5,0,Math.PI*2);
+    ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.globalAlpha=pulse;ctx.stroke();ctx.globalAlpha=1;
+
+    // "= 360°" below circle
+    drawLabel(AX,AY+AR+25,'拼成一個完整圓！','#00E676',16,anim);
+    drawLabel(AX,AY+AR+50,'= 360°','#FFD700',28,anim);
+
+    // Sum text
+    let sumText=exts.map((e,i)=>Math.round(e.extAngle*180/Math.PI)+'°').join(' + ');
+    drawLabel(350,480,sumText+' = 360°','#B0C4DE',14,anim);
+
+    requestAnimationFrame(render);
   }
   else if(step===T-1){
     // Grand finale
-    drawShape(verts,0.3);
-    for(let i=0;i<n;i++){
-      drawExtension(verts,i,1,0.5);
-      drawExteriorArc(verts,i,0.35,35);
-    }
+    drawPoly(verts,0.2);
 
+    // Assembly circle stays
+    drawAssembly(n,exts,-1);
+    const pulse2=0.4+0.15*Math.sin(Date.now()/300);
+    ctx.beginPath();ctx.arc(AX,AY,AR+6,0,Math.PI*2);
+    ctx.strokeStyle='#FFD700';ctx.lineWidth=3;ctx.globalAlpha=pulse2;ctx.stroke();ctx.globalAlpha=1;
+    drawLabel(AX,AY+AR+22,'完整圓 = 360°','#FFD700',15,1);
+
+    // Result card
     const pulse=1+0.05*Math.sin(Date.now()/300);
-    ctx.save();ctx.translate(350,240);ctx.scale(pulse,pulse);
+    ctx.save();ctx.translate(280,260);ctx.scale(pulse,pulse);
     ctx.fillStyle='rgba(255,107,53,0.95)';ctx.beginPath();
-    if(ctx.roundRect)ctx.roundRect(-175,-80,350,160,24);else ctx.rect(-175,-80,350,160);
-    ctx.fill();ctx.strokeStyle='#FFD700';ctx.lineWidth=5;ctx.stroke();
+    ctx.roundRect(-170,-80,340,160,24);ctx.fill();
+    ctx.strokeStyle='#FFD700';ctx.lineWidth=5;ctx.stroke();
     ctx.fillStyle='#fff';ctx.font='bold 22px "Noto Sans TC"';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText(`${SHAPES[n].name}外角和`,0,-45);
-    ctx.fillStyle='#fff';ctx.font='bold 18px "Noto Sans TC"';
-    ctx.fillText(`${n} 個外角，轉一圈`,0,-15);
-    ctx.fillStyle='#FFD700';ctx.font='bold 52px "Noto Sans TC"';
-    ctx.fillText('= 360°',0,35);
+    ctx.font='bold 16px "Noto Sans TC"';
+    ctx.fillText(`🚗 跑一圈，轉 ${n} 個彎`,0,-15);
+    ctx.fillText('外角拼起來 = 一個完整圓',0,12);
+    ctx.fillStyle='#FFD700';ctx.font='bold 48px "Noto Sans TC"';
+    ctx.fillText('= 360°',0,55);
     ctx.restore();
 
     const t=Date.now()/500;
-    ['🔄','✨','⭐','🔄','✨','⭐'].forEach((e,i)=>{
-      const sx=350+Math.cos(t+i*1.05)*260;
-      const sy=240+Math.sin(t+i*1.4)*150;
-      ctx.font='20px serif';ctx.textAlign='center';ctx.fillText(e,sx,sy);
+    ['🚗','✨','🔄','⭐','🚗','✨'].forEach((e,i)=>{
+      const sx=300+Math.cos(t+i*1.05)*250;
+      const sy=260+Math.sin(t+i*1.4)*160;
+      ctx.font='18px serif';ctx.textAlign='center';ctx.fillText(e,sx,sy);
     });
     requestAnimationFrame(render);
   }
@@ -329,36 +423,36 @@ function animateTo(target,duration,cb){
 }
 
 function updateUI(){
-  const steps=getSteps();const s=steps[step];
+  const stepsText=getStepsText();const s=stepsText[step];const T=totalSteps();
   document.getElementById('stepLabel').textContent=s.label;
-  const T=totalSteps();
   if(step===T-1){
-    document.getElementById('stepText').innerHTML=`${SHAPES[curN].name}的外角和<br><span class="formula">永遠 = 360° ！</span><br><br>不管幾邊形，外角轉一圈都是 360°`;
+    document.getElementById('stepText').innerHTML=`${SHAPES[curN].name}的外角和<br><span class="formula">永遠 = 360° ！</span><br><br>不管幾邊形，外角拼起來都是一個完整的圓！`;
   }else{
     document.getElementById('stepText').innerHTML=s.text.replace(/\n/g,'<br>');
   }
   document.getElementById('infoCard').style.borderLeftColor=s.border;
   document.getElementById('prevBtn').disabled=step===0;
   document.getElementById('nextBtn').disabled=step===T-1;
-  // Progress dots
   const bar=document.getElementById('progressBar');bar.innerHTML='';
   for(let i=0;i<T;i++){
     const d=document.createElement('div');d.className='progress-dot';
     if(i<step)d.classList.add('done');else if(i===step)d.classList.add('active');
     bar.appendChild(d);
   }
-  // Tabs
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab')[curN-3].classList.add('active');
 }
 
 function next(){if(step>=totalSteps()-1)return;step++;anim=0;updateUI();
-  const dur=step===curN+2?2500:900; // Walking step is slower
+  const dur=step>=2&&step<2+curN?1800:900;
   animateTo(1,dur);
 }
 function prev(){if(step<=0)return;step--;anim=1;updateUI();render();}
 function reset(){step=0;anim=0;updateUI();render();}
 function switchShape(n){curN=n;step=0;anim=0;updateUI();render();}
+
+// roundRect polyfill
+if(!ctx.roundRect){ctx.roundRect=function(x,y,w,h,r){if(typeof r==='number')r=[r,r,r,r];this.moveTo(x+r[0],y);this.lineTo(x+w-r[1],y);this.quadraticCurveTo(x+w,y,x+w,y+r[1]);this.lineTo(x+w,y+h-r[2]);this.quadraticCurveTo(x+w,y+h,x+w-r[2],y+h);this.lineTo(x+r[3],y+h);this.quadraticCurveTo(x,y+h,x,y+h-r[3]);this.lineTo(x,y+r[0]);this.quadraticCurveTo(x,y,x+r[0],y);this.closePath()}}
 
 updateUI();render();
 </script>
