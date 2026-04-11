@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>會考英文搶分特訓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0B1D3A;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;min-height:100dvh;overflow-x:hidden}
+.screen{display:none;min-height:100vh;min-height:100dvh;padding:16px;padding-bottom:100px}
+.screen.active{display:block}
+/* ===== HOME ===== */
+.home-header{text-align:center;padding:20px 0 10px}
+.home-header h1{font-size:1.8em;font-weight:900;background:linear-gradient(135deg,#FFD700,#FF6B35);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.home-header p{color:#4FC3F7;font-size:1em;margin-top:4px}
+.total-progress{background:#1A3A6A;border-radius:16px;padding:16px;margin:12px 0;text-align:center}
+.total-progress .bar{height:12px;background:#112D5A;border-radius:6px;margin:8px 0;overflow:hidden}
+.total-progress .bar-fill{height:100%;background:linear-gradient(90deg,#00C9A7,#4FC3F7);border-radius:6px;transition:width .5s}
+.week-section{margin:16px 0}
+.week-title{font-size:1.1em;font-weight:700;color:#FFD700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.day-card{background:#1A3A6A;border-radius:14px;padding:14px;cursor:pointer;transition:all .3s;border:2px solid transparent;position:relative;overflow:hidden}
+.day-card:hover,.day-card:active{transform:translateY(-2px);border-color:#00C9A7}
+.day-card.completed{border-color:#00C9A7}
+.day-card.completed::after{content:'✅';position:absolute;top:8px;right:8px;font-size:16px}
+.day-card .day-num{font-size:.8em;color:#00C9A7;font-weight:700}
+.day-card .day-theme{font-size:1em;font-weight:700;margin:4px 0}
+.day-card .day-count{font-size:.75em;color:#B0C4DE}
+.day-card .day-icon{font-size:1.8em;margin-bottom:4px}
+/* ===== DAY MENU ===== */
+.day-header{text-align:center;padding:10px 0}
+.day-header h2{font-size:1.6em;font-weight:900;color:#FFD700}
+.day-header .day-sub{color:#00C9A7;font-size:.95em}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:500px;margin:16px auto}
+.mode-card{background:#1A3A6A;border-radius:16px;padding:20px 14px;text-align:center;cursor:pointer;transition:all .3s;border:2px solid #2A5A8A}
+.mode-card:hover,.mode-card:active{border-color:#FFD700;transform:translateY(-2px)}
+.mode-card .mode-icon{font-size:2.2em;margin-bottom:8px}
+.mode-card .mode-name{font-size:1.05em;font-weight:700}
+.mode-card .mode-desc{font-size:.75em;color:#B0C4DE;margin-top:4px}
+.word-preview{background:#112D5A;border-radius:14px;padding:14px;margin:14px auto;max-width:500px}
+.word-preview h3{font-size:.9em;color:#00C9A7;margin-bottom:8px}
+.word-preview-list{display:flex;flex-wrap:wrap;gap:6px}
+.word-chip{background:#1A3A6A;border-radius:8px;padding:6px 12px;font-size:.85em;border:1px solid #2A5A8A}
+/* ===== LEARN MODE ===== */
+.learn-card{background:linear-gradient(145deg,#1A3A6A,#112D5A);border-radius:20px;padding:30px 20px;text-align:center;max-width:500px;margin:20px auto;min-height:300px;display:flex;flex-direction:column;justify-content:center;align-items:center;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:2px solid #2A5A8A;position:relative}
+.learn-en{font-size:2.8em;font-weight:900;color:#FFD700;margin:10px 0}
+.learn-zh{font-size:1.8em;color:#fff;margin:6px 0}
+.learn-sentence{font-size:1em;color:#B0C4DE;margin:10px 0;font-style:italic}
+.learn-sentence-zh{font-size:.9em;color:#4FC3F7}
+.learn-counter{font-size:.85em;color:#00C9A7;margin-bottom:10px}
+.audio-btn{width:70px;height:70px;border-radius:50%;border:none;background:linear-gradient(135deg,#FF6B35,#FF8F60);color:#fff;font-size:1.8em;cursor:pointer;margin:10px;transition:all .2s;box-shadow:0 4px 16px rgba(255,107,53,0.3)}
+.audio-btn:active{transform:scale(0.9)}
+.audio-btn.zh-btn{background:linear-gradient(135deg,#00C9A7,#4FC3F7);box-shadow:0 4px 16px rgba(0,201,167,0.3)}
+.learn-nav{display:flex;gap:12px;margin-top:16px;justify-content:center}
+/* ===== QUIZ MODES ===== */
+.quiz-top{text-align:center;padding:10px 0}
+.quiz-top .quiz-q-num{font-size:.85em;color:#00C9A7}
+.quiz-top .quiz-score{font-size:.85em;color:#FFD700;margin-top:4px}
+.quiz-progress{height:8px;background:#112D5A;border-radius:4px;margin:8px 0;overflow:hidden}
+.quiz-progress-fill{height:100%;background:linear-gradient(90deg,#00C9A7,#4FC3F7);border-radius:4px;transition:width .4s}
+.quiz-prompt{text-align:center;margin:20px 0}
+.quiz-prompt .prompt-label{font-size:.9em;color:#B0C4DE;margin-bottom:8px}
+.quiz-prompt .prompt-word{font-size:2.2em;font-weight:900;color:#FFD700}
+.quiz-prompt .prompt-word.zh{color:#fff}
+.quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:500px;margin:0 auto;padding:0 10px}
+.quiz-option{background:#1A3A6A;border:3px solid #2A5A8A;border-radius:14px;padding:18px 14px;text-align:center;font-size:1.2em;font-weight:700;cursor:pointer;transition:all .2s;min-height:70px;display:flex;align-items:center;justify-content:center}
+.quiz-option:active{transform:scale(0.96)}
+.quiz-option.correct{background:#00C9A7;border-color:#00C9A7;color:#fff;animation:pop .3s}
+.quiz-option.wrong{background:#FF4444;border-color:#FF4444;color:#fff;animation:shake .4s}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.quiz-feedback{text-align:center;margin:16px 0;min-height:60px}
+.quiz-feedback .fb-text{font-size:1.3em;font-weight:700;animation:pop .3s}
+.quiz-feedback .fb-correct-answer{font-size:1em;color:#FFD700;margin-top:4px}
+/* ===== RESULTS ===== */
+.results-box{background:#1A3A6A;border-radius:20px;padding:30px;text-align:center;max-width:500px;margin:30px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.results-box .result-icon{font-size:4em;margin-bottom:10px}
+.results-box .result-title{font-size:1.6em;font-weight:900;color:#FFD700;margin-bottom:6px}
+.results-box .result-score{font-size:2.5em;font-weight:900;color:#00C9A7;margin:10px 0}
+.results-box .result-msg{font-size:1.1em;color:#B0C4DE;line-height:1.6}
+.stars-display{font-size:2em;margin:10px 0;letter-spacing:4px}
+.result-words{margin:16px 0;text-align:left}
+.result-words h4{font-size:.9em;color:#FFD700;margin-bottom:6px}
+.result-word-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #112D5A;font-size:.9em}
+.result-word-item .rw-status{font-size:1.1em}
+/* ===== COMMON ===== */
+.btn{padding:14px 28px;border:none;border-radius:50px;font-family:'Noto Sans TC',sans-serif;font-size:1em;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:active{transform:scale(0.96)}
+.btn-primary{background:linear-gradient(135deg,#FF6B35,#FF8F60);color:#fff}
+.btn-secondary{background:#1A3A6A;color:#B0C4DE;border:2px solid #2A5A8A}
+.btn-success{background:linear-gradient(135deg,#00C9A7,#00E676);color:#fff}
+.btn-back{background:none;border:none;color:#B0C4DE;font-size:1em;font-weight:700;cursor:pointer;padding:10px;font-family:'Noto Sans TC',sans-serif}
+.btn-back:active{color:#fff}
+.nav-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(11,29,58,0.95);backdrop-filter:blur(10px);padding:10px 16px;display:flex;justify-content:center;gap:10px;z-index:100;border-top:1px solid #1A3A6A}
+.sentence-box{background:#112D5A;border-radius:12px;padding:12px;margin:10px auto;max-width:500px;border-left:4px solid #FF6B35}
+.sentence-box .sb-en{font-size:1em;color:#FFD700;font-weight:700}
+.sentence-box .sb-zh{font-size:.85em;color:#B0C4DE;margin-top:4px}
+.pattern-section{margin:16px auto;max-width:500px}
+.pattern-section h3{font-size:.95em;color:#00C9A7;margin-bottom:8px}
+/* ===== STREAK ===== */
+.streak-banner{background:linear-gradient(135deg,#FF6B35,#FFD700);border-radius:12px;padding:10px;text-align:center;margin:8px auto;max-width:300px;font-weight:700;animation:pop .4s}
+</style>
+</head>
+<body>
+
+<!-- ===== HOME SCREEN ===== -->
+<div class="screen active" id="screenHome">
+  <div class="home-header">
+    <h1>📚 會考英文搶分特訓</h1>
+    <p>掃 QR Code → 每天練 → 搶更多分！</p>
+  </div>
+  <div class="total-progress">
+    <div>已學 <strong id="totalLearned">0</strong> / 200 個單字 💪</div>
+    <div class="bar"><div class="bar-fill" id="totalBar" style="width:0%"></div></div>
+    <div style="font-size:.8em;color:#B0C4DE" id="streakText"></div>
+  </div>
+  <div id="weekContainer"></div>
+</div>
+
+<!-- ===== DAY MENU ===== -->
+<div class="screen" id="screenDay">
+  <button class="btn-back" onclick="showScreen('screenHome')">⬅ 回首頁</button>
+  <div class="day-header">
+    <h2 id="dayTitle"></h2>
+    <div class="day-sub" id="daySub"></div>
+  </div>
+  <div class="mode-grid">
+    <div class="mode-card" onclick="startMode('learn')">
+      <div class="mode-icon">📖</div>
+      <div class="mode-name">學習模式</div>
+      <div class="mode-desc">看＋聽＋記</div>
+    </div>
+    <div class="mode-card" onclick="startMode('listen')">
+      <div class="mode-icon">🔊</div>
+      <div class="mode-name">聽力選擇</div>
+      <div class="mode-desc">聽英文選中文</div>
+    </div>
+    <div class="mode-card" onclick="startMode('match')">
+      <div class="mode-icon">🎯</div>
+      <div class="mode-name">中翻英選擇</div>
+      <div class="mode-desc">看中文選英文</div>
+    </div>
+    <div class="mode-card" onclick="startMode('quiz')">
+      <div class="mode-icon">⭐</div>
+      <div class="mode-name">綜合挑戰</div>
+      <div class="mode-desc">混合題目搶星星</div>
+    </div>
+  </div>
+  <div class="word-preview">
+    <h3>📝 今日單字</h3>
+    <div class="word-preview-list" id="wordPreviewList"></div>
+  </div>
+  <div class="pattern-section" id="patternSection"></div>
+</div>
+
+<!-- ===== LEARN MODE ===== -->
+<div class="screen" id="screenLearn">
+  <button class="btn-back" onclick="showScreen('screenDay')">⬅ 回選單</button>
+  <div class="learn-counter" id="learnCounter"></div>
+  <div class="learn-card" id="learnCard">
+    <div class="learn-en" id="learnEn"></div>
+    <div style="display:flex;gap:10px;justify-content:center;align-items:center;margin:10px 0">
+      <button class="audio-btn" onclick="speakEn()" title="聽英文">🔊</button>
+      <button class="audio-btn zh-btn" onclick="speakZh()" title="聽中文">🔊</button>
+    </div>
+    <div class="learn-zh" id="learnZh"></div>
+    <div class="learn-sentence" id="learnSentence"></div>
+    <div class="learn-sentence-zh" id="learnSentenceZh"></div>
+  </div>
+  <div class="learn-nav">
+    <button class="btn btn-secondary" onclick="learnPrev()">⬅ 上一個</button>
+    <button class="btn btn-primary" onclick="learnNext()">下一個 ➡</button>
+  </div>
+</div>
+
+<!-- ===== QUIZ SCREEN (listen/match/quiz) ===== -->
+<div class="screen" id="screenQuiz">
+  <button class="btn-back" id="quizBackBtn" onclick="showScreen('screenDay')">⬅ 回選單</button>
+  <div class="quiz-top">
+    <div class="quiz-q-num" id="quizQNum"></div>
+    <div class="quiz-progress"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+    <div class="quiz-score" id="quizScoreDisplay"></div>
+  </div>
+  <div class="quiz-prompt" id="quizPrompt">
+    <div class="prompt-label" id="promptLabel"></div>
+    <div class="prompt-word" id="promptWord"></div>
+    <button class="audio-btn" id="quizAudioBtn" onclick="speakQuizWord()" style="display:none">🔊</button>
+  </div>
+  <div class="quiz-options" id="quizOptions"></div>
+  <div class="quiz-feedback" id="quizFeedback"></div>
+</div>
+
+<!-- ===== RESULTS SCREEN ===== -->
+<div class="screen" id="screenResults">
+  <div class="results-box">
+    <div class="result-icon" id="resultIcon"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="stars-display" id="starsDisplay"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-msg" id="resultMsg"></div>
+    <div class="result-words" id="resultWords"></div>
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;align-items:center">
+      <button class="btn btn-primary" onclick="retryQuiz()">🔄 再練一次</button>
+      <button class="btn btn-success" onclick="showScreen('screenDay')">✅ 回選單</button>
+      <button class="btn btn-secondary" onclick="showScreen('screenHome')">🏠 回首頁</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== WORD DATABASE =====================
+// 200 高頻單字，按日分組（20天 × 10字）
+// 來源：會考歷屆高頻 ＋ 翰林版 1-6 冊核心字彙
+const DAYS = {
+  1:{theme:'人物＆身分',icon:'👥',words:[
+    {en:'student',zh:'學生',s:'I am a student.',sz:'我是學生。'},
+    {en:'teacher',zh:'老師',s:'She is a teacher.',sz:'她是老師。'},
+    {en:'friend',zh:'朋友',s:'He is my friend.',sz:'他是我的朋友。'},
+    {en:'boy',zh:'男孩',s:'The boy is tall.',sz:'那個男孩很高。'},
+    {en:'girl',zh:'女孩',s:'The girl is smart.',sz:'那個女孩很聰明。'},
+    {en:'people',zh:'人們',s:'Many people are here.',sz:'很多人在這裡。'},
+    {en:'family',zh:'家人',s:'I love my family.',sz:'我愛我的家人。'},
+    {en:'name',zh:'名字',s:'My name is Amy.',sz:'我的名字是 Amy。'},
+  ],patterns:[{en:'I am a ___.',zh:'我是___。'},{en:'He/She is my ___.',zh:'他/她是我的___。'}]},
+
+  2:{theme:'基本動作',icon:'🏃',words:[
+    {en:'go',zh:'去',s:'I go to school.',sz:'我去上學。'},
+    {en:'come',zh:'來',s:'Come here, please.',sz:'請過來。'},
+    {en:'eat',zh:'吃',s:'I eat breakfast.',sz:'我吃早餐。'},
+    {en:'drink',zh:'喝',s:'I drink water.',sz:'我喝水。'},
+    {en:'read',zh:'讀',s:'I read a book.',sz:'我讀一本書。'},
+    {en:'write',zh:'寫',s:'Please write your name.',sz:'請寫下你的名字。'},
+    {en:'play',zh:'玩',s:'I play basketball.',sz:'我打籃球。'},
+    {en:'study',zh:'讀書',s:'I study English.',sz:'我讀英文。'},
+    {en:'sleep',zh:'睡覺',s:'I sleep at ten.',sz:'我十點睡覺。'},
+    {en:'walk',zh:'走路',s:'I walk to school.',sz:'我走路上學。'},
+  ],patterns:[{en:'I ___ every day.',zh:'我每天___。'},{en:'Do you ___?',zh:'你___嗎？'}]},
+
+  3:{theme:'時間',icon:'⏰',words:[
+    {en:'today',zh:'今天',s:'Today is Monday.',sz:'今天是星期一。'},
+    {en:'tomorrow',zh:'明天',s:'See you tomorrow.',sz:'明天見。'},
+    {en:'morning',zh:'早上',s:'Good morning!',sz:'早安！'},
+    {en:'afternoon',zh:'下午',s:'Good afternoon!',sz:'午安！'},
+    {en:'evening',zh:'晚上',s:'Good evening!',sz:'晚上好！'},
+    {en:'night',zh:'夜晚',s:'Good night!',sz:'晚安！'},
+    {en:'week',zh:'星期',s:'One week has seven days.',sz:'一星期有七天。'},
+    {en:'month',zh:'月',s:'This month is April.',sz:'這個月是四月。'},
+    {en:'year',zh:'年',s:'Happy New Year!',sz:'新年快樂！'},
+    {en:'time',zh:'時間',s:'What time is it?',sz:'現在幾點？'},
+  ],patterns:[{en:'What time is it?',zh:'現在幾點？'},{en:'It is ___ o\'clock.',zh:'現在___點。'}]},
+
+  4:{theme:'地點',icon:'📍',words:[
+    {en:'school',zh:'學校',s:'I like my school.',sz:'我喜歡我的學校。'},
+    {en:'home',zh:'家',s:'I go home at five.',sz:'我五點回家。'},
+    {en:'park',zh:'公園',s:'Let\'s go to the park.',sz:'我們去公園吧。'},
+    {en:'store',zh:'商店',s:'The store is big.',sz:'那間商店很大。'},
+    {en:'library',zh:'圖書館',s:'I study in the library.',sz:'我在圖書館讀書。'},
+    {en:'hospital',zh:'醫院',s:'She is in the hospital.',sz:'她在醫院。'},
+    {en:'restaurant',zh:'餐廳',s:'Let\'s eat at the restaurant.',sz:'我們去餐廳吃吧。'},
+    {en:'market',zh:'市場',s:'Mom goes to the market.',sz:'媽媽去市場。'},
+  ],patterns:[{en:'Where is the ___?',zh:'___在哪裡？'},{en:'I go to the ___.',zh:'我去___。'}]},
+
+  5:{theme:'感受＆情緒',icon:'😊',words:[
+    {en:'happy',zh:'開心',s:'I am happy.',sz:'我很開心。'},
+    {en:'sad',zh:'難過',s:'She is sad.',sz:'她很難過。'},
+    {en:'angry',zh:'生氣',s:'Don\'t be angry.',sz:'不要生氣。'},
+    {en:'tired',zh:'累',s:'I am very tired.',sz:'我很累。'},
+    {en:'hungry',zh:'餓',s:'I am hungry.',sz:'我餓了。'},
+    {en:'thirsty',zh:'渴',s:'I am thirsty.',sz:'我渴了。'},
+    {en:'sick',zh:'生病',s:'He is sick today.',sz:'他今天生病了。'},
+    {en:'excited',zh:'興奮',s:'I am so excited!',sz:'我好興奮！'},
+    {en:'scared',zh:'害怕',s:'Are you scared?',sz:'你害怕嗎？'},
+    {en:'bored',zh:'無聊',s:'I feel bored.',sz:'我覺得無聊。'},
+  ],patterns:[{en:'I am ___.',zh:'我很___。'},{en:'How do you feel?',zh:'你覺得怎麼樣？'}]},
+
+  6:{theme:'食物＆飲料',icon:'🍱',words:[
+    {en:'rice',zh:'飯',s:'I eat rice for lunch.',sz:'我午餐吃飯。'},
+    {en:'noodle',zh:'麵',s:'I like noodles.',sz:'我喜歡吃麵。'},
+    {en:'chicken',zh:'雞肉',s:'Chicken is delicious.',sz:'雞肉很好吃。'},
+    {en:'egg',zh:'蛋',s:'I eat an egg every day.',sz:'我每天吃一顆蛋。'},
+    {en:'bread',zh:'麵包',s:'I eat bread for breakfast.',sz:'我早餐吃麵包。'},
+    {en:'juice',zh:'果汁',s:'I drink juice.',sz:'我喝果汁。'},
+    {en:'water',zh:'水',s:'Please drink more water.',sz:'請多喝水。'},
+    {en:'milk',zh:'牛奶',s:'I drink milk every morning.',sz:'我每天早上喝牛奶。'},
+    {en:'fruit',zh:'水果',s:'I like fruit.',sz:'我喜歡水果。'},
+    {en:'cake',zh:'蛋糕',s:'The cake is sweet.',sz:'蛋糕是甜的。'},
+  ],patterns:[{en:'I like ___.',zh:'我喜歡___。'},{en:'Do you want some ___?',zh:'你要___嗎？'}]},
+
+  7:{theme:'數字＆金錢',icon:'💰',words:[
+    {en:'number',zh:'數字',s:'What is the number?',sz:'號碼是什麼？'},
+    {en:'dollar',zh:'元',s:'It\'s ten dollars.',sz:'十塊錢。'},
+    {en:'hundred',zh:'百',s:'One hundred students.',sz:'一百位學生。'},
+    {en:'thousand',zh:'千',s:'Two thousand people.',sz:'兩千個人。'},
+    {en:'cheap',zh:'便宜',s:'This is cheap.',sz:'這個很便宜。'},
+    {en:'expensive',zh:'貴',s:'It is too expensive.',sz:'太貴了。'},
+    {en:'buy',zh:'買',s:'I want to buy it.',sz:'我想買它。'},
+    {en:'pay',zh:'付錢',s:'I will pay for it.',sz:'我來付錢。'},
+    {en:'money',zh:'錢',s:'I don\'t have money.',sz:'我沒有錢。'},
+    {en:'price',zh:'價格',s:'What is the price?',sz:'價格多少？'},
+  ],patterns:[{en:'How much is it?',zh:'這個多少錢？'},{en:'It\'s ___ dollars.',zh:'___元。'}]},
+
+  8:{theme:'天氣',icon:'🌤️',words:[
+    {en:'weather',zh:'天氣',s:'The weather is nice.',sz:'天氣很好。'},
+    {en:'hot',zh:'熱',s:'It is hot today.',sz:'今天很熱。'},
+    {en:'cold',zh:'冷',s:'It is cold outside.',sz:'外面很冷。'},
+    {en:'warm',zh:'溫暖',s:'It is warm and sunny.',sz:'溫暖又晴朗。'},
+    {en:'cool',zh:'涼爽',s:'It is cool in the evening.',sz:'傍晚很涼爽。'},
+    {en:'rain',zh:'下雨',s:'It will rain tomorrow.',sz:'明天會下雨。'},
+    {en:'sunny',zh:'晴天',s:'It is a sunny day.',sz:'今天是晴天。'},
+    {en:'cloudy',zh:'多雲',s:'It is cloudy today.',sz:'今天多雲。'},
+    {en:'wind',zh:'風',s:'The wind is strong.',sz:'風很大。'},
+    {en:'snow',zh:'雪',s:'It snows in winter.',sz:'冬天會下雪。'},
+  ],patterns:[{en:'How\'s the weather?',zh:'天氣怎麼樣？'},{en:'It is ___ today.',zh:'今天___。'}]},
+
+  9:{theme:'交通',icon:'🚌',words:[
+    {en:'bus',zh:'公車',s:'I take the bus to school.',sz:'我搭公車上學。'},
+    {en:'car',zh:'汽車',s:'My dad drives a car.',sz:'我爸開車。'},
+    {en:'bike',zh:'腳踏車',s:'I ride a bike.',sz:'我騎腳踏車。'},
+    {en:'train',zh:'火車',s:'The train is fast.',sz:'火車很快。'},
+    {en:'MRT',zh:'捷運',s:'I take the MRT.',sz:'我搭捷運。'},
+    {en:'ride',zh:'騎',s:'Can you ride a bike?',sz:'你會騎腳踏車嗎？'},
+    {en:'drive',zh:'開車',s:'She can drive.',sz:'她會開車。'},
+    {en:'stop',zh:'停',s:'The bus stop is here.',sz:'公車站在這裡。'},
+    {en:'fast',zh:'快',s:'The car is fast.',sz:'車子很快。'},
+    {en:'slow',zh:'慢',s:'Please drive slowly.',sz:'請慢慢開。'},
+  ],patterns:[{en:'I take the ___ to school.',zh:'我搭___上學。'},{en:'How do you go to school?',zh:'你怎麼去上學？'}]},
+
+  10:{theme:'身體',icon:'🦴',words:[
+    {en:'head',zh:'頭',s:'My head hurts.',sz:'我頭痛。'},
+    {en:'eye',zh:'眼睛',s:'She has big eyes.',sz:'她有大眼睛。'},
+    {en:'ear',zh:'耳朵',s:'I can hear with my ears.',sz:'我用耳朵聽。'},
+    {en:'mouth',zh:'嘴巴',s:'Open your mouth.',sz:'張開嘴巴。'},
+    {en:'hand',zh:'手',s:'Wash your hands.',sz:'洗手。'},
+    {en:'foot',zh:'腳',s:'My foot hurts.',sz:'我的腳痛。'},
+    {en:'body',zh:'身體',s:'Exercise is good for your body.',sz:'運動對身體好。'},
+    {en:'tooth',zh:'牙齒',s:'Brush your teeth.',sz:'刷牙。'},
+    {en:'face',zh:'臉',s:'Wash your face.',sz:'洗臉。'},
+    {en:'hair',zh:'頭髮',s:'She has long hair.',sz:'她有長頭髮。'},
+  ],patterns:[{en:'My ___ hurts.',zh:'我的___痛。'},{en:'What\'s wrong?',zh:'怎麼了？'}]},
+
+  11:{theme:'形容詞（一）',icon:'📏',words:[
+    {en:'big',zh:'大',s:'The dog is big.',sz:'那隻狗很大。'},
+    {en:'small',zh:'小',s:'The cat is small.',sz:'那隻貓很小。'},
+    {en:'long',zh:'長',s:'The road is long.',sz:'路很長。'},
+    {en:'short',zh:'短/矮',s:'He is short.',sz:'他很矮。'},
+    {en:'tall',zh:'高',s:'The tree is tall.',sz:'那棵樹很高。'},
+    {en:'old',zh:'老/舊',s:'My grandpa is old.',sz:'我阿公年紀大了。'},
+    {en:'new',zh:'新',s:'I have a new bag.',sz:'我有一個新書包。'},
+    {en:'young',zh:'年輕',s:'She is young.',sz:'她很年輕。'},
+    {en:'heavy',zh:'重',s:'The box is heavy.',sz:'箱子很重。'},
+    {en:'light',zh:'輕/亮',s:'This bag is light.',sz:'這個包很輕。'},
+  ],patterns:[{en:'The ___ is ___.',zh:'___是___的。'},{en:'It is too ___.',zh:'太___了。'}]},
+
+  12:{theme:'形容詞（二）',icon:'⭐',words:[
+    {en:'good',zh:'好',s:'You are a good student.',sz:'你是好學生。'},
+    {en:'bad',zh:'壞',s:'The weather is bad.',sz:'天氣很糟。'},
+    {en:'nice',zh:'好的',s:'Nice to meet you.',sz:'很高興見到你。'},
+    {en:'beautiful',zh:'漂亮',s:'The flower is beautiful.',sz:'花很漂亮。'},
+    {en:'easy',zh:'簡單',s:'This is easy.',sz:'這很簡單。'},
+    {en:'difficult',zh:'困難',s:'Math is difficult.',sz:'數學很難。'},
+    {en:'important',zh:'重要',s:'English is important.',sz:'英文很重要。'},
+    {en:'interesting',zh:'有趣',s:'The book is interesting.',sz:'這本書很有趣。'},
+    {en:'different',zh:'不同',s:'We are different.',sz:'我們是不同的。'},
+    {en:'same',zh:'相同',s:'We have the same bag.',sz:'我們有一樣的包。'},
+  ],patterns:[{en:'It is very ___.',zh:'這很___。'},{en:'That sounds ___!',zh:'聽起來很___！'}]},
+
+  13:{theme:'問句關鍵字',icon:'❓',words:[
+    {en:'what',zh:'什麼',s:'What is this?',sz:'這是什麼？'},
+    {en:'where',zh:'哪裡',s:'Where are you?',sz:'你在哪裡？'},
+    {en:'when',zh:'什麼時候',s:'When is your birthday?',sz:'你的生日是什麼時候？'},
+    {en:'who',zh:'誰',s:'Who is she?',sz:'她是誰？'},
+    {en:'why',zh:'為什麼',s:'Why are you sad?',sz:'你為什麼難過？'},
+    {en:'how',zh:'如何',s:'How are you?',sz:'你好嗎？'},
+    {en:'which',zh:'哪一個',s:'Which one do you like?',sz:'你喜歡哪一個？'},
+    {en:'how much',zh:'多少錢',s:'How much is this?',sz:'這個多少錢？'},
+    {en:'how many',zh:'多少個',s:'How many students?',sz:'有多少學生？'},
+    {en:'how old',zh:'幾歲',s:'How old are you?',sz:'你幾歲？'},
+  ],patterns:[{en:'Wh- + do/does + S + V?',zh:'疑問詞＋助動詞＋主詞＋動詞？'}]},
+
+  14:{theme:'購物＆餐廳',icon:'🛒',words:[
+    {en:'menu',zh:'菜單',s:'Can I see the menu?',sz:'可以看菜單嗎？'},
+    {en:'order',zh:'點餐',s:'I want to order.',sz:'我要點餐。'},
+    {en:'delicious',zh:'好吃',s:'The food is delicious.',sz:'食物很好吃。'},
+    {en:'favorite',zh:'最喜歡',s:'Pizza is my favorite.',sz:'披薩是我的最愛。'},
+    {en:'popular',zh:'受歡迎',s:'This shop is popular.',sz:'這家店很受歡迎。'},
+    {en:'try',zh:'試',s:'Let\'s try it.',sz:'試試看吧。'},
+    {en:'taste',zh:'味道',s:'It tastes good.',sz:'味道很好。'},
+    {en:'special',zh:'特別',s:'Today\'s special is steak.',sz:'今日特餐是牛排。'},
+    {en:'sell',zh:'賣',s:'They sell drinks.',sz:'他們賣飲料。'},
+    {en:'shop',zh:'購物',s:'I like to shop.',sz:'我喜歡購物。'},
+  ],patterns:[{en:'I\'d like to ___.',zh:'我想要___。'},{en:'Can I have ___?',zh:'可以給我___嗎？'}]},
+
+  15:{theme:'休閒活動',icon:'🎮',words:[
+    {en:'movie',zh:'電影',s:'Let\'s watch a movie.',sz:'我們去看電影吧。'},
+    {en:'music',zh:'音樂',s:'I like music.',sz:'我喜歡音樂。'},
+    {en:'game',zh:'遊戲',s:'Let\'s play a game.',sz:'我們玩遊戲吧。'},
+    {en:'sport',zh:'運動',s:'What sport do you like?',sz:'你喜歡什麼運動？'},
+    {en:'travel',zh:'旅行',s:'I want to travel.',sz:'我想旅行。'},
+    {en:'vacation',zh:'假期',s:'Summer vacation is fun.',sz:'暑假很好玩。'},
+    {en:'fun',zh:'有趣',s:'Swimming is fun!',sz:'游泳很好玩！'},
+    {en:'enjoy',zh:'享受',s:'I enjoy reading.',sz:'我享受閱讀。'},
+    {en:'hobby',zh:'嗜好',s:'My hobby is drawing.',sz:'我的嗜好是畫畫。'},
+    {en:'exercise',zh:'運動',s:'I exercise every day.',sz:'我每天運動。'},
+  ],patterns:[{en:'I like to ___ in my free time.',zh:'我空閒時喜歡___。'},{en:'What do you do for fun?',zh:'你有什麼休閒活動？'}]},
+
+  16:{theme:'學校生活',icon:'🏫',words:[
+    {en:'class',zh:'課',s:'I have English class.',sz:'我有英文課。'},
+    {en:'homework',zh:'作業',s:'I do my homework.',sz:'我做作業。'},
+    {en:'test',zh:'考試',s:'We have a test today.',sz:'我們今天考試。'},
+    {en:'book',zh:'書',s:'Open your book.',sz:'打開你的書。'},
+    {en:'pen',zh:'筆',s:'I need a pen.',sz:'我需要一支筆。'},
+    {en:'question',zh:'問題',s:'Do you have a question?',sz:'你有問題嗎？'},
+    {en:'answer',zh:'回答',s:'I know the answer.',sz:'我知道答案。'},
+    {en:'exam',zh:'考試',s:'The exam is next week.',sz:'考試在下週。'},
+    {en:'practice',zh:'練習',s:'Practice makes perfect.',sz:'熟能生巧。'},
+    {en:'learn',zh:'學',s:'I want to learn English.',sz:'我想學英文。'},
+  ],patterns:[{en:'I have a ___ today.',zh:'我今天有___。'},{en:'Let me ___ first.',zh:'讓我先___。'}]},
+
+  17:{theme:'重要動詞',icon:'💪',words:[
+    {en:'help',zh:'幫忙',s:'Can you help me?',sz:'你能幫我嗎？'},
+    {en:'need',zh:'需要',s:'I need your help.',sz:'我需要你的幫忙。'},
+    {en:'want',zh:'想要',s:'I want to go home.',sz:'我想回家。'},
+    {en:'know',zh:'知道',s:'I don\'t know.',sz:'我不知道。'},
+    {en:'think',zh:'想',s:'I think so.',sz:'我覺得是。'},
+    {en:'remember',zh:'記得',s:'Remember this word.',sz:'記住這個字。'},
+    {en:'forget',zh:'忘記',s:'Don\'t forget!',sz:'不要忘記！'},
+    {en:'understand',zh:'了解',s:'Do you understand?',sz:'你了解嗎？'},
+    {en:'like',zh:'喜歡',s:'I like English.',sz:'我喜歡英文。'},
+    {en:'love',zh:'愛',s:'I love my family.',sz:'我愛我的家人。'},
+  ],patterns:[{en:'I want to ___.',zh:'我想要___。'},{en:'Can you ___?',zh:'你能___嗎？'}]},
+
+  18:{theme:'連接詞＆頻率',icon:'🔗',words:[
+    {en:'because',zh:'因為',s:'I\'m happy because I passed.',sz:'我開心因為我及格了。'},
+    {en:'but',zh:'但是',s:'I\'m tired, but I\'m happy.',sz:'我很累，但我很開心。'},
+    {en:'so',zh:'所以',s:'I\'m sick, so I stay home.',sz:'我生病，所以待在家。'},
+    {en:'and',zh:'和',s:'You and I are friends.',sz:'你和我是朋友。'},
+    {en:'or',zh:'或',s:'Tea or coffee?',sz:'茶還是咖啡？'},
+    {en:'always',zh:'總是',s:'I always eat breakfast.',sz:'我總是吃早餐。'},
+    {en:'never',zh:'從不',s:'I never give up.',sz:'我從不放棄。'},
+    {en:'sometimes',zh:'有時候',s:'I sometimes walk to school.',sz:'我有時走路上學。'},
+    {en:'usually',zh:'通常',s:'I usually sleep at ten.',sz:'我通常十點睡。'},
+    {en:'often',zh:'經常',s:'I often play basketball.',sz:'我經常打籃球。'},
+  ],patterns:[{en:'I ___ (always/sometimes/never) ___.',zh:'我___（總是/有時/從不）___。'}]},
+
+  19:{theme:'助動詞＆禮貌',icon:'🎩',words:[
+    {en:'can',zh:'能',s:'I can swim.',sz:'我會游泳。'},
+    {en:'should',zh:'應該',s:'You should study.',sz:'你應該讀書。'},
+    {en:'must',zh:'必須',s:'You must be careful.',sz:'你必須小心。'},
+    {en:'may',zh:'可以',s:'May I come in?',sz:'我可以進來嗎？'},
+    {en:'will',zh:'將會',s:'I will try my best.',sz:'我會盡力。'},
+    {en:'could',zh:'能夠',s:'Could you help me?',sz:'你能幫我嗎？'},
+    {en:'would',zh:'會',s:'Would you like some tea?',sz:'你要喝茶嗎？'},
+    {en:'please',zh:'請',s:'Please sit down.',sz:'請坐。'},
+    {en:'thank',zh:'謝謝',s:'Thank you very much.',sz:'非常謝謝你。'},
+    {en:'sorry',zh:'對不起',s:'I\'m sorry.',sz:'我很抱歉。'},
+  ],patterns:[{en:'Can/May I ___?',zh:'我可以___嗎？'},{en:'Could you ___, please?',zh:'請問你能___嗎？'}]},
+
+  20:{theme:'最後衝刺',icon:'🚀',words:[
+    {en:'problem',zh:'問題',s:'No problem!',sz:'沒問題！'},
+    {en:'example',zh:'例子',s:'For example, ...',sz:'例如⋯'},
+    {en:'idea',zh:'想法',s:'Good idea!',sz:'好主意！'},
+    {en:'every',zh:'每',s:'I study every day.',sz:'我每天讀書。'},
+    {en:'another',zh:'另一個',s:'Give me another chance.',sz:'再給我一次機會。'},
+    {en:'only',zh:'只有',s:'I only have one pen.',sz:'我只有一支筆。'},
+    {en:'other',zh:'其他',s:'Do you have other questions?',sz:'你有其他問題嗎？'},
+    {en:'many',zh:'很多',s:'I have many friends.',sz:'我有很多朋友。'},
+    {en:'much',zh:'很多',s:'Thank you so much!',sz:'非常感謝！'},
+    {en:'enough',zh:'足夠',s:'That\'s enough.',sz:'夠了。'},
+  ],patterns:[{en:'You can do it!',zh:'你做得到！'},{en:'Never give up!',zh:'永不放棄！'}]},
+};
+
+// Encouragement messages
+const ENCOURAGE = {
+  correct:['太棒了！🎉','答對了！💪','你好厲害！⭐','太強了！🔥','完美！✨','正確！👏','Great！🌟','Excellent！💯'],
+  wrong:['沒關係，再聽一次 🔊','加油，你可以的！💪','差一點點！再試試 😊','別擔心，學習就是這樣！🌱'],
+  result_great:['你太厲害了！根本是英文小天才！🏆','超級棒！會考穩了！💪','你的努力有了回報！繼續加油！🌟'],
+  result_good:['很不錯喔！繼續練習會更好！⭐','進步很多耶！再練一次會更熟！💪','你已經很棒了！再加把勁！😊'],
+  result_ok:['不要氣餒！多練幾次就會了！🌱','每次練習都在進步！加油！💪','學習需要時間，你做得到！😊'],
+};
+
+// ===================== STATE =====================
+let currentDay = 1;
+let currentMode = '';
+let learnIdx = 0;
+let quizQuestions = [];
+let quizIdx = 0;
+let quizScore = 0;
+let quizResults = [];
+let quizCurrentWord = null;
+
+// Progress stored in localStorage
+function getProgress(){
+  try{return JSON.parse(localStorage.getItem('vocabProgress')||'{}');}catch(e){return {};}
+}
+function saveProgress(data){
+  try{localStorage.setItem('vocabProgress',JSON.stringify(data));}catch(e){}
+}
+function getDayProgress(day){
+  const p=getProgress();
+  return p[`day${day}`]||{learned:false,score:0,stars:0};
+}
+function setDayProgress(day,data){
+  const p=getProgress();
+  p[`day${day}`]={...getDayProgress(day),...data};
+  saveProgress(p);
+}
+
+// ===================== SCREENS =====================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='screenHome') renderHome();
+}
+
+// ===================== HOME =====================
+function renderHome(){
+  const container=document.getElementById('weekContainer');
+  container.innerHTML='';
+  const weeks=[
+    {num:1,title:'第1週：基礎生存字',days:[1,2,3,4,5]},
+    {num:2,title:'第2週：日常生活字',days:[6,7,8,9,10]},
+    {num:3,title:'第3週：會考情境字',days:[11,12,13,14,15]},
+    {num:4,title:'第4週：衝刺！',days:[16,17,18,19,20]},
+  ];
+  let totalLearned=0;
+  weeks.forEach(w=>{
+    const sec=document.createElement('div');
+    sec.className='week-section';
+    sec.innerHTML=`<div class="week-title">📅 ${w.title}</div><div class="day-grid" id="week${w.num}Grid"></div>`;
+    container.appendChild(sec);
+    const grid=sec.querySelector('.day-grid');
+    w.days.forEach(d=>{
+      const day=DAYS[d];
+      if(!day)return;
+      const prog=getDayProgress(d);
+      if(prog.learned)totalLearned+=day.words.length;
+      const card=document.createElement('div');
+      card.className='day-card'+(prog.learned?' completed':'');
+      card.innerHTML=`<div class="day-icon">${day.icon}</div><div class="day-num">Day ${d}</div><div class="day-theme">${day.theme}</div><div class="day-count">${day.words.length} 個字${prog.stars?' ⭐'.repeat(Math.min(prog.stars,3)):''}</div>`;
+      card.onclick=()=>openDay(d);
+      grid.appendChild(card);
+    });
+  });
+  document.getElementById('totalLearned').textContent=totalLearned;
+  document.getElementById('totalBar').style.width=(totalLearned/200*100)+'%';
+
+  const streak=getStreak();
+  document.getElementById('streakText').textContent=streak>0?`🔥 連續練習 ${streak} 天！`:'每天練一點，會考不怕！';
+}
+
+function getStreak(){
+  const p=getProgress();
+  let streak=0;
+  const now=new Date();
+  for(let i=0;i<30;i++){
+    const d=new Date(now);
+    d.setDate(d.getDate()-i);
+    const key='date_'+d.toISOString().slice(0,10);
+    if(p[key])streak++;
+    else break;
+  }
+  return streak;
+}
+function markToday(){
+  const p=getProgress();
+  const key='date_'+new Date().toISOString().slice(0,10);
+  p[key]=true;
+  saveProgress(p);
+}
+
+// ===================== DAY MENU =====================
+function openDay(day){
+  currentDay=day;
+  const d=DAYS[day];
+  document.getElementById('dayTitle').textContent=`${d.icon} Day ${day}：${d.theme}`;
+  document.getElementById('daySub').textContent=`共 ${d.words.length} 個單字`;
+
+  const list=document.getElementById('wordPreviewList');
+  list.innerHTML='';
+  d.words.forEach(w=>{
+    const chip=document.createElement('span');
+    chip.className='word-chip';
+    chip.textContent=`${w.en} ${w.zh}`;
+    list.appendChild(chip);
+  });
+
+  const ps=document.getElementById('patternSection');
+  if(d.patterns&&d.patterns.length){
+    ps.innerHTML='<h3>📌 今日句型</h3>';
+    d.patterns.forEach(p=>{
+      const box=document.createElement('div');
+      box.className='sentence-box';
+      box.innerHTML=`<div class="sb-en">${p.en}</div><div class="sb-zh">${p.zh}</div>`;
+      ps.appendChild(box);
+    });
+  } else ps.innerHTML='';
+
+  showScreen('screenDay');
+}
+
+// ===================== LEARN MODE =====================
+function startMode(mode){
+  currentMode=mode;
+  if(mode==='learn'){
+    learnIdx=0;
+    renderLearnCard();
+    showScreen('screenLearn');
+  } else {
+    startQuiz(mode);
+    showScreen('screenQuiz');
+  }
+}
+
+function renderLearnCard(){
+  const words=DAYS[currentDay].words;
+  const w=words[learnIdx];
+  document.getElementById('learnCounter').textContent=`${learnIdx+1} / ${words.length}`;
+  document.getElementById('learnEn').textContent=w.en;
+  document.getElementById('learnZh').textContent=w.zh;
+  document.getElementById('learnSentence').textContent=w.s||'';
+  document.getElementById('learnSentenceZh').textContent=w.sz||'';
+  speakWord(w.en,'en-US');
+}
+function learnNext(){
+  const words=DAYS[currentDay].words;
+  learnIdx++;
+  if(learnIdx>=words.length){
+    setDayProgress(currentDay,{learned:true});
+    markToday();
+    learnIdx=0;
+    showResults(words.length,words.length,'learn');
+    return;
+  }
+  renderLearnCard();
+}
+function learnPrev(){
+  if(learnIdx>0){learnIdx--;renderLearnCard();}
+}
+function speakEn(){
+  const w=DAYS[currentDay].words[learnIdx];
+  speakWord(w.en,'en-US');
+}
+function speakZh(){
+  const w=DAYS[currentDay].words[learnIdx];
+  speakWord(w.zh,'zh-TW');
+}
+
+// ===================== QUIZ ENGINE =====================
+function startQuiz(mode){
+  const words=DAYS[currentDay].words;
+  quizQuestions=[];
+  quizIdx=0;
+  quizScore=0;
+  quizResults=[];
+
+  const shuffled=[...words].sort(()=>Math.random()-0.5);
+
+  shuffled.forEach(w=>{
+    if(mode==='listen'){
+      // Hear English, pick Chinese
+      const opts=generateOptions(w,'zh',words);
+      quizQuestions.push({type:'listen',word:w,prompt:w.en,options:opts,answer:w.zh,speakLang:'en-US'});
+    } else if(mode==='match'){
+      // See Chinese, pick English
+      const opts=generateOptions(w,'en',words);
+      quizQuestions.push({type:'match',word:w,prompt:w.zh,options:opts,answer:w.en});
+    } else {
+      // Mixed
+      if(Math.random()>0.5){
+        const opts=generateOptions(w,'zh',words);
+        quizQuestions.push({type:'listen',word:w,prompt:w.en,options:opts,answer:w.zh,speakLang:'en-US'});
+      } else {
+        const opts=generateOptions(w,'en',words);
+        quizQuestions.push({type:'match',word:w,prompt:w.zh,options:opts,answer:w.en});
+      }
+    }
+  });
+
+  renderQuiz();
+}
+
+function generateOptions(targetWord, field, allWords){
+  const correct=targetWord[field];
+  const others=allWords.filter(w=>w[field]!==correct).sort(()=>Math.random()-0.5).slice(0,3).map(w=>w[field]);
+  const opts=[correct,...others].sort(()=>Math.random()-0.5);
+  return opts;
+}
+
+function renderQuiz(){
+  const q=quizQuestions[quizIdx];
+  const total=quizQuestions.length;
+  document.getElementById('quizQNum').textContent=`第 ${quizIdx+1} / ${total} 題`;
+  document.getElementById('quizProgressFill').style.width=(quizIdx/total*100)+'%';
+  document.getElementById('quizScoreDisplay').textContent=`⭐ ${quizScore} 分`;
+  document.getElementById('quizFeedback').innerHTML='';
+
+  const promptLabel=document.getElementById('promptLabel');
+  const promptWord=document.getElementById('promptWord');
+  const audioBtn=document.getElementById('quizAudioBtn');
+
+  if(q.type==='listen'){
+    promptLabel.textContent='🔊 聽英文，選中文：';
+    promptWord.textContent=q.prompt;
+    promptWord.className='prompt-word';
+    audioBtn.style.display='inline-flex';
+    speakWord(q.prompt,'en-US');
+  } else {
+    promptLabel.textContent='🎯 看中文，選英文：';
+    promptWord.textContent=q.prompt;
+    promptWord.className='prompt-word zh';
+    audioBtn.style.display='none';
+  }
+
+  const optionsDiv=document.getElementById('quizOptions');
+  optionsDiv.innerHTML='';
+  q.options.forEach((opt,i)=>{
+    const btn=document.createElement('div');
+    btn.className='quiz-option';
+    btn.textContent=opt;
+    btn.onclick=()=>checkAnswer(btn,opt,q);
+    optionsDiv.appendChild(btn);
+  });
+
+  quizCurrentWord=q.word;
+}
+
+function speakQuizWord(){
+  const q=quizQuestions[quizIdx];
+  if(q&&q.speakLang) speakWord(q.prompt,q.speakLang);
+}
+
+let answerLocked=false;
+function checkAnswer(btn,selected,q){
+  if(answerLocked)return;
+  answerLocked=true;
+
+  const isCorrect=selected===q.answer;
+  const fb=document.getElementById('quizFeedback');
+
+  if(isCorrect){
+    btn.classList.add('correct');
+    quizScore+=10;
+    document.getElementById('quizScoreDisplay').textContent=`⭐ ${quizScore} 分`;
+    const msg=ENCOURAGE.correct[Math.floor(Math.random()*ENCOURAGE.correct.length)];
+    fb.innerHTML=`<div class="fb-text" style="color:#00E676">${msg}</div>`;
+    quizResults.push({word:q.word,correct:true});
+
+    // Speak the English word on correct answer
+    speakWord(q.word.en,'en-US');
+  } else {
+    btn.classList.add('wrong');
+    // Highlight correct
+    document.querySelectorAll('.quiz-option').forEach(o=>{
+      if(o.textContent===q.answer)o.classList.add('correct');
+    });
+    const msg=ENCOURAGE.wrong[Math.floor(Math.random()*ENCOURAGE.wrong.length)];
+    fb.innerHTML=`<div class="fb-text" style="color:#FF6B35">${msg}</div><div class="fb-correct-answer">正確答案：${q.word.en} = ${q.word.zh}</div>`;
+    quizResults.push({word:q.word,correct:false});
+
+    // Speak the correct word so they learn
+    setTimeout(()=>speakWord(q.word.en,'en-US'),500);
+  }
+
+  setTimeout(()=>{
+    answerLocked=false;
+    quizIdx++;
+    if(quizIdx>=quizQuestions.length){
+      finishQuiz();
+    } else {
+      renderQuiz();
+    }
+  }, isCorrect?1200:2500);
+}
+
+function finishQuiz(){
+  const total=quizQuestions.length;
+  const correct=quizResults.filter(r=>r.correct).length;
+  const stars=correct===total?3:correct>=total*0.7?2:correct>=total*0.4?1:0;
+
+  setDayProgress(currentDay,{learned:true,score:Math.max(getDayProgress(currentDay).score,quizScore),stars:Math.max(getDayProgress(currentDay).stars,stars)});
+  markToday();
+
+  showResults(correct,total,currentMode);
+}
+
+function showResults(correct,total,mode){
+  const pct=correct/total;
+  const stars=pct>=1?3:pct>=0.7?2:pct>=0.4?1:0;
+  const msgs=pct>=0.8?ENCOURAGE.result_great:pct>=0.5?ENCOURAGE.result_good:ENCOURAGE.result_ok;
+
+  document.getElementById('resultIcon').textContent=pct>=0.8?'🏆':pct>=0.5?'💪':'🌱';
+  document.getElementById('resultTitle').textContent=mode==='learn'?'學習完成！':`挑戰結果`;
+  document.getElementById('starsDisplay').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+  document.getElementById('resultScore').textContent=mode==='learn'?`${total} 個字全部看完！`:`${correct} / ${total} 答對`;
+  document.getElementById('resultMsg').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+
+  // Show word results
+  const wordsDiv=document.getElementById('resultWords');
+  if(quizResults.length>0){
+    let html='<h4>📝 單字結果：</h4>';
+    quizResults.forEach(r=>{
+      html+=`<div class="result-word-item"><span>${r.word.en} = ${r.word.zh}</span><span class="rw-status">${r.correct?'✅':'❌'}</span></div>`;
+    });
+    // Show wrong words for review
+    const wrongWords=quizResults.filter(r=>!r.correct);
+    if(wrongWords.length>0){
+      html+=`<h4 style="margin-top:12px;color:#FF6B35">🔄 要加強的字：</h4>`;
+      wrongWords.forEach(r=>{
+        html+=`<div class="result-word-item" style="color:#FF6B35"><span>${r.word.en} = ${r.word.zh}</span><button class="audio-btn" style="width:36px;height:36px;font-size:1em;margin:0" onclick="speakWord('${r.word.en}','en-US')">🔊</button></div>`;
+      });
+    }
+    wordsDiv.innerHTML=html;
+  } else {
+    wordsDiv.innerHTML='';
+  }
+
+  showScreen('screenResults');
+}
+
+function retryQuiz(){
+  if(currentMode==='learn'){
+    learnIdx=0;
+    renderLearnCard();
+    showScreen('screenLearn');
+  } else {
+    startQuiz(currentMode);
+    showScreen('screenQuiz');
+  }
+}
+
+// ===================== SPEECH =====================
+function speakWord(text,lang){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang||'en-US';
+  u.rate=lang==='en-US'?0.8:0.9;
+  u.pitch=1;
+  // Try to find a good voice
+  const voices=window.speechSynthesis.getVoices();
+  if(voices.length>0){
+    const match=voices.find(v=>v.lang.startsWith(lang==='en-US'?'en':'zh'));
+    if(match)u.voice=match;
+  }
+  window.speechSynthesis.speak(u);
+}
+// Preload voices
+if(window.speechSynthesis){
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
+}
+
+// ===================== INIT =====================
+renderHome();
+</script>
+</body>
+</html>
