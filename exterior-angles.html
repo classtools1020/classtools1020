@@ -195,21 +195,15 @@ function drawArrowLabel(fromX,fromY,toX,toY,text,color,alpha){
 }
 
 // Draw exterior angle arc at a vertex
+// The exterior angle is the SMALL angle between the extension line and the outgoing edge
+// It's supplementary to the interior angle (interior + exterior = 180°)
 function drawExtArc(ext,idx,alpha,radius){
   radius=radius||30;
   const v=ext.vertex;
-  // The exterior angle is between the extension of incoming edge and the outgoing edge
-  // Extension direction = inAngle (same direction as incoming)
-  // Outgoing direction = outAngle
-  // We draw an arc from inAngle to outAngle (the exterior angle side)
-  const startA=ext.inAngle;
-  const endA=ext.outAngle;
+  // Draw counterclockwise from inAngle to outAngle = the exterior angle (small arc, on the outside)
   ctx.globalAlpha=alpha;
   ctx.beginPath();ctx.moveTo(v.x,v.y);
-  // Determine if we go CW or CCW
-  // The exterior angle is on the "outside" of the polygon
-  // For our clockwise polygons, exterior is on the left side of travel
-  ctx.arc(v.x,v.y,radius,startA,endA);
+  ctx.arc(v.x,v.y,radius,ext.inAngle,ext.outAngle,true); // true = counterclockwise = the small outside arc
   ctx.closePath();
   ctx.fillStyle=extC[idx];ctx.fill();
   ctx.strokeStyle=extC[idx];ctx.lineWidth=2;ctx.stroke();
@@ -263,27 +257,28 @@ function drawAssembly(collectedAngles,exts,highlight){
 
 // Draw a flying sector (from vertex to assembly circle)
 function drawFlyingSector(ext,idx,collectedBefore,exts,progress){
-  // Start position: at the vertex
-  // End position: in the assembly circle
   const startPos={x:ext.vertex.x,y:ext.vertex.y};
   const endPos={x:AX,y:AY};
   const pos=lerpPt(startPos,endPos,progress);
-
-  // Start radius small, end radius = AR
   const r=lerp(30,AR,progress);
-  // Start angle: from the actual ext angle orientation
-  // End angle: positioned in the assembly circle
+
+  // Source: midpoint of exterior angle at vertex (CCW from inAngle)
+  const srcMid=ext.inAngle-ext.extAngle/2;
+  // Destination: midpoint of sector in assembly circle
   let accum=0;
   for(let i=0;i<collectedBefore;i++)accum+=exts[i].extAngle;
-  const targetStart=-Math.PI/2+accum;
-  const targetEnd=targetStart+ext.extAngle;
+  const dstMid=-Math.PI/2+accum+ext.extAngle/2;
 
-  const curStart=lerp(ext.inAngle,targetStart,progress);
-  const curEnd=lerp(ext.outAngle,targetEnd,progress);
+  // Interpolate midpoint angle (handle wrapping)
+  let diff=dstMid-srcMid;
+  while(diff>Math.PI)diff-=2*Math.PI;
+  while(diff<-Math.PI)diff+=2*Math.PI;
+  const midA=srcMid+diff*progress;
+  const half=ext.extAngle/2;
 
   ctx.globalAlpha=0.8;
   ctx.beginPath();ctx.moveTo(pos.x,pos.y);
-  ctx.arc(pos.x,pos.y,r,curStart,curEnd);ctx.closePath();
+  ctx.arc(pos.x,pos.y,r,midA-half,midA+half);ctx.closePath();
   ctx.fillStyle=extC[idx];ctx.fill();
   ctx.strokeStyle='#112D5A';ctx.lineWidth=2;ctx.stroke();
   ctx.globalAlpha=1;
