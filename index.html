@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>會考英文特訓基地</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0a0e27;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,107,53,.1),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.08),transparent 50%);pointer-events:none}
+.container{position:relative;z-index:1;width:100%;max-width:480px;padding:20px 16px;text-align:center}
+.hero{margin:30px 0 20px}
+.hero-icon{font-size:4em;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero h1{font-size:2em;font-weight:900;background:linear-gradient(135deg,#FFD700,#FF6B35,#FF2D95);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:10px 0 6px}
+.hero p{color:rgba(255,255,255,.6);font-size:.95em}
+.cards{display:flex;flex-direction:column;gap:14px;margin:24px 0}
+.card{display:block;background:rgba(255,255,255,.06);backdrop-filter:blur(10px);border:2px solid rgba(255,255,255,.1);border-radius:20px;padding:24px 20px;text-decoration:none;color:#fff;transition:all .3s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.03));pointer-events:none}
+.card:active{transform:scale(.97)}
+.card:hover{border-color:rgba(255,215,0,.4);box-shadow:0 8px 32px rgba(255,107,53,.15)}
+.card .card-icon{font-size:2.8em;margin-bottom:8px}
+.card .card-title{font-size:1.4em;font-weight:900;color:#FFD700}
+.card .card-desc{font-size:.9em;color:rgba(255,255,255,.6);margin-top:6px;line-height:1.5}
+.card .card-tag{display:inline-block;background:rgba(255,107,53,.2);border:1px solid rgba(255,107,53,.3);border-radius:20px;padding:4px 12px;font-size:.75em;color:#FF8F60;margin-top:10px;font-weight:700}
+.card-vocab{border-color:rgba(255,107,53,.25)}
+.card-vocab:hover{border-color:#FF6B35;box-shadow:0 8px 32px rgba(255,107,53,.2)}
+.card-grammar{border-color:rgba(79,195,247,.2)}
+.card-grammar:hover{border-color:#4FC3F7;box-shadow:0 8px 32px rgba(79,195,247,.15)}
+.card-grammar .card-title{color:#4FC3F7}
+.card-grammar .card-tag{background:rgba(79,195,247,.15);border-color:rgba(79,195,247,.3);color:#4FC3F7}
+.footer{margin-top:30px;color:rgba(255,255,255,.25);font-size:.75em;line-height:1.6}
+/* floating particles */
+.particle{position:fixed;pointer-events:none;opacity:.3;animation:drift linear infinite}
+@keyframes drift{0%{transform:translateY(100vh) rotate(0deg)}100%{transform:translateY(-20vh) rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">⚔️</div>
+    <h1>會考英文特訓基地</h1>
+    <p>每天練一點，會考不害怕！</p>
+  </div>
+
+  <div class="cards">
+    <a class="card card-vocab" href="vocab-adventure.html">
+      <div class="card-icon">🎮</div>
+      <div class="card-title">英文冒險 RPG</div>
+      <div class="card-desc">200 個會考高頻單字<br>聽力闖關 · 配對挑戰 · BOSS 戰<br>答對灑花、連擊火焰！</div>
+      <div class="card-tag">⭐ 單字練習 · 每天 10 分鐘</div>
+    </a>
+
+    <a class="card card-grammar" href="grammar-practice.html">
+      <div class="card-icon">📝</div>
+      <div class="card-title">句型口訣特訓</div>
+      <div class="card-desc">8 大必考句型<br>背口訣 → 練題目 → 直覺答對<br>不用背文法也能拿分！</div>
+      <div class="card-tag">🧠 句型練習 · 每天 5 分鐘</div>
+    </a>
+  </div>
+
+  <div class="footer">
+    <p>📱 用手機的 Chrome 瀏覽器開啟效果最好</p>
+    <p>🔊 記得打開聲音聽發音喔</p>
+  </div>
+</div>
+
+<script>
+// Floating particles
+const emojis=['✨','⭐','🌟','💫','🔥'];
+for(let i=0;i<8;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+  p.style.left=Math.random()*100+'%';
+  p.style.fontSize=(12+Math.random()*14)+'px';
+  p.style.animationDuration=(8+Math.random()*12)+'s';
+  p.style.animationDelay=(-Math.random()*15)+'s';
+  document.body.appendChild(p);
+}
+</script>
+</body>
+</html>
