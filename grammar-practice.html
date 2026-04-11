@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>會考句型特訓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0B1D3A;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;min-height:100dvh;overflow-x:hidden}
+.screen{display:none;min-height:100vh;padding:16px;padding-bottom:80px}
+.screen.active{display:block}
+h1{text-align:center;font-size:1.7em;font-weight:900;margin:10px 0 5px;background:linear-gradient(135deg,#FF6B35,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;color:#4FC3F7;font-size:.95em;margin-bottom:12px}
+.unit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:550px;margin:16px auto}
+.unit-card{background:#1A3A6A;border-radius:16px;padding:16px;cursor:pointer;transition:all .3s;border:2px solid #2A5A8A;text-align:center;position:relative}
+.unit-card:active{transform:scale(.97)}
+.unit-card.done{border-color:#00C9A7}
+.unit-card.done::after{content:'✅';position:absolute;top:6px;right:8px;font-size:14px}
+.unit-card .u-icon{font-size:2em;margin-bottom:4px}
+.unit-card .u-title{font-size:1em;font-weight:700;color:#FFD700}
+.unit-card .u-desc{font-size:.75em;color:#B0C4DE;margin-top:4px}
+.progress-box{background:#1A3A6A;border-radius:14px;padding:14px;margin:12px auto;max-width:550px;text-align:center}
+.progress-box .bar{height:10px;background:#112D5A;border-radius:5px;margin:6px 0;overflow:hidden}
+.progress-box .bar-fill{height:100%;background:linear-gradient(90deg,#FF6B35,#FFD700);border-radius:5px;transition:width .5s}
+/* Mnemonic card */
+.mnemonic{background:linear-gradient(145deg,#1A3A6A,#112D5A);border-radius:20px;padding:24px;margin:16px auto;max-width:550px;text-align:center;border:3px solid #FFD700;box-shadow:0 6px 24px rgba(255,215,0,.15)}
+.mnemonic .m-title{font-size:1.4em;font-weight:900;color:#FFD700;margin-bottom:10px}
+.mnemonic .m-rule{font-size:1.3em;font-weight:700;line-height:1.8;color:#fff}
+.mnemonic .m-rule .hi-am{color:#FF6B35;font-weight:900}
+.mnemonic .m-rule .hi-is{color:#4FC3F7;font-weight:900}
+.mnemonic .m-rule .hi-are{color:#00E676;font-weight:900}
+.mnemonic .m-rule .hi-key{color:#FFD700;font-weight:900;text-decoration:underline}
+.mnemonic .m-tip{font-size:.85em;color:#B0C4DE;margin-top:10px;line-height:1.5}
+/* Examples */
+.examples{max-width:550px;margin:12px auto}
+.example-item{background:#112D5A;border-radius:12px;padding:12px 16px;margin:8px 0;border-left:4px solid #4FC3F7}
+.example-item .ex-en{font-size:1.1em;font-weight:700;color:#fff}
+.example-item .ex-en .blank-filled{color:#FFD700;font-weight:900;border-bottom:2px solid #FFD700}
+.example-item .ex-zh{font-size:.85em;color:#B0C4DE;margin-top:4px}
+/* Quiz */
+.quiz-container{max-width:550px;margin:0 auto}
+.q-progress{text-align:center;margin:10px 0}
+.q-num{font-size:.85em;color:#00C9A7;font-weight:700}
+.q-bar{height:8px;background:#112D5A;border-radius:4px;margin:6px 0;overflow:hidden}
+.q-bar-fill{height:100%;background:linear-gradient(90deg,#FF6B35,#FFD700);border-radius:4px;transition:width .4s}
+.q-score{font-size:.85em;color:#FFD700}
+.q-sentence{background:#112D5A;border-radius:16px;padding:20px;margin:16px 0;text-align:center}
+.q-sentence .q-text{font-size:1.5em;font-weight:700;line-height:1.6}
+.q-sentence .q-text .q-blank{display:inline-block;min-width:80px;border-bottom:3px solid #FFD700;color:#FFD700;margin:0 4px}
+.q-sentence .q-zh{font-size:.9em;color:#B0C4DE;margin-top:8px}
+.q-hint-box{background:#1A3A6A;border-radius:10px;padding:10px;margin:8px 0;text-align:center;font-size:.85em;color:#FFD700;border:1px dashed #FFD700}
+.q-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.q-opt{background:#1A3A6A;border:3px solid #2A5A8A;border-radius:14px;padding:16px;text-align:center;font-size:1.25em;font-weight:700;cursor:pointer;transition:all .2s}
+.q-opt:active{transform:scale(.96)}
+.q-opt.correct{background:#00C9A7;border-color:#00C9A7;animation:pop .3s}
+.q-opt.wrong{background:#FF4444;border-color:#FF4444;animation:shake .4s}
+.q-opt .opt-label{font-size:.6em;color:#B0C4DE;display:block;margin-bottom:2px;font-weight:400}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.q-feedback{text-align:center;min-height:80px;margin:10px 0}
+.q-feedback .fb-msg{font-size:1.2em;font-weight:700}
+.q-feedback .fb-explain{font-size:.9em;color:#B0C4DE;margin-top:6px;line-height:1.5}
+.q-feedback .fb-rule{display:inline-block;background:#FF6B35;color:#fff;padding:4px 14px;border-radius:8px;font-weight:700;font-size:.9em;margin-top:6px}
+/* Buttons */
+.btn{padding:14px 28px;border:none;border-radius:50px;font-family:'Noto Sans TC',sans-serif;font-size:1em;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:linear-gradient(135deg,#FF6B35,#FF8F60);color:#fff}
+.btn-secondary{background:#1A3A6A;color:#B0C4DE;border:2px solid #2A5A8A}
+.btn-success{background:linear-gradient(135deg,#00C9A7,#00E676);color:#fff}
+.btn-back{background:none;border:none;color:#B0C4DE;font-size:1em;font-weight:700;cursor:pointer;padding:10px;font-family:'Noto Sans TC',sans-serif}
+.center-btns{display:flex;flex-direction:column;align-items:center;gap:10px;margin:20px 0}
+/* Results */
+.results-card{background:#1A3A6A;border-radius:20px;padding:30px;text-align:center;max-width:500px;margin:30px auto;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.results-card .r-icon{font-size:4em;margin-bottom:10px}
+.results-card .r-title{font-size:1.6em;font-weight:900;color:#FFD700}
+.results-card .r-stars{font-size:2em;margin:10px 0;letter-spacing:4px}
+.results-card .r-score{font-size:2em;font-weight:900;color:#00C9A7;margin:6px 0}
+.results-card .r-msg{font-size:1em;color:#B0C4DE;line-height:1.6;margin:10px 0}
+.wrong-review{text-align:left;margin:16px 0}
+.wrong-review h4{font-size:.9em;color:#FF6B35;margin-bottom:8px}
+.wrong-item{background:#112D5A;border-radius:10px;padding:10px;margin:6px 0;font-size:.9em}
+.wrong-item .wi-q{color:#fff}
+.wrong-item .wi-a{color:#00C9A7;font-weight:700;margin-top:4px}
+.wrong-item .wi-r{color:#FFD700;font-size:.8em;margin-top:2px}
+/* Audio btn */
+.audio-btn{width:50px;height:50px;border-radius:50%;border:none;background:linear-gradient(135deg,#FF6B35,#FF8F60);color:#fff;font-size:1.3em;cursor:pointer;transition:all .2s;box-shadow:0 3px 12px rgba(255,107,53,.3)}
+.audio-btn:active{transform:scale(.9)}
+.listen-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="screen active" id="screenHome">
+  <h1>📝 會考句型特訓</h1>
+  <p class="subtitle">不背規則，練到直覺選對！</p>
+  <div class="progress-box">
+    <div>已完成 <strong id="totalDone">0</strong> / 8 個單元</div>
+    <div class="bar"><div class="bar-fill" id="totalBar" style="width:0%"></div></div>
+  </div>
+  <div class="unit-grid" id="unitGrid"></div>
+  <div style="text-align:center;margin-top:16px">
+    <a href="vocab-practice.html" class="btn btn-secondary" style="text-decoration:none">📚 去練單字</a>
+  </div>
+</div>
+
+<!-- UNIT INTRO (mnemonic + examples) -->
+<div class="screen" id="screenIntro">
+  <button class="btn-back" onclick="goHome()">⬅ 回首頁</button>
+  <div class="mnemonic" id="mnemonicCard"></div>
+  <div class="examples" id="examplesBox"></div>
+  <div class="center-btns">
+    <button class="btn btn-primary" onclick="startUnitQuiz()" style="font-size:1.2em;padding:18px 40px">🚀 開始練習！</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="screenQuiz">
+  <button class="btn-back" onclick="goHome()">⬅ 回首頁</button>
+  <div class="quiz-container">
+    <div class="q-progress">
+      <div class="q-num" id="qNum"></div>
+      <div class="q-bar"><div class="q-bar-fill" id="qBarFill"></div></div>
+      <div class="q-score" id="qScore"></div>
+    </div>
+    <div class="q-sentence" id="qSentence"></div>
+    <div class="listen-row" id="listenRow" style="display:none">
+      <button class="audio-btn" onclick="speakQ()">🔊</button>
+      <span style="font-size:.85em;color:#B0C4DE">聽聽看</span>
+    </div>
+    <div class="q-hint-box" id="qHint"></div>
+    <div class="q-options" id="qOptions"></div>
+    <div class="q-feedback" id="qFeedback"></div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="screenResults">
+  <div class="results-card">
+    <div class="r-icon" id="rIcon"></div>
+    <div class="r-title" id="rTitle"></div>
+    <div class="r-stars" id="rStars"></div>
+    <div class="r-score" id="rScore"></div>
+    <div class="r-msg" id="rMsg"></div>
+    <div class="wrong-review" id="wrongReview"></div>
+    <div class="center-btns">
+      <button class="btn btn-primary" onclick="startUnitQuiz()">🔄 再練一次</button>
+      <button class="btn btn-success" onclick="goHome()">✅ 回首頁</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== UNIT DATA =====
+const UNITS = {
+  1:{
+    title:'be 動詞',icon:'🔤',
+    mnemonic:'我 <span class="hi-am">am</span>，你 <span class="hi-are">are</span>，他她它 <span class="hi-is">is</span>，複數 <span class="hi-are">are</span>',
+    tip:'看到 I → 選 am｜看到 He/She/It/人名 → 選 is｜看到 You/We/They → 選 are',
+    examples:[
+      {en:'I <span class="blank-filled">am</span> a student.',zh:'我是學生。'},
+      {en:'She <span class="blank-filled">is</span> my teacher.',zh:'她是我的老師。'},
+      {en:'They <span class="blank-filled">are</span> happy.',zh:'他們很開心。'},
+      {en:'Tom <span class="blank-filled">is</span> tall.',zh:'Tom 很高。（人名→is）'},
+    ],
+    questions:[
+      {text:'I ___ happy today.',zh:'我今天很開心。',opts:['am','is','are','do'],ans:0,rule:'I → am'},
+      {text:'She ___ a good student.',zh:'她是好學生。',opts:['am','is','are','does'],ans:1,rule:'She → is'},
+      {text:'They ___ my friends.',zh:'他們是我的朋友。',opts:['am','is','are','was'],ans:2,rule:'They → are'},
+      {text:'Tom ___ in the library.',zh:'Tom 在圖書館。',opts:['am','is','are','do'],ans:1,rule:'人名 → is'},
+      {text:'We ___ students.',zh:'我們是學生。',opts:['am','is','are','does'],ans:2,rule:'We → are'},
+      {text:'The cat ___ cute.',zh:'那隻貓很可愛。',opts:['am','is','are','do'],ans:1,rule:'The cat (它) → is'},
+      {text:'You ___ very kind.',zh:'你很善良。',opts:['am','is','are','was'],ans:2,rule:'You → are'},
+      {text:'My mother ___ a nurse.',zh:'我媽媽是護士。',opts:['am','is','are','do'],ans:1,rule:'My mother (她) → is'},
+      {text:'I ___ not scared.',zh:'我不害怕。',opts:['am','is','are','do'],ans:0,rule:'I → am'},
+      {text:'The dogs ___ big.',zh:'那些狗很大。',opts:['am','is','are','does'],ans:2,rule:'The dogs (複數) → are'},
+    ]
+  },
+  2:{
+    title:'do / does',icon:'❓',
+    mnemonic:'問句＋否定 → 找 <span class="hi-am">do/does</span> 幫忙！<br>He/She/It → <span class="hi-is">does</span>，其他 → <span class="hi-are">do</span>',
+    tip:'does 出場 → 後面動詞「不加 s」！<br>Do you like...? Does she like...? (不是 likes)',
+    examples:[
+      {en:'<span class="blank-filled">Do</span> you like music?',zh:'你喜歡音樂嗎？'},
+      {en:'<span class="blank-filled">Does</span> he play basketball?',zh:'他打籃球嗎？'},
+      {en:'I <span class="blank-filled">don\'t</span> know.',zh:'我不知道。'},
+      {en:'She <span class="blank-filled">doesn\'t</span> like math.',zh:'她不喜歡數學。'},
+    ],
+    questions:[
+      {text:'___ you like English?',zh:'你喜歡英文嗎？',opts:['Do','Does','Is','Are'],ans:0,rule:'You → Do'},
+      {text:'___ she have a pen?',zh:'她有筆嗎？',opts:['Do','Does','Is','Are'],ans:1,rule:'She → Does'},
+      {text:'I ___ like spicy food.',zh:'我不喜歡辣的食物。',opts:['do not','does not','am not','is not'],ans:0,rule:'I → do not'},
+      {text:'He ___ play games.',zh:'他不玩遊戲。',opts:['do not','does not','is not','are not'],ans:1,rule:'He → does not'},
+      {text:'___ they go to school?',zh:'他們去上學嗎？',opts:['Do','Does','Is','Are'],ans:0,rule:'They → Do'},
+      {text:'___ Tom eat breakfast?',zh:'Tom 吃早餐嗎？',opts:['Do','Does','Is','Are'],ans:1,rule:'Tom (他) → Does'},
+      {text:'She ___ drink coffee.',zh:'她不喝咖啡。',opts:['don\'t','doesn\'t','isn\'t','aren\'t'],ans:1,rule:'She → doesn\'t'},
+      {text:'___ you have a brother?',zh:'你有兄弟嗎？',opts:['Do','Does','Is','Are'],ans:0,rule:'You → Do'},
+      {text:'We ___ like homework.',zh:'我們不喜歡作業。',opts:['don\'t','doesn\'t','isn\'t','aren\'t'],ans:0,rule:'We → don\'t'},
+      {text:'___ it rain often here?',zh:'這裡常下雨嗎？',opts:['Do','Does','Is','Are'],ans:1,rule:'It → Does'},
+    ]
+  },
+  3:{
+    title:'過去式',icon:'⏪',
+    mnemonic:'看到 <span class="hi-key">yesterday / last / ago</span><br>→ 動詞要變<span class="hi-am">過去式</span>！',
+    tip:'常見過去式：go→went, eat→ate, see→saw, come→came<br>get→got, make→made, have→had, take→took, buy→bought',
+    examples:[
+      {en:'I <span class="blank-filled">went</span> to school yesterday.',zh:'我昨天去上學。（go→went）'},
+      {en:'She <span class="blank-filled">ate</span> lunch at twelve.',zh:'她十二點吃午餐。（eat→ate）'},
+      {en:'We <span class="blank-filled">saw</span> a movie last night.',zh:'我們昨晚看了電影。（see→saw）'},
+      {en:'He <span class="blank-filled">came</span> home late.',zh:'他很晚回家。（come→came）'},
+    ],
+    questions:[
+      {text:'I ___ to the park yesterday.',zh:'我昨天去公園。',opts:['go','went','goes','going'],ans:1,rule:'yesterday → 過去式 went'},
+      {text:'She ___ breakfast this morning.',zh:'她今天早上吃了早餐。',opts:['eat','eats','ate','eating'],ans:2,rule:'this morning → 過去式 ate'},
+      {text:'We ___ a good movie last week.',zh:'我們上週看了一部好電影。',opts:['see','sees','saw','seeing'],ans:2,rule:'last week → 過去式 saw'},
+      {text:'He ___ home at 5 yesterday.',zh:'他昨天五點回家。',opts:['come','comes','came','coming'],ans:2,rule:'yesterday → 過去式 came'},
+      {text:'I ___ a new bag last month.',zh:'我上個月買了新書包。',opts:['buy','buys','bought','buying'],ans:2,rule:'last month → 過去式 bought'},
+      {text:'She ___ a cake for me.',zh:'她做了蛋糕給我。',opts:['make','makes','made','making'],ans:2,rule:'過去式 made'},
+      {text:'They ___ a dog two years ago.',zh:'他們兩年前養了一隻狗。',opts:['have','has','had','having'],ans:2,rule:'ago → 過去式 had'},
+      {text:'Tom ___ my pen yesterday.',zh:'Tom 昨天拿了我的筆。',opts:['take','takes','took','taking'],ans:2,rule:'yesterday → 過去式 took'},
+      {text:'I ___ up at 7 this morning.',zh:'我今天早上七點起床。',opts:['get','gets','got','getting'],ans:2,rule:'this morning → 過去式 got'},
+      {text:'We ___ very happy yesterday.',zh:'我們昨天很開心。',opts:['are','is','were','was'],ans:2,rule:'We + yesterday → were'},
+    ]
+  },
+  4:{
+    title:'未來式 will',icon:'🔮',
+    mnemonic:'看到 <span class="hi-key">tomorrow / next / soon</span><br>→ 用 <span class="hi-is">will</span> + 動詞<span class="hi-am">原形</span>！',
+    tip:'will 後面的動詞「不變化」！直接原形！<br>will go ✅ will goes ❌ will going ❌',
+    examples:[
+      {en:'I <span class="blank-filled">will go</span> to school tomorrow.',zh:'我明天會去上學。'},
+      {en:'She <span class="blank-filled">will come</span> next week.',zh:'她下週會來。'},
+      {en:'It <span class="blank-filled">will rain</span> tomorrow.',zh:'明天會下雨。'},
+    ],
+    questions:[
+      {text:'I will ___ home tomorrow.',zh:'我明天會回家。',opts:['go','goes','went','going'],ans:0,rule:'will + 原形動詞'},
+      {text:'She ___ come to school tomorrow.',zh:'她明天會來學校。',opts:['will','is','does','did'],ans:0,rule:'tomorrow → will'},
+      {text:'We will ___ a test next week.',zh:'我們下週會考試。',opts:['have','has','had','having'],ans:0,rule:'will + 原形 have'},
+      {text:'It ___ be sunny tomorrow.',zh:'明天會是晴天。',opts:['will','is','was','does'],ans:0,rule:'tomorrow → will'},
+      {text:'They will ___ basketball after school.',zh:'他們放學後會打籃球。',opts:['play','plays','played','playing'],ans:0,rule:'will + 原形 play'},
+      {text:'Tom ___ visit us next month.',zh:'Tom 下個月會來看我們。',opts:['will','does','is','did'],ans:0,rule:'next month → will'},
+      {text:'I will ___ my best.',zh:'我會盡力。',opts:['try','tries','tried','trying'],ans:0,rule:'will + 原形 try'},
+      {text:'Mom will ___ dinner soon.',zh:'媽媽很快會做晚餐。',opts:['cook','cooks','cooked','cooking'],ans:0,rule:'will + 原形 cook'},
+    ]
+  },
+  5:{
+    title:'現在進行式',icon:'🏃',
+    mnemonic:'看到 <span class="hi-key">now / right now / Look!</span><br>→ 用 <span class="hi-is">be</span> + V-<span class="hi-am">ing</span>',
+    tip:'be 動詞(am/is/are) + 動詞加 ing<br>I am eating. She is reading. They are playing.',
+    examples:[
+      {en:'I <span class="blank-filled">am eating</span> lunch now.',zh:'我現在正在吃午餐。'},
+      {en:'She <span class="blank-filled">is reading</span> a book.',zh:'她正在看書。'},
+      {en:'They <span class="blank-filled">are playing</span> games.',zh:'他們正在玩遊戲。'},
+    ],
+    questions:[
+      {text:'I am ___ lunch now.',zh:'我現在正在吃午餐。',opts:['eat','eats','eating','ate'],ans:2,rule:'am + V-ing'},
+      {text:'She is ___ a book right now.',zh:'她現在正在看書。',opts:['read','reads','reading','readed'],ans:2,rule:'is + V-ing'},
+      {text:'They are ___ basketball.',zh:'他們正在打籃球。',opts:['play','plays','playing','played'],ans:2,rule:'are + V-ing'},
+      {text:'Look! The dog ___ running.',zh:'看！那隻狗在跑。',opts:['am','is','are','does'],ans:1,rule:'The dog (它) → is'},
+      {text:'We are ___ English now.',zh:'我們現在正在學英文。',opts:['study','studies','studying','studied'],ans:2,rule:'are + V-ing'},
+      {text:'Tom is ___ to music.',zh:'Tom 正在聽音樂。',opts:['listen','listens','listening','listened'],ans:2,rule:'is + V-ing'},
+      {text:'I ___ watching TV now.',zh:'我現在正在看電視。',opts:['am','is','are','do'],ans:0,rule:'I → am'},
+      {text:'The students ___ sleeping.',zh:'學生們正在睡覺。',opts:['am','is','are','does'],ans:2,rule:'students (複數) → are'},
+    ]
+  },
+  6:{
+    title:'比較級',icon:'📊',
+    mnemonic:'兩個比較 → 看到 <span class="hi-key">than</span> 就是比較級！<br>短字加 <span class="hi-am">-er</span>，長字加 <span class="hi-is">more</span>',
+    tip:'tall → taller｜big → bigger｜happy → happier<br>beautiful → more beautiful｜important → more important<br>特別的：good → better｜bad → worse',
+    examples:[
+      {en:'Tom is <span class="blank-filled">taller</span> than Amy.',zh:'Tom 比 Amy 高。'},
+      {en:'This book is <span class="blank-filled">more interesting</span> than that one.',zh:'這本書比那本有趣。'},
+      {en:'She is <span class="blank-filled">better</span> than me at English.',zh:'她英文比我好。（good→better）'},
+    ],
+    questions:[
+      {text:'Tom is ___ than Amy.',zh:'Tom 比 Amy 高。',opts:['tall','taller','tallest','more tall'],ans:1,rule:'短字 + -er = taller'},
+      {text:'This bag is ___ than that one.',zh:'這個包比那個便宜。',opts:['cheap','cheaper','cheapest','more cheap'],ans:1,rule:'短字 + -er = cheaper'},
+      {text:'Math is ___ than English.',zh:'數學比英文難。',opts:['difficult','difficulter','more difficult','most difficult'],ans:2,rule:'長字用 more + difficult'},
+      {text:'She runs ___ than I do.',zh:'她跑得比我快。',opts:['fast','faster','fastest','more fast'],ans:1,rule:'短字 + -er = faster'},
+      {text:'This movie is ___ than that one.',zh:'這部電影比那部好看。',opts:['good','better','best','gooder'],ans:1,rule:'good → better（特別的！）'},
+      {text:'Today is ___ than yesterday.',zh:'今天比昨天熱。',opts:['hot','hoter','hotter','more hot'],ans:2,rule:'hot → hotter（短字 + -er）'},
+      {text:'English is ___ than math for me.',zh:'英文對我來說比數學簡單。',opts:['easy','easier','easiest','more easy'],ans:1,rule:'easy → easier'},
+      {text:'Her bag is ___ than mine.',zh:'她的包比我的貴。',opts:['expensive','expensiver','more expensive','most expensive'],ans:2,rule:'長字用 more + expensive'},
+    ]
+  },
+  7:{
+    title:'連接詞',icon:'🔗',
+    mnemonic:'<span class="hi-am">because</span> = 因為<br><span class="hi-is">but</span> = 但是<br><span class="hi-are">so</span> = 所以<br><span class="hi-key">if</span> = 如果',
+    tip:'「因為」後面接原因 → because<br>「但是」前後相反 → but<br>「所以」後面接結果 → so<br>看中文意思就能選對！',
+    examples:[
+      {en:'I\'m happy <span class="blank-filled">because</span> I passed the test.',zh:'我很開心，因為我考試及格了。'},
+      {en:'I\'m tired, <span class="blank-filled">but</span> I\'m happy.',zh:'我很累，但是我很開心。'},
+      {en:'It\'s raining, <span class="blank-filled">so</span> I stay home.',zh:'下雨了，所以我待在家。'},
+      {en:'<span class="blank-filled">If</span> you study hard, you will pass.',zh:'如果你認真讀書，你會及格。'},
+    ],
+    questions:[
+      {text:'I\'m late ___ I got up late.',zh:'我遲到了，因為我起床太晚。',opts:['because','but','so','if'],ans:0,rule:'因為 → because'},
+      {text:'She is smart, ___ she is lazy.',zh:'她很聰明，但是她很懶。',opts:['because','but','so','if'],ans:1,rule:'但是 → but'},
+      {text:'It\'s cold, ___ I wear a jacket.',zh:'天很冷，所以我穿外套。',opts:['because','but','so','if'],ans:2,rule:'所以 → so'},
+      {text:'___ you are free, let\'s play.',zh:'如果你有空，我們去玩。',opts:['Because','But','So','If'],ans:3,rule:'如果 → If'},
+      {text:'I like music ___ it makes me happy.',zh:'我喜歡音樂，因為它讓我開心。',opts:['because','but','so','if'],ans:0,rule:'因為 → because'},
+      {text:'He studied hard, ___ he still failed.',zh:'他很認真讀書，但是他還是不及格。',opts:['because','but','so','if'],ans:1,rule:'但是 → but'},
+      {text:'She was sick, ___ she went to the doctor.',zh:'她生病了，所以她去看醫生。',opts:['because','but','so','if'],ans:2,rule:'所以 → so'},
+      {text:'___ it rains, we will stay inside.',zh:'如果下雨，我們就待在裡面。',opts:['Because','But','So','If'],ans:3,rule:'如果 → If'},
+      {text:'I\'m hungry ___ I didn\'t eat.',zh:'我很餓，因為我沒有吃東西。',opts:['because','but','so','if'],ans:0,rule:'因為 → because'},
+      {text:'I want to go, ___ I have homework.',zh:'我想去，但是我有作業。',opts:['because','but','so','if'],ans:1,rule:'但是 → but'},
+    ]
+  },
+  8:{
+    title:'介系詞 in/on/at',icon:'📌',
+    mnemonic:'<span class="hi-am">in</span> → 裡面 / 月 / 年 / 早午晚<br><span class="hi-is">on</span> → 上面 / 星期 / 日期<br><span class="hi-are">at</span> → 幾點 / 小地方',
+    tip:'in the morning / in May / in 2024<br>on Monday / on May 5th / on the table<br>at 3 o\'clock / at home / at school',
+    examples:[
+      {en:'I wake up <span class="blank-filled">in</span> the morning.',zh:'我早上起床。（早午晚 → in）'},
+      {en:'We have class <span class="blank-filled">on</span> Monday.',zh:'我們星期一有課。（星期 → on）'},
+      {en:'School starts <span class="blank-filled">at</span> 8 o\'clock.',zh:'學校八點開始。（幾點 → at）'},
+    ],
+    questions:[
+      {text:'I wake up ___ the morning.',zh:'我早上起床。',opts:['in','on','at','to'],ans:0,rule:'早上 morning → in'},
+      {text:'We have a test ___ Monday.',zh:'我們星期一考試。',opts:['in','on','at','to'],ans:1,rule:'星期 → on'},
+      {text:'Class starts ___ 8 o\'clock.',zh:'課八點開始。',opts:['in','on','at','to'],ans:2,rule:'幾點 → at'},
+      {text:'My birthday is ___ July.',zh:'我的生日在七月。',opts:['in','on','at','to'],ans:0,rule:'月份 → in'},
+      {text:'The book is ___ the table.',zh:'書在桌上。',opts:['in','on','at','to'],ans:1,rule:'上面 → on'},
+      {text:'She is ___ home now.',zh:'她現在在家。',opts:['in','on','at','to'],ans:2,rule:'at home（固定用法）'},
+      {text:'We swim ___ the afternoon.',zh:'我們下午游泳。',opts:['in','on','at','to'],ans:0,rule:'下午 afternoon → in'},
+      {text:'I was born ___ May 5th.',zh:'我五月五日出生。',opts:['in','on','at','to'],ans:1,rule:'日期 → on'},
+      {text:'Let\'s meet ___ 3:30.',zh:'我們三點半見。',opts:['in','on','at','to'],ans:2,rule:'幾點 → at'},
+      {text:'He is ___ school now.',zh:'他現在在學校。',opts:['in','on','at','to'],ans:2,rule:'at school（固定用法）'},
+    ]
+  },
+};
+
+// ===== STATE =====
+let currentUnit = 1;
+let qIdx = 0;
+let qScore = 0;
+let qResults = [];
+let qLocked = false;
+let currentQuestions = [];
+
+function getGProgress(){
+  try{return JSON.parse(localStorage.getItem('grammarProgress')||'{}');}catch(e){return {};}
+}
+function saveGProgress(d){
+  try{localStorage.setItem('grammarProgress',JSON.stringify(d));}catch(e){}
+}
+
+// ===== SCREENS =====
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goHome(){
+  renderHome();
+  showScreen('screenHome');
+}
+
+// ===== HOME =====
+function renderHome(){
+  const grid=document.getElementById('unitGrid');
+  grid.innerHTML='';
+  const prog=getGProgress();
+  let done=0;
+  Object.keys(UNITS).forEach(k=>{
+    const u=UNITS[k];
+    const isDone=prog[`unit${k}`]&&prog[`unit${k}`].done;
+    if(isDone) done++;
+    const card=document.createElement('div');
+    card.className='unit-card'+(isDone?' done':'');
+    card.innerHTML=`<div class="u-icon">${u.icon}</div><div class="u-title">${u.title}</div><div class="u-desc">${u.questions.length} 題練習${isDone&&prog[`unit${k}`].stars?' ⭐'.repeat(prog[`unit${k}`].stars):''}</div>`;
+    card.onclick=()=>openUnit(parseInt(k));
+    grid.appendChild(card);
+  });
+  document.getElementById('totalDone').textContent=done;
+  document.getElementById('totalBar').style.width=(done/8*100)+'%';
+}
+
+// ===== UNIT INTRO =====
+function openUnit(num){
+  currentUnit=num;
+  const u=UNITS[num];
+  const mc=document.getElementById('mnemonicCard');
+  mc.innerHTML=`<div class="m-title">${u.icon} ${u.title}</div><div class="m-rule">${u.mnemonic}</div><div class="m-tip">💡 ${u.tip}</div>`;
+
+  const ex=document.getElementById('examplesBox');
+  ex.innerHTML='<h3 style="color:#4FC3F7;font-size:.95em;margin-bottom:6px">📝 例句：</h3>';
+  u.examples.forEach(e=>{
+    ex.innerHTML+=`<div class="example-item"><div class="ex-en">${e.en}</div><div class="ex-zh">${e.zh}</div></div>`;
+  });
+  showScreen('screenIntro');
+}
+
+// ===== QUIZ =====
+function startUnitQuiz(){
+  const u=UNITS[currentUnit];
+  currentQuestions=[...u.questions].sort(()=>Math.random()-0.5);
+  qIdx=0; qScore=0; qResults=[]; qLocked=false;
+  renderQ();
+  showScreen('screenQuiz');
+}
+
+function renderQ(){
+  const q=currentQuestions[qIdx];
+  const total=currentQuestions.length;
+  document.getElementById('qNum').textContent=`第 ${qIdx+1} / ${total} 題`;
+  document.getElementById('qBarFill').style.width=(qIdx/total*100)+'%';
+  document.getElementById('qScore').textContent=`⭐ ${qScore} 分`;
+  document.getElementById('qFeedback').innerHTML='';
+
+  // Sentence
+  const sDiv=document.getElementById('qSentence');
+  const textHtml=q.text.replace('___','<span class="q-blank">？</span>');
+  sDiv.innerHTML=`<div class="q-text">${textHtml}</div><div class="q-zh">${q.zh}</div>`;
+
+  // Listen row
+  const lr=document.getElementById('listenRow');
+  lr.style.display='flex';
+
+  // Hint
+  document.getElementById('qHint').textContent='💡 '+UNITS[currentUnit].tip.split('<br>')[0].replace(/<[^>]+>/g,'');
+
+  // Options
+  const optDiv=document.getElementById('qOptions');
+  optDiv.innerHTML='';
+  const labels=['A','B','C','D'];
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('div');
+    btn.className='q-opt';
+    btn.innerHTML=`<span class="opt-label">${labels[i]}</span>${opt}`;
+    btn.onclick=()=>checkQ(btn,i,q);
+    optDiv.appendChild(btn);
+  });
+}
+
+function speakQ(){
+  const q=currentQuestions[qIdx];
+  const fullText=q.text.replace('___','blank');
+  speakWord(fullText,'en-US');
+}
+
+function checkQ(btn,selected,q){
+  if(qLocked)return;
+  qLocked=true;
+  const correct=selected===q.ans;
+  const fb=document.getElementById('qFeedback');
+  const encourage={
+    correct:['太棒了！🎉','答對了！💪','你好厲害！⭐','完美！✨','正確！👏','太強了！🔥'],
+    wrong:['沒關係！記住口訣再試 💪','差一點！看看提示 😊','加油！你快學會了 🌱'],
+  };
+
+  if(correct){
+    btn.classList.add('correct');
+    qScore+=10;
+    document.getElementById('qScore').textContent=`⭐ ${qScore} 分`;
+    const msg=encourage.correct[Math.floor(Math.random()*encourage.correct.length)];
+    fb.innerHTML=`<div class="fb-msg" style="color:#00E676">${msg}</div><div class="fb-rule">${q.rule}</div>`;
+    qResults.push({q,correct:true});
+    // Speak the correct sentence
+    const full=q.text.replace('___',q.opts[q.ans]);
+    setTimeout(()=>speakWord(full,'en-US'),300);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.q-opt').forEach((o,i)=>{
+      if(i===q.ans) o.classList.add('correct');
+    });
+    const msg=encourage.wrong[Math.floor(Math.random()*encourage.wrong.length)];
+    fb.innerHTML=`<div class="fb-msg" style="color:#FF6B35">${msg}</div><div class="fb-explain">正確答案：<strong>${q.opts[q.ans]}</strong></div><div class="fb-rule">${q.rule}</div>`;
+    qResults.push({q,correct:false});
+    const full=q.text.replace('___',q.opts[q.ans]);
+    setTimeout(()=>speakWord(full,'en-US'),500);
+  }
+
+  setTimeout(()=>{
+    qLocked=false;
+    qIdx++;
+    if(qIdx>=currentQuestions.length) finishUnit();
+    else renderQ();
+  },correct?1500:3000);
+}
+
+function finishUnit(){
+  const total=currentQuestions.length;
+  const correct=qResults.filter(r=>r.correct).length;
+  const pct=correct/total;
+  const stars=pct>=1?3:pct>=0.7?2:pct>=0.4?1:0;
+
+  const prog=getGProgress();
+  const prev=prog[`unit${currentUnit}`]||{};
+  prog[`unit${currentUnit}`]={done:true,score:Math.max(prev.score||0,qScore),stars:Math.max(prev.stars||0,stars)};
+  saveGProgress(prog);
+
+  const msgs=pct>=0.8?['你太厲害了！這個句型完全學會了！🏆','太強了！會考遇到這種題穩拿！💪']:pct>=0.5?['很不錯！再練一次會更熟！⭐','進步了！你越來越厲害了！😊']:['不要氣餒！多看幾次口訣就會了！🌱','慢慢來，每次都在進步！💪'];
+
+  document.getElementById('rIcon').textContent=pct>=0.8?'🏆':pct>=0.5?'💪':'🌱';
+  document.getElementById('rTitle').textContent=`${UNITS[currentUnit].icon} ${UNITS[currentUnit].title}`;
+  document.getElementById('rStars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+  document.getElementById('rScore').textContent=`${correct} / ${total} 答對`;
+  document.getElementById('rMsg').textContent=msgs[Math.floor(Math.random()*msgs.length)];
+
+  const wr=document.getElementById('wrongReview');
+  const wrongs=qResults.filter(r=>!r.correct);
+  if(wrongs.length>0){
+    let html='<h4>🔄 要加強的題目：</h4>';
+    wrongs.forEach(r=>{
+      html+=`<div class="wrong-item"><div class="wi-q">${r.q.text.replace('___','<strong style="color:#FFD700">___</strong>')} (${r.q.zh})</div><div class="wi-a">答案：${r.q.opts[r.q.ans]}</div><div class="wi-r">口訣：${r.q.rule}</div></div>`;
+    });
+    wr.innerHTML=html;
+  } else wr.innerHTML='<div style="text-align:center;color:#00E676;font-size:1.1em;font-weight:700">🎉 全部答對！太厲害了！</div>';
+
+  showScreen('screenResults');
+}
+
+// ===== SPEECH =====
+function speakWord(text,lang){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang||'en-US';
+  u.rate=0.75;
+  const voices=window.speechSynthesis.getVoices();
+  if(voices.length){
+    const m=voices.find(v=>v.lang.startsWith(lang==='en-US'?'en':'zh'));
+    if(m) u.voice=m;
+  }
+  window.speechSynthesis.speak(u);
+}
+if(window.speechSynthesis){
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
+}
+
+// ===== INIT =====
+renderHome();
+</script>
+</body>
+</html>
