@@ -108,7 +108,7 @@ function getStepsText(){
   const s=SHAPES[curN],n=curN;
   const arr=[
     {label:`${s.icon} 出發！`,text:`這是一個${s.name}！\n小車車準備出發跑一圈 🚗💨`,border:'#00C9A7'},
-    {label:'什麼是外角？',text:'小車車跑到轉角時\n要「轉彎」的角度 = 外角！\n每個轉角都轉一點點⋯',border:'#FFD700'},
+    {label:'什麼是外角？',text:'看頂點 A：\n灰色 = 內角（三角形裡面的角）\n把邊延長出去 ➡ 虛線\n橘色 = 外角（延長線和另一條邊中間的角）\n內角＋外角 = 一條直線 = 180°',border:'#FFD700'},
   ];
   for(let i=0;i<n;i++){
     arr.push({label:`🚗 第 ${i+1} 個轉彎`,text:`小車車到了頂點 ${String.fromCharCode(65+i)}！\n轉彎！外角被撕下來\n飛到右邊的圓圈裡！`,border:extC[i]});
@@ -158,6 +158,40 @@ function drawCar(x,y,angle,alpha){
   ctx.fillStyle='#333';
   ctx.fillRect(-10,-12,8,3);ctx.fillRect(-10,9,8,3);
   ctx.restore();ctx.globalAlpha=1;
+}
+
+// Draw interior angle arc at a vertex (gray, to contrast with exterior)
+function drawIntArc(verts,idx,alpha,radius){
+  radius=radius||28;
+  const n=verts.length;
+  const prev=verts[(idx-1+n)%n],cur=verts[idx],next=verts[(idx+1)%n];
+  const a1=Math.atan2(prev.y-cur.y,prev.x-cur.x);
+  const a2=Math.atan2(next.y-cur.y,next.x-cur.x);
+  ctx.globalAlpha=alpha;
+  ctx.beginPath();ctx.moveTo(cur.x,cur.y);
+  ctx.arc(cur.x,cur.y,radius,a2,a1);
+  ctx.closePath();
+  ctx.fillStyle='rgba(255,255,255,0.15)';ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.globalAlpha=1;
+}
+
+// Draw label with arrow line pointing to a position
+function drawArrowLabel(fromX,fromY,toX,toY,text,color,alpha){
+  ctx.globalAlpha=alpha;
+  ctx.beginPath();ctx.moveTo(fromX,fromY);ctx.lineTo(toX,toY);
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();
+  // Arrowhead
+  const angle=Math.atan2(toY-fromY,toX-fromX);
+  ctx.beginPath();
+  ctx.moveTo(toX,toY);
+  ctx.lineTo(toX-8*Math.cos(angle-0.4),toY-8*Math.sin(angle-0.4));
+  ctx.lineTo(toX-8*Math.cos(angle+0.4),toY-8*Math.sin(angle+0.4));
+  ctx.closePath();ctx.fillStyle=color;ctx.fill();
+  // Text
+  ctx.fillStyle=color;ctx.font='bold 15px "Noto Sans TC"';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(text,fromX,fromY-12);
+  ctx.globalAlpha=1;
 }
 
 // Draw exterior angle arc at a vertex
@@ -278,68 +312,109 @@ function render(){
     requestAnimationFrame(render);
   }
   else if(step===1){
-    // Explain: show one exterior angle example with extension line
+    // Explain: show interior angle (gray) + extension line + exterior angle (colored) + clear labels
     drawPoly(verts,1);drawVerts(verts,1);
-    drawExtLine(verts,0,anim);
-    drawExtArc(exts[0],0,0.5*anim,35);
     const dir=Math.atan2(verts[1].y-verts[0].y,verts[1].x-verts[0].x);
-    drawCar(verts[0].x,verts[0].y,dir,1);
+    drawCar(verts[0].x,verts[0].y,dir,0.6);
     drawAssembly(0,exts,-1);
-    if(anim>0.5){
-      const prev=verts[n-1],cur=verts[0];
-      const dx=cur.x-prev.x,dy=cur.y-prev.y,len=Math.sqrt(dx*dx+dy*dy);
-      drawLabel(cur.x+dx/len*55,cur.y+dy/len*55,'← 外角','#FF6B35',16,anim);
-      drawLabel(cur.x+dx/len*40,cur.y+dy/len*40+20,'(轉彎的角度)','#B0C4DE',13,anim);
+
+    const v0=verts[0],prev0=verts[n-1],next0=verts[1];
+
+    // Step animation: first interior, then extension, then exterior
+    // Phase 1 (0→0.3): show interior angle (gray)
+    if(anim>0){
+      const t1=Math.min(anim/0.3,1);
+      drawIntArc(verts,0,0.5*t1,35);
+      // Label "內角" with arrow
+      const intMidA=(Math.atan2(prev0.y-v0.y,prev0.x-v0.x)+Math.atan2(next0.y-v0.y,next0.x-v0.x))/2;
+      const ilx=v0.x+Math.cos(intMidA)*55,ily=v0.y+Math.sin(intMidA)*55;
+      drawArrowLabel(v0.x+Math.cos(intMidA)*80,v0.y+Math.sin(intMidA)*80,ilx,ily,'內角','rgba(255,255,255,0.6)',t1);
+    }
+    // Phase 2 (0.3→0.6): draw extension line
+    if(anim>0.3){
+      const t2=Math.min((anim-0.3)/0.3,1);
+      drawExtLine(verts,0,t2);
+      // Label "延長線"
+      const dx0=v0.x-prev0.x,dy0=v0.y-prev0.y,len0=Math.sqrt(dx0*dx0+dy0*dy0);
+      drawLabel(v0.x+dx0/len0*85,v0.y+dy0/len0*85+15,'延長線 →','#B0C4DE',13,t2);
+    }
+    // Phase 3 (0.6→1.0): show exterior angle (colored) with label
+    if(anim>0.6){
+      const t3=Math.min((anim-0.6)/0.4,1);
+      drawExtArc(exts[0],0,0.6*t3,40);
+      // Label "外角" with arrow pointing to the exterior angle area
+      const extMidA=(exts[0].inAngle+exts[0].outAngle)/2;
+      const elx=v0.x+Math.cos(extMidA)*50,ely=v0.y+Math.sin(extMidA)*50;
+      drawArrowLabel(v0.x+Math.cos(extMidA)*90,v0.y+Math.sin(extMidA)*90,elx,ely,'外角','#FF6B35',t3);
+      // Show "內角 + 外角 = 180°" text
+      if(t3>0.5){
+        drawLabel(350,480,'💡 內角 ＋ 外角 ＝ 一條直線 ＝ 180°','#FFD700',16,(t3-0.5)*2);
+      }
     }
   }
   else if(step>=2 && step<2+n){
     // Collect each exterior angle
-    const idx=step-2; // which angle we're collecting (0-based)
+    const idx=step-2;
 
     drawPoly(verts,0.7);drawVerts(verts,0.8);
-    drawAssembly(idx,exts,-1); // show previously collected
+    drawAssembly(idx,exts,-1);
 
-    // Show extension lines for completed angles
+    // Show completed angles faintly
     for(let i=0;i<idx;i++){
-      drawExtLine(verts,i,0.4);
-      drawExtArc(exts[i],i,0.15,30);
+      drawExtLine(verts,i,0.3);
+      drawExtArc(exts[i],i,0.12,28);
     }
 
-    // Current angle animation
-    if(anim<0.35){
+    // Always show interior angle at current vertex (gray) for context
+    if(anim>0.1){
+      drawIntArc(verts,idx,0.4,30);
+    }
+
+    if(anim<0.3){
       // Phase 1: car drives to vertex
-      const fromV=verts[(idx-1+n)%n];
-      const toV=verts[idx];
-      const t=anim/0.35;
+      const fromV=verts[(idx-1+n)%n],toV=verts[idx];
+      const t=anim/0.3;
       const carPos=lerpPt(fromV,toV,t);
       const dir=Math.atan2(toV.y-fromV.y,toV.x-fromV.x);
       drawCar(carPos.x,carPos.y,dir,1);
     }
     else if(anim<0.55){
-      // Phase 2: car at vertex, exterior angle appears
-      const t=(anim-0.35)/0.2;
-      const dir=Math.atan2(verts[(idx+1)%n].y-verts[idx].y,verts[(idx+1)%n].x-verts[idx].x);
-      // Car turns
+      // Phase 2: car at vertex, show interior(gray) + extension + exterior(color)
+      const t=(anim-0.3)/0.25;
       const inDir=Math.atan2(verts[idx].y-verts[(idx-1+n)%n].y,verts[idx].x-verts[(idx-1+n)%n].x);
-      const carAngle=lerp(inDir,dir,t);
+      const outDir=Math.atan2(verts[(idx+1)%n].y-verts[idx].y,verts[(idx+1)%n].x-verts[idx].x);
+      const carAngle=lerp(inDir,outDir,t);
       drawCar(verts[idx].x,verts[idx].y,carAngle,1);
+      // Extension line grows
       drawExtLine(verts,idx,t);
-      drawExtArc(exts[idx],idx,0.6*t,35);
-      // "轉彎！" label
-      drawLabel(verts[idx].x,verts[idx].y-35,'轉彎！🔄',extC[idx],16,t);
+      // Exterior angle appears
+      drawExtArc(exts[idx],idx,0.65*t,38);
+
+      // Labels
+      const v=verts[idx],prev=verts[(idx-1+n)%n],next=verts[(idx+1)%n];
+      // Interior label
+      const intMidA=(Math.atan2(prev.y-v.y,prev.x-v.x)+Math.atan2(next.y-v.y,next.x-v.x))/2;
+      drawLabel(v.x+Math.cos(intMidA)*50,v.y+Math.sin(intMidA)*50,'內角','rgba(255,255,255,0.5)',13,t);
+      // Exterior label
+      const extMidA=(exts[idx].inAngle+exts[idx].outAngle)/2;
+      drawLabel(v.x+Math.cos(extMidA)*55,v.y+Math.sin(extMidA)*55,'外角',extC[idx],14,t);
+      // Turn label
+      if(t>0.5) drawLabel(v.x,v.y-40,'轉彎！🔄',extC[idx],16,(t-0.5)*2);
     }
     else{
       // Phase 3: exterior angle flies to assembly circle
       const t=(anim-0.55)/0.45;
-      const dir=Math.atan2(verts[(idx+1)%n].y-verts[idx].y,verts[(idx+1)%n].x-verts[idx].x);
-      drawCar(verts[idx].x,verts[idx].y,dir,1);
-      drawExtLine(verts,idx,1-t*0.5);
+      const outDir=Math.atan2(verts[(idx+1)%n].y-verts[idx].y,verts[(idx+1)%n].x-verts[idx].x);
+      drawCar(verts[idx].x,verts[idx].y,outDir,1);
+      drawExtLine(verts,idx,1-t*0.6);
 
-      // Draw the flying sector
+      // Flying sector
       drawFlyingSector(exts[idx],idx,idx,exts,t);
+      // Fading arc at vertex
+      drawExtArc(exts[idx],idx,0.25*(1-t),30);
 
-      // At vertex, fading arc
-      drawExtArc(exts[idx],idx,0.3*(1-t),30);
+      // Keep interior angle visible
+      drawIntArc(verts,idx,0.3*(1-t),28);
     }
   }
   else if(step===T-2){
