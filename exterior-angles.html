@@ -71,7 +71,14 @@ const SHAPES={
   5:{name:'五邊形',icon:'⬠',verts:[{x:280,y:75},{x:480,y:190},{x:420,y:410},{x:140,y:410},{x:80,y:190}]},
 };
 
-let curN=3,step=0,anim=0,animId=null;
+let curN=3,step=0,anim=0,animId=null,_ccw=true;
+
+// Detect polygon winding direction (CCW = true in screen coords)
+function isCCW(verts){
+  let sum=0;
+  for(let i=0;i<verts.length;i++){const c=verts[i],n=verts[(i+1)%verts.length];sum+=(n.x-c.x)*(n.y+c.y);}
+  return sum<0;
+}
 
 // Compute exterior (turning) angles for the polygon
 function computeExteriors(verts){
@@ -169,7 +176,7 @@ function drawIntArc(verts,idx,alpha,radius){
   const a2=Math.atan2(next.y-cur.y,next.x-cur.x);
   ctx.globalAlpha=alpha;
   ctx.beginPath();ctx.moveTo(cur.x,cur.y);
-  ctx.arc(cur.x,cur.y,radius,a2,a1);
+  ctx.arc(cur.x,cur.y,radius,a2,a1,!_ccw);
   ctx.closePath();
   ctx.fillStyle='rgba(255,255,255,0.15)';ctx.fill();
   ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1.5;ctx.stroke();
@@ -203,7 +210,7 @@ function drawExtArc(ext,idx,alpha,radius){
   // Draw counterclockwise from inAngle to outAngle = the exterior angle (small arc, on the outside)
   ctx.globalAlpha=alpha;
   ctx.beginPath();ctx.moveTo(v.x,v.y);
-  ctx.arc(v.x,v.y,radius,ext.inAngle,ext.outAngle,true); // true = counterclockwise = the small outside arc
+  ctx.arc(v.x,v.y,radius,ext.inAngle,ext.outAngle,_ccw); // direction depends on polygon winding
   ctx.closePath();
   ctx.fillStyle=extC[idx];ctx.fill();
   ctx.strokeStyle=extC[idx];ctx.lineWidth=2;ctx.stroke();
@@ -263,7 +270,7 @@ function drawFlyingSector(ext,idx,collectedBefore,exts,progress){
   const r=lerp(30,AR,progress);
 
   // Source: midpoint of exterior angle at vertex (CCW from inAngle)
-  const srcMid=ext.inAngle-ext.extAngle/2;
+  const srcMid=_ccw ? ext.inAngle-ext.extAngle/2 : ext.inAngle+ext.extAngle/2;
   // Destination: midpoint of sector in assembly circle
   let accum=0;
   for(let i=0;i<collectedBefore;i++)accum+=exts[i].extAngle;
@@ -295,6 +302,7 @@ function render(){
   const n=curN;
   const T=totalSteps();
   const exts=computeExteriors(verts);
+  _ccw=isCCW(verts);
 
   if(step===0){
     // Intro: show polygon + car at vertex 0
