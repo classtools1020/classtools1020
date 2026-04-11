@@ -136,8 +136,28 @@ canvas#particles{position:fixed;inset:0;pointer-events:none;z-index:999}
   <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
   <div class="xp-text" id="xpText">EXP 0 / 200</div>
   <div class="map-scroll"><div class="map-path" id="mapPath"></div></div>
-  <div style="text-align:center;margin-top:10px">
+  <div style="text-align:center;margin-top:10px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
     <a href="grammar-practice.html" class="btn btn-neon" style="text-decoration:none;font-size:.9em">📝 去練句型</a>
+    <button class="btn btn-ghost" style="font-size:.9em" onclick="showTeacher()">📊 給老師看</button>
+  </div>
+</div>
+
+<!-- ===== TEACHER VERIFICATION ===== -->
+<div class="screen" id="scrTeacher">
+  <button class="btn-back" onclick="goHome()">⬅ 回冒險地圖</button>
+  <div style="text-align:center;padding:10px 0">
+    <h2 style="color:var(--neon-gold);font-size:1.5em">📊 學習紀錄</h2>
+    <div style="color:var(--neon-blue);font-size:.85em;margin-top:4px">給老師確認用</div>
+  </div>
+  <div style="max-width:500px;margin:0 auto">
+    <div style="background:var(--glass);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;margin:10px 0">
+      <div style="margin-bottom:10px">
+        <label style="font-size:.85em;color:rgba(255,255,255,.5)">學生姓名：</label>
+        <input type="text" id="studentName" placeholder="輸入你的名字" style="width:100%;padding:10px;border-radius:10px;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;font-size:1.1em;font-family:'Noto Sans TC',sans-serif;margin-top:4px" oninput="renderReport()">
+      </div>
+      <div id="verifyCode" style="text-align:center;background:rgba(255,215,0,.1);border:1px dashed var(--neon-gold);border-radius:10px;padding:10px;margin:8px 0;font-size:.85em;color:var(--neon-gold)"></div>
+    </div>
+    <div id="teacherReport"></div>
   </div>
 </div>
 
@@ -165,7 +185,10 @@ canvas#particles{position:fixed;inset:0;pointer-events:none;z-index:999}
       <button class="audio-btn" onclick="speak(CUR_WORDS[learnIdx].zh,'zh-TW')" style="width:56px;height:56px;font-size:1.3em;background:linear-gradient(135deg,var(--neon-blue),var(--neon-green))">🗣</button>
     </div>
     <div style="font-size:2em;color:#fff" id="learnZh"></div>
-    <div style="font-size:.95em;color:var(--neon-blue);margin-top:10px;font-style:italic" id="learnS"></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px">
+      <button class="audio-btn" onclick="speakSentence()" style="width:36px;height:36px;font-size:.9em;background:linear-gradient(135deg,#9c27b0,#e040fb);box-shadow:0 2px 10px rgba(156,39,176,.3);flex-shrink:0" id="sentenceAudioBtn">🔊</button>
+      <div style="font-size:.95em;color:var(--neon-blue);font-style:italic" id="learnS"></div>
+    </div>
     <div style="font-size:.85em;color:rgba(255,255,255,.5);margin-top:4px" id="learnSz"></div>
   </div>
   <div style="display:flex;gap:12px;justify-content:center;margin-top:16px">
@@ -331,7 +354,7 @@ let qIdx=0,qScore=0,qCombo=0,qMaxCombo=0,qResults=[],qLocked=false,qList=[];
 function gp(){try{return JSON.parse(localStorage.getItem('rpgProg')||'{}')}catch(e){return{}}}
 function sp(d){try{localStorage.setItem('rpgProg',JSON.stringify(d))}catch(e){}}
 function dp(day){const p=gp();return p[`d${day}`]||{done:false,stars:0,score:0}}
-function sdp(day,v){const p=gp();p[`d${day}`]={...dp(day),...v};sp(p)}
+function sdp(day,v){const p=gp();const prev=dp(day);const upd={...prev,...v};if(!prev.done&&upd.done)upd.doneAt=new Date().toISOString();p[`d${day}`]=upd;sp(p)}
 function addXp(n){const p=gp();p.xp=(p.xp||0)+n;p.totalWords=Object.keys(D).reduce((s,k)=>s+(dp(k).done?D[k].w.length:0),0);sp(p)}
 function markDay(){const p=gp();p['date_'+new Date().toISOString().slice(0,10)]=true;sp(p)}
 function getStreak(){const p=gp();let s=0;const now=new Date();for(let i=0;i<60;i++){const d=new Date(now);d.setDate(d.getDate()-i);if(p['date_'+d.toISOString().slice(0,10)])s++;else break;}return s;}
@@ -454,6 +477,7 @@ function renderLearn(){
   document.getElementById('learnZh').textContent=w.zh;
   document.getElementById('learnS').textContent=w.s||'';
   document.getElementById('learnSz').textContent=w.sz||'';
+  document.getElementById('sentenceAudioBtn').style.display=w.s?'block':'none';
   speak(w.en,'en-US');
 }
 function learnNext(){
@@ -582,6 +606,77 @@ function finishQuiz(){
     wl.innerHTML=h;
   }else wl.innerHTML='';
   show('scrResult');
+}
+
+// ========== SENTENCE AUDIO ==========
+function speakSentence(){
+  const w=CUR_WORDS[learnIdx];
+  if(w&&w.s)speak(w.s,'en-US');
+}
+
+// ========== TEACHER VERIFICATION ==========
+function showTeacher(){
+  renderReport();
+  show('scrTeacher');
+  // Restore saved name
+  const p=gp();
+  if(p.studentName)document.getElementById('studentName').value=p.studentName;
+}
+function renderReport(){
+  const name=document.getElementById('studentName').value.trim();
+  const p=gp();
+  if(name){p.studentName=name;sp(p);}
+
+  // Generate verification code (date + progress hash)
+  const today=new Date().toISOString().slice(0,10);
+  let doneCount=0,totalStars=0,totalScore=0;
+  const dayRows=[];
+  for(let d=1;d<=20;d++){
+    const prog=dp(d);
+    if(prog.done){
+      doneCount++;totalStars+=prog.stars||0;totalScore+=prog.score||0;
+      const t=prog.doneAt?new Date(prog.doneAt):null;
+      const timeStr=t?`${t.getMonth()+1}/${t.getDate()} ${t.getHours()}:${String(t.getMinutes()).padStart(2,'0')}`:'--';
+      dayRows.push({d,prog,timeStr});
+    }
+  }
+  const code=`${(name||'?').slice(0,4)}-${today.replace(/-/g,'').slice(4)}-${doneCount}D${totalStars}S`;
+  document.getElementById('verifyCode').innerHTML=`驗證碼：<strong style="font-size:1.3em;letter-spacing:2px">${code}</strong><br><span style="font-size:.75em;color:rgba(255,255,255,.4)">老師可以用此碼確認學習紀錄真實性</span>`;
+
+  let html=`<div style="background:var(--glass);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;margin:10px 0">
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <span>📅 查詢日期</span><span style="color:var(--neon-gold)">${today}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <span>📚 已完成天數</span><span style="color:var(--neon-green);font-weight:700">${doneCount} / 20 天</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <span>🔤 已學單字</span><span style="color:var(--neon-blue);font-weight:700">${Object.keys(D).reduce((s,k)=>s+(dp(k).done?D[k].w.length:0),0)} / 200 字</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+      <span>⭐ 總星數</span><span style="color:var(--neon-gold);font-weight:700">${totalStars} ⭐</span>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      <span>🔥 連續天數</span><span style="color:var(--neon-orange);font-weight:700">${getStreak()} 天</span>
+    </div>
+  </div>`;
+
+  if(dayRows.length>0){
+    html+=`<div style="background:var(--glass);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;margin:10px 0">
+      <div style="font-weight:700;margin-bottom:8px;color:var(--neon-blue)">📋 完成紀錄</div>`;
+    dayRows.forEach(r=>{
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.85em">
+        <span>${D[r.d].i} Day${r.d} ${D[r.d].t}</span>
+        <span style="color:rgba(255,255,255,.5)">${r.timeStr}</span>
+        <span>${'⭐'.repeat(r.prog.stars||0)}</span>
+      </div>`;
+    });
+    html+=`</div>`;
+  } else {
+    html+=`<div style="text-align:center;color:rgba(255,255,255,.3);margin:30px 0">還沒有完成任何關卡喔！<br>快去冒險吧！🗺</div>`;
+  }
+
+  document.getElementById('teacherReport').innerHTML=html;
 }
 
 // ========== INIT ==========
