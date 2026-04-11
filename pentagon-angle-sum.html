@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>五邊形內角和 = 540° 動畫</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0B1D3A;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(1px 1px at 10% 20%,#FFD700 100%,transparent),radial-gradient(1.5px 1.5px at 50% 10%,#fff 100%,transparent),radial-gradient(1px 1px at 70% 40%,#FFD700 100%,transparent),radial-gradient(1px 1px at 90% 80%,#fff 100%,transparent),radial-gradient(1px 1px at 25% 75%,#FFD700 100%,transparent),radial-gradient(1px 1px at 80% 25%,#fff 100%,transparent);pointer-events:none;z-index:0}
+.container{position:relative;z-index:1;width:100%;max-width:900px;padding:20px}
+h1{text-align:center;font-size:2em;font-weight:900;margin:10px 0 5px;background:linear-gradient(135deg,#00C9A7,#4FC3F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;color:#FFD700;font-size:1.1em;margin-bottom:15px}
+canvas{width:100%;max-width:700px;height:auto;display:block;margin:0 auto;border-radius:16px;background:#112D5A;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.controls{display:flex;justify-content:center;gap:12px;margin:18px 0;flex-wrap:wrap}
+.btn{padding:14px 32px;border:none;border-radius:50px;font-family:'Noto Sans TC',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:8px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.3)}
+.btn:active{transform:translateY(0)}
+.btn-next{background:linear-gradient(135deg,#FF6B35,#FF8F60);color:#fff}
+.btn-prev{background:#1A3A6A;color:#B0C4DE;border:2px solid #2A5A8A}
+.btn-reset{background:#1A3A6A;color:#FFD700;border:2px solid #FFD700}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.info-card{background:#1A3A6A;border-radius:16px;padding:18px 22px;margin:12px auto;max-width:700px;box-shadow:0 4px 16px rgba(0,0,0,0.3);border-left:5px solid #00C9A7;transition:all .4s}
+.step-label{font-size:.85em;color:#00C9A7;font-weight:700;margin-bottom:4px}
+.step-text{font-size:1.15em;line-height:1.6}
+.formula{display:inline-block;background:#FF6B35;color:#fff;padding:6px 18px;border-radius:8px;font-weight:900;font-size:1.3em;margin-top:8px}
+.progress-bar{display:flex;justify-content:center;gap:8px;margin:8px 0}
+.progress-dot{width:14px;height:14px;border-radius:50%;background:#1A3A6A;border:2px solid #2A5A8A;transition:all .3s}
+.progress-dot.active{background:#00C9A7;border-color:#00C9A7;box-shadow:0 0 8px rgba(0,201,167,0.5)}
+.progress-dot.done{background:#FF6B35;border-color:#FF6B35}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>⬠ 五邊形內角和 = 540°</h1>
+  <p class="subtitle">切兩刀變三個三角形，算出來！</p>
+  <div class="progress-bar" id="progressBar"></div>
+  <canvas id="c" width="700" height="520"></canvas>
+  <div class="info-card" id="infoCard">
+    <div class="step-label" id="stepLabel"></div>
+    <div class="step-text" id="stepText"></div>
+  </div>
+  <div class="controls">
+    <button class="btn btn-prev" id="prevBtn" onclick="prev()">⬅ 上一步</button>
+    <button class="btn btn-next" id="nextBtn" onclick="next()">下一步 ➡</button>
+    <button class="btn btn-reset" onclick="reset()">🔄 重來</button>
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+const W=700,H=520;
+
+// Pentagon vertices (irregular, tilted for visual interest)
+const P=[
+  {x:350,y:45},  // A top
+  {x:580,y:170}, // B right-top
+  {x:520,y:420}, // C right-bottom
+  {x:180,y:420}, // D left-bottom
+  {x:120,y:170}, // E left-top
+];
+const [A,B,C,D,E]=P;
+const labels=['A','B','C','D','E'];
+
+// Colors
+const colPent='#00C9A7';
+const colDiag='#FF6B35';
+const triColors=['rgba(255,107,53,0.25)','rgba(79,195,247,0.25)','rgba(255,215,0,0.25)'];
+const triStrokes=['#FF6B35','#4FC3F7','#FFD700'];
+const colGold='#FFD700';
+const colGreen='#00E676';
+const vertColors=['#FF6B35','#FFD700','#4FC3F7','#00E676','#FF2D95'];
+
+// Triangles formed by diagonals from A: △ABC, △ACD, △ADE
+const tris=[[A,B,C],[A,C,D],[A,D,E]];
+
+let step=0;
+const TOTAL=10;
+let anim=0,animId=null;
+
+const steps=[
+  {label:'⬠ 開始',text:'這是一個五邊形！\n它有 5 個角：A、B、C、D、E',border:'#00C9A7'},
+  {label:'✂️ 第1刀！',text:'從角A 到 角C 畫一條對角線\n✂️ 咔嚓！第一刀！',border:'#FF6B35'},
+  {label:'✂️ 第2刀！',text:'從角A 到 角D 再畫一條對角線\n✂️ 咔嚓！第二刀！',border:'#4FC3F7'},
+  {label:'變成三個三角形！',text:'兩刀下去，五邊形變成了\n🔺 △1（橘色）\n🔺 △2（藍色）\n🔺 △3（黃色）',border:'#FFD700'},
+  {label:'分開來看',text:'把三個三角形稍微分開⋯\n每個三角形的內角和都是 180°！',border:'#FFD700'},
+  {label:'🧮 △1 = 180°',text:'△1（橘色）三個角加起來 = 180°',border:'#FF6B35'},
+  {label:'🧮 △2 = 180°',text:'△2（藍色）三個角加起來 = 180°',border:'#4FC3F7'},
+  {label:'🧮 △3 = 180°',text:'△3（黃色）三個角加起來 = 180°',border:'#FFD700'},
+  {label:'🧮 一起算！',text:'三個三角形合在一起：\n180° + 180° + 180° = ？',border:'#FFD700'},
+  {label:'🎉 結論',text:'',border:'#00E676'},
+];
+
+function lerp(a,b,t){return a+(b-a)*t}
+function lerpPt(a,b,t){return{x:lerp(a.x,b.x,t),y:lerp(a.y,b.y,t)}}
+
+if(!ctx.roundRect){ctx.roundRect=function(x,y,w,h,r){if(typeof r==='number')r=[r,r,r,r];this.moveTo(x+r[0],y);this.lineTo(x+w-r[1],y);this.quadraticCurveTo(x+w,y,x+w,y+r[1]);this.lineTo(x+w,y+h-r[2]);this.quadraticCurveTo(x+w,y+h,x+w-r[2],y+h);this.lineTo(x+r[3],y+h);this.quadraticCurveTo(x,y+h,x,y+h-r[3]);this.lineTo(x,y+r[0]);this.quadraticCurveTo(x,y,x+r[0],y);this.closePath()}}
+
+function drawPentagon(alpha){
+  ctx.globalAlpha=alpha;ctx.beginPath();
+  P.forEach((p,i)=>{if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+  ctx.closePath();ctx.strokeStyle=colPent;ctx.lineWidth=4;ctx.stroke();ctx.globalAlpha=1;
+}
+
+function drawVertices(alpha){
+  const offsets=[{dx:0,dy:-22},{dx:22,dy:-10},{dx:18,dy:22},{dx:-18,dy:22},{dx:-22,dy:-10}];
+  P.forEach((p,i)=>{
+    ctx.globalAlpha=alpha;
+    ctx.beginPath();ctx.arc(p.x,p.y,8,0,Math.PI*2);ctx.fillStyle=vertColors[i];ctx.fill();
+    ctx.fillStyle=vertColors[i];ctx.font='bold 22px "Noto Sans TC"';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(labels[i],p.x+offsets[i].dx,p.y+offsets[i].dy);
+    ctx.globalAlpha=1;
+  });
+}
+
+function drawDiagonal(from,to,progress,alpha){
+  ctx.globalAlpha=alpha;
+  const end=lerpPt(from,to,progress);
+  ctx.beginPath();ctx.setLineDash([12,8]);
+  ctx.moveTo(from.x,from.y);ctx.lineTo(end.x,end.y);
+  ctx.strokeStyle=colDiag;ctx.lineWidth=4;ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+}
+
+function drawTriFilled(pts,fillColor,strokeColor,alpha){
+  ctx.globalAlpha=alpha;ctx.beginPath();
+  ctx.moveTo(pts[0].x,pts[0].y);ctx.lineTo(pts[1].x,pts[1].y);ctx.lineTo(pts[2].x,pts[2].y);ctx.closePath();
+  ctx.fillStyle=fillColor;ctx.fill();ctx.strokeStyle=strokeColor;ctx.lineWidth=3;ctx.stroke();ctx.globalAlpha=1;
+}
+
+function drawBadge(x,y,text,bg,alpha,scale){
+  scale=scale||1;ctx.globalAlpha=alpha;ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+  ctx.fillStyle=bg;ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(-55,-18,110,36,10);else ctx.rect(-55,-18,110,36);
+  ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 18px "Noto Sans TC"';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(text,0,0);ctx.restore();ctx.globalAlpha=1;
+}
+
+function drawLabel(x,y,text,color,size,alpha){
+  ctx.globalAlpha=alpha;ctx.fillStyle=color;ctx.font=`bold ${size}px "Noto Sans TC"`;
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,x,y);ctx.globalAlpha=1;
+}
+
+// Centroids for triangle labels
+function centroid(pts){return{x:(pts[0].x+pts[1].x+pts[2].x)/3,y:(pts[0].y+pts[1].y+pts[2].y)/3};}
+const triCenters=tris.map(t=>centroid(t));
+
+// Separated triangle positions (offset for visual separation)
+function sepTri(tri,idx,amount){
+  const c=centroid(tri);const cx=350,cy=260;
+  const dx=(c.x-cx),dy=(c.y-cy);
+  const dist=Math.sqrt(dx*dx+dy*dy)||1;
+  const ox=dx/dist*amount,oy=dy/dist*amount;
+  return tri.map(p=>({x:p.x+ox,y:p.y+oy}));
+}
+
+function drawAngleArcs(pts,color,alpha){
+  pts.forEach((v,i)=>{
+    const p1=pts[(i+1)%3],p2=pts[(i+2)%3];
+    const a1=Math.atan2(p1.y-v.y,p1.x-v.x);
+    const a2=Math.atan2(p2.y-v.y,p2.x-v.x);
+    ctx.globalAlpha=alpha;ctx.beginPath();ctx.moveTo(v.x,v.y);
+    ctx.arc(v.x,v.y,25,a1,a2);ctx.closePath();ctx.fillStyle=color;ctx.fill();ctx.globalAlpha=1;
+  });
+}
+
+function render(){
+  ctx.clearRect(0,0,W,H);
+
+  if(step===0){
+    drawPentagon(1);drawVertices(1);
+  }
+  else if(step===1){
+    drawPentagon(1);drawVertices(1);
+    drawDiagonal(A,C,anim,1);
+    if(anim<1){const s=lerpPt(A,C,anim);drawLabel(s.x+20,s.y-15,'✂️','#fff',28,1);}
+  }
+  else if(step===2){
+    drawPentagon(1);drawVertices(1);
+    drawDiagonal(A,C,1,1);
+    drawDiagonal(A,D,anim,1);
+    if(anim<1){const s=lerpPt(A,D,anim);drawLabel(s.x+20,s.y-15,'✂️','#fff',28,1);}
+  }
+  else if(step===3){
+    // Three triangles highlighted
+    tris.forEach((t,i)=>drawTriFilled(t,triColors[i],triStrokes[i],0.6*anim));
+    drawPentagon(1);drawDiagonal(A,C,1,1);drawDiagonal(A,D,1,1);drawVertices(1);
+    tris.forEach((t,i)=>{const c=triCenters[i];drawBadge(c.x,c.y,`△${i+1}`,triStrokes[i],anim);});
+  }
+  else if(step===4){
+    // Separate
+    const sep=35*anim;
+    tris.forEach((t,i)=>{
+      const st=sepTri(t,i,sep);
+      drawTriFilled(st,triColors[i],triStrokes[i],0.6);
+      drawAngleArcs(st,triStrokes[i],0.4*anim);
+      const c=centroid(st);
+      drawBadge(c.x,c.y-30,`△${i+1}`,triStrokes[i],1);
+      drawLabel(c.x,c.y+5,'= 180°',triStrokes[i],18,anim);
+    });
+  }
+  else if(step>=5&&step<=7){
+    // Focus on one triangle at a time
+    const focus=step-5;
+    const sep=35;
+    tris.forEach((t,i)=>{
+      const st=sepTri(t,i,sep);
+      const isFocus=i===focus;
+      drawTriFilled(st,triColors[i],triStrokes[i],isFocus?0.8:0.15);
+      if(isFocus){
+        const pulse=0.5+0.3*Math.sin(Date.now()/400);
+        drawAngleArcs(st,triStrokes[i],pulse);
+      }
+      const c=centroid(st);
+      drawBadge(c.x,c.y-30,`△${i+1}`,triStrokes[i],isFocus?1:0.3);
+    });
+    // Result box for focused triangle
+    const st=sepTri(tris[focus],focus,sep);const c=centroid(st);
+    ctx.globalAlpha=anim;
+    ctx.fillStyle='rgba(26,58,106,0.9)';ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(460,50+focus*70,200,60,12);else ctx.rect(460,50+focus*70,200,60);
+    ctx.fill();ctx.strokeStyle=triStrokes[focus];ctx.lineWidth=2;ctx.stroke();
+    drawLabel(560,70+focus*70,`△${focus+1} 的三個角`,triStrokes[focus],16,anim);
+    drawLabel(560,95+focus*70,'= 180°','#fff',26,anim);
+    ctx.globalAlpha=1;
+    requestAnimationFrame(render);
+  }
+  else if(step===8){
+    // Merge back + calculation
+    const sep=35*(1-anim);
+    tris.forEach((t,i)=>{
+      const st=sepTri(t,i,sep);
+      drawTriFilled(st,triColors[i],triStrokes[i],0.5);
+    });
+    // Calculation box
+    ctx.globalAlpha=anim;
+    ctx.fillStyle='rgba(26,58,106,0.95)';ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(175,140,350,220,20);else ctx.rect(175,140,350,220);
+    ctx.fill();ctx.strokeStyle=colGold;ctx.lineWidth=3;ctx.stroke();
+    drawLabel(350,170,'🧮 一起算！',colGold,22,anim);
+    drawLabel(350,205,'△1 = 180°',triStrokes[0],20,anim);
+    drawLabel(350,235,'△2 = 180°',triStrokes[1],20,anim);
+    drawLabel(350,265,'△3 = 180°',triStrokes[2],20,anim);
+    drawLabel(255,235,'+','#fff',22,anim);
+    drawLabel(255,250,'+','#fff',22,anim);
+    ctx.beginPath();ctx.moveTo(240,285);ctx.lineTo(460,285);ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    const rAlpha=Math.max(0,(anim-.5)*2);
+    drawLabel(350,325,'180°+180°+180° = 540°',colGreen,26,rAlpha);
+    ctx.globalAlpha=1;
+  }
+  else if(step===9){
+    // Grand finale
+    tris.forEach((t,i)=>drawTriFilled(t,triColors[i],triStrokes[i],0.25));
+    drawPentagon(0.4);drawDiagonal(A,C,1,0.3);drawDiagonal(A,D,1,0.3);
+
+    const pulse=1+0.05*Math.sin(Date.now()/300);
+    ctx.save();ctx.translate(350,230);ctx.scale(pulse,pulse);
+    ctx.fillStyle='rgba(255,107,53,0.95)';ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(-185,-85,370,170,24);else ctx.rect(-185,-85,370,170);
+    ctx.fill();ctx.strokeStyle=colGold;ctx.lineWidth=5;ctx.stroke();
+    ctx.fillStyle='#fff';ctx.font='bold 22px "Noto Sans TC"';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('五邊形內角和',0,-45);
+    ctx.fillStyle='#fff';ctx.font='bold 18px "Noto Sans TC"';
+    ctx.fillText('切 2 刀 → 3 個三角形',0,-15);
+    ctx.fillText('3 × 180°',0,15);
+    ctx.fillStyle=colGold;ctx.font='bold 52px "Noto Sans TC"';
+    ctx.fillText('= 540°',0,60);
+    ctx.restore();
+
+    const t=Date.now()/500;
+    ['✨','⭐','🌟','⬠','✨','⭐','🌟'].forEach((e,i)=>{
+      const sx=350+Math.cos(t+i*.9)*280;
+      const sy=230+Math.sin(t+i*1.3)*160;
+      ctx.font='22px serif';ctx.textAlign='center';ctx.fillText(e,sx,sy);
+    });
+    requestAnimationFrame(render);
+  }
+}
+
+function animateTo(target,duration,cb){
+  if(animId)cancelAnimationFrame(animId);
+  const start=anim,startTime=performance.now();
+  function tick(now){
+    const t=Math.min((now-startTime)/duration,1);
+    const ease=1-Math.pow(1-t,3);anim=start+(target-start)*ease;render();
+    if(t<1)animId=requestAnimationFrame(tick);
+    else{anim=target;render();if(cb)cb();}
+  }
+  animId=requestAnimationFrame(tick);
+}
+
+function updateUI(){
+  const s=steps[step];
+  document.getElementById('stepLabel').textContent=s.label;
+  if(step===9)document.getElementById('stepText').innerHTML='五邊形內角和<br><span class="formula">永遠 = 540° ！</span><br><br>切 2 刀 → 3 個△ → 3 × 180° = 540°';
+  else document.getElementById('stepText').innerHTML=s.text.replace(/\n/g,'<br>');
+  document.getElementById('infoCard').style.borderLeftColor=s.border;
+  document.getElementById('prevBtn').disabled=step===0;
+  document.getElementById('nextBtn').disabled=step===TOTAL-1;
+  document.querySelectorAll('.progress-dot').forEach((d,i)=>{
+    d.className='progress-dot';if(i<step)d.classList.add('done');else if(i===step)d.classList.add('active');
+  });
+}
+
+function next(){if(step>=TOTAL-1)return;step++;anim=0;updateUI();animateTo(1,900);}
+function prev(){if(step<=0)return;step--;anim=1;updateUI();render();}
+function reset(){step=0;anim=0;updateUI();render();}
+
+const bar=document.getElementById('progressBar');
+for(let i=0;i<TOTAL;i++){const d=document.createElement('div');d.className='progress-dot'+(i===0?' active':'');bar.appendChild(d);}
+
+updateUI();render();
+</script>
+</body>
+</html>
