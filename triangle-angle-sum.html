@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三角形內角和 = 180° 動畫</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0B1D3A;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(1px 1px at 10% 20%,#FFD700 100%,transparent),radial-gradient(1.5px 1.5px at 50% 10%,#fff 100%,transparent),radial-gradient(1px 1px at 70% 40%,#FFD700 100%,transparent),radial-gradient(1px 1px at 90% 80%,#fff 100%,transparent),radial-gradient(1px 1px at 25% 75%,#FFD700 100%,transparent),radial-gradient(1px 1px at 80% 25%,#fff 100%,transparent);pointer-events:none;z-index:0}
+.container{position:relative;z-index:1;width:100%;max-width:900px;padding:20px}
+h1{text-align:center;font-size:2em;font-weight:900;margin:10px 0 5px;background:linear-gradient(135deg,#00C9A7,#4FC3F7);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;color:#FFD700;font-size:1.1em;margin-bottom:15px}
+canvas{width:100%;max-width:700px;height:auto;display:block;margin:0 auto;border-radius:16px;background:#112D5A;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.controls{display:flex;justify-content:center;gap:12px;margin:18px 0;flex-wrap:wrap}
+.btn{padding:14px 32px;border:none;border-radius:50px;font-family:'Noto Sans TC',sans-serif;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:8px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.3)}
+.btn:active{transform:translateY(0)}
+.btn-next{background:linear-gradient(135deg,#FF6B35,#FF8F60);color:#fff}
+.btn-prev{background:#1A3A6A;color:#B0C4DE;border:2px solid #2A5A8A}
+.btn-reset{background:#1A3A6A;color:#FFD700;border:2px solid #FFD700}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.info-card{background:#1A3A6A;border-radius:16px;padding:18px 22px;margin:12px auto;max-width:700px;box-shadow:0 4px 16px rgba(0,0,0,0.3);border-left:5px solid #00C9A7;transition:all .4s}
+.step-label{font-size:.85em;color:#00C9A7;font-weight:700;margin-bottom:4px}
+.step-text{font-size:1.15em;line-height:1.6}
+.formula{display:inline-block;background:#FF6B35;color:#fff;padding:6px 18px;border-radius:8px;font-weight:900;font-size:1.3em;margin-top:8px}
+.progress-bar{display:flex;justify-content:center;gap:8px;margin:8px 0}
+.progress-dot{width:14px;height:14px;border-radius:50%;background:#1A3A6A;border:2px solid #2A5A8A;transition:all .3s}
+.progress-dot.active{background:#00C9A7;border-color:#00C9A7;box-shadow:0 0 8px rgba(0,201,167,0.5)}
+.progress-dot.done{background:#FF6B35;border-color:#FF6B35}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔺 三角形內角和 = 180°</h1>
+  <p class="subtitle">撕下三個角，拼成一條直線！</p>
+  <div class="progress-bar" id="progressBar"></div>
+  <canvas id="c" width="700" height="480"></canvas>
+  <div class="info-card" id="infoCard">
+    <div class="step-label" id="stepLabel"></div>
+    <div class="step-text" id="stepText"></div>
+  </div>
+  <div class="controls">
+    <button class="btn btn-prev" id="prevBtn" onclick="prev()">⬅ 上一步</button>
+    <button class="btn btn-next" id="nextBtn" onclick="next()">下一步 ➡</button>
+    <button class="btn btn-reset" onclick="reset()">🔄 重來</button>
+  </div>
+</div>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = 700, H = 480;
+
+// Triangle vertices
+const A = {x:350, y:60};
+const B = {x:100, y:390};
+const C = {x:600, y:390};
+
+// Angle colors
+const colA = '#FF6B35'; // orange
+const colB = '#4FC3F7'; // blue
+const colC = '#FFD700'; // yellow
+const colTri = '#00C9A7';
+
+// Where the three angles will be assembled (bottom center)
+const assembleY = 400;
+const assembleX = 350;
+
+let step = 0;
+const TOTAL = 9;
+let anim = 0;
+let animId = null;
+
+const steps = [
+  {label:'開始',text:'這是一個三角形 🔺\n它有 3 個角：角A、角B、角C',border:'#00C9A7'},
+  {label:'認識三個角',text:'角A（橘色）在上面\n角B（藍色）在左下\n角C（黃色）在右下\n三個角的大小都不一樣！',border:'#FF6B35'},
+  {label:'第1步：撕下角A',text:'✂️ 把角A撕下來！\n看它飛到下面去⋯',border:'#FF6B35'},
+  {label:'第2步：撕下角B',text:'✂️ 再把角B撕下來！\n看它也飛到下面去⋯',border:'#4FC3F7'},
+  {label:'第3步：撕下角C',text:'✂️ 最後把角C撕下來！\n三個角都到下面了！',border:'#FFD700'},
+  {label:'第4步：拼在一起',text:'把三個角排在一起⋯\n角A、角B、角C 肩並肩！',border:'#00C9A7'},
+  {label:'發現了嗎？',text:'三個角拼在一起\n剛好變成一條直線！\n一條直線 = 180°',border:'#FFD700'},
+  {label:'✨ 所以！',text:'不管什麼形狀的三角形\n三個角加起來，永遠都是⋯',border:'#00E676'},
+  {label:'🎉 結論',text:'',border:'#00E676'},
+];
+
+// Angle arc helper
+function drawArc(cx,cy, startAngle, endAngle, radius, color, alpha) {
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.moveTo(cx,cy);
+  ctx.arc(cx,cy,radius,startAngle,endAngle);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+// Compute angles of triangle at each vertex
+const angA = Math.atan2(B.y-A.y,B.x-A.x) - Math.atan2(C.y-A.y,C.x-A.x);
+const angleAtA = {start: Math.atan2(C.y-A.y,C.x-A.x), end: Math.atan2(B.y-A.y,B.x-A.x)};
+const angleAtB = {start: Math.atan2(A.y-B.y,A.x-B.x), end: Math.atan2(C.y-B.y,C.x-B.x)};
+const angleAtC = {start: Math.atan2(B.y-C.y,B.x-C.x), end: Math.atan2(A.y-C.y,A.x-C.x)};
+
+function lerp(a,b,t){return a+(b-a)*t}
+function lerpPt(p1,p2,t){return{x:lerp(p1.x,p2.x,t),y:lerp(p1.y,p2.y,t)}}
+
+function drawTriangle(alpha, showAngles) {
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.lineTo(C.x,C.y);ctx.closePath();
+  ctx.strokeStyle = colTri;
+  ctx.lineWidth = 4;
+  ctx.stroke();
+
+  if (showAngles) {
+    drawArc(A.x,A.y, angleAtA.start, angleAtA.end, 35, colA, 0.5*alpha);
+    drawArc(B.x,B.y, angleAtB.start, angleAtB.end, 35, colB, 0.5*alpha);
+    drawArc(C.x,C.y, angleAtC.start, angleAtC.end, 35, colC, 0.5*alpha);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawVertex(p, label, color, alpha) {
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.arc(p.x,p.y,10,0,Math.PI*2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.font = 'bold 22px "Noto Sans TC"';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const dx = p.x - 350, dy = p.y - 225;
+  const dist = Math.sqrt(dx*dx+dy*dy);
+  const ox = dx/dist * 30, oy = dy/dist * 30;
+  ctx.fillText(label, p.x+ox, p.y+oy);
+  ctx.globalAlpha = 1;
+}
+
+function drawAnglePiece(vertex, angleStart, angleEnd, color, position, alpha, radius) {
+  radius = radius || 40;
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.moveTo(position.x, position.y);
+  ctx.arc(position.x, position.y, radius, angleStart, angleEnd);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
+function normalizeAngle(a) { while(a<0)a+=Math.PI*2; while(a>Math.PI*2)a-=Math.PI*2; return a; }
+function angleDiff(start,end) { let d=end-start; while(d<0)d+=Math.PI*2; while(d>Math.PI*2)d-=Math.PI*2; return d; }
+
+const szA = angleDiff(angleAtA.start, angleAtA.end);
+const szB = angleDiff(angleAtB.start, angleAtB.end);
+const szC = angleDiff(angleAtC.start, angleAtC.end);
+
+const assembleR = 50;
+const targetB = {x: assembleX, y: assembleY, start: Math.PI, end: Math.PI + szB};
+const targetA = {x: assembleX, y: assembleY, start: Math.PI + szB, end: Math.PI + szB + szA};
+const targetC = {x: assembleX, y: assembleY, start: Math.PI + szB + szA, end: Math.PI + szB + szA + szC};
+
+const tornA = {x: 350, y: 320};
+const tornB = {x: 200, y: 340};
+const tornC = {x: 500, y: 340};
+
+function render() {
+  ctx.clearRect(0,0,W,H);
+
+  if (step === 0) {
+    drawTriangle(1, false);
+    drawVertex(A,'角A',colA,1);
+    drawVertex(B,'角B',colB,1);
+    drawVertex(C,'角C',colC,1);
+  }
+  else if (step === 1) {
+    drawTriangle(1, true);
+    drawVertex(A,'角A',colA,1);
+    drawVertex(B,'角B',colB,1);
+    drawVertex(C,'角C',colC,1);
+  }
+  else if (step === 2) {
+    drawTriangle(1, true);
+    drawArc(A.x,A.y, angleAtA.start, angleAtA.end, 35, colA, 0.5*(1-anim));
+    drawVertex(B,'角B',colB,1);
+    drawVertex(C,'角C',colC,1);
+    drawVertex(A,'角A',colA,1-anim);
+
+    const pos = lerpPt(A, tornA, anim);
+    drawAnglePiece(A, angleAtA.start, angleAtA.end, colA, pos, anim, 40);
+
+    ctx.globalAlpha = anim;
+    ctx.fillStyle = colA;
+    ctx.font = 'bold 18px "Noto Sans TC"';
+    ctx.textAlign = 'center';
+    ctx.fillText('角A', pos.x, pos.y - 50);
+    ctx.globalAlpha = 1;
+  }
+  else if (step === 3) {
+    drawTriangle(1, false);
+    drawArc(B.x,B.y, angleAtB.start, angleAtB.end, 35, colB, 0.5*(1-anim));
+    drawArc(C.x,C.y, angleAtC.start, angleAtC.end, 35, colC, 0.5);
+    drawVertex(C,'角C',colC,1);
+    drawVertex(A,'角A',colA,0);
+    drawVertex(B,'角B',colB,1-anim);
+
+    drawAnglePiece(A, angleAtA.start, angleAtA.end, colA, tornA, 1, 40);
+    ctx.fillStyle = colA; ctx.font = 'bold 18px "Noto Sans TC"'; ctx.textAlign = 'center';
+    ctx.fillText('角A', tornA.x, tornA.y - 50);
+
+    const pos = lerpPt(B, tornB, anim);
+    drawAnglePiece(B, angleAtB.start, angleAtB.end, colB, pos, anim, 40);
+    ctx.globalAlpha = anim;
+    ctx.fillStyle = colB; ctx.fillText('角B', pos.x, pos.y - 50);
+    ctx.globalAlpha = 1;
+  }
+  else if (step === 4) {
+    drawTriangle(0.3, false);
+    drawVertex(C,'角C',colC,1-anim);
+
+    drawAnglePiece(A, angleAtA.start, angleAtA.end, colA, tornA, 1, 40);
+    ctx.fillStyle = colA; ctx.font = 'bold 18px "Noto Sans TC"'; ctx.textAlign = 'center';
+    ctx.fillText('角A', tornA.x, tornA.y - 50);
+    drawAnglePiece(B, angleAtB.start, angleAtB.end, colB, tornB, 1, 40);
+    ctx.fillStyle = colB; ctx.fillText('角B', tornB.x, tornB.y - 50);
+
+    const pos = lerpPt(C, tornC, anim);
+    drawAnglePiece(C, angleAtC.start, angleAtC.end, colC, pos, anim, 40);
+    ctx.globalAlpha = anim;
+    ctx.fillStyle = colC; ctx.fillText('角C', pos.x, pos.y - 50);
+    ctx.globalAlpha = 1;
+  }
+  else if (step === 5) {
+    drawTriangle(0.15, false);
+
+    const posA = lerpPt(tornA, {x:assembleX, y:assembleY}, anim);
+    const posB = lerpPt(tornB, {x:assembleX, y:assembleY}, anim);
+    const posC = lerpPt(tornC, {x:assembleX, y:assembleY}, anim);
+
+    const aStartA = lerp(angleAtA.start, targetA.start, anim);
+    const aEndA = lerp(angleAtA.end, targetA.end, anim);
+    const aStartB = lerp(angleAtB.start, targetB.start, anim);
+    const aEndB = lerp(angleAtB.end, targetB.end, anim);
+    const aStartC = lerp(angleAtC.start, targetC.start, anim);
+    const aEndC = lerp(angleAtC.end, targetC.end, anim);
+
+    drawAnglePiece(null, aStartB, aEndB, colB, posB, 1, assembleR);
+    drawAnglePiece(null, aStartA, aEndA, colA, posA, 1, assembleR);
+    drawAnglePiece(null, aStartC, aEndC, colC, posC, 1, assembleR);
+
+    ctx.font = 'bold 16px "Noto Sans TC"'; ctx.textAlign = 'center';
+    if (anim < 0.5) {
+      ctx.fillStyle = colA; ctx.fillText('角A', posA.x, posA.y - 55);
+      ctx.fillStyle = colB; ctx.fillText('角B', posB.x, posB.y - 55);
+      ctx.fillStyle = colC; ctx.fillText('角C', posC.x, posC.y - 55);
+    }
+  }
+  else if (step === 6 || step === 7) {
+    drawTriangle(0.1, false);
+
+    drawAnglePiece(null, targetB.start, targetB.end, colB, {x:assembleX,y:assembleY}, 1, assembleR);
+    drawAnglePiece(null, targetA.start, targetA.end, colA, {x:assembleX,y:assembleY}, 1, assembleR);
+    drawAnglePiece(null, targetC.start, targetC.end, colC, {x:assembleX,y:assembleY}, 1, assembleR);
+
+    ctx.font = 'bold 16px "Noto Sans TC"'; ctx.textAlign = 'center';
+    const labelR = assembleR + 22;
+    const midB = (targetB.start + targetB.end)/2;
+    ctx.fillStyle = colB; ctx.fillText('角B', assembleX + labelR*Math.cos(midB), assembleY + labelR*Math.sin(midB));
+    const midA = (targetA.start + targetA.end)/2;
+    ctx.fillStyle = colA; ctx.fillText('角A', assembleX + labelR*Math.cos(midA), assembleY + labelR*Math.sin(midA));
+    const midC = (targetC.start + targetC.end)/2;
+    ctx.fillStyle = colC; ctx.fillText('角C', assembleX + labelR*Math.cos(midC), assembleY + labelR*Math.sin(midC));
+
+    ctx.globalAlpha = anim;
+    ctx.beginPath();
+    ctx.moveTo(assembleX - 120, assembleY);
+    ctx.lineTo(assembleX + 120, assembleY);
+    ctx.strokeStyle = '#00E676';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([]);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    if (step === 6) {
+      ctx.globalAlpha = anim;
+      ctx.fillStyle = '#00E676';
+      ctx.font = 'bold 22px "Noto Sans TC"';
+      ctx.fillText('← 一條直線！→', assembleX, assembleY + 30);
+
+      ctx.fillStyle = '#FFD700';
+      ctx.font = 'bold 26px "Noto Sans TC"';
+      ctx.fillText('一條直線 = 180°', assembleX, assembleY + 65);
+      ctx.globalAlpha = 1;
+    }
+
+    if (step === 7) {
+      ctx.fillStyle = '#00E676';
+      ctx.font = 'bold 22px "Noto Sans TC"';
+      ctx.fillText('← 一條直線！→', assembleX, assembleY + 30);
+
+      ctx.globalAlpha = anim;
+      ctx.fillStyle = 'rgba(11,29,58,0.9)';
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(assembleX-140, 100, 280, 80, 16);
+      else { ctx.rect(assembleX-140, 100, 280, 80); }
+      ctx.fill();
+      ctx.strokeStyle = '#FFD700';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.fillStyle = '#FFD700';
+      ctx.font = 'bold 18px "Noto Sans TC"';
+      ctx.fillText('角A + 角B + 角C', assembleX, 128);
+      ctx.fillStyle = '#00E676';
+      ctx.font = 'bold 30px "Noto Sans TC"';
+      ctx.fillText('= 180°', assembleX, 165);
+      ctx.globalAlpha = 1;
+    }
+  }
+  else if (step === 8) {
+    drawTriangle(0.15, false);
+
+    drawAnglePiece(null, targetB.start, targetB.end, colB, {x:assembleX,y:assembleY}, 1, assembleR);
+    drawAnglePiece(null, targetA.start, targetA.end, colA, {x:assembleX,y:assembleY}, 1, assembleR);
+    drawAnglePiece(null, targetC.start, targetC.end, colC, {x:assembleX,y:assembleY}, 1, assembleR);
+
+    ctx.beginPath();
+    ctx.moveTo(assembleX-120,assembleY);ctx.lineTo(assembleX+120,assembleY);
+    ctx.strokeStyle='#00E676';ctx.lineWidth=4;ctx.stroke();
+    ctx.fillStyle='#00E676';ctx.font='bold 20px "Noto Sans TC"';ctx.textAlign='center';
+    ctx.fillText('← 一條直線！→', assembleX, assembleY+28);
+
+    const pulse = 1 + 0.05 * Math.sin(Date.now()/300);
+    ctx.save();
+    ctx.translate(assembleX, 140);
+    ctx.scale(pulse, pulse);
+
+    ctx.fillStyle = 'rgba(255,107,53,0.9)';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-160, -55, 320, 110, 20);
+    else ctx.rect(-160,-55,320,110);
+    ctx.fill();
+    ctx.strokeStyle = '#FFD700';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 20px "Noto Sans TC"';
+    ctx.fillText('三角形內角和', 0, -18);
+    ctx.font = 'bold 48px "Noto Sans TC"';
+    ctx.fillText('= 180°', 0, 35);
+    ctx.restore();
+
+    const t = Date.now()/500;
+    ['✨','⭐','🌟','✨','⭐'].forEach((e,i) => {
+      const sx = assembleX + Math.cos(t+i*1.3)*200;
+      const sy = 140 + Math.sin(t+i*1.7)*80;
+      ctx.font = '20px serif';
+      ctx.fillText(e, sx, sy);
+    });
+
+    if (step === 8) requestAnimationFrame(render);
+  }
+}
+
+function animateTo(target, duration, cb) {
+  if(animId)cancelAnimationFrame(animId);
+  const start=anim, startTime=performance.now();
+  function tick(now){
+    const t=Math.min((now-startTime)/duration,1);
+    const ease=1-Math.pow(1-t,3);
+    anim=start+(target-start)*ease;
+    render();
+    if(t<1)animId=requestAnimationFrame(tick);
+    else{anim=target;render();if(cb)cb();}
+  }
+  animId=requestAnimationFrame(tick);
+}
+
+function updateUI(){
+  const s=steps[step];
+  document.getElementById('stepLabel').textContent=s.label;
+  if(step===8) document.getElementById('stepText').innerHTML='三角形內角和<br><span class="formula">永遠 = 180° ！</span>';
+  else document.getElementById('stepText').innerHTML=s.text.replace(/\n/g,'<br>');
+  document.getElementById('infoCard').style.borderLeftColor=s.border;
+  document.getElementById('prevBtn').disabled=step===0;
+  document.getElementById('nextBtn').disabled=step===TOTAL-1;
+  document.querySelectorAll('.progress-dot').forEach((d,i)=>{
+    d.className='progress-dot';
+    if(i<step)d.classList.add('done');
+    else if(i===step)d.classList.add('active');
+  });
+}
+
+function next(){if(step>=TOTAL-1)return;step++;anim=0;updateUI();animateTo(1,900);}
+function prev(){if(step<=0)return;step--;anim=1;updateUI();render();}
+function reset(){step=0;anim=0;updateUI();render();}
+
+const bar=document.getElementById('progressBar');
+for(let i=0;i<TOTAL;i++){const d=document.createElement('div');d.className='progress-dot'+(i===0?' active':'');bar.appendChild(d);}
+
+if(!ctx.roundRect){ctx.roundRect=function(x,y,w,h,r){if(typeof r==='number')r=[r,r,r,r];this.moveTo(x+r[0],y);this.lineTo(x+w-r[1],y);this.quadraticCurveTo(x+w,y,x+w,y+r[1]);this.lineTo(x+w,y+h-r[2]);this.quadraticCurveTo(x+w,y+h,x+w-r[2],y+h);this.lineTo(x+r[3],y+h);this.quadraticCurveTo(x,y+h,x,y+h-r[3]);this.lineTo(x,y+r[0]);this.quadraticCurveTo(x,y,x+r[0],y);this.closePath()}}
+
+updateUI();render();
+</script>
+</body>
+</html>
