@@ -3,141 +3,203 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>🎧 會考聽力特訓</title>
+<title>🎧 聽力金幣大冒險</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0a0e27;--card:rgba(20,30,70,.85);--glass:rgba(255,255,255,.08);--blue:#00d4ff;--pink:#ff2d95;--green:#00ff88;--gold:#ffd700;--orange:#ff6b35}
+:root{--bg:#1a0a2e;--card:rgba(30,20,80,.85);--glass:rgba(255,255,255,.08);--blue:#00d4ff;--pink:#ff2d95;--green:#00ff88;--gold:#ffd700;--orange:#ff6b35;--coin:#ffc107;--pipe-green:#4caf50;--mario-red:#e53935;--sky:#1565c0}
 body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;min-height:100dvh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(0,212,255,.06),transparent 50%),radial-gradient(ellipse at 80% 30%,rgba(255,45,149,.06),transparent 50%);pointer-events:none}
-canvas#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:999}
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 30% 20%,rgba(255,193,7,.08),transparent 50%),
+  radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.06),transparent 50%),
+  radial-gradient(ellipse at 50% 50%,rgba(156,39,176,.05),transparent 60%);
+  pointer-events:none}
+canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:999}
 .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:12px 16px 80px}
 .screen.active{display:block}
 @keyframes popIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
 @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+@keyframes coinSpin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
+@keyframes coinFloat{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-60px) scale(1.5);opacity:0}}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+@keyframes starBurst{0%{transform:scale(0) rotate(0deg);opacity:1}100%{transform:scale(2) rotate(180deg);opacity:0}}
+@keyframes glow{0%,100%{box-shadow:0 0 15px rgba(255,193,7,.3)}50%{box-shadow:0 0 35px rgba(255,193,7,.6)}}
+@keyframes rainbow{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+@keyframes pipeUp{0%{transform:translateY(100%)}100%{transform:translateY(0)}}
+@keyframes hintPulse{0%,100%{box-shadow:0 0 10px rgba(156,39,176,.3)}50%{box-shadow:0 0 25px rgba(156,39,176,.6)}}
+
 /* HOME */
-.home-hero{text-align:center;padding:30px 0 10px}
-.home-hero .icon{font-size:4em;animation:float 3s ease-in-out infinite}
-.home-hero h1{font-size:2em;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--orange),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:10px 0}
+.home-hero{text-align:center;padding:20px 0 10px}
+.home-hero .icon{font-size:4.5em;animation:bounce 2s ease-in-out infinite}
+.home-hero h1{font-size:2.2em;font-weight:900;background:linear-gradient(135deg,var(--coin),var(--orange),var(--mario-red));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:8px 0}
 .home-hero p{color:rgba(255,255,255,.5);font-size:.9em}
-.day-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px;max-width:500px;margin:20px auto}
-.day-btn{background:var(--glass);border:2px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 4px;text-align:center;font-family:'Noto Sans TC',sans-serif;font-size:.9em;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;transition:all .2s}
-.day-btn:active{transform:scale(.93)}
-.day-btn.done{border-color:var(--green);color:var(--green);background:rgba(0,255,136,.08)}
-.day-btn.done::after{content:'✅';display:block;font-size:.6em;margin-top:2px}
-.day-btn.today{border-color:var(--gold);color:var(--gold);animation:pulse 2s infinite;background:rgba(255,215,0,.1)}
-.home-links{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
-.home-links a{text-decoration:none;padding:10px 20px;border-radius:30px;font-size:.85em;font-weight:700;border:2px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);transition:all .2s}
+.coin-display{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0;font-size:1.4em;font-weight:900;color:var(--coin)}
+.coin-display .coin-icon{font-size:1.2em;animation:coinSpin 3s linear infinite}
+.level-cards{display:flex;flex-direction:column;gap:14px;max-width:420px;margin:20px auto}
+.level-card{background:var(--card);backdrop-filter:blur(15px);border:2px solid rgba(255,255,255,.1);border-radius:20px;padding:20px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.level-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.03));pointer-events:none}
+.level-card:active{transform:scale(.97)}
+.level-card.locked{opacity:.4;cursor:not-allowed}
+.level-card.locked::after{content:'🔒';position:absolute;top:50%;right:20px;transform:translateY(-50%);font-size:2em}
+.lc-top{display:flex;align-items:center;gap:12px}
+.lc-icon{font-size:2.5em;flex-shrink:0}
+.lc-info{flex:1}
+.lc-title{font-size:1.3em;font-weight:900;color:var(--gold)}
+.lc-desc{font-size:.85em;color:rgba(255,255,255,.5);margin-top:4px;line-height:1.4}
+.lc-tag{display:inline-block;border-radius:20px;padding:3px 10px;font-size:.7em;font-weight:700;margin-top:6px}
+.lc-stars{margin-top:8px;font-size:1.2em;letter-spacing:4px}
+.level-card.lv1{border-color:rgba(76,175,80,.3)}.level-card.lv1:not(.locked):hover{border-color:var(--pipe-green);box-shadow:0 8px 30px rgba(76,175,80,.2)}
+.level-card.lv1 .lc-title{color:#69f0ae}.level-card.lv1 .lc-tag{background:rgba(76,175,80,.2);color:#69f0ae;border:1px solid rgba(76,175,80,.3)}
+.level-card.lv2{border-color:rgba(0,212,255,.25)}.level-card.lv2:not(.locked):hover{border-color:var(--blue);box-shadow:0 8px 30px rgba(0,212,255,.2)}
+.level-card.lv2 .lc-title{color:var(--blue)}.level-card.lv2 .lc-tag{background:rgba(0,212,255,.15);color:var(--blue);border:1px solid rgba(0,212,255,.3)}
+.level-card.lv3{border-color:rgba(255,45,149,.2)}.level-card.lv3:not(.locked):hover{border-color:var(--pink);box-shadow:0 8px 30px rgba(255,45,149,.15)}
+.level-card.lv3 .lc-title{color:var(--pink)}.level-card.lv3 .lc-tag{background:rgba(255,45,149,.15);color:var(--pink);border:1px solid rgba(255,45,149,.3)}
+.home-links{display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap}
+.home-links a{text-decoration:none;padding:10px 18px;border-radius:30px;font-size:.85em;font-weight:700;border:2px solid rgba(255,255,255,.12);color:rgba(255,255,255,.45);transition:all .2s}
 .home-links a:hover{border-color:var(--blue);color:var(--blue)}
+.motivation{text-align:center;margin:16px 0 0;padding:10px 16px;background:rgba(255,255,255,.03);border-radius:14px;border:1px solid rgba(255,255,255,.06)}
+.motivation .q{font-size:.9em;color:var(--pink);font-style:italic}
+.motivation .src{font-size:.75em;color:rgba(255,255,255,.3);margin-top:4px}
+
 /* QUIZ */
-.quiz-header{text-align:center;padding:8px 0}
-.quiz-header h2{font-size:1.2em;color:var(--gold)}
-.quiz-header .part-label{font-size:.8em;color:var(--blue);margin-top:2px}
-.progress-track{height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin:10px 0;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--gold));border-radius:3px;transition:width .5s}
-.q-counter{text-align:center;font-size:.8em;color:rgba(255,255,255,.4);margin-bottom:8px}
-.q-card{background:var(--card);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:24px 20px;max-width:550px;margin:0 auto;text-align:center}
-.q-emoji{font-size:3.5em;margin:10px 0;min-height:70px}
-.q-text{font-size:1.1em;color:rgba(255,255,255,.7);margin:8px 0;min-height:40px;font-style:italic}
-.q-prompt{font-size:1.15em;font-weight:700;color:#fff;margin:10px 0}
-.listen-btns{display:flex;gap:10px;justify-content:center;margin:12px 0;flex-wrap:wrap}
-.listen-btn{width:60px;height:60px;border-radius:50%;border:none;font-size:1.5em;cursor:pointer;transition:all .2s;color:#fff}
-.listen-btn:active{transform:scale(.85)}
-.listen-btn.play{background:linear-gradient(135deg,var(--orange),var(--pink));box-shadow:0 4px 16px rgba(255,107,53,.3)}
-.listen-btn.slow{background:linear-gradient(135deg,#9c27b0,#e040fb);box-shadow:0 4px 16px rgba(156,39,176,.3);width:48px;height:48px;font-size:1.1em}
-.listen-btn.show-text{background:transparent;border:2px solid rgba(255,255,255,.2);width:48px;height:48px;font-size:1.1em;color:rgba(255,255,255,.4)}
-.transcript{background:rgba(255,255,255,.05);border-radius:12px;padding:12px;margin:10px 0;font-size:.9em;color:var(--blue);display:none;text-align:left;line-height:1.6}
+.quiz-top{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.quiz-coins{display:flex;align-items:center;gap:6px;font-size:1.1em;font-weight:900;color:var(--coin)}
+.quiz-coins .coin-sm{font-size:1em;animation:coinSpin 3s linear infinite}
+.quiz-q-num{font-size:.85em;color:rgba(255,255,255,.4)}
+.quiz-level-tag{font-size:.75em;padding:4px 10px;border-radius:20px;font-weight:700}
+.progress-bar{height:8px;background:rgba(255,255,255,.08);border-radius:4px;margin:10px 0;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width .5s;position:relative}
+.progress-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);animation:shimmer 2s infinite}
+.progress-fill.lv1{background:linear-gradient(90deg,#4caf50,#69f0ae)}
+.progress-fill.lv2{background:linear-gradient(90deg,#0288d1,var(--blue))}
+.progress-fill.lv3{background:linear-gradient(90deg,var(--pink),#ff80ab)}
+
+.q-card{background:var(--card);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:24px 20px;max-width:500px;margin:0 auto;text-align:center;animation:slideUp .4s}
+.q-emoji{font-size:4em;margin:10px 0;min-height:80px;animation:float 3s ease-in-out infinite}
+.q-label{font-size:.8em;color:rgba(255,255,255,.4);margin-bottom:4px}
+.q-prompt{font-size:1.15em;font-weight:700;margin:8px 0}
+.listen-area{display:flex;gap:10px;justify-content:center;align-items:center;margin:14px 0;flex-wrap:wrap}
+.play-btn{width:72px;height:72px;border-radius:50%;border:none;font-size:2em;cursor:pointer;transition:all .2s;color:#fff;background:linear-gradient(135deg,var(--orange),var(--mario-red));box-shadow:0 6px 24px rgba(255,107,53,.4);animation:pulse 2s infinite}
+.play-btn:active{transform:scale(.85);animation:none}
+.slow-btn{width:52px;height:52px;border-radius:50%;border:none;font-size:1.2em;cursor:pointer;transition:all .2s;color:#fff;background:linear-gradient(135deg,#9c27b0,#ce93d8);box-shadow:0 4px 16px rgba(156,39,176,.3)}
+.slow-btn:active{transform:scale(.85)}
+.hint-btn{width:52px;height:52px;border-radius:50%;border:none;font-size:1.2em;cursor:pointer;transition:all .2s;color:#fff;background:linear-gradient(135deg,#ff9800,#ffb74d);box-shadow:0 4px 16px rgba(255,152,0,.3);animation:hintPulse 2s infinite;display:none}
+.hint-btn:active{transform:scale(.85)}
+.hint-btn.visible{display:block;animation:popIn .3s,hintPulse 2s infinite}
+.hint-area{min-height:36px;margin:6px 0;transition:all .3s}
+.hint-text{background:rgba(255,152,0,.12);border:1px solid rgba(255,152,0,.25);border-radius:12px;padding:8px 14px;font-size:.9em;color:#ffb74d;animation:popIn .3s;display:inline-block}
+.transcript{background:rgba(255,255,255,.05);border-radius:12px;padding:12px;margin:10px 0;font-size:.9em;color:var(--blue);display:none;text-align:left;line-height:1.8}
 .transcript.visible{display:block;animation:popIn .3s}
+
 .options{display:flex;flex-direction:column;gap:10px;max-width:500px;margin:14px auto}
-.opt{background:var(--glass);backdrop-filter:blur(10px);border:2px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;font-size:1.1em;font-weight:700;cursor:pointer;transition:all .15s;text-align:left;display:flex;align-items:center;gap:10px;font-family:'Noto Sans TC',sans-serif;color:#fff}
+.opt{background:var(--glass);backdrop-filter:blur(10px);border:2px solid rgba(255,255,255,.12);border-radius:18px;padding:18px 16px;font-size:1.15em;font-weight:700;cursor:pointer;transition:all .15s;text-align:left;display:flex;align-items:center;gap:12px;font-family:'Noto Sans TC',sans-serif;color:#fff;position:relative;overflow:hidden}
+.opt::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.03));pointer-events:none}
 .opt:active{transform:scale(.97)}
-.opt .opt-letter{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.85em;color:rgba(255,255,255,.5);flex-shrink:0}
+.opt .opt-letter{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:.9em;color:rgba(255,255,255,.5);flex-shrink:0;font-weight:900}
 .opt.correct{background:rgba(0,255,136,.2);border-color:var(--green);animation:popIn .3s}
 .opt.correct .opt-letter{background:var(--green);color:#000}
-.opt.wrong{background:rgba(255,68,68,.2);border-color:#ff4444;animation:shake .4s}
+.opt.wrong{background:rgba(255,68,68,.15);border-color:#ff4444;animation:shake .4s}
 .opt.wrong .opt-letter{background:#ff4444;color:#fff}
-.feedback{text-align:center;min-height:70px;margin:10px 0}
-.fb-msg{font-size:1.3em;font-weight:900;animation:popIn .3s}
+.opt.eliminated{opacity:.2;pointer-events:none;transform:scale(.95)}
+.opt .opt-text{flex:1;line-height:1.3}
+
+.feedback{text-align:center;min-height:80px;margin:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.fb-msg{font-size:1.4em;font-weight:900;animation:popIn .3s}
+.fb-coins{font-size:1em;color:var(--coin);font-weight:700;margin-top:4px;animation:popIn .3s}
 .fb-detail{font-size:.85em;color:rgba(255,255,255,.5);margin-top:4px}
+.fb-anime{font-size:.85em;color:var(--pink);font-style:italic;margin-top:4px}
+.coin-popup{position:fixed;pointer-events:none;z-index:998;font-size:2em;animation:coinFloat 1s forwards}
+
 /* RESULTS */
-.result-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:85vh}
-.result-card{background:var(--card);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:30px;max-width:450px;width:100%;text-align:center;animation:popIn .5s}
-.result-icon{font-size:5em;margin-bottom:10px}
-.result-title{font-size:1.8em;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.result-score{font-size:2.5em;font-weight:900;color:var(--green);margin:10px 0}
-.result-stars{font-size:2em;letter-spacing:6px;margin:6px 0}
-.result-breakdown{text-align:left;margin:14px 0}
-.rb-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.9em}
-.rb-row .rb-label{color:rgba(255,255,255,.6)}
-.rb-row .rb-val{font-weight:700;color:var(--green)}
-.result-msg{font-size:.95em;color:var(--pink);font-style:italic;margin:10px 0}
+.result-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh}
+.result-card{background:var(--card);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:28px;padding:30px 24px;max-width:440px;width:100%;text-align:center;animation:popIn .5s}
+.result-icon{font-size:5em;margin-bottom:8px}
+.result-title{font-size:2em;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.result-stars{font-size:2.5em;margin:8px 0;letter-spacing:6px}
+.result-coins{font-size:1.8em;font-weight:900;color:var(--coin);margin:8px 0;display:flex;align-items:center;justify-content:center;gap:8px}
+.result-coins .coin-lg{font-size:1.2em;animation:coinSpin 2s linear infinite}
+.result-msg{font-size:1em;color:rgba(255,255,255,.7);margin:6px 0;line-height:1.6}
+.result-anime{color:var(--pink);font-size:.9em;font-style:italic;margin:6px 0}
+.result-unlock{background:linear-gradient(135deg,rgba(255,193,7,.15),rgba(255,107,53,.1));border:1px solid var(--coin);border-radius:14px;padding:12px;margin:12px 0;color:var(--coin);font-weight:700;animation:glow 2s infinite}
 .btns-col{display:flex;flex-direction:column;gap:10px;margin-top:16px;align-items:center}
-.btn{padding:14px 32px;border:none;border-radius:50px;font-family:'Noto Sans TC',sans-serif;font-size:1em;font-weight:700;cursor:pointer;transition:all .2s}
+.btn{padding:14px 32px;border:none;border-radius:50px;font-family:'Noto Sans TC',sans-serif;font-size:1.05em;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
 .btn:active{transform:scale(.95)}
-.btn-fire{background:linear-gradient(135deg,var(--orange),var(--pink));color:#fff;box-shadow:0 4px 16px rgba(255,107,53,.3)}
+.btn-fire{background:linear-gradient(135deg,var(--orange),var(--mario-red));color:#fff;box-shadow:0 4px 20px rgba(255,107,53,.4)}
 .btn-neon{background:transparent;border:2px solid var(--blue);color:var(--blue)}
-.btn-ghost{background:transparent;border:2px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5)}
+.btn-ghost{background:transparent;border:2px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45)}
 .btn-back{background:none;border:none;color:rgba(255,255,255,.4);font-size:.9em;cursor:pointer;padding:8px;font-family:'Noto Sans TC',sans-serif}
+
+/* floating particles */
+.particle{position:fixed;pointer-events:none;opacity:.25;animation:drift linear infinite}
+@keyframes drift{0%{transform:translateY(100vh) rotate(0deg)}100%{transform:translateY(-20vh) rotate(360deg)}}
 </style>
 </head>
 <body>
-<canvas id="confettiCanvas"></canvas>
+<canvas id="confetti"></canvas>
 
-<!-- HOME -->
+<!-- ===== HOME ===== -->
 <div class="screen active" id="scrHome">
   <div class="home-hero">
-    <div class="icon">🎧</div>
-    <h1>會考聽力特訓</h1>
-    <p>每天 14 題，練到會考不緊張！</p>
+    <div class="icon">🍄</div>
+    <h1>聽力金幣大冒險</h1>
+    <p>收集金幣，升級聽力！</p>
   </div>
-  <div style="text-align:center;margin:10px 0">
-    <div style="font-size:.85em;color:rgba(255,255,255,.4)">選一天開始練習 👇</div>
+  <div class="coin-display">
+    <span class="coin-icon">🪙</span>
+    <span id="totalCoins">0</span>
+    <span style="font-size:.6em;font-weight:400;color:rgba(255,255,255,.4)">枚金幣</span>
   </div>
-  <div class="day-grid" id="dayGrid"></div>
+  <div class="level-cards" id="levelCards"></div>
+  <div class="motivation" id="motiBox"></div>
   <div class="home-links">
     <a href="index.html">⬅ 回首頁</a>
+    <a href="vocab-adventure.html">🎮 練單字</a>
   </div>
 </div>
 
-<!-- QUIZ -->
+<!-- ===== QUIZ ===== -->
 <div class="screen" id="scrQuiz">
   <button class="btn-back" onclick="goHome()">⬅ 回選單</button>
-  <div class="quiz-header">
-    <h2 id="quizTitle"></h2>
-    <div class="part-label" id="partLabel"></div>
+  <div class="quiz-top">
+    <span class="quiz-level-tag" id="qLevelTag"></span>
+    <div class="quiz-coins"><span class="coin-sm">🪙</span><span id="qCoins">0</span></div>
   </div>
-  <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
-  <div class="q-counter" id="qCounter"></div>
+  <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+  <div class="quiz-q-num" id="qNum"></div>
   <div class="q-card">
     <div class="q-emoji" id="qEmoji"></div>
+    <div class="q-label" id="qLabel"></div>
     <div class="q-prompt" id="qPrompt"></div>
-    <div class="listen-btns">
-      <button class="listen-btn play" id="playBtn" onclick="playAudio()">🔊</button>
-      <button class="listen-btn slow" onclick="playAudioSlow()">🐢</button>
-      <button class="listen-btn show-text" onclick="toggleScript()">👁</button>
+    <div class="listen-area">
+      <button class="play-btn" id="playBtn" onclick="playAudio()">🔊</button>
+      <button class="slow-btn" onclick="playAudioSlow()">🐢</button>
+      <button class="hint-btn" id="hintBtn" onclick="useHint()">💡</button>
     </div>
+    <div class="hint-area" id="hintArea"></div>
     <div class="transcript" id="transcript"></div>
     <div class="options" id="optBox"></div>
     <div class="feedback" id="fbBox"></div>
   </div>
 </div>
 
-<!-- RESULTS -->
+<!-- ===== RESULTS ===== -->
 <div class="screen" id="scrResult">
   <div class="result-screen">
     <div class="result-card">
       <div class="result-icon" id="resIcon"></div>
       <div class="result-title" id="resTitle"></div>
       <div class="result-stars" id="resStars"></div>
-      <div class="result-score" id="resScr"></div>
-      <div class="result-breakdown" id="resBreak"></div>
+      <div class="result-coins" id="resCoins"></div>
       <div class="result-msg" id="resMsg"></div>
+      <div class="result-anime" id="resAnime"></div>
+      <div id="resUnlock"></div>
       <div class="btns-col">
-        <button class="btn btn-fire" onclick="startDay(curDay)">🔄 再練一次</button>
-        <button class="btn btn-neon" onclick="goHome()">🏠 回選單</button>
+        <button class="btn btn-fire" id="resRetry"></button>
+        <button class="btn btn-neon" onclick="goHome()">🏠 回冒險地圖</button>
       </div>
     </div>
   </div>
@@ -145,277 +207,329 @@ canvas#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:999}
 
 <script>
 // ========== CONFETTI ==========
-const ccvs=document.getElementById('confettiCanvas');
-const cctx=ccvs.getContext('2d');
+const ccvs=document.getElementById('confetti'),cctx=ccvs.getContext('2d');
 let cparts=[];
-function resizeCC(){ccvs.width=window.innerWidth;ccvs.height=window.innerHeight}
-window.addEventListener('resize',resizeCC);resizeCC();
-function addConfetti(count){
-  const cx=ccvs.width/2,cy=ccvs.height/3;
-  const colors=['#FFD700','#FF6B35','#00FF88','#00D4FF','#FF2D95','#fff'];
-  for(let i=0;i<count;i++){
+function resizeC(){ccvs.width=innerWidth;ccvs.height=innerHeight}
+addEventListener('resize',resizeC);resizeC();
+function addConfetti(n,cx,cy){
+  cx=cx||ccvs.width/2;cy=cy||ccvs.height/3;
+  const colors=['#FFD700','#FF6B35','#00FF88','#00D4FF','#FF2D95','#fff','#ffc107'];
+  for(let i=0;i<n;i++){
     const a=Math.random()*Math.PI*2,sp=3+Math.random()*7;
-    cparts.push({x:cx+Math.random()*200-100,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-5,
+    cparts.push({x:cx+Math.random()*160-80,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-4,
       sz:4+Math.random()*6,color:colors[Math.floor(Math.random()*colors.length)],
       life:1,decay:.008+Math.random()*.015,rot:Math.random()*360,rotS:Math.random()*10-5});
   }
 }
-function fireConfetti(){for(let i=0;i<5;i++)setTimeout(()=>addConfetti(40),i*100);}
+function fireConfetti(){for(let i=0;i<5;i++)setTimeout(()=>addConfetti(40),i*100)}
 function updConfetti(){
   cctx.clearRect(0,0,ccvs.width,ccvs.height);
   cparts=cparts.filter(p=>{
     p.x+=p.vx;p.y+=p.vy;p.vy+=.15;p.life-=p.decay;p.rot+=p.rotS;
     if(p.life<=0)return false;
     cctx.save();cctx.globalAlpha=p.life;cctx.translate(p.x,p.y);cctx.rotate(p.rot*Math.PI/180);
-    cctx.fillStyle=p.color;cctx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz*.6);
-    cctx.restore();return true;
-  });
-  requestAnimationFrame(updConfetti);
+    cctx.fillStyle=p.color;cctx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz*.6);cctx.restore();return true;
+  });requestAnimationFrame(updConfetti);
 }
 updConfetti();
 
-// ========== SOUND FX ==========
-let audioCtx;
-function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
-function playTone(freq,dur,type,vol){
-  initAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-  o.connect(g);g.connect(audioCtx.destination);o.type=type||'sine';o.frequency.value=freq;
-  g.gain.value=vol||.12;g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);
-  o.start();o.stop(audioCtx.currentTime+dur);
-}
-function sndCorrect(){playTone(523,.08,'sine',.1);setTimeout(()=>playTone(659,.08,'sine',.1),80);setTimeout(()=>playTone(784,.12,'sine',.08),160);}
-function sndWrong(){playTone(330,.15,'sawtooth',.06);setTimeout(()=>playTone(262,.2,'sawtooth',.05),100);}
-function sndDone(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.15,'sine',.08),i*120));}
+// ========== SOUND ==========
+let aCtx;
+function initA(){if(!aCtx)aCtx=new(AudioContext||webkitAudioContext)()}
+function tone(f,d,t,v){initA();const o=aCtx.createOscillator(),g=aCtx.createGain();o.connect(g);g.connect(aCtx.destination);o.type=t||'sine';o.frequency.value=f;g.gain.value=v||.1;g.gain.exponentialRampToValueAtTime(.001,aCtx.currentTime+d);o.start();o.stop(aCtx.currentTime+d)}
+function sndCoin(){tone(987,.06);setTimeout(()=>tone(1319,.08),60)}
+function sndCorrect(){tone(523,.07);setTimeout(()=>tone(659,.07),70);setTimeout(()=>tone(784,.1),140)}
+function sndWrong(){tone(311,.12,'sawtooth',.05);setTimeout(()=>tone(262,.15,'sawtooth',.04),100)}
+function sndDone(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.12),i*110))}
+function sndLevelUp(){[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>tone(f,.15,.08),i*100))}
+function sndHint(){tone(440,.1,'triangle',.06);setTimeout(()=>tone(554,.1,'triangle',.05),100)}
 
 // ========== TTS ==========
 function speak(text,opts,cb){
-  if(!window.speechSynthesis)return cb&&cb();
+  if(!speechSynthesis)return cb&&cb();
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
-  u.lang='en-US';u.rate=opts?.rate||.78;u.pitch=opts?.pitch||1;
+  u.lang='en-US';u.rate=opts?.rate||.75;u.pitch=opts?.pitch||1;
   const voices=speechSynthesis.getVoices();
   if(voices.length){
-    const gender=opts?.gender||'male';
-    // Try to find distinct voices
-    const enVoices=voices.filter(v=>v.lang.startsWith('en'));
-    if(gender==='female'){
-      const f=enVoices.find(v=>/female|zira|samantha|karen|victoria|fiona/i.test(v.name));
-      if(f)u.voice=f; u.pitch=opts?.pitch||1.3;
-    }else{
-      const m=enVoices.find(v=>/male|david|daniel|james|mark|alex/i.test(v.name)&&!/female/i.test(v.name));
-      if(m)u.voice=m; u.pitch=opts?.pitch||0.82;
-    }
+    const g=opts?.gender||'male';
+    const en=voices.filter(v=>v.lang.startsWith('en'));
+    if(g==='female'){const f=en.find(v=>/female|zira|samantha|karen|victoria|fiona/i.test(v.name));if(f)u.voice=f;u.pitch=opts?.pitch||1.3}
+    else{const m=en.find(v=>/male|david|daniel|james|mark|alex/i.test(v.name)&&!/female/i.test(v.name));if(m)u.voice=m;u.pitch=opts?.pitch||0.82}
   }
-  u.onend=()=>cb&&cb();
-  speechSynthesis.speak(u);
+  u.onend=()=>cb&&cb();speechSynthesis.speak(u);
 }
-function speakSlow(text,opts,cb){speak(text,{...opts,rate:.5},cb);}
-if(window.speechSynthesis){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();}
+function speakSlow(text,opts,cb){speak(text,{...opts,rate:.45},cb)}
+if(speechSynthesis){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices()}
 
-// ========== QUESTION BANK ==========
-// Part 1: Picture identification (emoji + 3 sentences, hear one, pick which matches)
-const P1_BANK=[
-  {emoji:'🏫',audio:'The students are studying in the classroom.',opts:['The students are studying in the classroom.','The students are playing in the park.','The students are eating lunch.'],ans:0},
-  {emoji:'🌧️',audio:'It is raining outside. You should bring an umbrella.',opts:['It is sunny today.','It is raining outside.','It is snowing outside.'],ans:1},
-  {emoji:'🍕',audio:'The boy is eating pizza for lunch.',opts:['The boy is eating pizza.','The boy is drinking juice.','The boy is cooking dinner.'],ans:0},
-  {emoji:'📖',audio:'She is reading a book in the library.',opts:['She is reading a book.','She is watching TV.','She is writing a letter.'],ans:0},
-  {emoji:'🚌',audio:'They are waiting for the bus at the bus stop.',opts:['They are riding bikes.','They are driving a car.','They are waiting for the bus.'],ans:2},
-  {emoji:'🏀',audio:'The boys are playing basketball after school.',opts:['The boys are playing basketball.','The boys are swimming.','The boys are playing soccer.'],ans:0},
-  {emoji:'🛒',audio:'Mom is buying vegetables at the market.',opts:['Mom is cooking at home.','Mom is buying vegetables.','Mom is washing dishes.'],ans:1},
-  {emoji:'😴',audio:'The cat is sleeping on the sofa.',opts:['The cat is eating fish.','The cat is playing with a ball.','The cat is sleeping on the sofa.'],ans:2},
-  {emoji:'🎂',audio:'Today is Amy\'s birthday. She has a big cake.',opts:['Amy is at school.','Amy is having a birthday party.','Amy is going shopping.'],ans:1},
-  {emoji:'✈️',audio:'The family is going to Japan for vacation.',opts:['The family is going to Japan.','The family is going to school.','The family is going to the hospital.'],ans:0},
-  {emoji:'🏥',audio:'Tom is sick. He is going to see a doctor.',opts:['Tom is going to school.','Tom is going to the park.','Tom is going to see a doctor.'],ans:2},
-  {emoji:'🎵',audio:'The girl is listening to music with her headphones.',opts:['The girl is singing.','The girl is listening to music.','The girl is dancing.'],ans:1},
-  {emoji:'🐕',audio:'A boy is walking his dog in the park.',opts:['A boy is walking his dog.','A boy is feeding a cat.','A boy is riding a horse.'],ans:0},
-  {emoji:'🍳',audio:'Dad is cooking breakfast in the kitchen.',opts:['Dad is eating out.','Dad is watching TV.','Dad is cooking breakfast.'],ans:2},
-  {emoji:'📱',audio:'She is talking to her friend on the phone.',opts:['She is sending a text message.','She is talking on the phone.','She is playing a game.'],ans:1},
+// ========== QUESTION BANKS ==========
+// Level 1: 聽單字/短句 → 選 emoji 圖片（超簡單，建立信心）
+const LV1_BANK=[
+  {audio:'cat',emoji:'🐱',opts:['🐱','🐶','🐟'],ans:0,zhHint:'貓'},
+  {audio:'dog',emoji:'🐶',opts:['🐱','🐶','🐦'],ans:1,zhHint:'狗'},
+  {audio:'apple',emoji:'🍎',opts:['🍎','🍌','🍕'],ans:0,zhHint:'蘋果'},
+  {audio:'book',emoji:'📖',opts:['📖','📱','🎮'],ans:0,zhHint:'書'},
+  {audio:'school',emoji:'🏫',opts:['🏥','🏫','🏠'],ans:1,zhHint:'學校'},
+  {audio:'rain',emoji:'🌧️',opts:['☀️','🌧️','❄️'],ans:1,zhHint:'下雨'},
+  {audio:'happy',emoji:'😊',opts:['😢','😡','😊'],ans:2,zhHint:'開心'},
+  {audio:'music',emoji:'🎵',opts:['🎵','📖','🏀'],ans:0,zhHint:'音樂'},
+  {audio:'pizza',emoji:'🍕',opts:['🍔','🍕','🍳'],ans:1,zhHint:'披薩'},
+  {audio:'sleep',emoji:'😴',opts:['😴','🏃','🎮'],ans:0,zhHint:'睡覺'},
+  {audio:'basketball',emoji:'🏀',opts:['⚽','🏀','🎾'],ans:1,zhHint:'籃球'},
+  {audio:'water',emoji:'💧',opts:['🔥','💧','🌊'],ans:1,zhHint:'水'},
+  {audio:'bus',emoji:'🚌',opts:['🚗','🚌','✈️'],ans:1,zhHint:'公車'},
+  {audio:'phone',emoji:'📱',opts:['📱','📖','💻'],ans:0,zhHint:'手機'},
+  {audio:'fish',emoji:'🐟',opts:['🐱','🐟','🐶'],ans:1,zhHint:'魚'},
+  {audio:'cold',emoji:'🥶',opts:['🥵','🥶','😊'],ans:1,zhHint:'冷'},
+  {audio:'hot',emoji:'🥵',opts:['🥵','🥶','😴'],ans:0,zhHint:'熱'},
+  {audio:'star',emoji:'⭐',opts:['🌙','⭐','☀️'],ans:1,zhHint:'星星'},
+  {audio:'cake',emoji:'🎂',opts:['🍕','🎂','🍳'],ans:1,zhHint:'蛋糕'},
+  {audio:'run',emoji:'🏃',opts:['😴','🏃','🧘'],ans:1,zhHint:'跑步'},
+  {audio:'morning',emoji:'🌅',opts:['🌅','🌙','⭐'],ans:0,zhHint:'早上'},
+  {audio:'night',emoji:'🌙',opts:['☀️','🌅','🌙'],ans:2,zhHint:'晚上'},
+  {audio:'bird',emoji:'🐦',opts:['🐦','🐶','🐱'],ans:0,zhHint:'鳥'},
+  {audio:'heart',emoji:'❤️',opts:['⭐','❤️','💧'],ans:1,zhHint:'愛心'},
+  {audio:'house',emoji:'🏠',opts:['🏫','🏥','🏠'],ans:2,zhHint:'房子'},
+  {audio:'eat',emoji:'🍽️',opts:['😴','🍽️','🏃'],ans:1,zhHint:'吃'},
+  {audio:'sing',emoji:'🎤',opts:['🎤','📖','🏀'],ans:0,zhHint:'唱歌'},
+  {audio:'sun',emoji:'☀️',opts:['🌙','☀️','⭐'],ans:1,zhHint:'太陽'},
+  {audio:'milk',emoji:'🥛',opts:['☕','🥛','🧃'],ans:1,zhHint:'牛奶'},
+  {audio:'bicycle',emoji:'🚲',opts:['🚗','🚌','🚲'],ans:2,zhHint:'腳踏車'},
 ];
 
-// Part 2: Basic Q&A (hear question, pick best response)
-const P2_BANK=[
-  {q:'How are you today?',opts:['I\'m fine, thank you.','I\'m twelve years old.','I\'m a student.'],ans:0},
-  {q:'What time is it now?',opts:['It\'s Monday.','It\'s three o\'clock.','It\'s sunny.'],ans:1},
-  {q:'Where is the library?',opts:['It\'s very big.','It\'s next to the park.','It\'s my favorite.'],ans:1},
-  {q:'What do you want for lunch?',opts:['I want fried rice.','I go to school.','I like my teacher.'],ans:0},
-  {q:'Can you help me with my homework?',opts:['Yes, I can swim.','Sure, no problem.','I don\'t like homework.'],ans:1},
-  {q:'How much is this T-shirt?',opts:['It\'s very nice.','It\'s two hundred dollars.','It\'s my brother\'s.'],ans:1},
-  {q:'What did you do yesterday?',opts:['I will go to the movies.','I went to the park.','I am eating lunch.'],ans:1},
-  {q:'When is your birthday?',opts:['It\'s in July.','It\'s at home.','It\'s my mom.'],ans:0},
-  {q:'Who is that girl over there?',opts:['She is tall.','She is my sister.','She is cooking.'],ans:1},
-  {q:'Why are you late for school?',opts:['Because I missed the bus.','Because I like school.','Because it\'s Monday.'],ans:0},
-  {q:'How do you go to school every day?',opts:['I go at eight.','I ride my bike.','I like my school.'],ans:1},
-  {q:'What\'s the weather like today?',opts:['It\'s Tuesday.','I like summer.','It\'s cloudy and cold.'],ans:2},
-  {q:'Would you like some tea?',opts:['Yes, please.','Yes, I am.','Yes, it is.'],ans:0},
-  {q:'Do you have any brothers or sisters?',opts:['Yes, I have a younger brother.','Yes, I have a dog.','Yes, I have homework.'],ans:0},
-  {q:'What subject do you like the most?',opts:['I like music the most.','I like my teacher.','I like summer.'],ans:0},
-  {q:'How often do you exercise?',opts:['I exercise at the park.','I exercise three times a week.','I exercise with my friends.'],ans:1},
-  {q:'May I sit here?',opts:['Yes, it\'s mine.','Sure, go ahead.','No, I\'m not.'],ans:1},
-  {q:'What are you going to do this weekend?',opts:['I went shopping.','I\'m going to visit my grandma.','I don\'t like weekends.'],ans:1},
-  {q:'Could you tell me the way to the station?',opts:['Go straight and turn right.','I like trains.','It\'s very far.'],ans:0},
-  {q:'Did you enjoy the movie last night?',opts:['Yes, I will go.','Yes, it was great!','Yes, I can.'],ans:1},
-  {q:'What does your father do?',opts:['He is fine.','He is tall.','He is a teacher.'],ans:2},
-  {q:'Have you ever been to Japan?',opts:['Yes, I went there last year.','Yes, I like sushi.','Yes, Japan is a country.'],ans:0},
-  {q:'What\'s wrong with you?',opts:['I\'m happy.','I have a headache.','I\'m a student.'],ans:1},
-  {q:'How long does it take to get to school?',opts:['It\'s very far.','About twenty minutes.','I go by bus.'],ans:1},
-  {q:'Excuse me, is there a convenience store nearby?',opts:['Yes, it\'s around the corner.','Yes, I like shopping.','Yes, it\'s convenient.'],ans:0},
-  {q:'What do you usually do after school?',opts:['I usually play basketball.','I go to school at seven.','I like school.'],ans:0},
-  {q:'Shall we go to the movies tonight?',opts:['Sounds great!','I went yesterday.','The movie is good.'],ans:0},
-  {q:'Do you know where Tom is?',opts:['He is nice.','He is in the classroom.','He is my friend.'],ans:1},
-  {q:'What kind of food do you like?',opts:['I eat lunch at twelve.','I like Japanese food.','I\'m hungry.'],ans:1},
-  {q:'Is there anything I can help you with?',opts:['I\'m looking for a gift for my mom.','Yes, you are helpful.','No, you can\'t.'],ans:0},
+// Level 2: 聽簡單問句 → 選回答（2-3 個選項）
+const LV2_BANK=[
+  {q:'How are you?',opts:['I\'m fine, thank you.','I\'m twelve years old.'],ans:0,zhHint:'你好嗎？'},
+  {q:'What time is it?',opts:['It\'s Monday.','It\'s three o\'clock.'],ans:1,zhHint:'現在幾點？'},
+  {q:'What do you want for lunch?',opts:['I want fried rice.','I go to school.'],ans:0,zhHint:'午餐想吃什麼？'},
+  {q:'How much is this?',opts:['It\'s very nice.','It\'s one hundred dollars.'],ans:1,zhHint:'這個多少錢？'},
+  {q:'Where is the library?',opts:['It\'s next to the park.','It\'s very big.'],ans:0,zhHint:'圖書館在哪裡？'},
+  {q:'What did you do yesterday?',opts:['I will go tomorrow.','I went to the park.'],ans:1,zhHint:'你昨天做了什麼？'},
+  {q:'When is your birthday?',opts:['It\'s in July.','It\'s at home.'],ans:0,zhHint:'你的生日是什麼時候？'},
+  {q:'Who is that girl?',opts:['She is my sister.','She is cooking.'],ans:0,zhHint:'那個女生是誰？'},
+  {q:'Can you help me?',opts:['Sure, no problem!','Yes, I can swim.'],ans:0,zhHint:'你可以幫我嗎？'},
+  {q:'Do you like music?',opts:['Yes, I love it!','Yes, it\'s Monday.'],ans:0,zhHint:'你喜歡音樂嗎？'},
+  {q:'What\'s the weather like?',opts:['It\'s sunny today.','It\'s Tuesday.'],ans:0,zhHint:'天氣怎麼樣？'},
+  {q:'Would you like some tea?',opts:['Yes, please!','Yes, I am.'],ans:0,zhHint:'你要喝茶嗎？'},
+  {q:'How do you go to school?',opts:['I ride my bike.','I go at eight.'],ans:0,zhHint:'你怎麼去上學？'},
+  {q:'What subject do you like?',opts:['I like music.','I like my teacher.'],ans:0,zhHint:'你喜歡什麼科目？'},
+  {q:'May I sit here?',opts:['Sure, go ahead!','No, I\'m not.'],ans:0,zhHint:'我可以坐這裡嗎？'},
+  {q:'What\'s your name?',opts:['My name is Amy.','I\'m fine.'],ans:0,zhHint:'你叫什麼名字？'},
+  {q:'Are you hungry?',opts:['Yes, very hungry!','Yes, I\'m happy.'],ans:0,zhHint:'你餓了嗎？'},
+  {q:'Do you have a pet?',opts:['Yes, I have a dog.','Yes, I have homework.'],ans:0,zhHint:'你有養寵物嗎？'},
+  {q:'What color do you like?',opts:['I like blue.','I like summer.'],ans:0,zhHint:'你喜歡什麼顏色？'},
+  {q:'Is this your pencil?',opts:['Yes, it\'s mine. Thank you!','Yes, it\'s a pencil.'],ans:0,zhHint:'這是你的鉛筆嗎？'},
 ];
 
-// Part 3: Dialogue comprehension (conversation + question)
-const P3_BANK=[
-  {dialog:[{g:'male',t:'Hi, Amy. Do you want to go to the movies this Saturday?'},{g:'female',t:'Sure! What time?'},{g:'male',t:'How about two o\'clock?'},{g:'female',t:'Sounds good. See you then!'}],
-   question:'When will they go to the movies?',opts:['Friday','Saturday at 2','Sunday'],ans:1},
-  {dialog:[{g:'female',t:'Excuse me, how much is this bag?'},{g:'male',t:'It\'s five hundred dollars.'},{g:'female',t:'That\'s too expensive. Do you have a cheaper one?'},{g:'male',t:'Yes, this one is only two hundred dollars.'}],
-   question:'Why doesn\'t the woman buy the first bag?',opts:['It\'s too small.','It\'s too expensive.','She doesn\'t like it.'],ans:1},
-  {dialog:[{g:'male',t:'Mom, I don\'t feel well. My head hurts.'},{g:'female',t:'Oh no. Let me check. You have a fever. You should stay home today.'},{g:'male',t:'But I have a test today!'},{g:'female',t:'Your health is more important. I\'ll call your teacher.'}],
-   question:'What will the boy do today?',opts:['Go to school.','Take the test.','Stay home.'],ans:2},
-  {dialog:[{g:'female',t:'What did you do during the summer vacation, Tom?'},{g:'male',t:'I went to Kenting with my family. We went swimming and had a barbecue.'},{g:'female',t:'That sounds fun! I just stayed home and read books.'}],
-   question:'What did Tom do during summer vacation?',opts:['He read books.','He went to Kenting.','He stayed home.'],ans:1},
-  {dialog:[{g:'male',t:'Lisa, are you free after school today?'},{g:'female',t:'Sorry, I have piano class on Wednesdays.'},{g:'male',t:'How about Thursday then?'},{g:'female',t:'Thursday is fine. Let\'s study together at the library.'}],
-   question:'When will they study together?',opts:['Wednesday','Today','Thursday'],ans:2},
-  {dialog:[{g:'female',t:'Can I have a hamburger and a large coke, please?'},{g:'male',t:'Sure. For here or to go?'},{g:'female',t:'To go, please.'},{g:'male',t:'That\'ll be one hundred and twenty dollars.'}],
-   question:'Where are they?',opts:['At school','At a restaurant','At home'],ans:1},
-  {dialog:[{g:'male',t:'Excuse me, which bus goes to the train station?'},{g:'female',t:'You can take bus number 307.'},{g:'male',t:'How long does it take?'},{g:'female',t:'About fifteen minutes.'}],
-   question:'How will the man get to the train station?',opts:['By taxi','By bus 307','By walking'],ans:1},
-  {dialog:[{g:'female',t:'Did you bring your umbrella today?'},{g:'male',t:'No, I didn\'t. Is it going to rain?'},{g:'female',t:'Yes! The weather report said it will rain this afternoon.'},{g:'male',t:'Oh no, I should go buy one.'}],
-   question:'What will the man probably do?',opts:['Go home','Buy an umbrella','Watch the weather report'],ans:1},
-  {dialog:[{g:'male',t:'Happy birthday, Jenny! This is for you.'},{g:'female',t:'Thank you! Can I open it now?'},{g:'male',t:'Of course!'},{g:'female',t:'Wow, a beautiful scarf! I love it!'}],
-   question:'What is the gift?',opts:['A book','A bag','A scarf'],ans:2},
-  {dialog:[{g:'female',t:'How was your English test, David?'},{g:'male',t:'Not very good. I only got sixty points.'},{g:'female',t:'Don\'t worry. If you study harder, you\'ll do better next time.'},{g:'male',t:'You\'re right. I\'ll study more.'}],
-   question:'How did David do on his English test?',opts:['He did great.','He didn\'t do well.','He didn\'t take the test.'],ans:1},
-  {dialog:[{g:'male',t:'Let\'s go ride our bikes in the park.'},{g:'female',t:'I can\'t. I hurt my leg yesterday.'},{g:'male',t:'Oh, I\'m sorry to hear that. How about playing cards at my house instead?'},{g:'female',t:'That sounds good!'}],
-   question:'Why can\'t the girl ride a bike?',opts:['Her bike is broken.','She hurt her leg.','She has homework.'],ans:1},
-  {dialog:[{g:'female',t:'Excuse me. I\'m looking for a book about animals.'},{g:'male',t:'The animal section is on the second floor.'},{g:'female',t:'Thank you. Is the library open until six today?'},{g:'male',t:'We close at five on Fridays.'}],
-   question:'What time does the library close today?',opts:['At four','At five','At six'],ans:1},
+// Level 3: 短對話 → 回答問題（有完整提示系統）
+const LV3_BANK=[
+  {dialog:[{g:'male',t:'Hi Amy. Do you want to go to the movies?'},{g:'female',t:'Sure! What time?'},{g:'male',t:'How about two o\'clock?'},{g:'female',t:'OK!'}],
+   question:'When will they go to the movies?',opts:['At 2 o\'clock','At 5 o\'clock','Tomorrow'],ans:0,zhHint:'他們幾點去看電影？聽聽 two o\'clock'},
+  {dialog:[{g:'female',t:'Excuse me, how much is this bag?'},{g:'male',t:'It\'s five hundred dollars.'},{g:'female',t:'That\'s too expensive!'}],
+   question:'Why doesn\'t the woman buy the bag?',opts:['太貴了','太小了','不好看'],ans:0,zhHint:'女生說 too expensive（太貴了）'},
+  {dialog:[{g:'male',t:'Mom, my head hurts.'},{g:'female',t:'You have a fever. Stay home today.'}],
+   question:'What will the boy do?',opts:['Stay home','Go to school','Go to the park'],ans:0,zhHint:'媽媽說 stay home（待在家）'},
+  {dialog:[{g:'female',t:'What did you do in summer, Tom?'},{g:'male',t:'I went to Kenting with my family.'},{g:'female',t:'That sounds fun!'}],
+   question:'Where did Tom go?',opts:['Kenting','Taipei','Japan'],ans:0,zhHint:'Tom 說去了 Kenting（墾丁）'},
+  {dialog:[{g:'male',t:'Are you free after school?'},{g:'female',t:'Sorry, I have piano class today.'},{g:'male',t:'How about tomorrow?'},{g:'female',t:'Tomorrow is fine!'}],
+   question:'Why can\'t the girl meet today?',opts:['She has piano class','She is sick','She has homework'],ans:0,zhHint:'女生說有 piano class（鋼琴課）'},
+  {dialog:[{g:'female',t:'Can I have a hamburger, please?'},{g:'male',t:'Sure. For here or to go?'},{g:'female',t:'To go, please.'}],
+   question:'Where are they?',opts:['At a restaurant','At school','At home'],ans:0,zhHint:'他們在點餐，hamburger = 漢堡'},
+  {dialog:[{g:'male',t:'Did you bring an umbrella?'},{g:'female',t:'No. Is it going to rain?'},{g:'male',t:'Yes! The weather report said rain this afternoon.'}],
+   question:'What will happen this afternoon?',opts:['It will rain','It will be sunny','It will snow'],ans:0,zhHint:'他說 rain this afternoon（下午會下雨）'},
+  {dialog:[{g:'male',t:'Happy birthday, Jenny!'},{g:'female',t:'Thank you! What a beautiful scarf! I love it!'}],
+   question:'What is the gift?',opts:['A scarf','A book','A bag'],ans:0,zhHint:'Jenny 說 scarf（圍巾）'},
 ];
 
-const ANIME_Q={
-  great:['「全集中・聽力の呼吸！」—— 你比炭治郎還強 🔥','「領域展開：完全聽懂術！」—— 會考穩了 💪','「PLUS ULTRA！」—— 你的聽力超越極限了！'],
-  good:['「只要努力就會變強！」—— 炭治郎 ⚔️','「安妮亞覺得你很厲害！」—— 間諜家家酒 🥜','「再來一球！」—— 排球少年 🏐'],
-  ok:['「慢慢來，比較快！」—— 哆啦A夢 🍩','「失敗了也沒關係！」—— 鳴人 🍥','「吃個銅鑼燒休息一下～」—— 哆啦A夢']
+// ========== ANIME QUOTES ==========
+const ANIME={
+  perfect:['「全集中・聽力の呼吸！」—— 炭治郎 🔥','「領域展開：完美聽懂！」—— 五條悟 💜','安妮亞覺得你超級厲害！🥜✨'],
+  great:['「做得好！這就是 PLUS ULTRA！」💪','「再來一球！」—— 排球少年 🏐','安妮亞給你一百分！🥜'],
+  good:['「只要不放棄，就會變強！」—— 炭治郎 ⚔️','「慢慢來就好～」—— 哆啦A夢 🍩','安妮亞覺得你很棒喔！🥜'],
+  try:['「吃個銅鑼燒再出發！」—— 哆啦A夢 🍩','「失敗是成功之母！下次會更好！」🌱','安妮亞會陪你一起練習！🥜💕']
 };
-const CORRECT_MSGS=['太棒了！🎉','答對了！💪','完美！✨','NICE！🎯','超厲害！⭐','Great！🌟'];
-const WRONG_MSGS=['沒關係！再聽一次 🔊','差一點！💪','加油！🌱','學到了！📝'];
+const CORRECT_FB=['太棒了！🎉','答對了！💪','完美！✨','NICE！🎯','超厲害！⭐','Great！🌟','讚！🔥','好強！💎'];
+const WRONG_FB=['沒關係！學到新的了！📝','差一點！下次一定行！💪','加油！你越來越進步了！🌱','學起來就好～ 👍'];
+const MOTIVATIONS=[
+  {q:'「不是因為看到希望才堅持，是因為堅持才看到希望。」',s:'——鬼滅之刃'},
+  {q:'「只要不放棄，花就一定會開。」',s:'——排球少年'},
+  {q:'「每天進步一點點，就是最大的勝利。」',s:'——安妮亞 🥜'},
+  {q:'「沒有做不到，只有不想做。」',s:'——航海王'},
+  {q:'「就算很慢也沒關係，重點是不要停下來。」',s:'——哆啦A夢 🍩'},
+  {q:'「你比你想像的還要厲害！」',s:'——我英 💪'},
+];
 
 // ========== STATE ==========
-let curDay=1,qIdx=0,qScore=0,qList=[],qLocked=false;
-let p1Score=0,p2Score=0,p3Score=0,p1Total=0,p2Total=0,p3Total=0;
-let curAudioText='',curAudioOpts={};
+let curLevel=1,qIdx=0,sessionCoins=0,hintsUsed=0,qList=[],qLocked=false;
+let curAudioText='',curAudioOpts={},curHintCount=0,curQ=null;
 
-// Seeded shuffle
+function gp(){try{return JSON.parse(localStorage.getItem('listenCoin')||'{}')}catch{return{}}}
+function sp(d){try{localStorage.setItem('listenCoin',JSON.stringify(d))}catch{}}
+
+function getTotalCoins(){
+  const p=gp();return p.totalCoins||0;
+}
+function getLevelBest(lv){
+  const p=gp();return p[`lv${lv}`]||{best:0,stars:0,plays:0};
+}
+function isLevelUnlocked(lv){
+  if(lv===1)return true;
+  // Unlock level 2 after getting 1+ star on level 1, level 3 after 1+ star on level 2
+  const prev=getLevelBest(lv-1);
+  return prev.stars>=1;
+}
+
 function seededShuffle(arr,seed){
-  const a=[...arr];
-  let s=seed;
-  function rng(){s=(s*16807)%2147483647;return(s-1)/2147483646;}
-  for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  const a=[...arr];let s=seed;
+  function rng(){s=(s*16807)%2147483647;return(s-1)/2147483646}
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
   return a;
 }
 
-function getDayQuestions(day){
-  const seed=day*7919;
-  const p1=seededShuffle(P1_BANK,seed).slice(0,3);
-  const p2=seededShuffle(P2_BANK,seed+1).slice(0,7);
-  const p3=seededShuffle(P3_BANK,seed+2).slice(0,4);
-  const qs=[];
-  p1.forEach(q=>qs.push({type:'p1',...q}));
-  p2.forEach(q=>qs.push({type:'p2',...q}));
-  p3.forEach(q=>qs.push({type:'p3',...q}));
-  return qs;
-}
-
-// Progress
-function gp(){try{return JSON.parse(localStorage.getItem('listenProg')||'{}')}catch{return{}}}
-function sp(d){try{localStorage.setItem('listenProg',JSON.stringify(d))}catch{}}
-
 // ========== SCREENS ==========
-function showScr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
-function goHome(){renderHome();showScr('scrHome');}
+function showScr(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');scrollTo(0,0)}
+function goHome(){renderHome();showScr('scrHome')}
 
 function renderHome(){
-  const grid=document.getElementById('dayGrid');grid.innerHTML='';
-  const prog=gp();
-  const today=new Date();
-  const dayOfYear=Math.floor((today-new Date(today.getFullYear(),0,0))/(1000*60*60*24));
-  for(let d=1;d<=29;d++){
-    const btn=document.createElement('div');
-    btn.className='day-btn';
-    const isDone=prog[`d${d}`]?.done;
-    if(isDone)btn.classList.add('done');
-    // Highlight "today" based on position (Day 1 = first day they open)
-    btn.textContent=`Day ${d}`;
-    btn.onclick=()=>startDay(d);
-    grid.appendChild(btn);
-  }
+  document.getElementById('totalCoins').textContent=getTotalCoins();
+
+  const cards=document.getElementById('levelCards');cards.innerHTML='';
+  const levels=[
+    {lv:1,icon:'🍄',title:'入門冒險',desc:'聽單字 → 選圖片<br>超簡單！先從這裡開始',tag:'⭐ 5 題 · 最輕鬆',cls:'lv1'},
+    {lv:2,icon:'🌟',title:'初級挑戰',desc:'聽問句 → 選回答<br>2 個選項，聽懂關鍵字就行',tag:'🎯 5 題 · 剛剛好',cls:'lv2'},
+    {lv:3,icon:'👑',title:'勇者試煉',desc:'聽短對話 → 回答問題<br>有完整提示，不用怕！',tag:'🔥 5 題 · 小挑戰',cls:'lv3'},
+  ];
+  levels.forEach(l=>{
+    const unlocked=isLevelUnlocked(l.lv);
+    const best=getLevelBest(l.lv);
+    const div=document.createElement('div');
+    div.className=`level-card ${l.cls}${unlocked?'':' locked'}`;
+    div.innerHTML=`
+      <div class="lc-top">
+        <div class="lc-icon">${l.icon}</div>
+        <div class="lc-info">
+          <div class="lc-title">${l.title}</div>
+          <div class="lc-desc">${l.desc}</div>
+          <div class="lc-tag">${l.tag}</div>
+        </div>
+      </div>
+      ${best.plays>0?`<div class="lc-stars">${'⭐'.repeat(best.stars)}${'☆'.repeat(3-best.stars)}</div>`:''}
+    `;
+    if(unlocked)div.onclick=()=>startLevel(l.lv);
+    cards.appendChild(div);
+  });
+
+  const m=MOTIVATIONS[Math.floor(Math.random()*MOTIVATIONS.length)];
+  document.getElementById('motiBox').innerHTML=`<div class="q">${m.q}</div><div class="src">${m.s}</div>`;
 }
 
-function startDay(day){
-  curDay=day;qIdx=0;qScore=0;qLocked=false;
-  p1Score=0;p2Score=0;p3Score=0;p1Total=0;p2Total=0;p3Total=0;
-  qList=getDayQuestions(day);
-  document.getElementById('quizTitle').textContent=`🎧 Day ${day}`;
-  renderQ();
-  showScr('scrQuiz');
+function startLevel(lv){
+  curLevel=lv;qIdx=0;sessionCoins=0;hintsUsed=0;qLocked=false;
+  const seed=new Date().toDateString().split('').reduce((a,c)=>a+c.charCodeAt(0),0)+lv*1000;
+
+  if(lv===1){
+    qList=seededShuffle(LV1_BANK,seed).slice(0,5);
+  }else if(lv===2){
+    qList=seededShuffle(LV2_BANK,seed).slice(0,5);
+  }else{
+    qList=seededShuffle(LV3_BANK,seed).slice(0,5);
+  }
+
+  const colors={1:'background:rgba(76,175,80,.2);color:#69f0ae;border:1px solid rgba(76,175,80,.3)',
+                2:'background:rgba(0,212,255,.15);color:var(--blue);border:1px solid rgba(0,212,255,.3)',
+                3:'background:rgba(255,45,149,.15);color:var(--pink);border:1px solid rgba(255,45,149,.3)'};
+  const names={1:'🍄 入門冒險',2:'🌟 初級挑戰',3:'👑 勇者試煉'};
+  document.getElementById('qLevelTag').textContent=names[lv];
+  document.getElementById('qLevelTag').style.cssText=colors[lv];
+  document.getElementById('qCoins').textContent='0';
+
+  renderQ();showScr('scrQuiz');
 }
 
 function renderQ(){
-  if(qIdx>=qList.length){finishDay();return;}
-  const q=qList[qIdx];
+  if(qIdx>=qList.length){finishLevel();return}
+  curQ=qList[qIdx];curHintCount=0;
   const total=qList.length;
+
+  const fillCls=curLevel===1?'lv1':curLevel===2?'lv2':'lv3';
+  document.getElementById('progFill').className='progress-fill '+fillCls;
   document.getElementById('progFill').style.width=(qIdx/total*100)+'%';
-  document.getElementById('qCounter').textContent=`第 ${qIdx+1} / ${total} 題`;
+  document.getElementById('qNum').textContent=`第 ${qIdx+1} / ${total} 題`;
   document.getElementById('fbBox').innerHTML='';
+  document.getElementById('hintArea').innerHTML='';
+  document.getElementById('hintBtn').classList.remove('visible');
   document.getElementById('transcript').classList.remove('visible');
   document.getElementById('transcript').style.display='none';
 
-  if(q.type==='p1'){
-    document.getElementById('partLabel').textContent='第一部分：辨識句意（聽句子 → 看圖選答案）';
-    document.getElementById('qEmoji').textContent=q.emoji;
-    document.getElementById('qPrompt').textContent='聽句子，選出符合圖片的描述';
-    curAudioText=q.audio;curAudioOpts={gender:'female'};
-    document.getElementById('transcript').textContent=q.audio;
-    p1Total++;
-  }else if(q.type==='p2'){
-    document.getElementById('partLabel').textContent='第二部分：基本問答（聽問題 → 選最佳回答）';
+  if(curLevel===1){
+    // Listen to word → pick emoji
+    document.getElementById('qEmoji').textContent='🔊';
+    document.getElementById('qLabel').textContent='聽英文單字';
+    document.getElementById('qPrompt').textContent='聽到什麼？選出正確的圖片！';
+    curAudioText=curQ.audio;curAudioOpts={gender:'female',rate:.7};
+    document.getElementById('transcript').textContent=curQ.audio;
+
+    // Render emoji options
+    const optBox=document.getElementById('optBox');optBox.innerHTML='';
+    optBox.style.display='grid';optBox.style.gridTemplateColumns='1fr 1fr 1fr';optBox.style.gap='12px';
+    curQ.opts.forEach((emoji,i)=>{
+      const div=document.createElement('div');
+      div.className='opt';
+      div.style.cssText='justify-content:center;padding:20px 10px;font-size:2.5em;border-radius:20px;text-align:center';
+      div.innerHTML=`<span>${emoji}</span>`;
+      div.onclick=()=>checkAns(div,i);
+      optBox.appendChild(div);
+    });
+  }else if(curLevel===2){
+    // Listen to question → pick answer
     document.getElementById('qEmoji').textContent='❓';
-    document.getElementById('qPrompt').textContent='聽問題，選出最適合的回答';
-    curAudioText=q.q;curAudioOpts={gender:'male'};
-    document.getElementById('transcript').textContent=q.q;
-    p2Total++;
+    document.getElementById('qLabel').textContent='聽英文問句';
+    document.getElementById('qPrompt').textContent='聽問題，選出最好的回答！';
+    curAudioText=curQ.q;curAudioOpts={gender:'male',rate:.7};
+    document.getElementById('transcript').textContent=curQ.q;
+
+    const optBox=document.getElementById('optBox');optBox.innerHTML='';
+    optBox.style.display='flex';optBox.style.gridTemplateColumns='';
+    const letters=['A','B','C'];
+    curQ.opts.forEach((opt,i)=>{
+      const div=document.createElement('div');div.className='opt';
+      div.innerHTML=`<span class="opt-letter">${letters[i]}</span><span class="opt-text">${opt}</span>`;
+      div.onclick=()=>checkAns(div,i);
+      optBox.appendChild(div);
+    });
   }else{
-    document.getElementById('partLabel').textContent='第三部分：言談理解（聽對話 → 回答問題）';
+    // Dialogue
     document.getElementById('qEmoji').textContent='💬';
-    document.getElementById('qPrompt').textContent='聽完對話後，回答問題';
-    // Build dialog text
-    const dText=q.dialog.map(d=>(d.g==='male'?'👨':'👩')+' '+d.t).join('\n');
-    curAudioText='__dialog__';curAudioOpts={dialog:q.dialog,question:q.question};
-    document.getElementById('transcript').textContent=dText+'\n\n❓ '+q.question;
-    p3Total++;
+    document.getElementById('qLabel').textContent='聽短對話';
+    document.getElementById('qPrompt').textContent='聽完對話，回答問題！';
+    const dText=curQ.dialog.map(d=>(d.g==='male'?'👨 ':'👩 ')+d.t).join('\n');
+    curAudioText='__dialog__';curAudioOpts={dialog:curQ.dialog,question:curQ.question};
+    document.getElementById('transcript').textContent=dText+'\n\n❓ '+curQ.question;
+
+    const optBox=document.getElementById('optBox');optBox.innerHTML='';
+    optBox.style.display='flex';optBox.style.gridTemplateColumns='';
+    const letters=['A','B','C'];
+    curQ.opts.forEach((opt,i)=>{
+      const div=document.createElement('div');div.className='opt';
+      div.innerHTML=`<span class="opt-letter">${letters[i]}</span><span class="opt-text">${opt}</span>`;
+      div.onclick=()=>checkAns(div,i);
+      optBox.appendChild(div);
+    });
   }
 
-  // Render options
-  const optBox=document.getElementById('optBox');optBox.innerHTML='';
-  const letters=['A','B','C'];
-  q.opts.forEach((opt,i)=>{
-    const div=document.createElement('div');div.className='opt';
-    div.innerHTML=`<span class="opt-letter">${letters[i]}</span><span>${opt}</span>`;
-    div.onclick=()=>checkAns(div,i,q);
-    optBox.appendChild(div);
-  });
+  // Show hint button after a delay
+  setTimeout(()=>{
+    if(!qLocked)document.getElementById('hintBtn').classList.add('visible');
+  },2000);
 
   // Auto-play
-  setTimeout(()=>playAudio(),400);
+  setTimeout(()=>playAudio(),500);
 }
 
 function playAudio(){
   if(curAudioText==='__dialog__'){
     playDialog(curAudioOpts.dialog,0,()=>{
-      // After dialog, ask question
-      setTimeout(()=>speak(curAudioOpts.question,{gender:'female',pitch:1.1,rate:.75}),500);
+      setTimeout(()=>speak(curAudioOpts.question,{gender:'female',pitch:1.1,rate:.7}),500);
     });
   }else{
     speak(curAudioText,curAudioOpts);
@@ -424,80 +538,161 @@ function playAudio(){
 function playAudioSlow(){
   if(curAudioText==='__dialog__'){
     playDialog(curAudioOpts.dialog,0,()=>{
-      setTimeout(()=>speak(curAudioOpts.question,{gender:'female',pitch:1.1,rate:.45}),500);
+      setTimeout(()=>speak(curAudioOpts.question,{gender:'female',pitch:1.1,rate:.4}),500);
     },true);
   }else{
     speakSlow(curAudioText,curAudioOpts);
   }
 }
-
 function playDialog(lines,idx,cb,slow){
-  if(idx>=lines.length){cb&&cb();return;}
-  const line=lines[idx];
-  speak(line.t,{gender:line.g,rate:slow?.45:.72},()=>{
+  if(idx>=lines.length){cb&&cb();return}
+  speak(lines[idx].t,{gender:lines[idx].g,rate:slow?.4:.68},()=>{
     setTimeout(()=>playDialog(lines,idx+1,cb,slow),400);
   });
 }
 
-function toggleScript(){
-  const t=document.getElementById('transcript');
-  if(t.classList.contains('visible')){t.classList.remove('visible');t.style.display='none';}
-  else{t.style.display='block';t.classList.add('visible');}
+function useHint(){
+  if(qLocked)return;
+  curHintCount++;sndHint();
+  const ha=document.getElementById('hintArea');
+
+  if(curHintCount===1){
+    // First hint: show Chinese hint
+    const hint=curQ.zhHint||(curLevel===1?curQ.audio:'');
+    ha.innerHTML=`<div class="hint-text">💡 提示：${hint}</div>`;
+  }else if(curHintCount===2){
+    // Second hint: show transcript
+    const t=document.getElementById('transcript');
+    t.style.display='block';t.classList.add('visible');
+    ha.innerHTML=`<div class="hint-text">📝 看原文 ↑ 再聽一次！</div>`;
+    // Also replay audio
+    setTimeout(()=>playAudioSlow(),300);
+  }else if(curHintCount>=3&&curLevel!==1){
+    // Third hint: eliminate one wrong answer
+    const opts=document.querySelectorAll('#optBox .opt');
+    for(let i=0;i<opts.length;i++){
+      if(i!==curQ.ans&&!opts[i].classList.contains('eliminated')){
+        opts[i].classList.add('eliminated');
+        ha.innerHTML=`<div class="hint-text">🎯 幫你刪掉一個錯的！</div>`;
+        break;
+      }
+    }
+  }
 }
 
-function checkAns(div,selected,q){
+function showCoinFloat(el){
+  const r=el.getBoundingClientRect();
+  const coin=document.createElement('div');
+  coin.className='coin-popup';
+  coin.textContent='🪙';
+  coin.style.left=(r.left+r.width/2-20)+'px';
+  coin.style.top=(r.top)+'px';
+  document.body.appendChild(coin);
+  setTimeout(()=>coin.remove(),1000);
+}
+
+function checkAns(div,selected){
   if(qLocked)return;qLocked=true;
-  const correct=selected===q.ans;
+  const correct=selected===curQ.ans;
   const fb=document.getElementById('fbBox');
 
+  // Calculate coins: 3 (no hints) → 2 (1 hint) → 1 (2+ hints) → 1 even if wrong (participation!)
+  let coins=correct?(curHintCount===0?3:curHintCount===1?2:1):1;
+
   if(correct){
-    div.classList.add('correct');qScore++;sndCorrect();
-    if(q.type==='p1')p1Score++;else if(q.type==='p2')p2Score++;else p3Score++;
-    const msg=CORRECT_MSGS[Math.floor(Math.random()*CORRECT_MSGS.length)];
-    fb.innerHTML=`<div class="fb-msg" style="color:var(--green)">${msg}</div>`;
-    // Sparkle
-    const r=div.getBoundingClientRect();
-    addConfetti(15);
+    div.classList.add('correct');sndCorrect();sndCoin();
+    sessionCoins+=coins;
+    document.getElementById('qCoins').textContent=sessionCoins;
+    showCoinFloat(div);
+    addConfetti(20);
+
+    const msg=CORRECT_FB[Math.floor(Math.random()*CORRECT_FB.length)];
+    fb.innerHTML=`
+      <div class="fb-msg" style="color:var(--green)">${msg}</div>
+      <div class="fb-coins">🪙 +${coins} 金幣！</div>
+    `;
   }else{
     div.classList.add('wrong');sndWrong();
-    // Show correct
-    document.querySelectorAll('.opt').forEach((o,i)=>{if(i===q.ans)o.classList.add('correct');});
-    const msg=WRONG_MSGS[Math.floor(Math.random()*WRONG_MSGS.length)];
-    const correctText=q.opts[q.ans];
-    fb.innerHTML=`<div class="fb-msg" style="color:var(--orange)">${msg}</div><div class="fb-detail">正確答案：${correctText}</div>`;
-    // Replay correct answer audio
-    if(q.type==='p2'){setTimeout(()=>speak(q.q,{gender:'male',rate:.6}),600);}
+    sessionCoins+=coins;
+    document.getElementById('qCoins').textContent=sessionCoins;
+    // Show correct answer
+    const opts=document.querySelectorAll('#optBox .opt');
+    opts.forEach((o,i)=>{if(i===curQ.ans)o.classList.add('correct')});
+
+    const msg=WRONG_FB[Math.floor(Math.random()*WRONG_FB.length)];
+    const correctText=curQ.opts[curQ.ans];
+    fb.innerHTML=`
+      <div class="fb-msg" style="color:var(--orange)">${msg}</div>
+      <div class="fb-coins">🪙 +${coins} 參與金幣！</div>
+      <div class="fb-detail" style="margin-top:6px">正確答案：${correctText}</div>
+    `;
+    // Replay correct audio
+    if(curLevel===1){
+      setTimeout(()=>speak(curQ.audio,{gender:'female',rate:.6}),600);
+    }else if(curLevel===2){
+      setTimeout(()=>speak(curQ.q,{gender:'male',rate:.55}),600);
+    }
   }
 
-  setTimeout(()=>{qLocked=false;qIdx++;renderQ();},correct?1500:3000);
+  setTimeout(()=>{qLocked=false;qIdx++;renderQ()},correct?1800:3500);
 }
 
-function finishDay(){
+function finishLevel(){
   const total=qList.length;
-  const pct=qScore/total;
-  const stars=pct>=.9?3:pct>=.65?2:pct>=.35?1:0;
+  const maxCoins=total*3;
+  const pct=sessionCoins/maxCoins;
+  const stars=pct>=.85?3:pct>=.55?2:pct>=.3?1:0;
 
   // Save progress
   const prog=gp();
-  prog[`d${curDay}`]={done:true,score:Math.max(prog[`d${curDay}`]?.score||0,qScore),stars:Math.max(prog[`d${curDay}`]?.stars||0,stars)};
+  const key=`lv${curLevel}`;
+  const prev=prog[key]||{best:0,stars:0,plays:0};
+  prog[key]={best:Math.max(prev.best,sessionCoins),stars:Math.max(prev.stars,stars),plays:(prev.plays||0)+1};
+  prog.totalCoins=(prog.totalCoins||0)+sessionCoins;
   sp(prog);
 
-  if(pct>=.65){fireConfetti();sndDone();}
+  if(stars>=2){fireConfetti();sndDone()}else if(stars>=1){addConfetti(30);sndDone()}
 
-  const qGroup=pct>=.75?'great':pct>=.45?'good':'ok';
-  document.getElementById('resIcon').textContent=pct>=.75?'🏆':pct>=.45?'💪':'🌱';
-  document.getElementById('resTitle').textContent=pct>=.75?'超強！':pct>=.45?'不錯喔！':'繼續加油！';
+  const qGroup=stars>=3?'perfect':stars>=2?'great':stars>=1?'good':'try';
+  document.getElementById('resIcon').textContent=stars>=3?'🏆':stars>=2?'🌟':stars>=1?'💪':'🍄';
+  document.getElementById('resTitle').textContent=stars>=3?'完美通關！':stars>=2?'超棒的！':stars>=1?'不錯喔！':'繼續練習！';
   document.getElementById('resStars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
-  document.getElementById('resScr').textContent=`${qScore} / ${total} 答對`;
-  document.getElementById('resMsg').textContent=ANIME_Q[qGroup][Math.floor(Math.random()*ANIME_Q[qGroup].length)];
+  document.getElementById('resCoins').innerHTML=`<span class="coin-lg">🪙</span> +${sessionCoins} 金幣`;
+  document.getElementById('resMsg').textContent=`答題獲得 ${sessionCoins} / ${maxCoins} 枚金幣`;
+  document.getElementById('resAnime').textContent=ANIME[qGroup][Math.floor(Math.random()*ANIME[qGroup].length)];
 
-  document.getElementById('resBreak').innerHTML=`
-    <div class="rb-row"><span class="rb-label">第一部分（辨識句意）</span><span class="rb-val">${p1Score} / ${p1Total}</span></div>
-    <div class="rb-row"><span class="rb-label">第二部分（基本問答）</span><span class="rb-val">${p2Score} / ${p2Total}</span></div>
-    <div class="rb-row"><span class="rb-label">第三部分（言談理解）</span><span class="rb-val">${p3Score} / ${p3Total}</span></div>
-  `;
+  // Unlock message
+  const nextLv=curLevel+1;
+  if(nextLv<=3&&stars>=1&&!isLevelUnlocked(nextLv)){
+    // Will be unlocked after saving
+  }
+  const unlock=document.getElementById('resUnlock');
+  if(nextLv<=3&&isLevelUnlocked(nextLv)&&getLevelBest(nextLv).plays===0){
+    const names={2:'🌟 初級挑戰',3:'👑 勇者試煉'};
+    unlock.innerHTML=`<div class="result-unlock">🔓 解鎖了「${names[nextLv]}」！</div>`;
+    sndLevelUp();
+  }else{
+    unlock.innerHTML='';
+  }
+
+  const names={1:'🍄 入門冒險',2:'🌟 初級挑戰',3:'👑 勇者試煉'};
+  document.getElementById('resRetry').textContent=`🔄 再玩一次 ${names[curLevel]}`;
+  document.getElementById('resRetry').onclick=()=>startLevel(curLevel);
 
   showScr('scrResult');
+}
+
+// ========== PARTICLES ==========
+const emojis=['✨','⭐','🪙','🍄','💎'];
+for(let i=0;i<6;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+  p.style.left=Math.random()*100+'%';
+  p.style.fontSize=(12+Math.random()*12)+'px';
+  p.style.animationDuration=(10+Math.random()*15)+'s';
+  p.style.animationDelay=(-Math.random()*15)+'s';
+  document.body.appendChild(p);
 }
 
 // ========== INIT ==========
