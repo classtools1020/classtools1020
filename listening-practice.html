@@ -265,36 +265,36 @@ if(speechSynthesis){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=
 // ========== QUESTION BANKS ==========
 // Level 1: 聽單字/短句 → 選 emoji 圖片（超簡單，建立信心）
 const LV1_BANK=[
-  {audio:'cat',emoji:'🐱',opts:['🐱','🐶','🐟'],ans:0,zhHint:'貓'},
-  {audio:'dog',emoji:'🐶',opts:['🐱','🐶','🐦'],ans:1,zhHint:'狗'},
-  {audio:'apple',emoji:'🍎',opts:['🍎','🍌','🍕'],ans:0,zhHint:'蘋果'},
-  {audio:'book',emoji:'📖',opts:['📖','📱','🎮'],ans:0,zhHint:'書'},
-  {audio:'school',emoji:'🏫',opts:['🏥','🏫','🏠'],ans:1,zhHint:'學校'},
-  {audio:'rain',emoji:'🌧️',opts:['☀️','🌧️','❄️'],ans:1,zhHint:'下雨'},
-  {audio:'happy',emoji:'😊',opts:['😢','😡','😊'],ans:2,zhHint:'開心'},
-  {audio:'music',emoji:'🎵',opts:['🎵','📖','🏀'],ans:0,zhHint:'音樂'},
-  {audio:'pizza',emoji:'🍕',opts:['🍔','🍕','🍳'],ans:1,zhHint:'披薩'},
-  {audio:'sleep',emoji:'😴',opts:['😴','🏃','🎮'],ans:0,zhHint:'睡覺'},
-  {audio:'basketball',emoji:'🏀',opts:['⚽','🏀','🎾'],ans:1,zhHint:'籃球'},
-  {audio:'water',emoji:'💧',opts:['🔥','💧','🌊'],ans:1,zhHint:'水'},
-  {audio:'bus',emoji:'🚌',opts:['🚗','🚌','✈️'],ans:1,zhHint:'公車'},
-  {audio:'phone',emoji:'📱',opts:['📱','📖','💻'],ans:0,zhHint:'手機'},
-  {audio:'fish',emoji:'🐟',opts:['🐱','🐟','🐶'],ans:1,zhHint:'魚'},
-  {audio:'cold',emoji:'🥶',opts:['🥵','🥶','😊'],ans:1,zhHint:'冷'},
-  {audio:'hot',emoji:'🥵',opts:['🥵','🥶','😴'],ans:0,zhHint:'熱'},
-  {audio:'star',emoji:'⭐',opts:['🌙','⭐','☀️'],ans:1,zhHint:'星星'},
-  {audio:'cake',emoji:'🎂',opts:['🍕','🎂','🍳'],ans:1,zhHint:'蛋糕'},
-  {audio:'run',emoji:'🏃',opts:['😴','🏃','🧘'],ans:1,zhHint:'跑步'},
-  {audio:'morning',emoji:'🌅',opts:['🌅','🌙','⭐'],ans:0,zhHint:'早上'},
-  {audio:'night',emoji:'🌙',opts:['☀️','🌅','🌙'],ans:2,zhHint:'晚上'},
-  {audio:'bird',emoji:'🐦',opts:['🐦','🐶','🐱'],ans:0,zhHint:'鳥'},
-  {audio:'heart',emoji:'❤️',opts:['⭐','❤️','💧'],ans:1,zhHint:'愛心'},
-  {audio:'house',emoji:'🏠',opts:['🏫','🏥','🏠'],ans:2,zhHint:'房子'},
-  {audio:'eat',emoji:'🍽️',opts:['😴','🍽️','🏃'],ans:1,zhHint:'吃'},
-  {audio:'sing',emoji:'🎤',opts:['🎤','📖','🏀'],ans:0,zhHint:'唱歌'},
-  {audio:'sun',emoji:'☀️',opts:['🌙','☀️','⭐'],ans:1,zhHint:'太陽'},
-  {audio:'milk',emoji:'🥛',opts:['☕','🥛','🧃'],ans:1,zhHint:'牛奶'},
-  {audio:'bicycle',emoji:'🚲',opts:['🚗','🚌','🚲'],ans:2,zhHint:'腳踏車'},
+  {audio:'cat',opts:[{e:'🐱',w:'cat'},{e:'🐶',w:'dog'},{e:'🐟',w:'fish'}],ans:0,zhHint:'貓'},
+  {audio:'dog',opts:[{e:'🐱',w:'cat'},{e:'🐶',w:'dog'},{e:'🐦',w:'bird'}],ans:1,zhHint:'狗'},
+  {audio:'apple',opts:[{e:'🍎',w:'apple'},{e:'🍌',w:'banana'},{e:'🍕',w:'pizza'}],ans:0,zhHint:'蘋果'},
+  {audio:'book',opts:[{e:'📖',w:'book'},{e:'📱',w:'phone'},{e:'🎮',w:'game'}],ans:0,zhHint:'書'},
+  {audio:'school',opts:[{e:'🏥',w:'hospital'},{e:'🏫',w:'school'},{e:'🏠',w:'house'}],ans:1,zhHint:'學校'},
+  {audio:'rain',opts:[{e:'☀️',w:'sun'},{e:'🌧️',w:'rain'},{e:'❄️',w:'snow'}],ans:1,zhHint:'下雨'},
+  {audio:'happy',opts:[{e:'😢',w:'sad'},{e:'😡',w:'angry'},{e:'😊',w:'happy'}],ans:2,zhHint:'開心'},
+  {audio:'music',opts:[{e:'🎵',w:'music'},{e:'📖',w:'book'},{e:'🏀',w:'basketball'}],ans:0,zhHint:'音樂'},
+  {audio:'pizza',opts:[{e:'🍔',w:'hamburger'},{e:'🍕',w:'pizza'},{e:'🍳',w:'egg'}],ans:1,zhHint:'披薩'},
+  {audio:'sleep',opts:[{e:'😴',w:'sleep'},{e:'🏃',w:'run'},{e:'🎮',w:'game'}],ans:0,zhHint:'睡覺'},
+  {audio:'basketball',opts:[{e:'⚽',w:'soccer'},{e:'🏀',w:'basketball'},{e:'🎾',w:'tennis'}],ans:1,zhHint:'籃球'},
+  {audio:'water',opts:[{e:'🔥',w:'fire'},{e:'💧',w:'water'},{e:'🌊',w:'ocean'}],ans:1,zhHint:'水'},
+  {audio:'bus',opts:[{e:'🚗',w:'car'},{e:'🚌',w:'bus'},{e:'✈️',w:'airplane'}],ans:1,zhHint:'公車'},
+  {audio:'phone',opts:[{e:'📱',w:'phone'},{e:'📖',w:'book'},{e:'💻',w:'computer'}],ans:0,zhHint:'手機'},
+  {audio:'fish',opts:[{e:'🐱',w:'cat'},{e:'🐟',w:'fish'},{e:'🐶',w:'dog'}],ans:1,zhHint:'魚'},
+  {audio:'cold',opts:[{e:'🥵',w:'hot'},{e:'🥶',w:'cold'},{e:'😊',w:'happy'}],ans:1,zhHint:'冷'},
+  {audio:'hot',opts:[{e:'🥵',w:'hot'},{e:'🥶',w:'cold'},{e:'😴',w:'sleep'}],ans:0,zhHint:'熱'},
+  {audio:'star',opts:[{e:'🌙',w:'moon'},{e:'⭐',w:'star'},{e:'☀️',w:'sun'}],ans:1,zhHint:'星星'},
+  {audio:'cake',opts:[{e:'🍕',w:'pizza'},{e:'🎂',w:'cake'},{e:'🍳',w:'egg'}],ans:1,zhHint:'蛋糕'},
+  {audio:'run',opts:[{e:'😴',w:'sleep'},{e:'🏃',w:'run'},{e:'🧘',w:'yoga'}],ans:1,zhHint:'跑步'},
+  {audio:'morning',opts:[{e:'🌅',w:'morning'},{e:'🌙',w:'night'},{e:'⭐',w:'star'}],ans:0,zhHint:'早上'},
+  {audio:'night',opts:[{e:'☀️',w:'sun'},{e:'🌅',w:'morning'},{e:'🌙',w:'night'}],ans:2,zhHint:'晚上'},
+  {audio:'bird',opts:[{e:'🐦',w:'bird'},{e:'🐶',w:'dog'},{e:'🐱',w:'cat'}],ans:0,zhHint:'鳥'},
+  {audio:'heart',opts:[{e:'⭐',w:'star'},{e:'❤️',w:'heart'},{e:'💧',w:'water'}],ans:1,zhHint:'愛心'},
+  {audio:'house',opts:[{e:'🏫',w:'school'},{e:'🏥',w:'hospital'},{e:'🏠',w:'house'}],ans:2,zhHint:'房子'},
+  {audio:'eat',opts:[{e:'😴',w:'sleep'},{e:'🍽️',w:'eat'},{e:'🏃',w:'run'}],ans:1,zhHint:'吃'},
+  {audio:'sing',opts:[{e:'🎤',w:'sing'},{e:'📖',w:'book'},{e:'🏀',w:'basketball'}],ans:0,zhHint:'唱歌'},
+  {audio:'sun',opts:[{e:'🌙',w:'moon'},{e:'☀️',w:'sun'},{e:'⭐',w:'star'}],ans:1,zhHint:'太陽'},
+  {audio:'milk',opts:[{e:'☕',w:'coffee'},{e:'🥛',w:'milk'},{e:'🧃',w:'juice'}],ans:1,zhHint:'牛奶'},
+  {audio:'bicycle',opts:[{e:'🚗',w:'car'},{e:'🚌',w:'bus'},{e:'🚲',w:'bicycle'}],ans:2,zhHint:'腳踏車'},
 ];
 
 // Level 2: 聽簡單問句 → 選回答（2-3 個選項）
@@ -469,14 +469,14 @@ function renderQ(){
     curAudioText=curQ.audio;curAudioOpts={gender:'female',rate:.7};
     document.getElementById('transcript').textContent=curQ.audio;
 
-    // Render emoji options
+    // Render emoji + word options
     const optBox=document.getElementById('optBox');optBox.innerHTML='';
     optBox.style.display='grid';optBox.style.gridTemplateColumns='1fr 1fr 1fr';optBox.style.gap='12px';
-    curQ.opts.forEach((emoji,i)=>{
+    curQ.opts.forEach((opt,i)=>{
       const div=document.createElement('div');
-      div.className='opt';
-      div.style.cssText='justify-content:center;padding:20px 10px;font-size:2.5em;border-radius:20px;text-align:center';
-      div.innerHTML=`<span>${emoji}</span>`;
+      div.className='opt lv1-opt';
+      div.style.cssText='flex-direction:column;justify-content:center;align-items:center;padding:16px 8px;border-radius:20px;text-align:center;gap:4px';
+      div.innerHTML=`<span style="font-size:2.2em;line-height:1.2">${opt.e}</span><span style="font-size:.8em;color:rgba(255,255,255,.55);font-weight:700;letter-spacing:.5px">${opt.w}</span>`;
       div.onclick=()=>checkAns(div,i);
       optBox.appendChild(div);
     });
@@ -567,7 +567,7 @@ function useHint(){
     ha.innerHTML=`<div class="hint-text">📝 看原文 ↑ 再聽一次！</div>`;
     // Also replay audio
     setTimeout(()=>playAudioSlow(),300);
-  }else if(curHintCount>=3&&curLevel!==1){
+  }else if(curHintCount>=3){
     // Third hint: eliminate one wrong answer
     const opts=document.querySelectorAll('#optBox .opt');
     for(let i=0;i<opts.length;i++){
@@ -620,7 +620,8 @@ function checkAns(div,selected){
     opts.forEach((o,i)=>{if(i===curQ.ans)o.classList.add('correct')});
 
     const msg=WRONG_FB[Math.floor(Math.random()*WRONG_FB.length)];
-    const correctText=curQ.opts[curQ.ans];
+    const ansObj=curQ.opts[curQ.ans];
+    const correctText=curLevel===1?`${ansObj.e} ${ansObj.w}`:ansObj;
     fb.innerHTML=`
       <div class="fb-msg" style="color:var(--orange)">${msg}</div>
       <div class="fb-coins">🪙 +${coins} 參與金幣！</div>
