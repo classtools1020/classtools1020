@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎧 會考英語聽力特訓 — 戰令版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;
+  --text:#c9d1d9;--muted:#8b949e;--accent:#58a6ff;--green:#3fb950;
+  --red:#f85149;--yellow:#d29922;--orange:#e3b341;--purple:#bc8cff;
+  --gold:#ffd700;--diamond:#b9f2ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);font-size:16px;}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:block;}
+
+/* ── BACK BUTTON (always visible) ── */
+.btn-back{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);
+  border:1px solid var(--border);color:var(--muted);border-radius:20px;
+  padding:6px 14px;font-size:12px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;
+  transition:all .15s;position:relative;z-index:20;}
+.btn-back:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ── COIN DISPLAY ── */
+.coin-bar{display:flex;align-items:center;gap:16px;justify-content:center;margin-bottom:16px;}
+.coin-display{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#2d1f00,#1a1300);
+  border:1px solid var(--gold);border-radius:20px;padding:5px 14px;font-size:14px;font-weight:700;color:var(--gold);}
+.streak-display{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#1f0000,#1a0500);
+  border:1px solid var(--orange);border-radius:20px;padding:5px 14px;font-size:14px;font-weight:700;color:var(--orange);}
+.rank-display{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:14px;font-weight:700;}
+
+/* ── FLOATING COIN ANIMATION ── */
+.coin-fly{position:fixed;font-size:20px;pointer-events:none;z-index:9999;animation:coinUp 1s ease-out forwards;}
+@keyframes coinUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-80px) scale(1.5)}}
+.combo-text{position:fixed;font-size:24px;font-weight:900;pointer-events:none;z-index:9999;
+  color:var(--gold);text-shadow:0 0 10px rgba(255,215,0,.5);animation:comboIn .8s ease-out forwards;}
+@keyframes comboIn{0%{opacity:0;transform:scale(0.5)}30%{opacity:1;transform:scale(1.3)}100%{opacity:0;transform:scale(1) translateY(-40px)}}
+
+/* ── HOME ── */
+#home{padding:24px 16px 60px;max-width:720px;margin:0 auto;text-align:center;}
+.logo{font-size:56px;margin-bottom:8px;}
+.site-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:4px;}
+.site-sub{font-size:13px;color:var(--muted);margin-bottom:16px;font-family:'Space Mono',monospace;}
+
+/* ── BATTLE PASS BANNER ── */
+.bp-banner{background:linear-gradient(135deg,#1a0a2e,#0d1117,#0a1628);border:1px solid var(--purple);
+  border-radius:14px;padding:16px;margin-bottom:20px;text-align:left;position:relative;overflow:hidden;}
+.bp-banner::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(188,140,255,.15),transparent);border-radius:50%;}
+.bp-title{font-size:16px;font-weight:900;color:var(--purple);margin-bottom:8px;}
+.bp-progress{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-bottom:8px;}
+.bp-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--accent));border-radius:4px;transition:width .5s;}
+.bp-info{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);}
+.bp-tier{font-weight:700;color:var(--purple);}
+.bp-next-reward{color:var(--gold);}
+.btn-bp{display:block;width:100%;background:linear-gradient(135deg,#2d1060,#1a0a2e);border:1px solid var(--purple);
+  color:var(--purple);border-radius:10px;padding:10px;font-size:14px;font-weight:700;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;margin-top:10px;transition:all .15s;}
+.btn-bp:hover{background:rgba(188,140,255,.15);}
+
+/* ── TABS ── */
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;background:var(--surface);border-radius:10px;padding:4px;}
+.tab-btn{flex:1;padding:8px;border:none;background:transparent;color:var(--muted);border-radius:8px;
+  font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s;}
+.tab-btn.active{background:var(--surface2);color:#fff;}
+.tab-btn:hover:not(.active){color:var(--text);}
+
+.warn-box{background:#1a1300;border:1px solid var(--yellow);border-radius:10px;padding:10px 14px;
+  margin-bottom:16px;font-size:12px;color:var(--orange);text-align:left;line-height:1.7;}
+.sec-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;
+  color:var(--muted);text-transform:uppercase;margin-bottom:10px;text-align:left;}
+.day-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;}
+.day-btn{aspect-ratio:1;background:var(--surface);border:2px solid var(--border);border-radius:12px;
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  transition:all .15s;color:var(--text);font-family:inherit;position:relative;}
+.day-btn:hover{border-color:var(--accent);background:var(--surface2);}
+.day-btn.today{border-color:var(--accent);background:rgba(88,166,255,.1);}
+.day-btn.done{border-color:var(--green);background:rgba(63,185,80,.1);}
+.day-btn .dn{font-weight:900;font-size:18px;color:#fff;}
+.day-btn .dl{font-size:9px;color:var(--muted);}
+.day-btn .dc{font-size:13px;}
+.day-btn .reward-badge{position:absolute;top:-4px;right:-4px;font-size:14px;
+  filter:drop-shadow(0 0 4px rgba(255,215,0,.5));}
+.legend{display:flex;gap:16px;justify-content:center;font-size:12px;color:var(--muted);margin-bottom:16px;}
+.format-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px;font-size:13px;line-height:2;text-align:left;}
+
+/* ── PRACTICE ── */
+#practice{max-width:720px;margin:0 auto;padding:0 16px 100px;}
+.prac-hdr{position:sticky;top:0;background:var(--bg);z-index:10;padding:10px 0 8px;
+  border-bottom:1px solid var(--border);margin-bottom:16px;}
+.prac-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.prac-coins{display:flex;align-items:center;gap:8px;}
+.prac-coins .coin-display{font-size:12px;padding:3px 10px;}
+.combo-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#2d1f00,#1a0a00);
+  border:1px solid var(--orange);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;color:var(--orange);}
+.prog-wrap{height:4px;background:var(--surface2);border-radius:2px;margin-bottom:8px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s;}
+.hdr-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+.day-badge{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);
+  border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;font-family:'Space Mono',monospace;}
+.part-chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;}
+.p1c{background:rgba(188,140,255,.2);color:var(--purple);}
+.p2c{background:rgba(88,166,255,.2);color:var(--accent);}
+.p3c{background:rgba(63,185,80,.2);color:var(--green);}
+.q-counter{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;}
+
+/* ── QUESTION CARD ── */
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:18px;margin-bottom:16px;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.q-type{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  color:var(--muted);margin-bottom:8px;}
+.q-instr{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:10px;}
+.q-text{font-size:15px;font-weight:700;color:#fff;line-height:1.5;}
+.same-dlg-note{background:rgba(210,153,34,.1);border:1px solid var(--yellow);border-radius:8px;
+  padding:10px 14px;font-size:13px;color:var(--orange);margin-bottom:12px;}
+
+/* ── AUDIO ── */
+.audio-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.btn-play{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#000;
+  border:none;border-radius:50px;padding:12px 22px;font-size:15px;font-weight:700;
+  cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s;min-width:120px;}
+.btn-play:hover{background:#79b8ff;transform:translateY(-1px);}
+.btn-play.playing{background:var(--yellow);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.btn-play:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.btn-replay{display:none;align-items:center;gap:6px;background:var(--surface2);
+  border:1px solid var(--border);color:var(--text);border-radius:50px;
+  padding:12px 18px;font-size:13px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s;}
+.btn-replay:hover{border-color:var(--accent);color:var(--accent);}
+.btn-show{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;
+  text-decoration:underline;font-family:'Noto Sans TC',sans-serif;padding:4px 0;}
+.script-box{background:var(--surface2);border-radius:8px;padding:12px 16px;font-size:13px;
+  line-height:1.8;margin-top:8px;display:none;}
+.dlg-m{color:#58a6ff;}.dlg-f{color:#f778ba;}
+
+/* ── PART 1 PICTURE CHOICES ── */
+.pic-choices{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pic-card{background:var(--surface2);border:2px solid var(--border);border-radius:12px;
+  padding:14px 8px;text-align:center;cursor:pointer;transition:all .15s;}
+.pic-card:hover{border-color:var(--accent);background:rgba(88,166,255,.05);}
+.pic-em{font-size:30px;margin-bottom:4px;}
+.pic-lt{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px;}
+.pic-tx{font-size:12px;color:var(--text);line-height:1.4;}
+
+/* ── CHOICE BUTTONS ── */
+.choices{display:flex;flex-direction:column;gap:8px;}
+.choice{display:flex;align-items:center;gap:12px;background:var(--surface2);
+  border:2px solid var(--border);border-radius:12px;padding:12px 16px;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--text);
+  text-align:left;transition:all .15s;width:100%;}
+.choice:hover:not(:disabled){border-color:var(--accent);background:rgba(88,166,255,.05);}
+.choice-lt{display:flex;align-items:center;justify-content:center;width:30px;height:30px;
+  border-radius:50%;background:var(--surface);border:2px solid var(--border);
+  font-family:'Space Mono',monospace;font-size:12px;font-weight:700;flex-shrink:0;}
+.choice.ok{border-color:var(--green)!important;background:rgba(63,185,80,.1)!important;}
+.choice.ok .choice-lt{background:var(--green);border-color:var(--green);color:#000;}
+.choice.ng{border-color:var(--red)!important;background:rgba(248,81,73,.1)!important;}
+.choice.ng .choice-lt{background:var(--red);border-color:var(--red);color:#fff;}
+.pic-card.ok{border-color:var(--green)!important;background:rgba(63,185,80,.1)!important;}
+.pic-card.ng{border-color:var(--red)!important;background:rgba(248,81,73,.1)!important;}
+
+/* ── FEEDBACK ── */
+.feedback{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-radius:10px;
+  margin-top:14px;font-size:14px;}
+.fb-ok{background:rgba(63,185,80,.12);border:1px solid var(--green);}
+.fb-ng{background:rgba(248,81,73,.12);border:1px solid var(--red);}
+.fb-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.fb-msg{flex:1;line-height:1.6;}
+.coin-earned{display:inline-flex;align-items:center;gap:4px;background:rgba(255,215,0,.15);
+  border:1px solid var(--gold);border-radius:20px;padding:2px 10px;font-size:12px;
+  font-weight:700;color:var(--gold);margin-top:6px;}
+.btn-next{width:100%;background:var(--accent);color:#000;border:none;border-radius:10px;
+  padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;
+  margin-top:10px;transition:all .15s;}
+.btn-next:hover{background:#79b8ff;}
+
+/* ── RESULTS ── */
+#results{padding:24px 20px;max-width:520px;margin:0 auto;text-align:center;}
+.r-trophy{font-size:72px;margin-bottom:8px;}
+.r-title{font-size:20px;font-weight:900;color:#fff;margin-bottom:6px;}
+.r-label{font-size:13px;color:var(--muted);margin-bottom:20px;font-family:'Space Mono',monospace;}
+.score-ring{width:140px;height:140px;border-radius:50%;background:var(--surface);
+  border:6px solid var(--accent);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;margin:0 auto 12px;}
+.r-num{font-size:42px;font-weight:900;color:#fff;line-height:1;}
+.r-den{font-size:14px;color:var(--muted);}
+.r-pct{font-size:18px;font-weight:700;margin-bottom:4px;}
+.r-msg{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7;}
+
+/* Reward unlock card */
+.reward-unlock{background:linear-gradient(135deg,#1a0a2e,#0d1117);border:2px solid var(--gold);
+  border-radius:14px;padding:20px;margin-bottom:16px;text-align:center;
+  animation:rewardGlow 2s ease-in-out infinite alternate;}
+@keyframes rewardGlow{0%{box-shadow:0 0 10px rgba(255,215,0,.2)}100%{box-shadow:0 0 30px rgba(255,215,0,.4)}}
+.reward-unlock .ru-label{font-size:12px;color:var(--gold);font-weight:700;margin-bottom:8px;letter-spacing:1px;}
+.reward-unlock .ru-icon{font-size:48px;margin-bottom:8px;}
+.reward-unlock .ru-name{font-size:16px;font-weight:900;color:#fff;margin-bottom:4px;}
+.reward-unlock .ru-desc{font-size:12px;color:var(--muted);}
+
+.r-coins-earned{display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:18px;font-weight:900;color:var(--gold);margin-bottom:16px;}
+
+.breakdown{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:14px;margin-bottom:16px;text-align:left;}
+.bdr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;
+  border-bottom:1px solid var(--border);font-size:13px;}
+.bdr:last-child{border-bottom:none;}
+.r-btns{display:flex;gap:10px;}
+.btn-home2{flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
+.btn-retry{flex:1;background:var(--accent);border:none;color:#000;border-radius:10px;
+  padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
+
+/* ── BATTLE PASS SCREEN ── */
+#battlepass{padding:24px 16px 60px;max-width:720px;margin:0 auto;}
+.bp-header{text-align:center;margin-bottom:24px;}
+.bp-header h2{font-size:20px;color:var(--purple);margin-bottom:8px;}
+.bp-tier-list{display:flex;flex-direction:column;gap:8px;}
+.bp-tier-card{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:12px 16px;transition:all .15s;}
+.bp-tier-card.unlocked{border-color:var(--green);background:rgba(63,185,80,.08);}
+.bp-tier-card.current{border-color:var(--gold);background:rgba(255,215,0,.08);
+  box-shadow:0 0 15px rgba(255,215,0,.1);}
+.bp-tier-card.locked{opacity:.5;}
+.bp-tier-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:14px;flex-shrink:0;}
+.bp-tier-card.unlocked .bp-tier-num{background:var(--green);color:#000;}
+.bp-tier-card.current .bp-tier-num{background:var(--gold);color:#000;}
+.bp-tier-card.locked .bp-tier-num{background:var(--surface2);color:var(--muted);}
+.bp-tier-reward{flex:1;}
+.bp-tier-reward .name{font-size:14px;font-weight:700;color:#fff;}
+.bp-tier-reward .desc{font-size:11px;color:var(--muted);}
+.bp-tier-icon{font-size:28px;}
+
+/* ── COLLECTION SCREEN ── */
+#collection{padding:24px 16px 60px;max-width:720px;margin:0 auto;}
+.skin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+.skin-card{background:var(--surface);border:2px solid var(--border);border-radius:14px;
+  padding:16px 8px;text-align:center;transition:all .15s;}
+.skin-card.owned{border-color:var(--green);background:rgba(63,185,80,.08);}
+.skin-card.equipped{border-color:var(--gold);background:rgba(255,215,0,.08);
+  box-shadow:0 0 10px rgba(255,215,0,.15);}
+.skin-card.locked{opacity:.4;}
+.skin-icon{font-size:36px;margin-bottom:6px;}
+.skin-name{font-size:12px;font-weight:700;color:#fff;margin-bottom:2px;}
+.skin-from{font-size:10px;color:var(--muted);}
+.btn-equip{margin-top:8px;background:var(--gold);color:#000;border:none;border-radius:6px;
+  padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
+
+/* ── CONFIRM DIALOG ── */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);
+  z-index:100;align-items:center;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:24px;max-width:320px;width:90%;text-align:center;}
+.modal-box h3{font-size:16px;color:#fff;margin-bottom:8px;}
+.modal-box p{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+.modal-btns{display:flex;gap:10px;}
+.modal-btns button{flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s;}
+.modal-cancel{background:var(--surface2);border:1px solid var(--border);color:var(--text);}
+.modal-confirm{background:var(--accent);border:none;color:#000;}
+
+@media(max-width:480px){
+  .pic-em{font-size:22px;}
+  .pic-tx{font-size:11px;}
+  .choice{font-size:13px;padding:10px 12px;}
+  .day-grid{grid-template-columns:repeat(5,1fr);}
+  .day-btn .dn{font-size:16px;}
+  .skin-grid{grid-template-columns:repeat(3,1fr);}
+  .coin-bar{flex-wrap:wrap;gap:8px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ CONFIRM DIALOG ══ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h3 id="modal-title">確定要離開嗎？</h3>
+    <p id="modal-msg">練習進度不會儲存喔！</p>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal()">繼續練習</button>
+      <button class="modal-confirm" id="modal-ok">回到首頁</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOME ══ -->
+<div class="screen active" id="home">
+  <div class="logo">🎧</div>
+  <div class="site-title">會考英語聽力特訓</div>
+  <div class="site-sub">29天戰令 ✦ 金幣收集 ✦ 造型解鎖 ✦ AI語音</div>
+
+  <div class="coin-bar">
+    <div class="coin-display">🪙 <span id="home-coins">0</span></div>
+    <div class="streak-display">🔥 <span id="home-streak">0</span> 天</div>
+    <div class="rank-display" id="home-rank">🥉 青銅</div>
+  </div>
+
+  <!-- Battle Pass Banner -->
+  <div class="bp-banner" id="bp-banner">
+    <div class="bp-title">⚔️ 戰令 BATTLE PASS — Season 1</div>
+    <div class="bp-progress"><div class="bp-fill" id="bp-fill" style="width:0%"></div></div>
+    <div class="bp-info">
+      <span>Tier <span class="bp-tier" id="bp-tier">0</span>/29</span>
+      <span class="bp-next-reward" id="bp-next">🎁 下一個獎勵：Tier 1</span>
+    </div>
+    <button class="btn-bp" onclick="showBattlePass()">🏆 查看戰令獎勵 & 造型收藏</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('practice')">📅 每日練習</button>
+    <button class="tab-btn" onclick="switchTab('info')">📋 格式說明</button>
+  </div>
+
+  <div id="tab-practice">
+    <div class="warn-box">
+      ⚠️ 請用 <strong>Chrome 瀏覽器</strong>開啟 🔊 確認音量已開
+      📱 手機也可用 🎮 答對得金幣，完成 Day 解鎖造型！
+    </div>
+    <div class="sec-label">選擇今天的練習</div>
+    <div class="day-grid" id="day-grid"></div>
+    <div class="legend">
+      <span>⬜ 未練習</span>
+      <span style="color:var(--green)">✅ 已完成</span>
+      <span style="color:var(--accent)">📅 今日建議</span>
+    </div>
+  </div>
+
+  <div id="tab-info" style="display:none;">
+    <div class="format-box">
+      <div>🔸 <strong style="color:var(--purple)">第一部分 辨識句意</strong>（3題）── 聽英文句子，選符合的圖片</div>
+      <div>🔸 <strong style="color:var(--accent)">第二部分 基本問答</strong>（7題）── 聽問題或句子，選最好的回答</div>
+      <div>🔸 <strong style="color:var(--green)">第三部分 言談理解</strong>（4題）── 聽短對話，回答理解題</div>
+      <div style="margin-top:10px;color:var(--muted);font-size:12px;">
+        每天共 14 題 ✦ 約 15–20 分鐘 ✦ 29天題組不重複
+      </div>
+      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+        <strong style="color:var(--gold)">🎮 遊戲規則</strong><br>
+        <span style="font-size:12px;">
+        🪙 答對 1 題 = +10 金幣<br>
+        🔥 連續答對 combo = 額外加倍（x2、x3...）<br>
+        ⭐ 完成 1 天 = 戰令升 1 階 + 解鎖造型<br>
+        🏆 段位：青銅→白銀→黃金→鑽石→傳說<br>
+        💎 每 7 天完成 = 段位提升！
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PRACTICE ══ -->
+<div class="screen" id="practice">
+  <div class="prac-hdr">
+    <div class="prac-top-row">
+      <button class="btn-back" onclick="confirmGoHome()">⬅ 回首頁</button>
+      <div class="prac-coins">
+        <div class="coin-display">🪙 <span id="prac-coins">0</span></div>
+        <div class="combo-badge" id="combo-badge" style="display:none;">🔥 x<span id="combo-count">0</span></div>
+      </div>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="prog"></div></div>
+    <div class="hdr-row">
+      <div class="day-badge">📅 Day <span id="h-day">1</span> · <span id="h-topic">學校生活</span></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="part-chip p1c" id="h-part">第一部分</span>
+        <span class="q-counter">Q<span id="h-now">1</span>/<span id="h-tot">14</span></span>
+      </div>
+    </div>
+  </div>
+  <div id="q-area"></div>
+</div>
+
+<!-- ══ RESULTS ══ -->
+<div class="screen" id="results">
+  <div style="max-width:520px;margin:0 auto;padding:24px 20px;text-align:center;">
+    <button class="btn-back" onclick="goHome()" style="margin-bottom:16px;">⬅ 回首頁</button>
+    <div class="r-trophy" id="r-trophy">🏆</div>
+    <div class="r-title">Day <span id="r-day">1</span> 完成！</div>
+    <div class="r-label" id="r-lbl">學校生活</div>
+    <div class="score-ring" id="r-ring">
+      <div class="r-num" id="r-sc">0</div>
+      <div class="r-den">/ 14</div>
+    </div>
+    <div class="r-pct" id="r-pct">0%</div>
+    <div class="r-coins-earned">🪙 +<span id="r-coins">0</span> 金幣</div>
+    <div id="r-reward-area"></div>
+    <div class="r-msg" id="r-msg">繼續加油！</div>
+    <div class="breakdown">
+      <div class="bdr"><span>🔸 第一部分 辨識句意</span><span id="r-p1">0/3</span></div>
+      <div class="bdr"><span>🔸 第二部分 基本問答</span><span id="r-p2">0/7</span></div>
+      <div class="bdr"><span>🔸 第三部分 言談理解</span><span id="r-p3">0/4</span></div>
+    </div>
+    <div class="r-btns">
+      <button class="btn-home2" onclick="goHome()">🏠 首頁</button>
+      <button class="btn-retry" onclick="retryDay()">🔄 再練一次</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BATTLE PASS ══ -->
+<div class="screen" id="battlepass">
+  <div style="padding:16px;">
+    <button class="btn-back" onclick="goHome()">⬅ 回首頁</button>
+  </div>
+  <div class="bp-header">
+    <h2>⚔️ 戰令 BATTLE PASS</h2>
+    <p style="color:var(--muted);font-size:13px;">完成每日練習 = 升 1 階 = 解鎖獎勵</p>
+    <div class="coin-bar" style="margin-top:12px;">
+      <div class="coin-display">🪙 <span id="bp-coins">0</span></div>
+      <div class="rank-display" id="bp-rank">🥉 青銅</div>
+    </div>
+  </div>
+
+  <div class="tab-bar" style="max-width:400px;margin:0 auto 16px;">
+    <button class="tab-btn active" id="bptab-pass" onclick="switchBPTab('pass')">🏆 戰令</button>
+    <button class="tab-btn" id="bptab-skins" onclick="switchBPTab('skins')">👤 造型收藏</button>
+  </div>
+
+  <div id="bp-pass-content">
+    <div class="bp-tier-list" id="bp-tier-list"></div>
+  </div>
+
+  <div id="bp-skins-content" style="display:none;">
+    <div style="text-align:center;margin-bottom:12px;">
+      <span style="font-size:13px;color:var(--muted);">點擊已解鎖的造型來裝備！</span>
+    </div>
+    <div class="skin-grid" id="skin-grid"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// QUESTION BANKS (same as original)
+// ════════════════════════════════════════
+
+const P1 = [
+  {audio:"The boy is raising his hand in class.",choices:[{e:"📱",t:"用手機"},{e:"🙋",t:"課堂舉手"},{e:"😴",t:"在睡覺"}],ans:1},
+  {audio:"Two girls are eating lunch together.",choices:[{e:"🏃",t:"女生在跑步"},{e:"🍱",t:"兩人一起吃飯"},{e:"📝",t:"女生在考試"}],ans:1},
+  {audio:"The teacher is writing on the blackboard.",choices:[{e:"📖",t:"老師在看書"},{e:"🧹",t:"老師在掃地"},{e:"✍️",t:"老師在板書"}],ans:2},
+  {audio:"A man is reading a newspaper on the park bench.",choices:[{e:"📰",t:"男人在長椅看報"},{e:"🏃",t:"男人在慢跑"},{e:"🌳",t:"男人在種樹"}],ans:0},
+  {audio:"The children are swimming in the pool.",choices:[{e:"🏖️",t:"孩子在沙灘玩"},{e:"🛁",t:"孩子在洗澡"},{e:"🏊",t:"孩子在游泳"}],ans:2},
+  {audio:"A woman is taking a photo with her phone.",choices:[{e:"📸",t:"女人在拍照"},{e:"📞",t:"女人在打電話"},{e:"💻",t:"女人用電腦"}],ans:0},
+  {audio:"The family is having dinner at a restaurant.",choices:[{e:"🏠",t:"全家在家煮飯"},{e:"🍽️",t:"全家在餐廳用餐"},{e:"🛒",t:"全家在購物"}],ans:1},
+  {audio:"It is snowing and the children are playing outside.",choices:[{e:"☀️",t:"孩子在陽光下玩"},{e:"⛄",t:"孩子在雪地玩"},{e:"🌧️",t:"孩子在雨中跑"}],ans:1},
+  {audio:"A girl is riding a bicycle along the river.",choices:[{e:"🏇",t:"女生在騎馬"},{e:"🛴",t:"女生在騎滑板車"},{e:"🚲",t:"沿河騎腳踏車"}],ans:2},
+  {audio:"The boy is watching a movie on his laptop.",choices:[{e:"🎮",t:"男生在打電動"},{e:"📺",t:"男生在看電視"},{e:"💻",t:"用電腦看電影"}],ans:2},
+  {audio:"Two boys are playing video games together.",choices:[{e:"🎮",t:"兩男生一起打電動"},{e:"📚",t:"兩男生在讀書"},{e:"⚽",t:"兩男生踢足球"}],ans:0},
+  {audio:"The students are planting trees in the school garden.",choices:[{e:"🌸",t:"學生在摘花"},{e:"💧",t:"學生在澆水"},{e:"🌳",t:"學生在種樹"}],ans:2},
+  {audio:"A woman is cooking at the market stall.",choices:[{e:"🛒",t:"女人在採買"},{e:"🍳",t:"女人在攤位烹飪"},{e:"🎪",t:"女人在逛市集"}],ans:1},
+  {audio:"The old man is feeding the birds in the park.",choices:[{e:"🐠",t:"老人在餵魚"},{e:"🐦",t:"老人在餵鳥"},{e:"🐶",t:"老人在遛狗"}],ans:1},
+  {audio:"The mother is cooking dinner in the kitchen.",choices:[{e:"🍳",t:"媽媽在廚房煮晚飯"},{e:"📺",t:"媽媽在看電視"},{e:"🛁",t:"媽媽在洗澡"}],ans:0},
+];
+
+const P2 = [
+  {audio:"What subject do you like best?",choices:["I like PE the best.","My teacher is very nice.","I go to school at seven."],ans:0},
+  {audio:"How do you usually go to school?",choices:["School starts at seven thirty.","I usually take the bus.","My school has five floors."],ans:1},
+  {audio:"What time does school start?",choices:["It starts at seven thirty.","I go to school by bus.","School is very far away."],ans:0},
+  {audio:"Did you bring your homework today?",choices:["Yes, I handed it in this morning.","I like doing homework.","My homework is very hard."],ans:0},
+  {audio:"Is the math test difficult?",choices:["I studied for two hours.","Yes, it was quite hard.","Math class is at nine."],ans:1},
+  {audio:"How many people are in your family?",choices:["I live near a park.","There are five people in my family.","My house is quite big."],ans:1},
+  {audio:"What does your father do?",choices:["My father is a doctor.","My father likes reading.","I have a younger sister."],ans:0},
+  {audio:"Do you help with housework at home?",choices:["My house is very clean.","Yes, I wash the dishes after dinner.","We have a big kitchen."],ans:1},
+  {audio:"Are you ready to order?",choices:["The food here is delicious.","Yes, I'd like a burger and a cola.","I already ate dinner."],ans:1},
+  {audio:"How was the food?",choices:["I'll have the chicken.","It was really delicious.","We sat by the window."],ans:1},
+  {audio:"What's the weather like today?",choices:["I love sunny days.","It's cloudy with a chance of rain.","The weather was nice last week."],ans:1},
+  {audio:"How long does it take to get to the train station?",choices:["The train comes every thirty minutes.","It takes about twenty minutes by bus.","The station is very crowded."],ans:1},
+  {audio:"How much is this T-shirt?",choices:["It looks really nice on you.","It's three hundred and fifty dollars.","We have many colors available."],ans:1},
+  {audio:"Is this jacket on sale?",choices:["That color suits you well.","Yes, it's twenty percent off today.","We just got new styles in."],ans:1},
+  {audio:"What's wrong? You don't look well.",choices:["I have a headache and a sore throat.","The hospital is very far.","I take medicine every morning."],ans:0},
+  {audio:"How often do you practice piano?",choices:["I started learning when I was eight.","I practice for one hour every day.","My piano teacher is very strict."],ans:1},
+  {audio:"What do you do in your free time?",choices:["I usually draw or listen to music.","I have a lot of homework.","My free time is on Sunday."],ans:0},
+  {audio:"Why should we save water?",choices:["Water is very tasty.","Because clean water is a limited resource.","I take a shower every day."],ans:1},
+  {audio:"What do you usually do during Chinese New Year?",choices:["I usually stay home and rest.","We visit relatives and eat big meals together.","I watch the countdown show."],ans:1},
+  {audio:"Can I get the check, please?",choices:["We ordered pasta and salad.","Of course. I'll bring it right away.","The kitchen is closed."],ans:1},
+  {audio:"Do you want to go hiking this Saturday?",choices:["That sounds fun! What time?","I went hiking yesterday.","The mountain is very tall."],ans:0},
+  {audio:"Would you prefer to travel by train or by plane?",choices:["I've never been abroad.","I prefer the train. It's more relaxing.","Plane tickets are expensive."],ans:1},
+  {audio:"What can we do to reduce pollution?",choices:["The air quality is bad today.","We can use public transportation more.","Factories cause a lot of pollution."],ans:1},
+  {audio:"Did you have trouble finding the hotel?",choices:["The hotel had a swimming pool.","Not really. We used GPS on the phone.","We stayed for three nights."],ans:1},
+  {audio:"Who cooks in your family?",choices:["We eat out every day.","I love my mom's cooking.","My mom usually cooks, but sometimes my dad does."],ans:2},
+  {audio:"Can I pay by credit card?",choices:["Of course. We accept all major cards.","The total is eight hundred dollars.","Do you have a membership?"],ans:0},
+  {audio:"Have you ever tried surfing?",choices:["I can't swim very well.","The ocean here is beautiful.","No, but I'd really like to try it."],ans:2},
+  {audio:"What do you think about recycling?",choices:["I always use the right bins.","I think it's really important for the environment.","Our school has a recycling program."],ans:1},
+  {audio:"What's your favorite holiday and why?",choices:["I have many holidays each year.","My favorite is Chinese New Year because I get to see the whole family.","Holidays are important for rest."],ans:1},
+  {audio:"Did you sleep well last night?",choices:["I usually go to bed at eleven.","Not really. I was too excited to sleep.","Sleep is very important for health."],ans:1},
+];
+
+const P3 = [
+  {title:"科學作業",lines:[{t:"Hey Amy, are you ready for the science project?",g:"M"},{t:"Not yet. I still need to make the poster.",g:"F"},{t:"When is it due?",g:"M"},{t:"This Friday. I'm a little stressed.",g:"F"},{t:"I can help you after school today.",g:"M"},{t:"Really? That would be great. Thank you, Tom.",g:"F"}],
+   qs:[{q:"What does Amy still need to do?",cs:["Write a report","Make a poster","Study for a test"],ans:1},{q:"When is the project due?",cs:["Thursday","This Friday","Next Monday"],ans:1}]},
+  {title:"找圖書館",lines:[{t:"Excuse me. Is there a library near here?",g:"F"},{t:"Yes. Go straight and turn left at the traffic light.",g:"M"},{t:"How far is it?",g:"F"},{t:"It's about five minutes on foot.",g:"M"},{t:"Thank you so much.",g:"F"}],
+   qs:[{q:"What is the woman looking for?",cs:["A school","A library","A hospital"],ans:1},{q:"How far is the library?",cs:["5 min by bus","5 min on foot","15 min on foot"],ans:1}]},
+  {title:"養寵物",lines:[{t:"Dad, can I have a pet?",g:"F"},{t:"What kind of pet do you want?",g:"M"},{t:"A rabbit. They're so cute and quiet.",g:"F"},{t:"But who will take care of it?",g:"M"},{t:"I will! I'll feed it and clean its cage every day.",g:"F"},{t:"OK, but if you forget, we'll give it away.",g:"M"}],
+   qs:[{q:"What pet does the girl want?",cs:["A dog","A cat","A rabbit"],ans:2},{q:"What will happen if the girl forgets to care for it?",cs:["The dad will help","They will give it away","They will buy another pet"],ans:1}]},
+  {title:"點餐",lines:[{t:"Welcome! Table for two?",g:"F"},{t:"Yes, please. A window seat if possible.",g:"M"},{t:"Of course. Right this way. Here are your menus.",g:"F"},{t:"Thanks. What do you recommend?",g:"M"},{t:"Today's special is grilled salmon. It's very popular.",g:"F"},{t:"Sounds great. I'll have that.",g:"M"}],
+   qs:[{q:"How many people are eating?",cs:["One","Two","Three"],ans:1},{q:"What does the man order?",cs:["A steak","A pizza","Grilled salmon"],ans:2}]},
+  {title:"颱風假",lines:[{t:"I heard there's a typhoon coming this weekend.",g:"M"},{t:"Really? Should we cancel our camping trip?",g:"F"},{t:"I think we should. It might be dangerous.",g:"M"},{t:"You're right. Let's plan it for next weekend instead.",g:"F"},{t:"Good idea. I'll check the weather forecast again.",g:"M"}],
+   qs:[{q:"Why do they cancel their camping trip?",cs:["They are too busy","A typhoon is coming","The campsite is full"],ans:1},{q:"When do they plan to go camping?",cs:["This weekend","Next weekend","Next month"],ans:1}]},
+  {title:"搭公車",lines:[{t:"Excuse me. Does this bus go to the Night Market?",g:"F"},{t:"No, you need bus number 12 for that.",g:"M"},{t:"Where can I catch bus 12?",g:"F"},{t:"At the stop across the street. It comes every fifteen minutes.",g:"M"},{t:"Thank you so much!",g:"F"}],
+   qs:[{q:"Where does the woman want to go?",cs:["The park","The Night Market","The train station"],ans:1},{q:"How often does bus 12 come?",cs:["Every 10 min","Every 15 min","Every 30 min"],ans:1}]},
+  {title:"退換鞋子",lines:[{t:"Excuse me. I bought these shoes last week, but one is broken.",g:"F"},{t:"I'm sorry. Do you have your receipt?",g:"M"},{t:"Yes, here it is.",g:"F"},{t:"We can exchange them or give you a full refund.",g:"M"},{t:"I'd like to exchange them, please.",g:"F"}],
+   qs:[{q:"What is the problem with the shoes?",cs:["Wrong size","One of them is broken","Wrong color"],ans:1},{q:"What does the woman decide to do?",cs:["Get a refund","Exchange them","Keep the shoes"],ans:1}]},
+  {title:"看醫生",lines:[{t:"Good morning. How can I help you?",g:"F"},{t:"I have a terrible stomachache. It started this morning.",g:"M"},{t:"Did you eat anything unusual?",g:"F"},{t:"I had some seafood last night.",g:"M"},{t:"I see. The doctor will see you shortly.",g:"F"}],
+   qs:[{q:"What is the man's problem?",cs:["A headache","A stomachache","A toothache"],ans:1},{q:"What did the man eat last night?",cs:["Fried chicken","Spicy food","Seafood"],ans:2}]},
+  {title:"生日禮物",lines:[{t:"Are you ready for tomorrow's birthday party?",g:"F"},{t:"Almost. I still need to wrap the gift.",g:"M"},{t:"What did you get Kevin?",g:"F"},{t:"A book about photography. He's really into it lately.",g:"M"},{t:"That's so thoughtful! He'll love it.",g:"F"}],
+   qs:[{q:"Whose birthday party is it?",cs:["The girl's","Kevin's","The boy's"],ans:1},{q:"What gift did the boy buy?",cs:["A photography book","A camera","A music album"],ans:0}]},
+  {title:"中秋烤肉",lines:[{t:"The Mid-Autumn Festival is next week. Are you having a BBQ?",g:"M"},{t:"Of course! We do it every year with the neighbors.",g:"F"},{t:"What do you usually eat?",g:"M"},{t:"Mooncakes, grilled corn, and lots of meat.",g:"F"},{t:"That sounds amazing. Can I join you this year?",g:"M"},{t:"Sure! The more the merrier.",g:"F"}],
+   qs:[{q:"When is the Mid-Autumn Festival?",cs:["This week","Next week","Next month"],ans:1},{q:"Who do they celebrate with?",cs:["Just family","Classmates","Neighbors"],ans:2}]},
+  {title:"去游泳",lines:[{t:"It's so hot today! What do you want to do?",g:"F"},{t:"How about going swimming? The pool is open.",g:"M"},{t:"Great idea! Should we ask Kevin to come?",g:"F"},{t:"Sure. I'll text him now.",g:"M"},{t:"Perfect. Let's meet at two o'clock.",g:"F"}],
+   qs:[{q:"What do they decide to do?",cs:["Play basketball","Go swimming","Watch a movie"],ans:1},{q:"What time will they meet?",cs:["1:00","2:00","3:00"],ans:1}]},
+  {title:"台南旅行",lines:[{t:"We're planning a trip to Tainan next month.",g:"M"},{t:"How exciting! How will you get there?",g:"F"},{t:"By high speed rail. It takes about ninety minutes.",g:"M"},{t:"What will you do there?",g:"F"},{t:"We want to try the local food and visit the old temples.",g:"M"}],
+   qs:[{q:"How will they travel to Tainan?",cs:["By bus","By car","By high speed rail"],ans:2},{q:"What do they plan to do in Tainan?",cs:["Go shopping","Try local food and visit temples","Visit museums"],ans:1}]},
+];
+
+const TOPICS = ["學校生活","家庭日常","食物餐廳","天氣活動","交通旅行","購物消費","健康醫療","興趣運動","環境自然","節慶假日","綜合複習A","綜合複習B","綜合複習C","綜合複習D","綜合複習E","衝刺訓練A","衝刺訓練B","衝刺訓練C","衝刺訓練D","衝刺模擬","複習加強A","複習加強B","複習加強C","複習加強D","複習加強E","最後衝刺A","最後衝刺B","最後衝刺C","決戰前夕"];
+
+// ════════════════════════════════════════
+// REWARD SYSTEM — Skins & Battle Pass Tiers
+// ════════════════════════════════════════
+
+const SKINS = [
+  {id:'default',name:'新手冒險者',icon:'🧑‍🎓',desc:'初始造型',tier:0},
+  {id:'naruto',name:'忍者學徒',icon:'🥷',desc:'Day 1 解鎖',tier:1},
+  {id:'pikachu',name:'電擊小子',icon:'⚡',desc:'Day 2 解鎖',tier:2},
+  {id:'mario',name:'水管工英雄',icon:'🍄',desc:'Day 3 解鎖',tier:3},
+  {id:'spy',name:'間諜偽裝者',icon:'🕵️',desc:'Day 4 解鎖',tier:4},
+  {id:'knight',name:'勇者騎士',icon:'⚔️',desc:'Day 5 解鎖',tier:5},
+  {id:'wizard',name:'魔法師',icon:'🧙',desc:'Day 6 解鎖',tier:6},
+  {id:'chef',name:'料理之神',icon:'👨‍🍳',desc:'Day 7 段位UP！',tier:7},
+  {id:'astronaut',name:'太空人',icon:'🧑‍🚀',desc:'Day 8 解鎖',tier:8},
+  {id:'dragon',name:'馴龍高手',icon:'🐉',desc:'Day 9 解鎖',tier:9},
+  {id:'sakura',name:'櫻花忍者',icon:'🌸',desc:'Day 10 解鎖',tier:10},
+  {id:'robot',name:'機械戰士',icon:'🤖',desc:'Day 11 解鎖',tier:11},
+  {id:'phoenix',name:'鳳凰使者',icon:'🔥',desc:'Day 12 解鎖',tier:12},
+  {id:'ocean',name:'海洋霸主',icon:'🦈',desc:'Day 13 解鎖',tier:13},
+  {id:'thunder',name:'雷神之槌',icon:'🔨',desc:'Day 14 段位UP！',tier:14},
+  {id:'crown',name:'王者之冠',icon:'👑',desc:'Day 15 解鎖',tier:15},
+  {id:'ninja2',name:'暗影忍者',icon:'🗡️',desc:'Day 16 解鎖',tier:16},
+  {id:'star',name:'流星獵人',icon:'🌠',desc:'Day 17 解鎖',tier:17},
+  {id:'cat',name:'貓咪大人',icon:'🐱',desc:'Day 18 解鎖',tier:18},
+  {id:'demon',name:'鬼殺隊士',icon:'👹',desc:'Day 19 解鎖',tier:19},
+  {id:'super',name:'超級英雄',icon:'🦸',desc:'Day 20 解鎖',tier:20},
+  {id:'diamond',name:'鑽石護衛',icon:'💎',desc:'Day 21 段位UP！',tier:21},
+  {id:'flame',name:'烈焰領主',icon:'🔥',desc:'Day 22 解鎖',tier:22},
+  {id:'ice',name:'冰霜女王',icon:'❄️',desc:'Day 23 解鎖',tier:23},
+  {id:'music',name:'搖滾巨星',icon:'🎸',desc:'Day 24 解鎖',tier:24},
+  {id:'wolf',name:'銀狼戰士',icon:'🐺',desc:'Day 25 解鎖',tier:25},
+  {id:'galaxy',name:'銀河守護者',icon:'🌌',desc:'Day 26 解鎖',tier:26},
+  {id:'legend',name:'傳說戰神',icon:'⚜️',desc:'Day 27 解鎖',tier:27},
+  {id:'final',name:'究極霸主',icon:'🏆',desc:'Day 28 段位UP！',tier:28},
+  {id:'champion',name:'會考冠軍',icon:'🎓',desc:'Day 29 全通關！',tier:29},
+];
+
+const RANKS = [
+  {name:'青銅',icon:'🥉',color:'#cd7f32',min:0},
+  {name:'白銀',icon:'🥈',color:'#c0c0c0',min:7},
+  {name:'黃金',icon:'🥇',color:'#ffd700',min:14},
+  {name:'鑽石',icon:'💎',color:'#b9f2ff',min:21},
+  {name:'傳說',icon:'👑',color:'#ff6b6b',min:28},
+];
+
+// ════════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════════
+
+function getStore(){
+  try{
+    const d=JSON.parse(localStorage.getItem('lbp')||'{}');
+    return {
+      done:d.done||[],
+      coins:d.coins||0,
+      streak:d.streak||0,
+      lastDay:d.lastDay||null,
+      equippedSkin:d.equippedSkin||'default',
+      ownedSkins:d.ownedSkins||['default'],
+      ...d
+    };
+  }catch{return {done:[],coins:0,streak:0,lastDay:null,equippedSkin:'default',ownedSkins:['default']};}
+}
+
+function saveStore(s){try{localStorage.setItem('lbp',JSON.stringify(s));}catch{}}
+
+// ════════════════════════════════════════
+// SEEDED RANDOM + DAY BUILDER
+// ════════════════════════════════════════
+
+function lcg(seed){let s=seed>>>0;return()=>{s=Math.imul(1664525,s)+1013904223>>>0;return s/0x100000000;};}
+function pickN(arr,n,rng){const pool=[...arr.map((_,i)=>i)],out=[];for(let i=0;i<Math.min(n,pool.length);i++){const x=Math.floor(rng()*pool.length);out.push(pool.splice(x,1)[0]);}return out.map(i=>arr[i]);}
+
+function buildDay(day){
+  const rng=lcg(day*1234567+89);
+  const p1=pickN(P1,3,rng),p2=pickN(P2,7,rng),p3=pickN(P3,2,rng);
+  const qs=[];
+  p1.forEach(q=>qs.push({part:1,type:'p1',...q}));
+  p2.forEach(q=>qs.push({part:2,type:'p2',...q}));
+  p3.forEach((d,di)=>d.qs.forEach((q,qi)=>qs.push({part:3,type:'p3',di,qi,title:d.title,lines:d.lines,...q})));
+  return qs;
+}
+
+// ════════════════════════════════════════
+// TTS
+// ════════════════════════════════════════
+
+function ttsSpeak(text,pitch,rate,cb){const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.pitch=pitch||1;u.rate=rate||0.83;u.onend=cb||null;u.onerror=()=>{cb&&cb();};window.speechSynthesis.speak(u);}
+function ttsDialog(lines,cb){let i=0;function next(){if(i>=lines.length){cb&&cb();return;}const l=lines[i++];setTimeout(()=>{const u=new SpeechSynthesisUtterance(l.t);u.lang='en-US';u.pitch=l.g==='M'?0.82:1.3;u.rate=0.82;u.onend=next;u.onerror=next;window.speechSynthesis.speak(u);},i===1?0:450);}next();}
+function stopTTS(){window.speechSynthesis.cancel();}
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+
+let S={day:1,qs:[],qi:0,ans:[],played:false,combo:0,sessionCoins:0};
+
+function getRank(doneCount){
+  let r=RANKS[0];
+  for(const rank of RANKS){if(doneCount>=rank.min)r=rank;}
+  return r;
+}
+
+// ════════════════════════════════════════
+// UI HELPERS
+// ════════════════════════════════════════
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+
+function switchTab(t){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(t==='practice'){
+    document.getElementById('tab-practice').style.display='block';
+    document.getElementById('tab-info').style.display='none';
+    document.querySelectorAll('#home .tab-btn')[0].classList.add('active');
+  }else{
+    document.getElementById('tab-practice').style.display='none';
+    document.getElementById('tab-info').style.display='block';
+    document.querySelectorAll('#home .tab-btn')[1].classList.add('active');
+  }
+}
+
+function switchBPTab(t){
+  document.getElementById('bptab-pass').classList.toggle('active',t==='pass');
+  document.getElementById('bptab-skins').classList.toggle('active',t==='skins');
+  document.getElementById('bp-pass-content').style.display=t==='pass'?'block':'none';
+  document.getElementById('bp-skins-content').style.display=t==='skins'?'block':'none';
+  if(t==='skins')renderSkinGrid();
+}
+
+function flyCoins(amount,x,y){
+  const el=document.createElement('div');
+  el.className='coin-fly';
+  el.textContent=`🪙 +${amount}`;
+  el.style.left=x+'px';el.style.top=y+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+}
+
+function showCombo(combo,x,y){
+  if(combo<2)return;
+  const el=document.createElement('div');
+  el.className='combo-text';
+  el.textContent=`${combo} COMBO! x${Math.min(combo,5)}`;
+  el.style.left=x+'px';el.style.top=(y-30)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),800);
+}
+
+// ════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════
+
+function confirmGoHome(){
+  document.getElementById('modal-title').textContent='確定要離開嗎？';
+  document.getElementById('modal-msg').textContent='這次練習的進度不會儲存，但已獲得的金幣會保留喔！';
+  document.getElementById('modal-ok').textContent='回到首頁';
+  document.getElementById('modal-ok').onclick=()=>{closeModal();goHome();};
+  document.getElementById('modal').classList.add('active');
+}
+function closeModal(){document.getElementById('modal').classList.remove('active');}
+
+// ════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════
+
+function renderHome(){
+  const store=getStore();
+  const done=store.done;
+  const today=Math.min(done.length+1,29);
+
+  // Update displays
+  document.getElementById('home-coins').textContent=store.coins;
+  document.getElementById('home-streak').textContent=store.streak;
+  const rank=getRank(done.length);
+  document.getElementById('home-rank').innerHTML=`${rank.icon} ${rank.name}`;
+  document.getElementById('home-rank').style.color=rank.color;
+  document.getElementById('home-rank').style.borderColor=rank.color;
+
+  // Battle pass banner
+  const tier=done.length;
+  document.getElementById('bp-fill').style.width=(tier/29*100)+'%';
+  document.getElementById('bp-tier').textContent=tier;
+  if(tier<29){
+    const nextSkin=SKINS[tier+1];
+    document.getElementById('bp-next').innerHTML=`🎁 下一個：${nextSkin?nextSkin.icon+' '+nextSkin.name:''}`;
+  }else{
+    document.getElementById('bp-next').textContent='🎉 全部解鎖！';
+  }
+
+  // Day grid
+  const g=document.getElementById('day-grid');
+  g.innerHTML='';
+  for(let d=1;d<=29;d++){
+    const isDone=done.includes(d),isToday=d===today;
+    const skin=SKINS[d];
+    const b=document.createElement('button');
+    b.className='day-btn'+(isDone?' done':'')+(isToday?' today':'');
+    b.innerHTML=`<div class="dn">${d}</div><div class="dl">${(TOPICS[d-1]||'').substring(0,4)}</div><div class="dc">${isDone?'✅':isToday?'📅':''}</div>${isDone&&skin?`<span class="reward-badge">${skin.icon}</span>`:''}`;
+    b.onclick=()=>startDay(d);
+    g.appendChild(b);
+  }
+}
+
+// ════════════════════════════════════════
+// PRACTICE
+// ════════════════════════════════════════
+
+function startDay(day){
+  stopTTS();
+  const store=getStore();
+  S={day,qs:buildDay(day),qi:0,ans:[],played:false,combo:0,sessionCoins:0};
+  document.getElementById('h-day').textContent=day;
+  document.getElementById('h-topic').textContent=TOPICS[day-1]||'';
+  document.getElementById('h-tot').textContent=S.qs.length;
+  document.getElementById('prac-coins').textContent=store.coins;
+  document.getElementById('combo-badge').style.display='none';
+  show('practice');
+  renderQ();
+}
+
+function renderQ(){
+  const q=S.qs[S.qi];
+  if(!q){showResults();return;}
+  stopTTS();S.played=false;
+
+  document.getElementById('prog').style.width=(S.qi/S.qs.length*100)+'%';
+  document.getElementById('h-now').textContent=S.qi+1;
+
+  const pc=document.getElementById('h-part');
+  if(q.part===1){pc.textContent='第一部分';pc.className='part-chip p1c';}
+  else if(q.part===2){pc.textContent='第二部分';pc.className='part-chip p2c';}
+  else{pc.textContent='第三部分';pc.className='part-chip p3c';}
+
+  let html='';
+
+  if(q.type==='p1'){
+    html=`
+    <div class="q-card">
+      <div class="q-type">📷 第一部分 ── 辨識句意</div>
+      <div class="q-instr">聽完英文句子，選出符合描述的圖片 (A/B/C)</div>
+    </div>
+    <div class="audio-row">
+      <button class="btn-play" id="bplay" onclick="doPlay()">▶ 播放句子</button>
+      <button class="btn-replay" id="breplay" onclick="doPlay()">🔄 重聽</button>
+      <button class="btn-show" onclick="toggleScript()">顯示文字</button>
+    </div>
+    <div class="script-box" id="sbox">"${q.audio}"</div>
+    <div class="pic-choices">
+      ${q.choices.map((c,i)=>`<div class="pic-card" id="c${i}" onclick="pick(${i},event)">
+        <div class="pic-em">${c.e}</div>
+        <div class="pic-lt">${['A','B','C'][i]}</div>
+        <div class="pic-tx">${c.t}</div>
+      </div>`).join('')}
+    </div>
+    <div id="fb"></div>`;
+  }
+  else if(q.type==='p2'){
+    html=`
+    <div class="q-card">
+      <div class="q-type">💬 第二部分 ── 基本問答</div>
+      <div class="q-instr">聽完以下句子或問題，選出最合適的回答</div>
+      <div class="q-text">❓ ${q.audio}</div>
+    </div>
+    <div class="audio-row">
+      <button class="btn-play" id="bplay" onclick="doPlay()">▶ 播放</button>
+      <button class="btn-replay" id="breplay" onclick="doPlay()">🔄 重聽</button>
+    </div>
+    <div class="choices">
+      ${q.choices.map((c,i)=>`<button class="choice" id="c${i}" onclick="pick(${i},event)">
+        <span class="choice-lt">${['A','B','C'][i]}</span>
+        <span>${c}</span>
+      </button>`).join('')}
+    </div>
+    <div id="fb"></div>`;
+  }
+  else{
+    const sameDlg=S.qi>0&&S.qs[S.qi-1].type==='p3'&&S.qs[S.qi-1].di===q.di;
+    const scriptLines=q.lines.map(l=>`<div class="script-box" style="display:block;margin:2px 0;"><span class="${l.g==='M'?'dlg-m':'dlg-f'}">${l.g==='M'?'👨':'👩'} ${l.t}</span></div>`).join('');
+    const instrText=q.qi===0?`聽完【${q.title}】的對話，回答問題一`:`根據剛才的對話，回答問題二`;
+    html=`
+    <div class="q-card">
+      <div class="q-type">🎭 第三部分 ── 言談理解</div>
+      <div class="q-instr">${instrText}</div>
+      <div class="q-text">❓ ${q.q}</div>
+    </div>
+    ${sameDlg?`<div class="same-dlg-note">💡 根據剛才的對話作答，或點「重播」再聽一次</div>`:''}
+    <div class="audio-row">
+      <button class="btn-play" id="bplay" onclick="doPlay()">${sameDlg?'▶ 重播對話':'▶ 播放對話'}</button>
+      <button class="btn-replay" id="breplay" onclick="doPlay()">🔄 重聽</button>
+      <button class="btn-show" onclick="toggleScript()">顯示對話文字</button>
+    </div>
+    <div class="script-box" id="sbox" style="padding:0;background:transparent;">${scriptLines}</div>
+    <div class="choices">
+      ${q.cs.map((c,i)=>`<button class="choice" id="c${i}" onclick="pick(${i},event)">
+        <span class="choice-lt">${['A','B','C'][i]}</span>
+        <span>${c}</span>
+      </button>`).join('')}
+    </div>
+    <div id="fb"></div>`;
+  }
+  document.getElementById('q-area').innerHTML=html;
+}
+
+function doPlay(){
+  const q=S.qs[S.qi];stopTTS();
+  const bp=document.getElementById('bplay');if(!bp)return;
+  bp.classList.add('playing');bp.disabled=true;bp.innerHTML='🔊 播放中...';
+  function done(){S.played=true;const b=document.getElementById('bplay');if(b){b.classList.remove('playing');b.disabled=false;b.innerHTML=q.type==='p3'?'▶ 重播對話':'▶ 播放';}const br=document.getElementById('breplay');if(br)br.style.display='inline-flex';}
+  if(q.type==='p1'||q.type==='p2'){ttsSpeak(q.audio,1,0.83,done);}
+  else{const src=S.qs.find(x=>x.type==='p3'&&x.di===q.di&&x.qi===0)||q;ttsDialog(src.lines,done);}
+}
+
+function toggleScript(){const s=document.getElementById('sbox');if(s)s.style.display=s.style.display==='none'?'block':'none';}
+
+function pick(ci,event){
+  const q=S.qs[S.qi];
+  if(S.ans[S.qi]!=null)return;
+  S.ans[S.qi]=ci;
+  const ok=ci===q.ans;
+
+  document.querySelectorAll('.choice,.pic-card').forEach(el=>el.style.pointerEvents='none');
+  const picked=document.getElementById('c'+ci);
+  const right=document.getElementById('c'+q.ans);
+  if(picked)picked.classList.add(ok?'ok':'ng');
+  if(!ok&&right)right.classList.add('ok');
+
+  // Coin + Combo system
+  let earned=0;
+  if(ok){
+    S.combo++;
+    const multiplier=Math.min(S.combo,5);
+    earned=10*multiplier;
+    S.sessionCoins+=earned;
+
+    const store=getStore();
+    store.coins+=earned;
+    saveStore(store);
+
+    document.getElementById('prac-coins').textContent=store.coins;
+
+    // Animations
+    const rect=event?.target?.getBoundingClientRect?.();
+    const x=rect?rect.left+rect.width/2:window.innerWidth/2;
+    const y=rect?rect.top:window.innerHeight/2;
+    flyCoins(earned,x,y);
+    showCombo(S.combo,x,y);
+
+    // Combo badge
+    const cb=document.getElementById('combo-badge');
+    if(S.combo>=2){
+      cb.style.display='inline-flex';
+      document.getElementById('combo-count').textContent=Math.min(S.combo,5);
+    }
+  }else{
+    S.combo=0;
+    document.getElementById('combo-badge').style.display='none';
+  }
+
+  const ans=q.type==='p1'?q.choices[q.ans].t:(q.type==='p2'?q.choices[q.ans]:q.cs[q.ans]);
+  const fb=document.getElementById('fb');
+  fb.innerHTML=`
+    <div class="feedback ${ok?'fb-ok':'fb-ng'}">
+      <span class="fb-icon">${ok?'✅':'❌'}</span>
+      <div class="fb-msg">
+        ${ok?`答對了！Great job! 🎉`:`答錯了。正確答案是 ${['A','B','C'][q.ans]}：<strong>${ans}</strong>`}
+        ${ok&&earned?`<div class="coin-earned">🪙 +${earned}${S.combo>=2?` (${S.combo} COMBO!)`:''}</div>`:''}
+      </div>
+    </div>
+    <button class="btn-next" onclick="nextQ()">${S.qi+1<S.qs.length?'下一題 →':'查看成績 🏆'}</button>`;
+}
+
+function nextQ(){S.qi++;renderQ();}
+
+// ════════════════════════════════════════
+// RESULTS
+// ════════════════════════════════════════
+
+function showResults(){
+  stopTTS();
+  const store=getStore();
+  const isNewDay=!store.done.includes(S.day);
+
+  if(isNewDay){
+    store.done.push(S.day);
+    // Streak logic
+    const today=new Date().toDateString();
+    if(store.lastDay){
+      const last=new Date(store.lastDay);
+      const diff=Math.floor((new Date()-last)/(1000*60*60*24));
+      if(diff<=1)store.streak++;
+      else store.streak=1;
+    }else{store.streak=1;}
+    store.lastDay=today;
+
+    // Unlock skin
+    const skin=SKINS[S.day];
+    if(skin&&!store.ownedSkins.includes(skin.id)){
+      store.ownedSkins.push(skin.id);
+    }
+
+    // Completion bonus
+    store.coins+=50;
+    S.sessionCoins+=50;
+  }
+  saveStore(store);
+
+  const tot=S.qs.length;
+  const cor=S.ans.filter((a,i)=>a===S.qs[i].ans).length;
+  const pct=Math.round(cor/tot*100);
+  let p1c=0,p1t=0,p2c=0,p2t=0,p3c=0,p3t=0;
+  S.qs.forEach((q,i)=>{
+    const ok=S.ans[i]===q.ans;
+    if(q.part===1){p1t++;if(ok)p1c++;}
+    else if(q.part===2){p2t++;if(ok)p2c++;}
+    else{p3t++;if(ok)p3c++;}
+  });
+
+  let trophy,msg;
+  if(pct>=90){trophy='🏆';msg='太厲害了！你已經準備好迎接會考了！繼續保持！';}
+  else if(pct>=70){trophy='🌟';msg='表現很好！繼續加油，每天練習一定會更進步！';}
+  else if(pct>=50){trophy='💪';msg='不錯喔！多練幾次，聽力一定越來越好！';}
+  else{trophy='🌱';msg='沒關係，每天一點點，進步慢慢看得到！加油！';}
+
+  document.getElementById('r-trophy').textContent=trophy;
+  document.getElementById('r-day').textContent=S.day;
+  document.getElementById('r-lbl').textContent=TOPICS[S.day-1]||'';
+  document.getElementById('r-sc').textContent=cor;
+  document.getElementById('r-pct').textContent=pct+'%';
+  document.getElementById('r-msg').textContent=msg;
+  document.getElementById('r-p1').textContent=p1c+'/'+p1t;
+  document.getElementById('r-p2').textContent=p2c+'/'+p2t;
+  document.getElementById('r-p3').textContent=p3c+'/'+p3t;
+  document.getElementById('r-coins').textContent=S.sessionCoins;
+  const ring=document.getElementById('r-ring');
+  ring.style.borderColor=pct>=70?'var(--green)':pct>=50?'var(--yellow)':'var(--red)';
+  document.getElementById('prog').style.width='100%';
+
+  // Show reward unlock
+  const rewardArea=document.getElementById('r-reward-area');
+  if(isNewDay){
+    const skin=SKINS[S.day];
+    const rank=getRank(store.done.length);
+    const prevRank=getRank(store.done.length-1);
+    const rankUp=rank.name!==prevRank.name;
+
+    let rewardHtml='';
+    if(skin){
+      rewardHtml+=`<div class="reward-unlock">
+        <div class="ru-label">✨ 造型解鎖 ✨</div>
+        <div class="ru-icon">${skin.icon}</div>
+        <div class="ru-name">${skin.name}</div>
+        <div class="ru-desc">完成 Day ${S.day} 獲得！</div>
+      </div>`;
+    }
+    if(rankUp){
+      rewardHtml+=`<div class="reward-unlock" style="border-color:${rank.color};">
+        <div class="ru-label" style="color:${rank.color};">⬆ 段位提升 ⬆</div>
+        <div class="ru-icon">${rank.icon}</div>
+        <div class="ru-name" style="color:${rank.color};">${rank.name}</div>
+        <div class="ru-desc">${prevRank.name} → ${rank.name}</div>
+      </div>`;
+    }
+    rewardArea.innerHTML=rewardHtml;
+  }else{
+    rewardArea.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:12px;">（此天已完成過，不重複計算戰令）</div>';
+  }
+
+  show('results');
+}
+
+// ════════════════════════════════════════
+// BATTLE PASS VIEW
+// ════════════════════════════════════════
+
+function showBattlePass(){
+  const store=getStore();
+  const tier=store.done.length;
+
+  document.getElementById('bp-coins').textContent=store.coins;
+  const rank=getRank(tier);
+  document.getElementById('bp-rank').innerHTML=`${rank.icon} ${rank.name}`;
+  document.getElementById('bp-rank').style.color=rank.color;
+
+  const list=document.getElementById('bp-tier-list');
+  list.innerHTML='';
+  for(let i=1;i<=29;i++){
+    const skin=SKINS[i];
+    const unlocked=tier>=i;
+    const isCurrent=tier===i-1;
+    const rankAtTier=getRank(i);
+    const prevRankAtTier=getRank(i-1);
+    const isRankUp=rankAtTier.name!==prevRankAtTier.name;
+
+    const card=document.createElement('div');
+    card.className='bp-tier-card '+(unlocked?'unlocked':isCurrent?'current':'locked');
+    card.innerHTML=`
+      <div class="bp-tier-num">${i}</div>
+      <div class="bp-tier-reward">
+        <div class="name">${skin?skin.name:'???'}${isRankUp?` <span style="color:${rankAtTier.color};font-size:11px;">⬆${rankAtTier.name}</span>`:''}</div>
+        <div class="desc">${unlocked?'✅ 已解鎖':isCurrent?'⭐ 下一個目標':'🔒 完成 Day '+i+' 解鎖'}</div>
+      </div>
+      <div class="bp-tier-icon">${unlocked||isCurrent?(skin?skin.icon:'🎁'):'🔒'}</div>
+    `;
+    list.appendChild(card);
+  }
+
+  switchBPTab('pass');
+  show('battlepass');
+}
+
+function renderSkinGrid(){
+  const store=getStore();
+  const grid=document.getElementById('skin-grid');
+  grid.innerHTML='';
+
+  SKINS.forEach(skin=>{
+    const owned=store.ownedSkins.includes(skin.id);
+    const equipped=store.equippedSkin===skin.id;
+    const card=document.createElement('div');
+    card.className='skin-card '+(equipped?'equipped':owned?'owned':'locked');
+    card.innerHTML=`
+      <div class="skin-icon">${skin.icon}</div>
+      <div class="skin-name">${owned?skin.name:'???'}</div>
+      <div class="skin-from">${owned?skin.desc:'🔒 Tier '+skin.tier}</div>
+      ${owned&&!equipped?`<button class="btn-equip" onclick="equipSkin('${skin.id}')">裝備</button>`:''}
+      ${equipped?'<div style="font-size:11px;color:var(--gold);margin-top:6px;">✨ 使用中</div>':''}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function equipSkin(id){
+  const store=getStore();
+  store.equippedSkin=id;
+  saveStore(store);
+  renderSkinGrid();
+}
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+
+function goHome(){stopTTS();renderHome();show('home');}
+function retryDay(){stopTTS();startDay(S.day);}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+
+if(!window.speechSynthesis){
+  document.querySelector('.warn-box').innerHTML='❌ 你的瀏覽器不支援語音功能，<strong>請改用 Chrome 瀏覽器</strong>開啟。';
+}
+renderHome();
+show('home');
+</script>
+</body>
+</html>
