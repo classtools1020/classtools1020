@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>九年級英文會考特訓</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0a0e27;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(79,195,247,.12),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(255,107,53,.08),transparent 50%);pointer-events:none}
+.container{position:relative;z-index:1;width:100%;max-width:560px;padding:20px 16px}
+
+/* Hero */
+.hero{text-align:center;margin:20px 0 8px}
+.hero-icon{font-size:3.2em;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero h1{font-size:1.6em;font-weight:900;background:linear-gradient(135deg,#4FC3F7,#00BCD4,#26C6DA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:8px 0 4px}
+.hero p{color:rgba(255,255,255,.5);font-size:.82em}
+
+/* Tutorial Section */
+.tutorial{margin:20px 0;background:rgba(255,255,255,.04);border:1.5px solid rgba(79,195,247,.2);border-radius:20px;padding:20px 16px;position:relative;overflow:hidden}
+.tutorial::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#4FC3F7,#FF6B35,#FF2D95)}
+.tutorial-title{display:flex;align-items:center;gap:8px;font-size:1.1em;font-weight:900;margin-bottom:16px;color:#4FC3F7}
+.tutorial-title span:first-child{font-size:1.3em}
+
+/* Steps */
+.step{display:flex;gap:12px;margin-bottom:16px;position:relative}
+.step:last-child{margin-bottom:0}
+.step-num{flex-shrink:0;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.95em;position:relative;z-index:1}
+.step-line{position:absolute;left:18px;top:36px;bottom:-16px;width:2px;border-radius:1px}
+.step:last-child .step-line{display:none}
+.step-content{flex:1;padding-top:6px}
+.step-label{font-weight:900;font-size:.95em;line-height:1.4}
+.step-desc{font-size:.78em;color:rgba(255,255,255,.5);margin-top:3px;line-height:1.5}
+.step-time{display:inline-block;margin-top:4px;font-size:.7em;font-weight:700;border-radius:20px;padding:2px 10px}
+
+/* Step colors */
+.step-1 .step-num{background:rgba(129,199,132,.2);border:2px solid #81C784;color:#81C784}
+.step-1 .step-line{background:linear-gradient(to bottom,#81C784,#4FC3F7)}
+.step-1 .step-label{color:#81C784}
+.step-1 .step-time{background:rgba(129,199,132,.12);border:1px solid rgba(129,199,132,.25);color:#81C784}
+
+.step-2 .step-num{background:rgba(79,195,247,.2);border:2px solid #4FC3F7;color:#4FC3F7}
+.step-2 .step-line{background:linear-gradient(to bottom,#4FC3F7,#CE93D8)}
+.step-2 .step-label{color:#4FC3F7}
+.step-2 .step-time{background:rgba(79,195,247,.12);border:1px solid rgba(79,195,247,.25);color:#4FC3F7}
+
+.step-3 .step-num{background:rgba(206,147,216,.2);border:2px solid #CE93D8;color:#CE93D8}
+.step-3 .step-line{background:linear-gradient(to bottom,#CE93D8,#FF8A65)}
+.step-3 .step-label{color:#CE93D8}
+.step-3 .step-time{background:rgba(206,147,216,.12);border:1px solid rgba(206,147,216,.25);color:#CE93D8}
+
+.step-4 .step-num{background:rgba(255,138,101,.2);border:2px solid #FF8A65;color:#FF8A65}
+.step-4 .step-line{background:linear-gradient(to bottom,#FF8A65,#ffc107)}
+.step-4 .step-label{color:#FF8A65}
+.step-4 .step-time{background:rgba(255,138,101,.12);border:1px solid rgba(255,138,101,.25);color:#FF8A65}
+
+.step-5 .step-num{background:rgba(255,193,7,.2);border:2px solid #ffc107;color:#ffc107}
+.step-5 .step-label{color:#ffc107}
+.step-5 .step-time{background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.25);color:#ffc107}
+
+/* Divider */
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);margin:16px 0}
+
+/* Section */
+.section-title{display:flex;align-items:center;gap:8px;font-size:1em;font-weight:900;margin:20px 0 12px;padding-left:4px;color:rgba(255,255,255,.4)}
+
+/* Cards */
+.cards{display:flex;flex-direction:column;gap:10px}
+.card{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;text-decoration:none;color:#fff;transition:all .25s;position:relative;overflow:hidden;text-align:left}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.02));pointer-events:none}
+.card:active{transform:scale(.97)}
+.card-icon{font-size:2.2em;flex-shrink:0;width:52px;text-align:center}
+.card-body{flex:1;min-width:0}
+.card-title{font-size:1em;font-weight:900;line-height:1.3}
+.card-desc{font-size:.78em;color:rgba(255,255,255,.5);margin-top:3px;line-height:1.5}
+.card-tag{display:inline-block;border-radius:20px;padding:2px 10px;font-size:.65em;font-weight:700;margin-top:5px}
+.card-arrow{color:rgba(255,255,255,.2);font-size:1.2em;flex-shrink:0}
+.card-step{position:absolute;top:8px;right:12px;font-size:.6em;font-weight:900;border-radius:10px;padding:1px 8px}
+
+/* Card colors */
+.c-green .card-title{color:#81C784}
+.c-green:hover{border-color:rgba(129,199,132,.4);box-shadow:0 4px 20px rgba(129,199,132,.12)}
+.c-green .card-tag{background:rgba(129,199,132,.12);border:1px solid rgba(129,199,132,.25);color:#81C784}
+.c-green .card-step{background:rgba(129,199,132,.15);color:#81C784}
+
+.c-blue .card-title{color:#4FC3F7}
+.c-blue:hover{border-color:rgba(79,195,247,.4);box-shadow:0 4px 20px rgba(79,195,247,.12)}
+.c-blue .card-tag{background:rgba(79,195,247,.12);border:1px solid rgba(79,195,247,.25);color:#4FC3F7}
+.c-blue .card-step{background:rgba(79,195,247,.15);color:#4FC3F7}
+
+.c-purple .card-title{color:#CE93D8}
+.c-purple:hover{border-color:rgba(206,147,216,.4);box-shadow:0 4px 20px rgba(206,147,216,.12)}
+.c-purple .card-tag{background:rgba(206,147,216,.12);border:1px solid rgba(206,147,216,.25);color:#CE93D8}
+.c-purple .card-step{background:rgba(206,147,216,.15);color:#CE93D8}
+
+.c-orange .card-title{color:#FF8A65}
+.c-orange:hover{border-color:rgba(255,107,53,.4);box-shadow:0 4px 20px rgba(255,107,53,.12)}
+.c-orange .card-tag{background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.25);color:#FF8F60}
+.c-orange .card-step{background:rgba(255,138,101,.15);color:#FF8A65}
+
+.c-gold .card-title{color:#ffc107}
+.c-gold:hover{border-color:rgba(255,193,7,.4);box-shadow:0 4px 20px rgba(255,193,7,.12)}
+.c-gold .card-tag{background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.25);color:#ffc107}
+.c-gold .card-step{background:rgba(255,193,7,.15);color:#ffc107}
+
+/* Badges */
+.badge-new{display:inline-block;background:linear-gradient(135deg,#FF2D95,#FF6B35);color:#fff;border-radius:4px;padding:1px 6px;font-size:.6em;font-weight:900;margin-left:6px;vertical-align:middle;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.badge-hot{display:inline-block;background:linear-gradient(135deg,#FF6B35,#ffc107);color:#000;border-radius:4px;padding:1px 6px;font-size:.6em;font-weight:900;margin-left:6px;vertical-align:middle}
+.badge-rec{display:inline-block;background:linear-gradient(135deg,#4FC3F7,#00BCD4);color:#fff;border-radius:4px;padding:1px 6px;font-size:.6em;font-weight:900;margin-left:6px;vertical-align:middle}
+
+/* How-to section */
+.howto{margin:20px 0;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,193,7,.2);border-radius:20px;padding:20px 16px}
+.howto-title{display:flex;align-items:center;gap:8px;font-size:1.05em;font-weight:900;margin-bottom:14px;color:#ffc107}
+.howto-item{display:flex;gap:10px;margin-bottom:12px;align-items:flex-start}
+.howto-item:last-child{margin-bottom:0}
+.howto-icon{font-size:1.3em;flex-shrink:0;width:28px;text-align:center}
+.howto-text{font-size:.82em;line-height:1.6;color:rgba(255,255,255,.7)}
+.howto-text strong{color:#fff;font-weight:700}
+
+/* Tips */
+.tips{margin:16px 0;background:rgba(255,107,53,.06);border:1.5px solid rgba(255,107,53,.2);border-radius:16px;padding:16px}
+.tips-title{font-size:.9em;font-weight:900;color:#FF8A65;margin-bottom:10px}
+.tips-item{font-size:.78em;color:rgba(255,255,255,.6);line-height:1.7;padding-left:20px;position:relative}
+.tips-item::before{content:'💡';position:absolute;left:0;top:0}
+
+.footer{margin:24px 0 16px;color:rgba(255,255,255,.2);font-size:.7em;line-height:1.6;text-align:center}
+
+/* particles */
+.particle{position:fixed;pointer-events:none;opacity:.25;animation:drift linear infinite}
+@keyframes drift{0%{transform:translateY(100vh) rotate(0deg)}100%{transform:translateY(-20vh) rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ═══ Hero ═══ -->
+  <div class="hero">
+    <div class="hero-icon">🎧</div>
+    <h1>九年級英文會考特訓</h1>
+    <p>芎林國中 · 樂學教室</p>
+  </div>
+
+  <!-- ═══ 使用教學 ═══ -->
+  <div class="tutorial">
+    <div class="tutorial-title">
+      <span>📋</span> 每天練習順序（照著做就對了！）
+    </div>
+
+    <div class="step step-1">
+      <div class="step-num">1</div>
+      <div class="step-line"></div>
+      <div class="step-content">
+        <div class="step-label">先背單字 → 打好基礎</div>
+        <div class="step-desc">點「📚 單字練習」，把不會的單字先記起來。<br>這是所有題目的基礎，單字不會＝聽不懂！</div>
+        <div class="step-time">⏱ 約 5 分鐘</div>
+      </div>
+    </div>
+
+    <div class="step step-2">
+      <div class="step-num">2</div>
+      <div class="step-line"></div>
+      <div class="step-content">
+        <div class="step-label">再練句型 → 看懂題目</div>
+        <div class="step-desc">點「📝 句型口訣特訓」，背口訣 → 練題目。<br>會考選擇題的關鍵就是句型！背起來直覺答對。</div>
+        <div class="step-time">⏱ 約 5 分鐘</div>
+      </div>
+    </div>
+
+    <div class="step step-3">
+      <div class="step-num">3</div>
+      <div class="step-line"></div>
+      <div class="step-content">
+        <div class="step-label">接著練聽力 → 耳朵打開</div>
+        <div class="step-desc">點「⚔️ 聽力特訓 — 戰令版」，每天做一關！<br>答對拿金幣、解鎖造型、升段位，越練越強 💪</div>
+        <div class="step-time">⏱ 約 15-20 分鐘</div>
+      </div>
+    </div>
+
+    <div class="step step-4">
+      <div class="step-num">4</div>
+      <div class="step-line"></div>
+      <div class="step-content">
+        <div class="step-label">想玩更多 → RPG 冒險模式</div>
+        <div class="step-desc">點「🎮 英文冒險 RPG」，用遊戲方式複習 200 個高頻單字。<br>有聽力闖關、配對挑戰、BOSS 戰！</div>
+        <div class="step-time">⏱ 約 10 分鐘</div>
+      </div>
+    </div>
+
+    <div class="step step-5">
+      <div class="step-num">5</div>
+      <div class="step-line"></div>
+      <div class="step-content">
+        <div class="step-label">額外加練 → 聽力金幣大冒險</div>
+        <div class="step-desc">還有時間就點「🍄 聽力金幣大冒險」，多練幾題。<br>從聽單字 → 聽問句 → 聽對話，一步步升級！</div>
+        <div class="step-time">⏱ 每次 5 題</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 每天必練（步驟 1-3）═══ -->
+  <div class="section-title">⭐ 每天必練</div>
+
+  <div class="cards">
+    <a class="card c-green" href="vocab-practice.html">
+      <div class="card-icon">📚</div>
+      <div class="card-body">
+        <div class="card-title">Step 1 — 單字練習</div>
+        <div class="card-desc">基礎單字反覆練習 · 先把單字記熟再往下做！</div>
+        <div class="card-tag">📖 單字 · 快速暖身 · 約 5 分鐘</div>
+      </div>
+      <div class="card-arrow">›</div>
+      <div class="card-step">步驟 1</div>
+    </a>
+
+    <a class="card c-blue" href="grammar-practice.html">
+      <div class="card-icon">📝</div>
+      <div class="card-body">
+        <div class="card-title">Step 2 — 句型口訣特訓</div>
+        <div class="card-desc">8 大必考句型 · 背口訣 → 練題目 → 直覺答對</div>
+        <div class="card-tag">🧠 句型 · 約 5 分鐘</div>
+      </div>
+      <div class="card-arrow">›</div>
+      <div class="card-step">步驟 2</div>
+    </a>
+
+    <a class="card c-purple" href="listening-battle-pass.html">
+      <div class="card-icon">⚔️</div>
+      <div class="card-body">
+        <div class="card-title">Step 3 — 聽力特訓戰令版<span class="badge-new">NEW</span></div>
+        <div class="card-desc">每天做 1 關 · 金幣收集 · 造型解鎖 · Combo 連擊 · 段位晉升</div>
+        <div class="card-tag">🎧 聽力 · 每天 14 題 · 約 15-20 分鐘</div>
+      </div>
+      <div class="card-arrow">›</div>
+      <div class="card-step">步驟 3</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══ 加碼練習（步驟 4-5）═══ -->
+  <div class="section-title">🎮 加碼練習（有時間再做）</div>
+
+  <div class="cards">
+    <a class="card c-orange" href="vocab-adventure.html">
+      <div class="card-icon">🎮</div>
+      <div class="card-body">
+        <div class="card-title">英文冒險 RPG<span class="badge-hot">HOT</span></div>
+        <div class="card-desc">200 個會考高頻單字 · 聽力闖關 · 配對挑戰 · BOSS 戰</div>
+        <div class="card-tag">⭐ 單字遊戲 · 約 10 分鐘</div>
+      </div>
+      <div class="card-arrow">›</div>
+      <div class="card-step">步驟 4</div>
+    </a>
+
+    <a class="card c-gold" href="listening-practice.html">
+      <div class="card-icon">🍄</div>
+      <div class="card-body">
+        <div class="card-title">聽力金幣大冒險</div>
+        <div class="card-desc">聽單字 → 聽問句 → 聽對話 · 收集金幣、逐步升級</div>
+        <div class="card-tag">🎧 聽力 · 每次 5 題</div>
+      </div>
+      <div class="card-arrow">›</div>
+      <div class="card-step">步驟 5</div>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ═══ 操作說明 ═══ -->
+  <div class="howto">
+    <div class="howto-title">
+      <span>🎮</span> 操作說明
+    </div>
+
+    <div class="howto-item">
+      <div class="howto-icon">👆</div>
+      <div class="howto-text"><strong>點卡片</strong> = 進入該練習。每個練習裡面都有教你怎麼做。</div>
+    </div>
+
+    <div class="howto-item">
+      <div class="howto-icon">⬅️</div>
+      <div class="howto-text"><strong>回上一頁</strong>：每個練習左上角都有「⬅ 回首頁」按鈕，<br>隨時可以回來這裡，不用做完也可以離開！</div>
+    </div>
+
+    <div class="howto-item">
+      <div class="howto-icon">🔊</div>
+      <div class="howto-text"><strong>打開聲音</strong>：聽力題需要聲音！做之前先把手機音量打開。</div>
+    </div>
+
+    <div class="howto-item">
+      <div class="howto-icon">💾</div>
+      <div class="howto-text"><strong>進度自動存</strong>：你的金幣、造型、完成天數都會自動記錄，<br>關掉再打開不會消失（但不要清除瀏覽器資料）。</div>
+    </div>
+
+    <div class="howto-item">
+      <div class="howto-icon">📱</div>
+      <div class="howto-text"><strong>用 Chrome 開</strong>：用 Chrome 瀏覽器效果最好。<br>如果用 LINE 內建瀏覽器開會怪怪的，請複製網址到 Chrome 開。</div>
+    </div>
+  </div>
+
+  <!-- ═══ 小提醒 ═══ -->
+  <div class="tips">
+    <div class="tips-title">⚡ 老師的小提醒</div>
+    <div class="tips-item">每天只要 25-30 分鐘（步驟 1+2+3），持續 29 天就能大幅進步！</div>
+    <div class="tips-item">不用一次全做完，今天累了就只做步驟 1 和 2 也很棒 👍</div>
+    <div class="tips-item">聽力特訓有「戰令」系統，連續練習可以解鎖超酷造型！</div>
+  </div>
+
+  <div class="footer">
+    <p>📱 用 Chrome 瀏覽器開啟效果最好 🔊 記得打開聲音</p>
+    <p>芎林國中 · 樂學教室 · 2025-2026</p>
+  </div>
+</div>
+
+<script>
+const emojis=['✨','⭐','🎧','📝','📚','🎮','💪','🔥'];
+for(let i=0;i<6;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+  p.style.left=Math.random()*100+'%';
+  p.style.fontSize=(12+Math.random()*14)+'px';
+  p.style.animationDuration=(8+Math.random()*12)+'s';
+  p.style.animationDelay=(-Math.random()*15)+'s';
+  document.body.appendChild(p);
+}
+</script>
+</body>
+</html>
