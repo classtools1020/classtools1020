@@ -7,7 +7,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:#0B1D3A;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;min-height:100dvh;overflow-x:hidden}
+body{background:#0B1D3A;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;min-height:100dvh;overflow-x:hidden;font-size:18px}
 .screen{display:none;min-height:100vh;min-height:100dvh;padding:16px;padding-bottom:100px}
 .screen.active{display:block}
 /* ===== HOME ===== */
@@ -100,13 +100,54 @@ body{background:#0B1D3A;font-family:'Noto Sans TC',sans-serif;color:#fff;min-hei
 .pattern-section h3{font-size:.95em;color:#00C9A7;margin-bottom:8px}
 /* ===== STREAK ===== */
 .streak-banner{background:linear-gradient(135deg,#FF6B35,#FFD700);border-radius:12px;padding:10px;text-align:center;margin:8px auto;max-width:300px;font-weight:700;animation:pop .4s}
+/* ===== LOGIN MODAL ===== */
+.login-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:#1A3A6A;border-radius:24px;padding:32px 24px;max-width:400px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.login-box h2{font-size:1.6em;font-weight:900;color:#FFD700;margin-bottom:6px}
+.login-box p{color:#B0C4DE;font-size:1em;margin-bottom:20px}
+.login-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:0 auto;max-width:320px}
+.login-btn{background:#112D5A;border:3px solid #2A5A8A;border-radius:18px;padding:18px 8px;text-align:center;cursor:pointer;transition:all .2s;font-family:'Noto Sans TC',sans-serif;color:#fff}
+.login-btn:active{transform:scale(.93);border-color:#FFD700}
+.login-btn .login-emoji{font-size:2.6em;display:block;margin-bottom:6px}
+.login-btn .login-name{font-size:1.1em;font-weight:700}
+.switch-btn{background:var(--surface2,#1A3A6A);border:2px solid #4FC3F7;color:#4FC3F7;border-radius:20px;padding:6px 16px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.quiz-option{font-size:1.3em}
+.quiz-prompt .prompt-word{font-size:2.4em}
+.quiz-prompt .prompt-label{font-size:1em}
+.quiz-feedback .fb-text{font-size:1.4em}
+.quiz-feedback .fb-correct-answer{font-size:1.1em}
+.learn-en{font-size:3em}
+.learn-zh{font-size:2em}
+.learn-sentence{font-size:1.1em}
+.day-card .day-theme{font-size:1.1em}
+.word-chip{font-size:.95em}
 </style>
 </head>
 <body>
 
+<!-- ===== LOGIN MODAL ===== -->
+<div class="login-overlay" id="loginOverlay" style="display:none">
+  <div class="login-box">
+    <h2>📚 你是誰？</h2>
+    <p>點你的動物開始練習！</p>
+    <div class="login-grid">
+      <div class="login-btn" onclick="pickStudent('Wendy')"><span class="login-emoji">🐱</span><span class="login-name">Wendy</span></div>
+      <div class="login-btn" onclick="pickStudent('Lynn')"><span class="login-emoji">🐶</span><span class="login-name">Lynn</span></div>
+      <div class="login-btn" onclick="pickStudent('Yumi')"><span class="login-emoji">🦊</span><span class="login-name">Yumi</span></div>
+      <div class="login-btn" onclick="pickStudent('Fan')"><span class="login-emoji">🐯</span><span class="login-name">Fan</span></div>
+      <div class="login-btn" onclick="pickStudent('Yoyo')"><span class="login-emoji">🐼</span><span class="login-name">Yoyo</span></div>
+      <div class="login-btn" onclick="pickStudent('Mike')"><span class="login-emoji">🦁</span><span class="login-name">Mike</span></div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== HOME SCREEN ===== -->
 <div class="screen active" id="screenHome">
-  <a href="eng9.html" style="display:inline-block;color:rgba(255,255,255,.5);font-size:.95em;padding:8px 0;text-decoration:none">⬅ 回到選單</a>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+    <a href="eng9.html" style="color:rgba(255,255,255,.5);font-size:.95em;text-decoration:none">⬅ 回到選單</a>
+    <span id="userBadge" style="font-size:15px;color:#B0C4DE"></span>
+    <button class="switch-btn" onclick="switchStudent()">🔄 換人</button>
+  </div>
   <div class="home-header">
     <h1>📚 會考英文搶分特訓</h1>
     <p>掃 QR Code → 每天練 → 搶更多分！</p>
@@ -497,6 +538,7 @@ function getProgress(){
 }
 function saveProgress(data){
   try{localStorage.setItem('vocabProgress',JSON.stringify(data));}catch(e){}
+  if(typeof cloudSave==='function')cloudSave();
 }
 function getDayProgress(day){
   const p=getProgress();
@@ -760,6 +802,7 @@ function checkAnswer(btn,selected,q){
     const msg=ENCOURAGE.wrong[Math.floor(Math.random()*ENCOURAGE.wrong.length)];
     fb.innerHTML=`<div class="fb-text" style="color:#FF6B35">${msg}</div><div class="fb-correct-answer">正確答案：${q.word.en} = ${q.word.zh}</div>`;
     quizResults.push({word:q.word,correct:false});
+    addToErrorPool(q.word);
 
     // Speak the correct word so they learn
     setTimeout(()=>speakWord(q.word.en,'en-US'),500);
@@ -861,8 +904,103 @@ if(window.speechSynthesis){
   window.speechSynthesis.onvoiceschanged=()=>window.speechSynthesis.getVoices();
 }
 
+// ===================== STUDENT LOGIN =====================
+const STUDENT_ANIMALS={Wendy:'🐱',Lynn:'🐶',Yumi:'🦊',Fan:'🐯',Yoyo:'🐼',Mike:'🦁'};
+const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
+
+function pickStudent(name){
+  localStorage.setItem('studentName',name);
+  document.getElementById('loginOverlay').style.display='none';
+  document.getElementById('userBadge').textContent=(STUDENT_ANIMALS[name]||'👋')+' '+name;
+  cloudLoad();
+}
+function switchStudent(){
+  document.getElementById('loginOverlay').style.display='flex';
+}
+function checkLogin(){
+  const name=localStorage.getItem('studentName');
+  if(name && STUDENT_ANIMALS[name]){
+    document.getElementById('loginOverlay').style.display='none';
+    document.getElementById('userBadge').textContent=(STUDENT_ANIMALS[name]||'👋')+' '+name;
+    cloudLoad();
+  } else {
+    document.getElementById('loginOverlay').style.display='flex';
+  }
+}
+
+// ===================== CLOUD SYNC =====================
+let cloudSaveTimer=null;
+function cloudSave(){
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer=setTimeout(()=>{
+    const name=localStorage.getItem('studentName');
+    if(!name)return;
+    const data=localStorage.getItem('vocabProgress')||'{}';
+    fetch(APPS_SCRIPT_URL,{
+      method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'save_progress',name,tool:'vocabPractice',data})
+    }).catch(()=>{});
+  },1000);
+}
+function cloudLoad(){
+  const name=localStorage.getItem('studentName');
+  if(!name)return;
+  fetch(APPS_SCRIPT_URL+'?action=load_progress&name='+encodeURIComponent(name)+'&tool=vocabPractice')
+    .then(r=>r.json()).then(res=>{
+      if(res.status==='ok'&&res.data){
+        try{
+          const cloud=JSON.parse(res.data);
+          const local=getProgress();
+          // Merge: take whichever has more completed days
+          const localDone=Object.keys(local).filter(k=>k.startsWith('day')&&local[k].learned).length;
+          const cloudDone=Object.keys(cloud).filter(k=>k.startsWith('day')&&cloud[k].learned).length;
+          if(cloudDone>localDone){
+            localStorage.setItem('vocabProgress',JSON.stringify(cloud));
+            renderHome();
+          }
+        }catch(e){}
+      }
+    }).catch(()=>{});
+  // Also load errorPool from cloud
+  fetch(APPS_SCRIPT_URL+'?action=load_progress&name='+encodeURIComponent(name)+'&tool=errorPool')
+    .then(r=>r.json()).then(res=>{
+      if(res.status==='ok'&&res.data){
+        try{
+          const cloudPool=JSON.parse(res.data);
+          const localPool=JSON.parse(localStorage.getItem('errorPool')||'[]');
+          if(cloudPool.length>localPool.length){
+            localStorage.setItem('errorPool',JSON.stringify(cloudPool));
+          }
+        }catch(e){}
+      }
+    }).catch(()=>{});
+}
+// ===================== ERROR POOL (送去 RPG 錯題大魔王) =====================
+function getErrorPool(){
+  try{return JSON.parse(localStorage.getItem('errorPool')||'[]');}catch{return [];}
+}
+function saveErrorPool(pool){
+  localStorage.setItem('errorPool',JSON.stringify(pool));
+  // Cloud sync
+  const name=localStorage.getItem('studentName');
+  if(name){
+    fetch('https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec',{
+      method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'save_progress',name,tool:'errorPool',data:JSON.stringify(pool)})
+    }).catch(()=>{});
+  }
+}
+function addToErrorPool(word){
+  const pool=getErrorPool();
+  const existing=pool.find(w=>w.en===word.en);
+  if(existing){existing.wrongCount=(existing.wrongCount||1)+1;}
+  else{pool.push({en:word.en,zh:word.zh,s:word.s||'',sz:word.sz||'',wrongCount:1,correctInRPG:0});}
+  saveErrorPool(pool);
+}
+
 // ===================== INIT =====================
 renderHome();
+checkLogin();
 </script>
 <script src="report-system.js"></script>
 </body>

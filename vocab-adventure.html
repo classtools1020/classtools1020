@@ -3,55 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>英文冒險 RPG｜會考搶分特訓</title>
+<title>錯題大魔王 RPG</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0a0e27;--card:rgba(20,30,70,.85);--glass:rgba(255,255,255,.08);--neon-blue:#00d4ff;--neon-pink:#ff2d95;--neon-green:#00ff88;--neon-gold:#ffd700;--neon-orange:#ff6b35}
-body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;min-height:100dvh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(0,212,255,.08),transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(255,45,149,.08),transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(0,255,136,.06),transparent 50%);pointer-events:none;z-index:0}
+:root{--bg:#0a0e27;--card:rgba(20,30,70,.85);--glass:rgba(255,255,255,.08);--neon-blue:#00d4ff;--neon-pink:#ff2d95;--neon-green:#00ff88;--neon-gold:#ffd700;--neon-orange:#ff6b35;--neon-red:#ff4444}
+body{background:var(--bg);font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;min-height:100dvh;overflow-x:hidden;font-size:18px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(255,45,45,.08),transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(255,45,149,.08),transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(255,107,53,.06),transparent 50%);pointer-events:none;z-index:0}
 canvas#particles{position:fixed;inset:0;pointer-events:none;z-index:999}
 .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:12px 16px 90px}
 .screen.active{display:block}
+
 /* ===== ANIMATIONS ===== */
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(0,212,255,.3)}50%{box-shadow:0 0 40px rgba(0,212,255,.6)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(255,68,68,.3)}50%{box-shadow:0 0 40px rgba(255,68,68,.6)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)}40%{transform:translateX(12px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
 @keyframes popIn{0%{transform:scale(0);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes fireGlow{0%,100%{text-shadow:0 0 10px #ff6b35,0 0 20px #ff4500,0 0 40px #ff0000}50%{text-shadow:0 0 20px #ffd700,0 0 40px #ff6b35,0 0 60px #ff4500}}
 @keyframes rainbow{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+@keyframes monsterIdle{0%,100%{transform:translateY(0) rotate(-2deg)}25%{transform:translateY(-5px) rotate(2deg)}50%{transform:translateY(0) rotate(-1deg)}75%{transform:translateY(-3px) rotate(1deg)}}
+@keyframes defeated{0%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.5}100%{transform:scale(0);opacity:0}}
 @keyframes starFloat{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(-60px) rotate(180deg);opacity:0}}
+
+/* ===== LOGIN ===== */
+.login-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:linear-gradient(145deg,#2a1040,#1a0a30);border:2px solid var(--neon-pink);border-radius:24px;padding:32px 24px;max-width:400px;width:100%;text-align:center;box-shadow:0 0 40px rgba(255,45,149,.2)}
+.login-box h2{font-size:1.6em;font-weight:900;color:var(--neon-red);margin-bottom:6px}
+.login-box p{color:rgba(255,255,255,.6);font-size:1em;margin-bottom:20px}
+.login-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:0 auto;max-width:320px}
+.login-btn{background:rgba(255,255,255,.05);border:3px solid rgba(255,255,255,.15);border-radius:18px;padding:18px 8px;text-align:center;cursor:pointer;transition:all .2s;font-family:'Noto Sans TC',sans-serif;color:#fff}
+.login-btn:active{transform:scale(.93);border-color:var(--neon-orange)}
+.login-btn .login-emoji{font-size:2.6em;display:block;margin-bottom:6px}
+.login-btn .login-name{font-size:1.1em;font-weight:700}
+.switch-btn{border:2px solid var(--neon-blue);color:var(--neon-blue);background:transparent;border-radius:20px;padding:6px 16px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+
 /* ===== HOME ===== */
 .home-hero{text-align:center;padding:20px 0 10px}
-.home-hero h1{font-size:2em;font-weight:900;background:linear-gradient(135deg,var(--neon-gold),var(--neon-orange),var(--neon-pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pulse 3s infinite}
-.home-hero .tagline{color:var(--neon-blue);font-size:.95em;margin-top:4px}
-.hero-character{font-size:3em;animation:float 3s ease-in-out infinite;margin:8px 0}
-.stats-bar{display:flex;justify-content:center;gap:16px;margin:12px 0}
-.stat{background:var(--glass);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 16px;text-align:center;min-width:80px}
+.home-hero h1{font-size:2.2em;font-weight:900;background:linear-gradient(135deg,var(--neon-red),var(--neon-orange),var(--neon-gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pulse 3s infinite}
+.home-hero .tagline{color:var(--neon-orange);font-size:1em;margin-top:4px}
+.hero-monster{font-size:4em;animation:monsterIdle 3s ease-in-out infinite}
+.stats-bar{display:flex;justify-content:center;gap:12px;margin:12px 0;flex-wrap:wrap}
+.stat{background:var(--glass);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;text-align:center;min-width:75px}
 .stat .stat-val{font-size:1.4em;font-weight:900;color:var(--neon-gold)}
 .stat .stat-label{font-size:.7em;color:rgba(255,255,255,.6)}
 .xp-bar{background:rgba(255,255,255,.1);border-radius:20px;height:16px;margin:8px auto;max-width:350px;overflow:hidden;border:1px solid rgba(255,255,255,.1)}
-.xp-fill{height:100%;background:linear-gradient(90deg,var(--neon-green),var(--neon-blue));border-radius:20px;transition:width .8s cubic-bezier(.4,0,.2,1);position:relative}
-.xp-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:shimmer 2s infinite}
-@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--neon-orange),var(--neon-red));border-radius:20px;transition:width .8s cubic-bezier(.4,0,.2,1)}
 .xp-text{font-size:.75em;color:rgba(255,255,255,.5);text-align:center;margin-top:2px}
-/* Map path */
-.map-scroll{overflow-x:auto;overflow-y:hidden;padding:10px 0 20px;-webkit-overflow-scrolling:touch}
-.map-path{display:flex;align-items:center;gap:0;min-width:max-content;padding:10px 20px}
-.map-node{display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:all .3s;position:relative;min-width:70px}
-.map-node:active{transform:scale(.9)}
-.node-circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6em;border:3px solid rgba(255,255,255,.15);background:var(--card);transition:all .3s;position:relative}
-.map-node.done .node-circle{border-color:var(--neon-green);box-shadow:0 0 15px rgba(0,255,136,.3)}
-.map-node.current .node-circle{border-color:var(--neon-gold);animation:glow 2s infinite;box-shadow:0 0 20px rgba(255,215,0,.4)}
-.map-node.locked .node-circle{opacity:.35;cursor:not-allowed}
-.node-label{font-size:.65em;color:rgba(255,255,255,.5);margin-top:4px;text-align:center;max-width:70px}
-.map-node.done .node-label{color:var(--neon-green)}
-.map-node.current .node-label{color:var(--neon-gold);font-weight:700}
-.node-stars{font-size:.7em;margin-top:2px}
-.map-connector{width:30px;height:3px;background:rgba(255,255,255,.1);flex-shrink:0}
-.map-node.done+.map-connector{background:var(--neon-green)}
+
+/* ===== MONSTER LIST ===== */
+.monster-section{margin:16px 0}
+.monster-section h3{font-size:1.1em;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.monster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.monster-card{background:var(--card);backdrop-filter:blur(10px);border:2px solid rgba(255,68,68,.3);border-radius:16px;padding:14px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;text-align:center}
+.monster-card:active{transform:scale(.95)}
+.monster-card .m-emoji{font-size:2.2em;animation:monsterIdle 2s ease-in-out infinite}
+.monster-card .m-word{font-size:1.2em;font-weight:900;color:var(--neon-gold);margin:4px 0}
+.monster-card .m-zh{font-size:.9em;color:rgba(255,255,255,.6)}
+.monster-card .m-hp{font-size:.75em;margin-top:6px}
+.monster-card .hp-bar{height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin-top:4px}
+.monster-card .hp-fill{height:100%;background:linear-gradient(90deg,var(--neon-red),var(--neon-orange));border-radius:3px;transition:width .3s}
+.monster-card.defeated{opacity:.4;border-color:var(--neon-green)}
+.monster-card.defeated .m-emoji{animation:none}
+.monster-card.defeated::after{content:'✅';position:absolute;top:8px;right:8px;font-size:1.2em}
+
+/* ===== EMPTY STATE ===== */
+.empty-state{text-align:center;padding:40px 20px}
+.empty-state .empty-icon{font-size:5em;margin-bottom:16px;animation:float 3s ease-in-out infinite}
+.empty-state h2{font-size:1.5em;color:var(--neon-green);margin-bottom:8px}
+.empty-state p{color:rgba(255,255,255,.6);font-size:1em;line-height:1.6;margin-bottom:20px}
+
+/* ===== BATTLE SCREEN ===== */
+.battle-monster{text-align:center;margin:10px 0}
+.battle-monster .bm-emoji{font-size:5em;animation:monsterIdle 2s ease-in-out infinite}
+.battle-monster .bm-name{font-size:1.8em;font-weight:900;color:var(--neon-red);margin-top:4px}
+.battle-monster .bm-zh{font-size:1.2em;color:var(--neon-gold)}
+.battle-monster .bm-hp{margin:8px auto;max-width:250px}
+.battle-monster .bm-hp-bar{height:10px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden}
+.battle-monster .bm-hp-fill{height:100%;background:linear-gradient(90deg,var(--neon-red),var(--neon-orange));border-radius:5px;transition:width .5s}
+.battle-monster .bm-hp-text{font-size:.8em;color:rgba(255,255,255,.5);margin-top:2px}
+
 /* ===== QUIZ ===== */
 .quiz-hud{display:flex;justify-content:space-between;align-items:center;padding:8px 4px;margin-bottom:8px}
 .hud-left,.hud-right{display:flex;align-items:center;gap:6px}
@@ -60,153 +92,107 @@ canvas#particles{position:fixed;inset:0;pointer-events:none;z-index:999}
 .hud-combo.fire{animation:fireGlow 1s infinite;color:#ff4500}
 .hud-combo.ultra{animation:fireGlow .5s infinite,rainbow 3s infinite;font-size:1.2em}
 .quiz-progress{height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin-bottom:12px}
-.quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--neon-orange),var(--neon-gold));border-radius:3px;transition:width .4s}
+.quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--neon-red),var(--neon-gold));border-radius:3px;transition:width .4s}
 .quiz-character{text-align:center;font-size:2.5em;min-height:60px;transition:all .3s}
 .quiz-prompt{text-align:center;margin:12px 0}
-.prompt-mode{font-size:.8em;color:var(--neon-blue);font-weight:700;margin-bottom:6px}
+.prompt-mode{font-size:.85em;color:var(--neon-blue);font-weight:700;margin-bottom:6px}
 .prompt-word{font-size:2.5em;font-weight:900;color:var(--neon-gold);text-shadow:0 0 20px rgba(255,215,0,.3)}
 .prompt-word.zh-mode{color:#fff;font-size:2em}
 .audio-btn{width:64px;height:64px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--neon-orange),var(--neon-pink));color:#fff;font-size:1.6em;cursor:pointer;margin:8px auto;display:block;transition:all .2s;box-shadow:0 4px 20px rgba(255,107,53,.4)}
 .audio-btn:active{transform:scale(.85)}
 .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:500px;margin:12px auto}
 .opt-btn{background:var(--glass);backdrop-filter:blur(10px);border:2px solid rgba(255,255,255,.15);border-radius:16px;padding:18px 12px;text-align:center;font-size:1.3em;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif;color:#fff;position:relative;overflow:hidden}
-.opt-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.05));pointer-events:none}
 .opt-btn:active{transform:scale(.95)}
 .opt-btn.correct{background:linear-gradient(135deg,rgba(0,255,136,.3),rgba(0,212,255,.2));border-color:var(--neon-green);box-shadow:0 0 30px rgba(0,255,136,.4);animation:popIn .3s}
 .opt-btn.wrong{background:rgba(255,45,45,.3);border-color:#ff4444;animation:shake .4s}
 .opt-btn .opt-label{font-size:.55em;color:rgba(255,255,255,.4);display:block;margin-bottom:2px;font-weight:400}
 .feedback-area{text-align:center;min-height:90px;margin:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .fb-msg{font-size:1.4em;font-weight:900;animation:popIn .3s}
-.fb-answer{font-size:.95em;color:var(--neon-gold);margin-top:4px}
-.fb-anime{font-size:.85em;color:var(--neon-pink);margin-top:4px;font-style:italic}
+.fb-answer{font-size:1em;color:var(--neon-gold);margin-top:4px}
 .combo-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3em;font-weight:900;color:var(--neon-orange);text-shadow:0 0 30px rgba(255,107,53,.8);animation:popIn .5s forwards;pointer-events:none;z-index:998}
+
 /* ===== RESULTS ===== */
 .results-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:90vh;text-align:center}
 .result-card{background:var(--card);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:30px 24px;max-width:420px;width:100%;animation:popIn .5s}
 .result-icon{font-size:5em;margin-bottom:8px}
 .result-title{font-size:1.8em;font-weight:900;background:linear-gradient(135deg,var(--neon-gold),var(--neon-orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.result-stars{font-size:2.5em;margin:10px 0;letter-spacing:6px}
 .result-score{font-size:2.2em;font-weight:900;color:var(--neon-green)}
 .result-msg{font-size:1em;color:rgba(255,255,255,.7);margin:8px 0;line-height:1.6}
-.result-anime{color:var(--neon-pink);font-size:.9em;font-style:italic;margin:6px 0}
-.result-xp{background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,107,53,.1));border:1px solid var(--neon-gold);border-radius:12px;padding:10px;margin:10px 0;font-weight:700;color:var(--neon-gold);animation:pulse 2s infinite}
-.wrong-list{text-align:left;margin:12px 0;max-height:200px;overflow-y:auto}
-.wrong-list h4{font-size:.85em;color:var(--neon-orange);margin-bottom:6px}
-.wrong-item{background:rgba(255,255,255,.05);border-radius:8px;padding:8px 10px;margin:4px 0;font-size:.85em;display:flex;justify-content:space-between;align-items:center}
-.wrong-item button{background:var(--neon-orange);border:none;border-radius:50%;width:32px;height:32px;color:#fff;font-size:.9em;cursor:pointer}
+.result-coins{background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,107,53,.1));border:1px solid var(--neon-gold);border-radius:12px;padding:10px;margin:10px 0;font-weight:700;color:var(--neon-gold);animation:pulse 2s infinite;font-size:1.1em}
+.result-xp{color:var(--neon-orange);font-size:.9em;margin:6px 0}
+.defeated-list{text-align:left;margin:12px 0}
+.defeated-list h4{font-size:.9em;color:var(--neon-green);margin-bottom:6px}
+.defeated-item{background:rgba(0,255,136,.08);border-radius:8px;padding:8px 10px;margin:4px 0;font-size:.9em;display:flex;justify-content:space-between;align-items:center}
 .btn{padding:14px 32px;border:none;border-radius:50px;font-family:'Noto Sans TC',sans-serif;font-size:1.05em;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
 .btn:active{transform:scale(.95)}
-.btn-fire{background:linear-gradient(135deg,var(--neon-orange),var(--neon-pink));color:#fff;box-shadow:0 4px 20px rgba(255,107,53,.4)}
+.btn-fire{background:linear-gradient(135deg,var(--neon-red),var(--neon-orange));color:#fff;box-shadow:0 4px 20px rgba(255,68,68,.4)}
 .btn-neon{background:transparent;border:2px solid var(--neon-blue);color:var(--neon-blue)}
 .btn-ghost{background:transparent;border:2px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6)}
+.btn-green{background:linear-gradient(135deg,var(--neon-green),var(--neon-blue));color:#fff;box-shadow:0 4px 20px rgba(0,255,136,.3)}
 .btns-col{display:flex;flex-direction:column;gap:10px;margin:16px 0;align-items:center}
 .btn-back{background:none;border:none;color:rgba(255,255,255,.5);font-size:.95em;cursor:pointer;padding:8px;font-family:'Noto Sans TC',sans-serif}
-/* Star float */
 .star-float{position:fixed;pointer-events:none;z-index:997;animation:starFloat 1s forwards}
-/* Mode select */
-.mode-select{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:400px;margin:16px auto}
-.mode-btn{background:var(--glass);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:18px 10px;text-align:center;cursor:pointer;transition:all .3s}
-.mode-btn:active{transform:scale(.95)}
-.mode-btn .mode-icon{font-size:2em;margin-bottom:4px}
-.mode-btn .mode-name{font-size:.95em;font-weight:700}
-.mode-btn .mode-sub{font-size:.7em;color:rgba(255,255,255,.4);margin-top:2px}
-/* day-info */
-.day-info{text-align:center;padding:12px 0}
-.day-info h2{font-size:1.5em;font-weight:900;color:var(--neon-gold)}
-.day-info .day-sub{color:var(--neon-blue);font-size:.85em;margin-top:2px}
-.word-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:450px;margin:10px auto}
-.w-chip{background:var(--glass);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 10px;font-size:.8em}
 </style>
 </head>
 <body>
 <canvas id="particles"></canvas>
 
+<!-- ===== LOGIN ===== -->
+<div class="login-overlay" id="loginOverlay" style="display:none">
+  <div class="login-box">
+    <h2>👹 你是哪位勇者？</h2>
+    <p>選你的動物開始打怪！</p>
+    <div class="login-grid">
+      <div class="login-btn" onclick="pickStudent('Wendy')"><span class="login-emoji">🐱</span><span class="login-name">Wendy</span></div>
+      <div class="login-btn" onclick="pickStudent('Lynn')"><span class="login-emoji">🐶</span><span class="login-name">Lynn</span></div>
+      <div class="login-btn" onclick="pickStudent('Yumi')"><span class="login-emoji">🦊</span><span class="login-name">Yumi</span></div>
+      <div class="login-btn" onclick="pickStudent('Fan')"><span class="login-emoji">🐯</span><span class="login-name">Fan</span></div>
+      <div class="login-btn" onclick="pickStudent('Yoyo')"><span class="login-emoji">🐼</span><span class="login-name">Yoyo</span></div>
+      <div class="login-btn" onclick="pickStudent('Mike')"><span class="login-emoji">🦁</span><span class="login-name">Mike</span></div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== HOME ===== -->
 <div class="screen active" id="scrHome">
-  <a href="eng9.html" style="display:inline-block;color:rgba(255,255,255,.5);font-size:.95em;padding:8px;text-decoration:none;font-family:'Noto Sans TC',sans-serif">⬅ 回到選單</a>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+    <a href="eng9.html" style="color:rgba(255,255,255,.5);font-size:.95em;text-decoration:none;font-family:'Noto Sans TC',sans-serif">⬅ 回到選單</a>
+    <span id="userBadge" style="font-size:15px;color:rgba(255,255,255,.5)"></span>
+    <button class="switch-btn" onclick="switchStudent()">🔄 換人</button>
+  </div>
   <div class="home-hero">
-    <div class="hero-character">⚔️</div>
-    <h1>英文冒險 RPG</h1>
-    <div class="tagline">每天打怪練功，會考不再害怕！</div>
+    <div class="hero-monster">👹</div>
+    <h1>錯題大魔王</h1>
+    <div class="tagline">答錯的單字變成怪獸！打敗牠們！</div>
   </div>
   <div class="stats-bar">
-    <div class="stat"><div class="stat-val" id="statWords">0</div><div class="stat-label">已學單字</div></div>
-    <div class="stat"><div class="stat-val" id="statLevel">Lv.1</div><div class="stat-label">等級</div></div>
-    <div class="stat"><div class="stat-val" id="statStreak">0</div><div class="stat-label">🔥連續天數</div></div>
+    <div class="stat"><div class="stat-val" id="statMonsters">0</div><div class="stat-label">🐉 怪獸</div></div>
+    <div class="stat"><div class="stat-val" id="statDefeated">0</div><div class="stat-label">💀 已消滅</div></div>
+    <div class="stat"><div class="stat-val" id="statLevel">Lv.1</div><div class="stat-label">⚔️ 等級</div></div>
+    <div class="stat"><div class="stat-val" id="statCoins">0</div><div class="stat-label">🪙 金幣</div></div>
   </div>
   <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
-  <div class="xp-text" id="xpText">EXP 0 / 200</div>
-  <div class="map-scroll"><div class="map-path" id="mapPath"></div></div>
-  <div style="text-align:center;margin-top:10px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
-    <a href="grammar-practice.html" class="btn btn-neon" style="text-decoration:none;font-size:.9em">📝 去練句型</a>
-    <button class="btn btn-ghost" style="font-size:.9em" onclick="showTeacher()">📊 給老師看</button>
-  </div>
+  <div class="xp-text" id="xpText">EXP 0 / 100</div>
+  <div id="monsterArea"></div>
 </div>
 
-<!-- ===== TEACHER VERIFICATION ===== -->
-<div class="screen" id="scrTeacher">
-  <button class="btn-back" onclick="goHome()">⬅ 回冒險地圖</button>
-  <div style="text-align:center;padding:10px 0">
-    <h2 style="color:var(--neon-gold);font-size:1.5em">📊 學習紀錄</h2>
-    <div style="color:var(--neon-blue);font-size:.85em;margin-top:4px">給老師確認用</div>
-  </div>
-  <div style="max-width:500px;margin:0 auto">
-    <div style="background:var(--glass);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;margin:10px 0">
-      <div style="margin-bottom:10px">
-        <label style="font-size:.85em;color:rgba(255,255,255,.5)">學生姓名：</label>
-        <input type="text" id="studentName" placeholder="輸入你的名字" style="width:100%;padding:10px;border-radius:10px;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;font-size:1.1em;font-family:'Noto Sans TC',sans-serif;margin-top:4px" oninput="renderReport()">
-      </div>
-      <div id="verifyCode" style="text-align:center;background:rgba(255,215,0,.1);border:1px dashed var(--neon-gold);border-radius:10px;padding:10px;margin:8px 0;font-size:.85em;color:var(--neon-gold)"></div>
-    </div>
-    <div id="teacherReport"></div>
-  </div>
-</div>
-
-<!-- ===== DAY SELECT ===== -->
-<div class="screen" id="scrDay">
-  <button class="btn-back" onclick="goHome()">⬅ 回冒險地圖</button>
-  <div class="day-info"><h2 id="dayTitle"></h2><div class="day-sub" id="daySub"></div></div>
-  <div class="mode-select">
-    <div class="mode-btn" onclick="startMode('learn')"><div class="mode-icon">📖</div><div class="mode-name">學習模式</div><div class="mode-sub">先聽先看</div></div>
-    <div class="mode-btn" onclick="startMode('listen')"><div class="mode-icon">🔊</div><div class="mode-name">聽力闖關</div><div class="mode-sub">聽英文選中文</div></div>
-    <div class="mode-btn" onclick="startMode('match')"><div class="mode-icon">🎯</div><div class="mode-name">配對挑戰</div><div class="mode-sub">看中文選英文</div></div>
-    <div class="mode-btn" onclick="startMode('boss')"><div class="mode-icon">👹</div><div class="mode-name">BOSS 戰</div><div class="mode-sub">混合終極挑戰</div></div>
-  </div>
-  <div class="word-chips" id="wordChips"></div>
-</div>
-
-<!-- ===== LEARN ===== -->
-<div class="screen" id="scrLearn">
-  <button class="btn-back" onclick="show('scrDay')">⬅ 回選單</button>
-  <div style="text-align:center;font-size:.85em;color:var(--neon-blue);margin:8px 0" id="learnCount"></div>
-  <div style="background:var(--card);backdrop-filter:blur(20px);border-radius:24px;padding:30px 20px;max-width:450px;margin:10px auto;text-align:center;border:1px solid rgba(255,255,255,.1)">
-    <div style="font-size:3em;font-weight:900;color:var(--neon-gold);text-shadow:0 0 30px rgba(255,215,0,.3)" id="learnEn"></div>
-    <div style="display:flex;gap:10px;justify-content:center;margin:14px 0">
-      <button class="audio-btn" onclick="speak(CUR_WORDS[learnIdx].en,'en-US')" style="width:56px;height:56px;font-size:1.3em">🔊</button>
-      <button class="audio-btn" onclick="speak(CUR_WORDS[learnIdx].zh,'zh-TW')" style="width:56px;height:56px;font-size:1.3em;background:linear-gradient(135deg,var(--neon-blue),var(--neon-green))">🗣</button>
-    </div>
-    <div style="font-size:2em;color:#fff" id="learnZh"></div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px">
-      <button class="audio-btn" onclick="speakSentence()" style="width:36px;height:36px;font-size:.9em;background:linear-gradient(135deg,#9c27b0,#e040fb);box-shadow:0 2px 10px rgba(156,39,176,.3);flex-shrink:0" id="sentenceAudioBtn">🔊</button>
-      <div style="font-size:.95em;color:var(--neon-blue);font-style:italic" id="learnS"></div>
-    </div>
-    <div style="font-size:.85em;color:rgba(255,255,255,.5);margin-top:4px" id="learnSz"></div>
-  </div>
-  <div style="display:flex;gap:12px;justify-content:center;margin-top:16px">
-    <button class="btn btn-ghost" onclick="learnPrev()">⬅</button>
-    <button class="btn btn-fire" onclick="learnNext()">下一個 ➡</button>
-  </div>
-</div>
-
-<!-- ===== QUIZ ===== -->
-<div class="screen" id="scrQuiz">
+<!-- ===== BATTLE SCREEN ===== -->
+<div class="screen" id="scrBattle">
   <div class="quiz-hud">
     <div class="hud-left"><span class="hud-score" id="hudScore">⭐ 0</span></div>
     <div class="hud-combo" id="hudCombo"></div>
-    <div class="hud-right"><button class="btn-back" onclick="show('scrDay')" style="padding:4px 8px">✕</button></div>
+    <div class="hud-right"><button class="btn-back" onclick="show('scrHome');renderHome()" style="padding:4px 8px">✕ 逃跑</button></div>
   </div>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quizBar"></div></div>
-  <div class="quiz-character" id="quizChar">( •̀ᴗ•́ )و</div>
+  <div class="battle-monster">
+    <div class="bm-emoji" id="bmEmoji">👹</div>
+    <div class="bm-name" id="bmName"></div>
+    <div class="bm-zh" id="bmZh"></div>
+    <div class="bm-hp">
+      <div class="bm-hp-bar"><div class="bm-hp-fill" id="bmHpFill" style="width:100%"></div></div>
+      <div class="bm-hp-text" id="bmHpText">HP 2/2</div>
+    </div>
+  </div>
   <div class="quiz-prompt">
     <div class="prompt-mode" id="promptMode"></div>
     <div class="prompt-word" id="promptWord"></div>
@@ -222,145 +208,84 @@ canvas#particles{position:fixed;inset:0;pointer-events:none;z-index:999}
     <div class="result-card">
       <div class="result-icon" id="resIcon"></div>
       <div class="result-title" id="resTitle"></div>
-      <div class="result-stars" id="resStars"></div>
       <div class="result-score" id="resScore"></div>
-      <div class="result-anime" id="resAnime"></div>
+      <div class="result-coins" id="resCoins" style="display:none"></div>
       <div class="result-xp" id="resXp"></div>
       <div class="result-msg" id="resMsg"></div>
-      <div class="wrong-list" id="wrongList"></div>
+      <div class="defeated-list" id="defeatedList"></div>
       <div class="btns-col">
-        <button class="btn btn-fire" onclick="startMode(CUR_MODE)">🔄 再挑戰一次</button>
-        <button class="btn btn-neon" onclick="show('scrDay')">📋 回選單</button>
-        <button class="btn btn-ghost" onclick="goHome()">🗺 回冒險地圖</button>
+        <button class="btn btn-fire" onclick="startBattle()">⚔️ 再戰一次</button>
+        <button class="btn btn-neon" onclick="show('scrHome');renderHome()">🏠 回大廳</button>
       </div>
-      <div id="reportBtnArea"></div>
     </div>
   </div>
 </div>
 
 <script>
-// ========== WORD DATA (200 words, compact) ==========
-const D={
-1:{t:'人物＆身分',i:'👥',w:[
-{en:'student',zh:'學生',s:'I am a student.',sz:'我是學生。'},{en:'teacher',zh:'老師',s:'She is a teacher.',sz:'她是老師。'},
-{en:'friend',zh:'朋友',s:'He is my friend.',sz:'他是我的朋友。'},{en:'boy',zh:'男孩',s:'The boy is tall.',sz:'那個男孩很高。'},
-{en:'girl',zh:'女孩',s:'The girl is smart.',sz:'那個女孩很聰明。'},{en:'people',zh:'人們',s:'Many people are here.',sz:'很多人在這裡。'},
-{en:'family',zh:'家人',s:'I love my family.',sz:'我愛我的家人。'},{en:'name',zh:'名字',s:'My name is Amy.',sz:'我的名字是Amy。'}]},
-2:{t:'基本動作',i:'🏃',w:[
-{en:'go',zh:'去',s:'I go to school.',sz:'我去上學。'},{en:'come',zh:'來',s:'Come here.',sz:'過來。'},
-{en:'eat',zh:'吃',s:'I eat breakfast.',sz:'我吃早餐。'},{en:'drink',zh:'喝',s:'I drink water.',sz:'我喝水。'},
-{en:'read',zh:'讀',s:'I read a book.',sz:'我讀書。'},{en:'write',zh:'寫',s:'Write your name.',sz:'寫你的名字。'},
-{en:'play',zh:'玩',s:'I play basketball.',sz:'我打籃球。'},{en:'study',zh:'讀書',s:'I study English.',sz:'我讀英文。'},
-{en:'sleep',zh:'睡覺',s:'I sleep at ten.',sz:'我十點睡。'},{en:'walk',zh:'走路',s:'I walk to school.',sz:'我走路上學。'}]},
-3:{t:'時間',i:'⏰',w:[
-{en:'today',zh:'今天',s:'Today is Monday.',sz:'今天是星期一。'},{en:'tomorrow',zh:'明天',s:'See you tomorrow.',sz:'明天見。'},
-{en:'morning',zh:'早上',s:'Good morning!',sz:'早安！'},{en:'afternoon',zh:'下午',s:'Good afternoon!',sz:'午安！'},
-{en:'evening',zh:'晚上',s:'Good evening!',sz:'晚上好！'},{en:'night',zh:'夜晚',s:'Good night!',sz:'晚安！'},
-{en:'week',zh:'星期',s:'One week has seven days.',sz:'一星期有七天。'},{en:'month',zh:'月',s:'This month is April.',sz:'這個月是四月。'},
-{en:'year',zh:'年',s:'Happy New Year!',sz:'新年快樂！'},{en:'time',zh:'時間',s:'What time is it?',sz:'現在幾點？'}]},
-4:{t:'地點',i:'📍',w:[
-{en:'school',zh:'學校',s:'I like my school.',sz:'我喜歡我的學校。'},{en:'home',zh:'家',s:'I go home at five.',sz:'我五點回家。'},
-{en:'park',zh:'公園',s:'Let\'s go to the park.',sz:'我們去公園。'},{en:'store',zh:'商店',s:'The store is big.',sz:'商店很大。'},
-{en:'library',zh:'圖書館',s:'I study in the library.',sz:'我在圖書館讀書。'},{en:'hospital',zh:'醫院',s:'She is in the hospital.',sz:'她在醫院。'},
-{en:'restaurant',zh:'餐廳',s:'Let\'s eat at the restaurant.',sz:'去餐廳吃。'},{en:'market',zh:'市場',s:'Mom goes to the market.',sz:'媽媽去市場。'}]},
-5:{t:'感受＆情緒',i:'😊',w:[
-{en:'happy',zh:'開心',s:'I am happy.',sz:'我很開心。'},{en:'sad',zh:'難過',s:'She is sad.',sz:'她很難過。'},
-{en:'angry',zh:'生氣',s:'Don\'t be angry.',sz:'不要生氣。'},{en:'tired',zh:'累',s:'I am tired.',sz:'我好累。'},
-{en:'hungry',zh:'餓',s:'I am hungry.',sz:'我餓了。'},{en:'thirsty',zh:'渴',s:'I am thirsty.',sz:'我渴了。'},
-{en:'sick',zh:'生病',s:'He is sick.',sz:'他生病了。'},{en:'excited',zh:'興奮',s:'I am excited!',sz:'我好興奮！'},
-{en:'scared',zh:'害怕',s:'Are you scared?',sz:'你害怕嗎？'},{en:'bored',zh:'無聊',s:'I feel bored.',sz:'我覺得無聊。'}]},
-6:{t:'食物＆飲料',i:'🍱',w:[
-{en:'rice',zh:'飯',s:'I eat rice.',sz:'我吃飯。'},{en:'noodle',zh:'麵',s:'I like noodles.',sz:'我喜歡麵。'},
-{en:'chicken',zh:'雞肉',s:'Chicken is delicious.',sz:'雞肉好吃。'},{en:'egg',zh:'蛋',s:'I eat eggs.',sz:'我吃蛋。'},
-{en:'bread',zh:'麵包',s:'I eat bread.',sz:'我吃麵包。'},{en:'juice',zh:'果汁',s:'I drink juice.',sz:'我喝果汁。'},
-{en:'water',zh:'水',s:'Drink more water.',sz:'多喝水。'},{en:'milk',zh:'牛奶',s:'I drink milk.',sz:'我喝牛奶。'},
-{en:'fruit',zh:'水果',s:'I like fruit.',sz:'我喜歡水果。'},{en:'cake',zh:'蛋糕',s:'The cake is sweet.',sz:'蛋糕很甜。'}]},
-7:{t:'數字＆金錢',i:'💰',w:[
-{en:'number',zh:'數字'},{en:'dollar',zh:'元',s:'It\'s ten dollars.',sz:'十塊錢。'},
-{en:'hundred',zh:'百'},{en:'thousand',zh:'千'},
-{en:'cheap',zh:'便宜',s:'This is cheap.',sz:'這個很便宜。'},{en:'expensive',zh:'貴',s:'Too expensive!',sz:'太貴了！'},
-{en:'buy',zh:'買',s:'I want to buy it.',sz:'我想買。'},{en:'pay',zh:'付錢'},
-{en:'money',zh:'錢',s:'I have no money.',sz:'我沒錢。'},{en:'price',zh:'價格'}]},
-8:{t:'天氣',i:'🌤',w:[
-{en:'weather',zh:'天氣'},{en:'hot',zh:'熱',s:'It is hot.',sz:'好熱。'},
-{en:'cold',zh:'冷',s:'It is cold.',sz:'好冷。'},{en:'warm',zh:'溫暖'},
-{en:'cool',zh:'涼爽'},{en:'rain',zh:'下雨',s:'It will rain.',sz:'會下雨。'},
-{en:'sunny',zh:'晴天'},{en:'cloudy',zh:'多雲'},
-{en:'wind',zh:'風'},{en:'snow',zh:'雪'}]},
-9:{t:'交通',i:'🚌',w:[
-{en:'bus',zh:'公車',s:'I take the bus.',sz:'我搭公車。'},{en:'car',zh:'汽車'},
-{en:'bike',zh:'腳踏車',s:'I ride a bike.',sz:'我騎腳踏車。'},{en:'train',zh:'火車'},
-{en:'MRT',zh:'捷運'},{en:'ride',zh:'騎'},
-{en:'drive',zh:'開車'},{en:'stop',zh:'停'},
-{en:'fast',zh:'快'},{en:'slow',zh:'慢'}]},
-10:{t:'身體',i:'🦴',w:[
-{en:'head',zh:'頭'},{en:'eye',zh:'眼睛'},{en:'ear',zh:'耳朵'},{en:'mouth',zh:'嘴巴'},
-{en:'hand',zh:'手'},{en:'foot',zh:'腳'},{en:'body',zh:'身體'},{en:'tooth',zh:'牙齒'},
-{en:'face',zh:'臉'},{en:'hair',zh:'頭髮'}]},
-11:{t:'形容詞（一）',i:'📏',w:[
-{en:'big',zh:'大'},{en:'small',zh:'小'},{en:'long',zh:'長'},{en:'short',zh:'短/矮'},
-{en:'tall',zh:'高'},{en:'old',zh:'老/舊'},{en:'new',zh:'新'},{en:'young',zh:'年輕'},
-{en:'heavy',zh:'重'},{en:'light',zh:'輕'}]},
-12:{t:'形容詞（二）',i:'⭐',w:[
-{en:'good',zh:'好'},{en:'bad',zh:'壞'},{en:'nice',zh:'好的'},{en:'beautiful',zh:'漂亮'},
-{en:'easy',zh:'簡單'},{en:'difficult',zh:'困難'},{en:'important',zh:'重要'},{en:'interesting',zh:'有趣'},
-{en:'different',zh:'不同'},{en:'same',zh:'相同'}]},
-13:{t:'問句關鍵字',i:'❓',w:[
-{en:'what',zh:'什麼'},{en:'where',zh:'哪裡'},{en:'when',zh:'什麼時候'},{en:'who',zh:'誰'},
-{en:'why',zh:'為什麼'},{en:'how',zh:'如何'},{en:'which',zh:'哪一個'},{en:'how much',zh:'多少錢'},
-{en:'how many',zh:'多少個'},{en:'how old',zh:'幾歲'}]},
-14:{t:'購物＆餐廳',i:'🛒',w:[
-{en:'menu',zh:'菜單'},{en:'order',zh:'點餐'},{en:'delicious',zh:'好吃'},{en:'favorite',zh:'最喜歡'},
-{en:'popular',zh:'受歡迎'},{en:'try',zh:'試'},{en:'taste',zh:'味道'},{en:'special',zh:'特別'},
-{en:'sell',zh:'賣'},{en:'shop',zh:'購物'}]},
-15:{t:'休閒活動',i:'🎮',w:[
-{en:'movie',zh:'電影'},{en:'music',zh:'音樂'},{en:'game',zh:'遊戲'},{en:'sport',zh:'運動'},
-{en:'travel',zh:'旅行'},{en:'vacation',zh:'假期'},{en:'fun',zh:'有趣'},{en:'enjoy',zh:'享受'},
-{en:'hobby',zh:'嗜好'},{en:'exercise',zh:'運動'}]},
-16:{t:'學校生活',i:'🏫',w:[
-{en:'class',zh:'課'},{en:'homework',zh:'作業'},{en:'test',zh:'考試'},{en:'book',zh:'書'},
-{en:'pen',zh:'筆'},{en:'question',zh:'問題'},{en:'answer',zh:'回答'},{en:'exam',zh:'考試'},
-{en:'practice',zh:'練習'},{en:'learn',zh:'學'}]},
-17:{t:'重要動詞',i:'💪',w:[
-{en:'help',zh:'幫忙'},{en:'need',zh:'需要'},{en:'want',zh:'想要'},{en:'know',zh:'知道'},
-{en:'think',zh:'想'},{en:'remember',zh:'記得'},{en:'forget',zh:'忘記'},{en:'understand',zh:'了解'},
-{en:'like',zh:'喜歡'},{en:'love',zh:'愛'}]},
-18:{t:'連接詞＆頻率',i:'🔗',w:[
-{en:'because',zh:'因為'},{en:'but',zh:'但是'},{en:'so',zh:'所以'},{en:'and',zh:'和'},
-{en:'or',zh:'或'},{en:'always',zh:'總是'},{en:'never',zh:'從不'},{en:'sometimes',zh:'有時候'},
-{en:'usually',zh:'通常'},{en:'often',zh:'經常'}]},
-19:{t:'助動詞＆禮貌',i:'🎩',w:[
-{en:'can',zh:'能'},{en:'should',zh:'應該'},{en:'must',zh:'必須'},{en:'may',zh:'可以'},
-{en:'will',zh:'將會'},{en:'could',zh:'能夠'},{en:'would',zh:'會'},{en:'please',zh:'請'},
-{en:'thank',zh:'謝謝'},{en:'sorry',zh:'對不起'}]},
-20:{t:'最後衝刺',i:'🚀',w:[
-{en:'problem',zh:'問題'},{en:'example',zh:'例子'},{en:'idea',zh:'想法'},{en:'every',zh:'每'},
-{en:'another',zh:'另一個'},{en:'only',zh:'只有'},{en:'other',zh:'其他'},{en:'many',zh:'很多'},
-{en:'much',zh:'很多'},{en:'enough',zh:'足夠'}]},
-};
+// ========== CONFIG ==========
+const STUDENT_ANIMALS={Wendy:'🐱',Lynn:'🐶',Yumi:'🦊',Fan:'🐯',Yoyo:'🐼',Mike:'🦁'};
+const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
 
-// ========== ANIME QUOTES ==========
-const ANIME_Q={
-  great:['「超越吧！PLUS ULTRA！」—— 我的英雄學院','「不管發生什麼事，我都不會放棄！」—— 魯夫','「全集中・英語の呼吸！」—— 你自己','「領域展開：完全記憶術！」—— 你比五條悟還強','「排球少年式特訓：再來一球！」','「這就是...冠軍的實力！」—— Labubu 認證'],
-  good:['「只要努力就會變強！」—— 炭治郎','「每一球都要全力！」—— 排球少年','「安妮亞覺得你很厲害！」—— 間諜家家酒','「不要小看自己喔！」—— 小新'],
-  ok:['「失敗了也沒關係，站起來就好！」—— 鳴人','「慢慢來，比較快！」—— 哆啦A夢','「要相信努力的自己！」—— 綠谷出久','「吃個銅鑼燒休息一下！」—— 哆啦A夢']
-};
+// Monster emojis based on wrong count
+const MONSTER_EMOJI=['👾','👹','👺','🐉','💀','☠️','🧟','👻','🦇','🕷','🐍','🦂','🔥','⚡','🌪'];
+function getMonsterEmoji(word){
+  // Consistent emoji per word
+  let hash=0;for(let i=0;i<word.en.length;i++)hash=((hash<<5)-hash)+word.en.charCodeAt(i);
+  return MONSTER_EMOJI[Math.abs(hash)%MONSTER_EMOJI.length];
+}
+
 const COMBO_MSG=['','','','🔥COMBO x3!','⚡x4 連擊!','💥x5 超強!','🌟x6 不可思議!','☄️x7 傳說!','🏆x8 神之領域!','👑x9 無敵!','💎x10 PERFECT!'];
-const CORRECT_MSG=['讚！✨','太強了！🔥','完美！💯','NICE！⚡','答對了！🎯','好厲害！👏','帥！🌟','Perfect！💎'];
-const WRONG_MSG=['沒關係！再來💪','差一點！加油😊','別擔心🌱','學到了！📝'];
-const CHARS={idle:'( •̀ᴗ•́ )و',correct:'✧٩(ˊᗜˋ*)و✧',wrong:'(╥﹏╥)',combo:'🔥(ง\'̀-\'́)ง🔥',ultra:'⚡👑⚡',think:'(｡•̀ᴗ-)✧'};
+const CORRECT_MSG=['打中了！✨','漂亮一擊！🔥','完美攻擊！💯','NICE！⚡','命中要害！🎯','超強！👏','暴擊！🌟','Critical！💎'];
+const WRONG_MSG=['怪獸反擊！💪','差一點！加油😊','被擋住了🛡','閃開了！再來📝'];
+const CHARS={idle:'(ง •̀_•́)ง',correct:'✧٩(ˊᗜˋ*)و✧',wrong:'(╥﹏╥)',combo:'🔥(ง\'̀-\'́)ง🔥',ultra:'⚡👑⚡'};
 
 // ========== STATE ==========
-let curDay=1,CUR_MODE='',CUR_WORDS=[],learnIdx=0;
 let qIdx=0,qScore=0,qCombo=0,qMaxCombo=0,qResults=[],qLocked=false,qList=[];
-function gp(){try{return JSON.parse(localStorage.getItem('rpgProg')||'{}')}catch(e){return{}}}
-function sp(d){try{localStorage.setItem('rpgProg',JSON.stringify(d))}catch(e){}}
-function dp(day){const p=gp();return p[`d${day}`]||{done:false,stars:0,score:0}}
-function sdp(day,v){const p=gp();const prev=dp(day);const upd={...prev,...v};if(!prev.done&&upd.done)upd.doneAt=new Date().toISOString();p[`d${day}`]=upd;sp(p)}
-function addXp(n){const p=gp();p.xp=(p.xp||0)+n;p.totalWords=Object.keys(D).reduce((s,k)=>s+(dp(k).done?D[k].w.length:0),0);sp(p)}
-function markDay(){const p=gp();p['date_'+new Date().toISOString().slice(0,10)]=true;sp(p)}
-function getStreak(){const p=gp();let s=0;const now=new Date();for(let i=0;i<60;i++){const d=new Date(now);d.setDate(d.getDate()-i);if(p['date_'+d.toISOString().slice(0,10)])s++;else break;}return s;}
-function getLevel(){const p=gp();const xp=p.xp||0;return Math.floor(xp/100)+1;}
+let battlePool=[]; // current battle monsters (subset of errorPool)
+let coinsEarned=0;
+
+// ========== ERROR POOL ==========
+function getErrorPool(){
+  try{return JSON.parse(localStorage.getItem('errorPool')||'[]');}catch{return [];}
+}
+function saveErrorPool(pool){
+  localStorage.setItem('errorPool',JSON.stringify(pool));
+  const name=localStorage.getItem('studentName');
+  if(name){
+    fetch(APPS_SCRIPT_URL,{
+      method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'save_progress',name,tool:'errorPool',data:JSON.stringify(pool)})
+    }).catch(()=>{});
+  }
+}
+
+// ========== RPG PROGRESS ==========
+function getRpg(){try{return JSON.parse(localStorage.getItem('rpgBoss')||'{}')}catch{return{}}}
+function saveRpg(d){try{localStorage.setItem('rpgBoss',JSON.stringify(d))}catch{}}
+function addXp(n){const p=getRpg();p.xp=(p.xp||0)+n;saveRpg(p);}
+function getLevel(){return Math.floor((getRpg().xp||0)/100)+1;}
+function getCoins(){
+  // Read shared coins from listening battle pass storage
+  try{
+    const bp=JSON.parse(localStorage.getItem('lbpProgress')||'{}');
+    return bp.coins||0;
+  }catch{return 0;}
+}
+function addCoins(n){
+  try{
+    const bp=JSON.parse(localStorage.getItem('lbpProgress')||'{}');
+    bp.coins=(bp.coins||0)+n;
+    localStorage.setItem('lbpProgress',JSON.stringify(bp));
+    // Cloud sync coins
+    const name=localStorage.getItem('studentName');
+    if(name){
+      fetch(APPS_SCRIPT_URL,{
+        method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'save_progress',name,tool:'listeningBP',data:JSON.stringify(bp)})
+      }).catch(()=>{});
+    }
+  }catch{}
+}
 
 // ========== PARTICLE SYSTEM ==========
 const cvs=document.getElementById('particles');
@@ -379,7 +304,7 @@ function addParticles(x,y,count,colors,type){
   }
 }
 function confetti(){const cx=cvs.width/2,cy=cvs.height/3;for(let i=0;i<5;i++)setTimeout(()=>addParticles(cx+Math.random()*200-100,cy,40,['#FFD700','#FF6B35','#00FF88','#00D4FF','#FF2D95','#fff'],'confetti'),i*100);}
-function sparkle(x,y){addParticles(x,y,12,['#FFD700','#fff','#00D4FF'],'spark');}
+function sparkle(x,y){addParticles(x,y,12,['#FFD700','#fff','#FF4444'],'spark');}
 function updateParticles(){
   pctx.clearRect(0,0,cvs.width,cvs.height);
   parts=parts.filter(p=>{
@@ -407,7 +332,7 @@ function playTone(freq,dur,type,vol){
 function sndCorrect(){playTone(523,.08,'sine',.12);setTimeout(()=>playTone(659,.08,'sine',.12),80);setTimeout(()=>playTone(784,.15,'sine',.1),160);}
 function sndWrong(){playTone(330,.15,'sawtooth',.08);setTimeout(()=>playTone(262,.2,'sawtooth',.06),100);}
 function sndCombo(){playTone(784,.06,'sine',.1);setTimeout(()=>playTone(988,.06,'sine',.1),60);setTimeout(()=>playTone(1175,.12,'sine',.08),120);}
-function sndLevelUp(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.15,'sine',.1),i*120));}
+function sndDefeat(){[784,988,1175,1568].forEach((f,i)=>setTimeout(()=>playTone(f,.15,'sine',.1),i*100));}
 
 // ========== TTS ==========
 function speak(text,lang){
@@ -420,112 +345,225 @@ if(window.speechSynthesis){speechSynthesis.getVoices();speechSynthesis.onvoicesc
 
 // ========== SCREENS ==========
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
-function goHome(){renderHome();show('scrHome');}
+
+// ========== LOGIN ==========
+function pickStudent(name){
+  localStorage.setItem('studentName',name);
+  document.getElementById('loginOverlay').style.display='none';
+  document.getElementById('userBadge').textContent=(STUDENT_ANIMALS[name]||'👋')+' '+name;
+  cloudLoadErrorPool();
+  renderHome();
+}
+function switchStudent(){
+  document.getElementById('loginOverlay').style.display='flex';
+}
+function checkLogin(){
+  const name=localStorage.getItem('studentName');
+  if(name && STUDENT_ANIMALS[name]){
+    document.getElementById('loginOverlay').style.display='none';
+    document.getElementById('userBadge').textContent=(STUDENT_ANIMALS[name]||'👋')+' '+name;
+    cloudLoadErrorPool();
+  } else {
+    document.getElementById('loginOverlay').style.display='flex';
+  }
+}
+
+// ========== CLOUD SYNC ==========
+function cloudLoadErrorPool(){
+  const name=localStorage.getItem('studentName');
+  if(!name)return;
+  fetch(APPS_SCRIPT_URL+'?action=load_progress&name='+encodeURIComponent(name)+'&tool=errorPool')
+    .then(r=>r.json()).then(res=>{
+      if(res.status==='ok'&&res.data){
+        try{
+          const cloudPool=JSON.parse(res.data);
+          const localPool=getErrorPool();
+          // Merge: cloud has more entries → use cloud; else merge by en key
+          if(cloudPool.length>0){
+            const merged=[...localPool];
+            cloudPool.forEach(cw=>{
+              const existing=merged.find(w=>w.en===cw.en);
+              if(!existing) merged.push(cw);
+              else {
+                // Take higher wrongCount, higher correctInRPG
+                existing.wrongCount=Math.max(existing.wrongCount||0,cw.wrongCount||0);
+                existing.correctInRPG=Math.max(existing.correctInRPG||0,cw.correctInRPG||0);
+              }
+            });
+            localStorage.setItem('errorPool',JSON.stringify(merged));
+          }
+          renderHome();
+        }catch(e){}
+      }
+    }).catch(()=>{});
+  // Also load RPG progress
+  fetch(APPS_SCRIPT_URL+'?action=load_progress&name='+encodeURIComponent(name)+'&tool=rpgBoss')
+    .then(r=>r.json()).then(res=>{
+      if(res.status==='ok'&&res.data){
+        try{
+          const cloud=JSON.parse(res.data);
+          const local=getRpg();
+          if((cloud.xp||0)>(local.xp||0)){
+            localStorage.setItem('rpgBoss',JSON.stringify(cloud));
+            renderHome();
+          }
+        }catch{}
+      }
+    }).catch(()=>{});
+}
+function cloudSaveRpg(){
+  const name=localStorage.getItem('studentName');
+  if(!name)return;
+  fetch(APPS_SCRIPT_URL,{
+    method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'save_progress',name,tool:'rpgBoss',data:JSON.stringify(getRpg())})
+  }).catch(()=>{});
+}
 
 // ========== HOME ==========
 function renderHome(){
-  const p=gp();let totalW=0;
-  const path=document.getElementById('mapPath');path.innerHTML='';
-  const zones=[{name:'🌊 新手村',days:[1,2,3,4,5]},{name:'🌋 火山島',days:[6,7,8,9,10]},{name:'🏔 冰山峰',days:[11,12,13,14,15]},{name:'👑 王者城',days:[16,17,18,19,20]}];
-  let firstIncomplete=null;
-  zones.forEach(z=>{
-    const zLabel=document.createElement('div');zLabel.style.cssText='font-size:.65em;color:rgba(255,255,255,.4);min-width:60px;text-align:center;padding:0 4px';
-    zLabel.textContent=z.name;path.appendChild(zLabel);
-    z.days.forEach((d,i)=>{
-      const day=D[d];if(!day)return;
-      const prog=dp(d);if(prog.done)totalW+=day.w.length;
-      const isDone=prog.done;const isCurrent=!isDone&&!firstIncomplete;
-      if(isCurrent)firstIncomplete=d;
-      const node=document.createElement('div');
-      node.className='map-node'+(isDone?' done':isCurrent?' current':' locked');
-      node.innerHTML=`<div class="node-circle">${day.i}</div><div class="node-label">Day${d} ${day.t}</div><div class="node-stars">${prog.stars?'⭐'.repeat(prog.stars):''}</div>`;
-      node.onclick=()=>{if(!node.classList.contains('locked'))openDay(d);};
-      path.appendChild(node);
-      if(i<z.days.length-1){const conn=document.createElement('div');conn.className='map-connector';if(isDone)conn.style.background='var(--neon-green)';path.appendChild(conn);}
-    });
-    const spacer=document.createElement('div');spacer.style.width='20px';path.appendChild(spacer);
-  });
-  if(!firstIncomplete)firstIncomplete=20;
-  // Scroll to current
-  setTimeout(()=>{const cur=document.querySelector('.map-node.current');if(cur)cur.scrollIntoView({behavior:'smooth',inline:'center'});},100);
-  document.getElementById('statWords').textContent=totalW;
+  const pool=getErrorPool();
+  const alive=pool.filter(w=>(w.correctInRPG||0)<2);
+  const defeated=pool.filter(w=>(w.correctInRPG||0)>=2);
+  const area=document.getElementById('monsterArea');
+
+  // Stats
+  document.getElementById('statMonsters').textContent=alive.length;
+  document.getElementById('statDefeated').textContent=defeated.length;
   document.getElementById('statLevel').textContent='Lv.'+getLevel();
-  document.getElementById('statStreak').textContent=getStreak();
-  const xp=(p.xp||0)%100;
+  document.getElementById('statCoins').textContent=getCoins();
+  const xp=(getRpg().xp||0)%100;
   document.getElementById('xpFill').style.width=xp+'%';
   document.getElementById('xpText').textContent=`EXP ${xp} / 100（升級到 Lv.${getLevel()+1}）`;
+
+  if(alive.length===0 && defeated.length===0){
+    // No errors at all
+    area.innerHTML=`
+      <div class="empty-state">
+        <div class="empty-icon">🏰</div>
+        <h2>目前沒有怪獸！</h2>
+        <p>去「會考英文搶分特訓」(Step 1) 練習單字，<br>答錯的字會變成怪獸出現在這裡！</p>
+        <a href="vocab-practice.html" class="btn btn-green" style="text-decoration:none">📚 去練單字</a>
+      </div>`;
+    return;
+  }
+
+  let html='';
+
+  if(alive.length>0){
+    html+=`<div class="monster-section">
+      <h3>🐉 活著的怪獸（${alive.length} 隻）</h3>
+      <div style="text-align:center;margin-bottom:12px">
+        <button class="btn btn-fire" onclick="startBattle()" style="font-size:1.1em;padding:16px 40px">⚔️ 開始戰鬥！</button>
+      </div>
+      <div class="monster-grid">`;
+    alive.forEach(w=>{
+      const hp=2-(w.correctInRPG||0);
+      html+=`<div class="monster-card">
+        <div class="m-emoji">${getMonsterEmoji(w)}</div>
+        <div class="m-word">${w.en}</div>
+        <div class="m-zh">${w.zh}</div>
+        <div class="m-hp">HP ${hp}/2</div>
+        <div class="hp-bar"><div class="hp-fill" style="width:${hp/2*100}%"></div></div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  } else {
+    html+=`<div class="empty-state" style="padding:20px">
+      <div class="empty-icon">🎉</div>
+      <h2>所有怪獸都被打敗了！</h2>
+      <p>太厲害了！去 Step 1 繼續練習吧～</p>
+      <a href="vocab-practice.html" class="btn btn-green" style="text-decoration:none">📚 去練單字</a>
+    </div>`;
+  }
+
+  if(defeated.length>0){
+    html+=`<div class="monster-section" style="margin-top:20px">
+      <h3>💀 已消滅的怪獸（${defeated.length} 隻）</h3>
+      <div class="monster-grid">`;
+    defeated.slice(-12).forEach(w=>{
+      html+=`<div class="monster-card defeated">
+        <div class="m-emoji">${getMonsterEmoji(w)}</div>
+        <div class="m-word">${w.en}</div>
+        <div class="m-zh">${w.zh}</div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  }
+
+  area.innerHTML=html;
 }
 
-// ========== DAY ==========
-function openDay(d){
-  curDay=d;const day=D[d];CUR_WORDS=day.w;
-  document.getElementById('dayTitle').textContent=`${day.i} Day ${d}：${day.t}`;
-  document.getElementById('daySub').textContent=`${day.w.length} 個單字等你來挑戰！`;
-  const chips=document.getElementById('wordChips');chips.innerHTML='';
-  day.w.forEach(w=>{const c=document.createElement('span');c.className='w-chip';c.textContent=`${w.en} ${w.zh}`;chips.appendChild(c);});
-  show('scrDay');
-}
+// ========== BATTLE ==========
+function startBattle(){
+  const pool=getErrorPool();
+  const alive=pool.filter(w=>(w.correctInRPG||0)<2);
+  if(alive.length===0){
+    alert('沒有怪獸可以打！去 Step 1 練習單字，答錯的字會變成怪獸！');
+    return;
+  }
 
-// ========== LEARN ==========
-function startMode(mode){
-  CUR_MODE=mode;CUR_WORDS=D[curDay].w;
-  if(mode==='learn'){learnIdx=0;renderLearn();show('scrLearn');}
-  else{startQuiz(mode);show('scrQuiz');}
-}
-function renderLearn(){
-  const w=CUR_WORDS[learnIdx];
-  document.getElementById('learnCount').textContent=`${learnIdx+1} / ${CUR_WORDS.length}`;
-  document.getElementById('learnEn').textContent=w.en;
-  document.getElementById('learnZh').textContent=w.zh;
-  document.getElementById('learnS').textContent=w.s||'';
-  document.getElementById('learnSz').textContent=w.sz||'';
-  document.getElementById('sentenceAudioBtn').style.display=w.s?'block':'none';
-  speak(w.en,'en-US');
-}
-function learnNext(){
-  learnIdx++;
-  if(learnIdx>=CUR_WORDS.length){sdp(curDay,{done:true});addXp(20);markDay();sndLevelUp();confetti();
-    document.getElementById('resIcon').textContent='📖';document.getElementById('resTitle').textContent='學習完成！';
-    document.getElementById('resStars').textContent='⭐⭐⭐';document.getElementById('resScore').textContent=`${CUR_WORDS.length} 個字全部看完！`;
-    document.getElementById('resAnime').textContent=ANIME_Q.great[Math.floor(Math.random()*ANIME_Q.great.length)];
-    document.getElementById('resXp').textContent='🎮 +20 EXP！';document.getElementById('resMsg').textContent='太棒了，你已經看完所有單字！\n接下來去挑戰聽力或配對吧！';
-    document.getElementById('wrongList').innerHTML='';show('scrResult');learnIdx=0;return;}
-  renderLearn();
-}
-function learnPrev(){if(learnIdx>0){learnIdx--;renderLearn();}}
+  // Pick up to 5 monsters for this battle
+  battlePool=[...alive].sort(()=>Math.random()-.5).slice(0,5);
 
-// ========== QUIZ ==========
-function startQuiz(mode){
-  qIdx=0;qScore=0;qCombo=0;qMaxCombo=0;qResults=[];qLocked=false;
-  const words=[...CUR_WORDS].sort(()=>Math.random()-.5);
-  qList=words.map(w=>{
-    if(mode==='listen'||( mode==='boss'&&Math.random()>.5)){
-      return{type:'listen',word:w,prompt:w.en,opts:genOpts(w,'zh'),ans:w.zh};
-    }else{
-      return{type:'match',word:w,prompt:w.zh,opts:genOpts(w,'en'),ans:w.en};
-    }
+  // Generate questions: each monster gets 2 questions (listen + match) to give 2 chances
+  qList=[];
+  battlePool.forEach(w=>{
+    // Question 1: listen (hear English, pick Chinese)
+    qList.push({type:'listen',word:w,prompt:w.en,opts:genOpts(w,'zh',pool),ans:w.zh});
+    // Question 2: match (see Chinese, pick English)
+    qList.push({type:'match',word:w,prompt:w.zh,opts:genOpts(w,'en',pool),ans:w.en});
   });
-  renderQuiz();
+  // Shuffle questions
+  qList.sort(()=>Math.random()-.5);
+
+  qIdx=0;qScore=0;qCombo=0;qMaxCombo=0;qResults=[];qLocked=false;coinsEarned=0;
+  show('scrBattle');
+  renderBattle();
 }
-function genOpts(target,field){
-  const all=CUR_WORDS.filter(w=>w[field]!==target[field]).sort(()=>Math.random()-.5).slice(0,3).map(w=>w[field]);
-  return[target[field],...all].sort(()=>Math.random()-.5);
+
+function genOpts(target,field,pool){
+  // Get distractors from the full error pool or fallback words
+  const FALLBACK=[
+    {en:'apple',zh:'蘋果'},{en:'book',zh:'書'},{en:'cat',zh:'貓'},{en:'dog',zh:'狗'},
+    {en:'eat',zh:'吃'},{en:'fish',zh:'魚'},{en:'good',zh:'好'},{en:'happy',zh:'開心'},
+    {en:'ice',zh:'冰'},{en:'jump',zh:'跳'},{en:'kind',zh:'善良'},{en:'love',zh:'愛'}
+  ];
+  const allWords=[...pool,...FALLBACK];
+  const others=allWords.filter(w=>w[field]!==target[field]).sort(()=>Math.random()-.5).slice(0,3).map(w=>w[field]);
+  // Ensure we have 3 distractors
+  while(others.length<3) others.push('???');
+  return[target[field],...others].sort(()=>Math.random()-.5);
 }
-function renderQuiz(){
+
+function renderBattle(){
   const q=qList[qIdx],total=qList.length;
+  const monster=q.word;
+
+  // HUD
   document.getElementById('hudScore').textContent='⭐ '+qScore;
   document.getElementById('quizBar').style.width=(qIdx/total*100)+'%';
   document.getElementById('fbArea').innerHTML='';
-  document.getElementById('quizChar').textContent=CHARS.idle;
+
   // Combo display
   const hc=document.getElementById('hudCombo');
   if(qCombo>=3){hc.textContent=COMBO_MSG[Math.min(qCombo,10)];hc.className='hud-combo'+(qCombo>=7?' ultra':' fire');}
   else{hc.textContent='';hc.className='hud-combo';}
+
+  // Monster display
+  document.getElementById('bmEmoji').textContent=getMonsterEmoji(monster);
+  document.getElementById('bmEmoji').style.animation='monsterIdle 2s ease-in-out infinite';
+  document.getElementById('bmName').textContent=monster.en;
+  document.getElementById('bmZh').textContent=monster.zh;
+  const hp=2-(monster.correctInRPG||0);
+  document.getElementById('bmHpFill').style.width=(hp/2*100)+'%';
+  document.getElementById('bmHpText').textContent=`HP ${hp}/2`;
+
   // Prompt
   const audioBtn=document.getElementById('qAudioBtn');
   if(q.type==='listen'){
     document.getElementById('promptMode').textContent='🔊 聽英文，選中文';
-    document.getElementById('promptWord').textContent=q.prompt;
+    document.getElementById('promptWord').textContent='❓';
     document.getElementById('promptWord').className='prompt-word';
     audioBtn.style.display='block';speak(q.prompt,'en-US');
   }else{
@@ -534,6 +572,7 @@ function renderQuiz(){
     document.getElementById('promptWord').className='prompt-word zh-mode';
     audioBtn.style.display='none';
   }
+
   // Options
   const grid=document.getElementById('optGrid');grid.innerHTML='';
   const labels=['A','B','C','D'];
@@ -543,155 +582,120 @@ function renderQuiz(){
     btn.onclick=()=>checkAnswer(btn,o,q);grid.appendChild(btn);
   });
 }
-function speakQuiz(){const q=qList[qIdx];if(q)speak(q.prompt,'en-US');}
+
+function speakQuiz(){const q=qList[qIdx];if(q&&q.type==='listen')speak(q.prompt,'en-US');}
 
 function checkAnswer(btn,selected,q){
   if(qLocked)return;qLocked=true;
   const correct=selected===q.ans;
   const fb=document.getElementById('fbArea');
+  const pool=getErrorPool();
+
   if(correct){
     btn.classList.add('correct');qScore+=10+(qCombo>=3?qCombo*2:0);qCombo++;qMaxCombo=Math.max(qMaxCombo,qCombo);
     sndCorrect();
     document.getElementById('hudScore').textContent='⭐ '+qScore;
-    document.getElementById('quizChar').textContent=qCombo>=5?CHARS.ultra:CHARS.correct;
-    // Sparkle at button position
-    const rect=btn.getBoundingClientRect();sparkle(rect.left+rect.width/2,rect.top+rect.height/2);
+
+    // Update monster HP in error pool
+    const monster=pool.find(w=>w.en===q.word.en);
+    if(monster){
+      monster.correctInRPG=(monster.correctInRPG||0)+1;
+      saveErrorPool(pool);
+
+      if(monster.correctInRPG>=2){
+        // Monster defeated!
+        sndDefeat();confetti();
+        document.getElementById('bmEmoji').style.animation='defeated .6s forwards';
+        coinsEarned+=10;
+        fb.innerHTML=`<div class="fb-msg" style="color:var(--neon-green);font-size:1.6em">💀 怪獸消滅！+10 金幣！</div>`;
+        qResults.push({word:q.word,correct:true,defeated:true});
+      } else {
+        // Hit but not dead
+        const rect=btn.getBoundingClientRect();sparkle(rect.left+rect.width/2,rect.top+rect.height/2);
+        const msg=CORRECT_MSG[Math.floor(Math.random()*CORRECT_MSG.length)];
+        fb.innerHTML=`<div class="fb-msg" style="color:var(--neon-green)">${msg}</div>`;
+        qResults.push({word:q.word,correct:true,defeated:false});
+        // Update HP display
+        const hp=2-(monster.correctInRPG||0);
+        document.getElementById('bmHpFill').style.width=(hp/2*100)+'%';
+        document.getElementById('bmHpText').textContent=`HP ${hp}/2`;
+      }
+    }
+
     // Combo popup
     if(qCombo>=3){
       sndCombo();
       const popup=document.createElement('div');popup.className='combo-popup';popup.textContent=COMBO_MSG[Math.min(qCombo,10)];
       document.body.appendChild(popup);setTimeout(()=>popup.remove(),1000);
-      const hc=document.getElementById('hudCombo');hc.textContent=COMBO_MSG[Math.min(qCombo,10)];hc.className='hud-combo'+(qCombo>=7?' ultra':' fire');
     }
-    const msg=CORRECT_MSG[Math.floor(Math.random()*CORRECT_MSG.length)];
-    fb.innerHTML=`<div class="fb-msg" style="color:var(--neon-green)">${msg}</div>`;
-    qResults.push({word:q.word,correct:true});
+
     speak(q.word.en,'en-US');
-  }else{
+  } else {
     btn.classList.add('wrong');qCombo=0;sndWrong();
-    document.getElementById('quizChar').textContent=CHARS.wrong;
     document.getElementById('hudCombo').textContent='';document.getElementById('hudCombo').className='hud-combo';
-    // Shake screen
-    document.getElementById('scrQuiz').style.animation='shake .4s';
-    setTimeout(()=>document.getElementById('scrQuiz').style.animation='',400);
+    // Shake
+    document.getElementById('scrBattle').style.animation='shake .4s';
+    setTimeout(()=>document.getElementById('scrBattle').style.animation='',400);
     // Show correct
-    document.querySelectorAll('.opt-btn').forEach(o=>{if(o.textContent.slice(1)===q.ans||o.textContent===q.ans)o.classList.add('correct');});
+    document.querySelectorAll('.opt-btn').forEach(o=>{
+      const txt=o.textContent.replace(/^[A-D]/,'');
+      if(txt===q.ans)o.classList.add('correct');
+    });
     const msg=WRONG_MSG[Math.floor(Math.random()*WRONG_MSG.length)];
     fb.innerHTML=`<div class="fb-msg" style="color:var(--neon-orange)">${msg}</div><div class="fb-answer">✅ ${q.word.en} = ${q.word.zh}</div>`;
-    qResults.push({word:q.word,correct:false});
+    qResults.push({word:q.word,correct:false,defeated:false});
     setTimeout(()=>speak(q.word.en,'en-US'),500);
   }
-  setTimeout(()=>{qLocked=false;qIdx++;if(qIdx>=qList.length)finishQuiz();else renderQuiz();},correct?1200:2800);
+
+  setTimeout(()=>{qLocked=false;qIdx++;if(qIdx>=qList.length)finishBattle();else renderBattle();},correct?1200:2800);
 }
 
-function finishQuiz(){
-  const total=qList.length,correct=qResults.filter(r=>r.correct).length;
-  const pct=correct/total;const stars=pct>=1?3:pct>=.7?2:pct>=.4?1:0;
-  const xpGain=correct*5+qMaxCombo*3;
-  sdp(curDay,{done:true,stars:Math.max(dp(curDay).stars,stars),score:Math.max(dp(curDay).score,qScore)});
-  addXp(xpGain);markDay();
-  if(pct>=.7){confetti();sndLevelUp();}
-  const qGroup=pct>=.8?'great':pct>=.5?'good':'ok';
-  document.getElementById('resIcon').textContent=pct>=.8?'🏆':pct>=.5?'💪':'🌱';
-  document.getElementById('resTitle').textContent=pct>=.8?'完美通關！':pct>=.5?'挑戰成功！':'繼續努力！';
-  document.getElementById('resStars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
-  document.getElementById('resScore').textContent=`${correct}/${total} 答對`;
-  document.getElementById('resAnime').textContent=ANIME_Q[qGroup][Math.floor(Math.random()*ANIME_Q[qGroup].length)];
-  document.getElementById('resXp').textContent=`🎮 +${xpGain} EXP！${qMaxCombo>=3?' 🔥最高連擊 x'+qMaxCombo:''}`;
-  document.getElementById('resMsg').textContent=pct>=.8?'你真的太強了！':'不斷練習，你會越來越厲害！';
-  // Wrong words
-  const wrongs=qResults.filter(r=>!r.correct);
-  const wl=document.getElementById('wrongList');
-  if(wrongs.length){
-    let h='<h4>🔄 要加強的字：</h4>';
-    wrongs.forEach(r=>{h+=`<div class="wrong-item"><span>${r.word.en} = ${r.word.zh}</span><button onclick="speak('${r.word.en}','en-US')">🔊</button></div>`;});
-    wl.innerHTML=h;
-  }else wl.innerHTML='';
-  show('scrResult');
-  var savedName = gp().studentName;
-  if(savedName) ReportSystem.setName(savedName);
-  ReportSystem.showButton('reportBtnArea', {
-    tool: '英文冒險RPG',
-    level: '第' + curDay + '天',
-    score: qScore,
-    stars: stars,
-    coins: 0
-  });
-}
+function finishBattle(){
+  const total=qList.length;
+  const correct=qResults.filter(r=>r.correct).length;
+  const defeatedCount=qResults.filter(r=>r.defeated).length;
+  const pct=correct/total;
+  const xpGain=correct*5+qMaxCombo*3+defeatedCount*15;
+  const bonusCoins=qMaxCombo>=3?5:0;
+  coinsEarned+=bonusCoins;
 
-// ========== SENTENCE AUDIO ==========
-function speakSentence(){
-  const w=CUR_WORDS[learnIdx];
-  if(w&&w.s)speak(w.s,'en-US');
-}
+  addXp(xpGain);
+  if(coinsEarned>0) addCoins(coinsEarned);
+  cloudSaveRpg();
 
-// ========== TEACHER VERIFICATION ==========
-function showTeacher(){
-  renderReport();
-  show('scrTeacher');
-  // Restore saved name
-  const p=gp();
-  if(p.studentName)document.getElementById('studentName').value=p.studentName;
-}
-function renderReport(){
-  const name=document.getElementById('studentName').value.trim();
-  const p=gp();
-  if(name){p.studentName=name;sp(p);}
+  if(pct>=.7){confetti();sndDefeat();}
 
-  // Generate verification code (date + progress hash)
-  const today=new Date().toISOString().slice(0,10);
-  let doneCount=0,totalStars=0,totalScore=0;
-  const dayRows=[];
-  for(let d=1;d<=20;d++){
-    const prog=dp(d);
-    if(prog.done){
-      doneCount++;totalStars+=prog.stars||0;totalScore+=prog.score||0;
-      const t=prog.doneAt?new Date(prog.doneAt):null;
-      const timeStr=t?`${t.getMonth()+1}/${t.getDate()} ${t.getHours()}:${String(t.getMinutes()).padStart(2,'0')}`:'--';
-      dayRows.push({d,prog,timeStr});
-    }
-  }
-  const code=`${(name||'?').slice(0,4)}-${today.replace(/-/g,'').slice(4)}-${doneCount}D${totalStars}S`;
-  document.getElementById('verifyCode').innerHTML=`驗證碼：<strong style="font-size:1.3em;letter-spacing:2px">${code}</strong><br><span style="font-size:.75em;color:rgba(255,255,255,.4)">老師可以用此碼確認學習紀錄真實性</span>`;
+  document.getElementById('resIcon').textContent=defeatedCount>0?'💀':pct>=.7?'⚔️':'🛡';
+  document.getElementById('resTitle').textContent=defeatedCount>0?`消滅了 ${defeatedCount} 隻怪獸！`:pct>=.7?'戰鬥成功！':'再接再厲！';
+  document.getElementById('resScore').textContent=`${correct}/${total} 命中`;
 
-  let html=`<div style="background:var(--glass);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;margin:10px 0">
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-      <span>📅 查詢日期</span><span style="color:var(--neon-gold)">${today}</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-      <span>📚 已完成天數</span><span style="color:var(--neon-green);font-weight:700">${doneCount} / 20 天</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-      <span>🔤 已學單字</span><span style="color:var(--neon-blue);font-weight:700">${Object.keys(D).reduce((s,k)=>s+(dp(k).done?D[k].w.length:0),0)} / 200 字</span>
-    </div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-      <span>⭐ 總星數</span><span style="color:var(--neon-gold);font-weight:700">${totalStars} ⭐</span>
-    </div>
-    <div style="display:flex;justify-content:space-between">
-      <span>🔥 連續天數</span><span style="color:var(--neon-orange);font-weight:700">${getStreak()} 天</span>
-    </div>
-  </div>`;
-
-  if(dayRows.length>0){
-    html+=`<div style="background:var(--glass);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;margin:10px 0">
-      <div style="font-weight:700;margin-bottom:8px;color:var(--neon-blue)">📋 完成紀錄</div>`;
-    dayRows.forEach(r=>{
-      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.85em">
-        <span>${D[r.d].i} Day${r.d} ${D[r.d].t}</span>
-        <span style="color:rgba(255,255,255,.5)">${r.timeStr}</span>
-        <span>${'⭐'.repeat(r.prog.stars||0)}</span>
-      </div>`;
-    });
-    html+=`</div>`;
+  if(coinsEarned>0){
+    document.getElementById('resCoins').style.display='block';
+    document.getElementById('resCoins').textContent=`🪙 獲得 ${coinsEarned} 金幣！（可以去聽力戰令抽扭蛋）`;
   } else {
-    html+=`<div style="text-align:center;color:rgba(255,255,255,.3);margin:30px 0">還沒有完成任何關卡喔！<br>快去冒險吧！🗺</div>`;
+    document.getElementById('resCoins').style.display='none';
   }
 
-  document.getElementById('teacherReport').innerHTML=html;
+  document.getElementById('resXp').textContent=`🎮 +${xpGain} EXP！${qMaxCombo>=3?' 🔥最高連擊 x'+qMaxCombo:''}`;
+  document.getElementById('resMsg').textContent=defeatedCount>0?'太強了！被打敗的怪獸不會再出現！':'繼續努力，把怪獸打到 HP 歸零就能消滅牠！';
+
+  // Show defeated monsters
+  const defList=document.getElementById('defeatedList');
+  const defs=qResults.filter(r=>r.defeated);
+  if(defs.length>0){
+    let h='<h4>💀 本次消滅的怪獸：</h4>';
+    defs.forEach(r=>{
+      h+=`<div class="defeated-item"><span>${getMonsterEmoji(r.word)} ${r.word.en} = ${r.word.zh}</span><span style="color:var(--neon-green)">+10🪙</span></div>`;
+    });
+    defList.innerHTML=h;
+  } else defList.innerHTML='';
+
+  show('scrResult');
 }
 
 // ========== INIT ==========
 renderHome();
+checkLogin();
 </script>
 <script src="report-system.js"></script>
 </body>
