@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>設定學生練習回報系統 — 樂學教室</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0a0e27;font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,107,53,.1),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.08),transparent 50%);pointer-events:none}
+.container{position:relative;z-index:1;width:100%;max-width:680px;padding:20px 16px}
+
+/* Back link */
+.back-link{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.5);text-decoration:none;font-size:.85em;transition:color .2s}
+.back-link:hover{color:#4FC3F7}
+
+/* Hero */
+.hero{text-align:center;margin:20px 0 28px}
+.hero-icon{font-size:3em;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.hero h1{font-size:1.6em;font-weight:900;background:linear-gradient(135deg,#4FC3F7,#00BCD4,#8BC34A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:8px 0 4px}
+.hero p{color:rgba(255,255,255,.5);font-size:.85em}
+
+/* Step Card */
+.step-card{background:rgba(255,255,255,.04);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.08);border-radius:20px;padding:24px 20px;margin-bottom:20px;position:relative;overflow:hidden}
+.step-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.015));pointer-events:none}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;font-size:.85em;font-weight:900;margin-bottom:12px}
+.step-num-1{background:linear-gradient(135deg,#4FC3F7,#0288D1);color:#fff}
+.step-num-2{background:linear-gradient(135deg,#FF6B35,#FF2D95);color:#fff}
+.step-num-3{background:linear-gradient(135deg,#8BC34A,#4CAF50);color:#fff}
+.step-title{font-size:1.15em;font-weight:900;margin-bottom:8px}
+.step-title-1{color:#4FC3F7}
+.step-title-2{color:#FF8A65}
+.step-title-3{color:#81C784}
+.step-desc{color:rgba(255,255,255,.6);font-size:.88em;line-height:1.7;margin-bottom:14px}
+.step-desc strong{color:rgba(255,255,255,.85)}
+
+/* Table header preview */
+.header-preview{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 16px}
+.header-preview span{background:rgba(79,195,247,.1);border:1px solid rgba(79,195,247,.2);color:#4FC3F7;border-radius:8px;padding:4px 10px;font-size:.75em;font-weight:700;white-space:nowrap}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;padding:12px 24px;font-size:.9em;font-weight:700;font-family:inherit;cursor:pointer;transition:all .25s;text-decoration:none}
+.btn:active{transform:scale(.96)}
+.btn-blue{background:linear-gradient(135deg,#0288D1,#4FC3F7);color:#fff}
+.btn-blue:hover{box-shadow:0 4px 20px rgba(79,195,247,.3)}
+.btn-green{background:linear-gradient(135deg,#388E3C,#66BB6A);color:#fff}
+.btn-green:hover{box-shadow:0 4px 20px rgba(102,187,106,.3)}
+.btn-orange{background:linear-gradient(135deg,#E65100,#FF8A65);color:#fff}
+.btn-orange:hover{box-shadow:0 4px 20px rgba(255,138,101,.3)}
+.btn-sm{padding:8px 16px;font-size:.8em;border-radius:10px}
+
+/* Code block */
+.code-wrap{position:relative;margin:12px 0}
+.code-block{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px;font-family:'Consolas','Courier New',monospace;font-size:.78em;line-height:1.6;color:#c5e1a5;overflow-x:auto;white-space:pre;max-height:400px;overflow-y:auto;tab-size:2}
+.copy-btn{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:8px;padding:6px 14px;font-size:.75em;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.copy-btn:hover{background:rgba(255,255,255,.2)}
+.copy-btn.copied{background:rgba(102,187,106,.3);border-color:rgba(102,187,106,.5);color:#81C784}
+
+/* Deploy steps */
+.deploy-steps{list-style:none;margin:12px 0;padding:0}
+.deploy-steps li{position:relative;padding:8px 0 8px 28px;color:rgba(255,255,255,.65);font-size:.85em;line-height:1.6}
+.deploy-steps li::before{content:'';position:absolute;left:0;top:14px;width:14px;height:14px;border-radius:50%;background:rgba(255,138,101,.15);border:2px solid rgba(255,138,101,.4)}
+.deploy-steps li code{background:rgba(255,255,255,.08);border-radius:4px;padding:1px 6px;font-size:.9em;color:#FFD54F}
+
+/* Input / URL area */
+.url-input{width:100%;background:rgba(0,0,0,.3);border:1.5px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 14px;color:#fff;font-size:.88em;font-family:inherit;outline:none;transition:border-color .2s}
+.url-input:focus{border-color:rgba(129,199,132,.5)}
+.url-input::placeholder{color:rgba(255,255,255,.25)}
+.btn-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+
+/* Status messages */
+.status-msg{margin-top:12px;padding:10px 14px;border-radius:10px;font-size:.85em;font-weight:700;display:none}
+.status-success{display:block;background:rgba(102,187,106,.12);border:1px solid rgba(102,187,106,.3);color:#81C784}
+.status-error{display:block;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.3);color:#ef5350}
+
+/* Test area */
+.test-area{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.06);border-radius:20px;padding:24px 20px;margin-top:8px}
+.test-area h3{font-size:1em;font-weight:900;color:#CE93D8;margin-bottom:12px}
+.test-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.test-grid label{display:flex;flex-direction:column;gap:4px;font-size:.78em;color:rgba(255,255,255,.5)}
+.test-grid input{background:rgba(0,0,0,.3);border:1.5px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px;color:#fff;font-size:1em;font-family:inherit;outline:none;transition:border-color .2s}
+.test-grid input:focus{border-color:rgba(206,147,216,.4)}
+
+/* Footer */
+.footer{text-align:center;padding:20px 0;color:rgba(255,255,255,.25);font-size:.75em}
+
+/* Saved badge */
+.saved-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(102,187,106,.12);border:1px solid rgba(102,187,106,.25);color:#81C784;border-radius:8px;padding:4px 10px;font-size:.78em;font-weight:700;margin-left:8px}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Back link -->
+  <a href="index.html" class="back-link">&larr; 返回首頁</a>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-icon">&#9881;&#65039;</div>
+    <h1>設定練習回報系統</h1>
+    <p>三步驟自動收集學生練習紀錄到 Google Sheets</p>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="step-card">
+    <div class="step-num step-num-1">1</div>
+    <div class="step-title step-title-1">建立 Google Sheet</div>
+    <div class="step-desc">
+      開啟一個新的 Google 試算表，將檔案命名為<strong>「學生練習紀錄」</strong>。<br>
+      然後在第一列（Row 1）輸入以下表頭：
+    </div>
+    <div class="header-preview">
+      <span>時間戳記</span>
+      <span>姓名</span>
+      <span>工具</span>
+      <span>關卡</span>
+      <span>分數</span>
+      <span>星數</span>
+      <span>金幣</span>
+      <span>驗證碼</span>
+    </div>
+    <a href="https://sheets.google.com/create" target="_blank" class="btn btn-blue">
+      &#128196; 點此建立 Google Sheet
+    </a>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step-card">
+    <div class="step-num step-num-2">2</div>
+    <div class="step-title step-title-2">部署 Apps Script</div>
+    <div class="step-desc">
+      在剛才建立的 Google Sheet 中，點選上方選單<br>
+      <strong>「擴充功能 &rarr; Apps Script」</strong>，<br>
+      將下方的程式碼<strong>全部複製</strong>，貼到編輯器中（取代原有內容），然後儲存。
+    </div>
+
+    <div class="code-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">&#128203; 複製程式碼</button>
+      <div class="code-block" id="appsScriptCode">function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+
+    sheet.appendRow([
+      new Date().toLocaleString('zh-TW', {timeZone: 'Asia/Taipei'}),
+      data.name || '未填寫',
+      data.tool || '',
+      data.level || '',
+      data.score || 0,
+      data.stars || 0,
+      data.coins || 0,
+      data.verifyCode || ''
+    ]);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({status: 'success'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({status: 'error', message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService
+    .createTextOutput(JSON.stringify({status: 'ok', message: '回報系統運作中'}))
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
+    </div>
+
+    <div class="step-desc" style="margin-top:16px;margin-bottom:8px">
+      儲存後，依照以下步驟部署為網頁應用程式：
+    </div>
+    <ol class="deploy-steps">
+      <li>點選右上角 <code>部署</code> &rarr; <code>新增部署</code></li>
+      <li>左側齒輪圖示選擇類型為 <code>網頁應用程式</code></li>
+      <li>「誰可以存取」改為 <code>所有人</code></li>
+      <li>點 <code>部署</code>，授權後複製產生的網址</li>
+    </ol>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step-card">
+    <div class="step-num step-num-3">3</div>
+    <div class="step-title step-title-3">貼上網址</div>
+    <div class="step-desc">
+      部署完成後，將 Apps Script Web App 網址貼到下方，<br>
+      然後測試連接是否正常，最後按儲存設定。
+    </div>
+
+    <input type="text" class="url-input" id="endpointUrl" placeholder="貼上 Apps Script Web App 網址..." value="">
+
+    <div class="btn-row">
+      <button class="btn btn-blue btn-sm" onclick="testConnection()">&#128274; 測試連接</button>
+      <button class="btn btn-green btn-sm" onclick="saveEndpoint()">&#128190; 儲存設定</button>
+    </div>
+
+    <div class="status-msg" id="step3Status"></div>
+  </div>
+
+  <!-- Test Area -->
+  <div class="test-area">
+    <h3>&#128295; 測試回報</h3>
+    <p style="color:rgba(255,255,255,.45);font-size:.82em;margin-bottom:14px">
+      手動發送一筆測試資料到 Google Sheet，確認系統正常運作。
+    </p>
+    <div class="test-grid">
+      <label>
+        姓名
+        <input type="text" id="testName" placeholder="例：小明">
+      </label>
+      <label>
+        分數
+        <input type="number" id="testScore" placeholder="例：85" min="0" max="100">
+      </label>
+    </div>
+    <button class="btn btn-orange btn-sm" onclick="sendTestReport()">&#128640; 發送測試回報</button>
+    <div class="status-msg" id="testStatus"></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    樂學教室 &mdash; 練習回報系統設定頁
+  </div>
+
+</div>
+
+<script>
+// On load, fill saved endpoint if exists
+(function(){
+  var saved = localStorage.getItem('reportEndpoint');
+  if(saved){
+    document.getElementById('endpointUrl').value = saved;
+  }
+})();
+
+// Copy code
+function copyCode(btn){
+  var code = document.getElementById('appsScriptCode').textContent;
+  navigator.clipboard.writeText(code).then(function(){
+    btn.textContent = '\u2705 已複製';
+    btn.classList.add('copied');
+    setTimeout(function(){
+      btn.textContent = '\uD83D\uDCCB 複製程式碼';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// Test connection
+function testConnection(){
+  var url = document.getElementById('endpointUrl').value.trim();
+  var statusEl = document.getElementById('step3Status');
+  if(!url){
+    statusEl.className = 'status-msg status-error';
+    statusEl.textContent = '\u274C 請先貼上網址';
+    return;
+  }
+  statusEl.className = 'status-msg status-success';
+  statusEl.textContent = '\u23F3 測試中...';
+  statusEl.style.display = 'block';
+
+  fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      name: '\u6E2C\u8A66\u7528\u6236',
+      tool: '\u7CFB\u7D71\u6E2C\u8A66',
+      level: 'test',
+      score: 100,
+      stars: 3,
+      coins: 10,
+      verifyCode: 'TEST-OK'
+    }),
+    mode: 'no-cors'
+  }).then(function(){
+    statusEl.className = 'status-msg status-success';
+    statusEl.textContent = '\u2705 \u8ACB\u6AA2\u67E5 Google Sheet \u662F\u5426\u65B0\u589E\u4E86\u4E00\u7B46\u6E2C\u8A66\u8CC7\u6599\uFF01';
+  }).catch(function(err){
+    statusEl.className = 'status-msg status-error';
+    statusEl.textContent = '\u274C \u9023\u63A5\u5931\u6557\uFF1A' + err.message;
+  });
+}
+
+// Save endpoint
+function saveEndpoint(){
+  var url = document.getElementById('endpointUrl').value.trim();
+  var statusEl = document.getElementById('step3Status');
+  if(!url){
+    statusEl.className = 'status-msg status-error';
+    statusEl.textContent = '\u274C 請先貼上網址';
+    return;
+  }
+  localStorage.setItem('reportEndpoint', url);
+  statusEl.className = 'status-msg status-success';
+  statusEl.innerHTML = '\uD83C\uDF89 \u8A2D\u5B9A\u5B8C\u6210\uFF01\u6240\u6709\u7DF4\u7FD2\u5DE5\u5177\u5DF2\u81EA\u52D5\u9023\u63A5';
+}
+
+// Send test report
+function sendTestReport(){
+  var endpoint = localStorage.getItem('reportEndpoint');
+  var statusEl = document.getElementById('testStatus');
+  if(!endpoint){
+    statusEl.className = 'status-msg status-error';
+    statusEl.textContent = '\u274C \u8ACB\u5148\u5728\u6B65\u9A5F 3 \u5132\u5B58\u7DB2\u5740';
+    return;
+  }
+  var name = document.getElementById('testName').value.trim() || '\u6E2C\u8A66\u540C\u5B78';
+  var score = parseInt(document.getElementById('testScore').value) || 0;
+
+  statusEl.className = 'status-msg status-success';
+  statusEl.textContent = '\u23F3 \u50B3\u9001\u4E2D...';
+  statusEl.style.display = 'block';
+
+  fetch(endpoint, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      name: name,
+      tool: '\u624B\u52D5\u6E2C\u8A66',
+      level: '\u6E2C\u8A66\u95DC\u5361',
+      score: score,
+      stars: 3,
+      coins: 5,
+      verifyCode: 'MANUAL-TEST'
+    }),
+    mode: 'no-cors'
+  }).then(function(){
+    statusEl.className = 'status-msg status-success';
+    statusEl.textContent = '\u2705 \u5DF2\u50B3\u9001\uFF01\u8ACB\u6AA2\u67E5 Google Sheet';
+  }).catch(function(err){
+    statusEl.className = 'status-msg status-error';
+    statusEl.textContent = '\u274C \u50B3\u9001\u5931\u6557\uFF1A' + err.message;
+  });
+}
+</script>
+
+</body>
+</html>

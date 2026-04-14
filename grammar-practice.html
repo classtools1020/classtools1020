@@ -149,6 +149,7 @@ h1{text-align:center;font-size:1.7em;font-weight:900;margin:10px 0 5px;backgroun
       <button class="btn btn-primary" onclick="startUnitQuiz()">🔄 再練一次</button>
       <button class="btn btn-success" onclick="goHome()">✅ 回首頁</button>
     </div>
+    <div id="reportBtnArea"></div>
   </div>
 </div>
 
@@ -510,6 +511,13 @@ function finishUnit(){
   } else wr.innerHTML='<div style="text-align:center;color:#00E676;font-size:1.1em;font-weight:700">🎉 全部答對！太厲害了！</div>';
 
   showScreen('screenResults');
+  ReportSystem.showButton('reportBtnArea', {
+    tool: '句型口訣特訓',
+    level: UNITS[currentUnit].title,
+    score: correct,
+    stars: stars,
+    coins: 0
+  });
 }
 
 // ===== SPEECH =====
@@ -534,5 +542,6 @@ if(window.speechSynthesis){
 // ===== INIT =====
 renderHome();
 </script>
+<script src="report-system.js"></script>
 </body>
 </html>

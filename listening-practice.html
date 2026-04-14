@@ -201,6 +201,7 @@ canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:999}
         <button class="btn btn-fire" id="resRetry"></button>
         <button class="btn btn-neon" onclick="goHome()">🏠 回冒險地圖</button>
       </div>
+      <div id="reportBtnArea"></div>
     </div>
   </div>
 </div>
@@ -681,6 +682,13 @@ function finishLevel(){
   document.getElementById('resRetry').onclick=()=>startLevel(curLevel);
 
   showScr('scrResult');
+  ReportSystem.showButton('reportBtnArea', {
+    tool: '聽力金幣大冒險',
+    level: '第' + curLevel + '關',
+    score: sessionCoins,
+    stars: stars,
+    coins: sessionCoins
+  });
 }
 
 // ========== PARTICLES ==========
@@ -699,5 +707,6 @@ for(let i=0;i<6;i++){
 // ========== INIT ==========
 renderHome();
 </script>
+<script src="report-system.js"></script>
 </body>
 </html>

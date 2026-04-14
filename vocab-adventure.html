@@ -233,6 +233,7 @@ canvas#particles{position:fixed;inset:0;pointer-events:none;z-index:999}
         <button class="btn btn-neon" onclick="show('scrDay')">📋 回選單</button>
         <button class="btn btn-ghost" onclick="goHome()">🗺 回冒險地圖</button>
       </div>
+      <div id="reportBtnArea"></div>
     </div>
   </div>
 </div>
@@ -607,6 +608,15 @@ function finishQuiz(){
     wl.innerHTML=h;
   }else wl.innerHTML='';
   show('scrResult');
+  var savedName = gp().studentName;
+  if(savedName) ReportSystem.setName(savedName);
+  ReportSystem.showButton('reportBtnArea', {
+    tool: '英文冒險RPG',
+    level: '第' + curDay + '天',
+    score: qScore,
+    stars: stars,
+    coins: 0
+  });
 }
 
 // ========== SENTENCE AUDIO ==========
@@ -683,5 +693,6 @@ function renderReport(){
 // ========== INIT ==========
 renderHome();
 </script>
+<script src="report-system.js"></script>
 </body>
 </html>

@@ -206,6 +206,7 @@ body{background:#0B1D3A;font-family:'Noto Sans TC',sans-serif;color:#fff;min-hei
       <button class="btn btn-success" onclick="showScreen('screenDay')">✅ 回選單</button>
       <button class="btn btn-secondary" onclick="showScreen('screenHome')">🏠 回首頁</button>
     </div>
+    <div id="reportBtnArea"></div>
   </div>
 </div>
 
@@ -818,6 +819,13 @@ function showResults(correct,total,mode){
   }
 
   showScreen('screenResults');
+  ReportSystem.showButton('reportBtnArea', {
+    tool: '單字練習',
+    level: '第' + currentDay + '天',
+    score: correct,
+    stars: stars,
+    coins: 0
+  });
 }
 
 function retryQuiz(){
@@ -856,5 +864,6 @@ if(window.speechSynthesis){
 // ===================== INIT =====================
 renderHome();
 </script>
+<script src="report-system.js"></script>
 </body>
 </html>

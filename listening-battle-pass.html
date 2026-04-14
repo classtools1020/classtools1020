@@ -406,6 +406,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
       <button class="btn-home2" onclick="goHome()">🏠 首頁</button>
       <button class="btn-retry" onclick="retryDay()">🔄 再練一次</button>
     </div>
+    <div id="reportBtnArea"></div>
   </div>
 </div>
 
@@ -994,6 +995,13 @@ function showResults(){
   }
 
   show('results');
+  ReportSystem.showButton('reportBtnArea', {
+    tool: '聽力特訓戰令',
+    level: '第' + S.day + '天',
+    score: cor,
+    stars: 0,
+    coins: S.sessionCoins
+  });
 }
 
 // ════════════════════════════════════════
@@ -1081,5 +1089,6 @@ if(!window.speechSynthesis){
 renderHome();
 show('home');
 </script>
+<script src="report-system.js"></script>
 </body>
 </html>
