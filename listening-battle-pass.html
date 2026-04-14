@@ -15,7 +15,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
-body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);font-size:16px;}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);font-size:18px;}
 .screen{display:none;min-height:100vh;}
 .screen.active{display:block;}
 
@@ -117,15 +117,15 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .q-type{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
   color:var(--muted);margin-bottom:8px;}
-.q-instr{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:10px;}
-.q-text{font-size:15px;font-weight:700;color:#fff;line-height:1.5;}
+.q-instr{font-size:16px;color:var(--text);line-height:1.6;margin-bottom:10px;}
+.q-text{font-size:18px;font-weight:700;color:#fff;line-height:1.5;}
 .same-dlg-note{background:rgba(210,153,34,.1);border:1px solid var(--yellow);border-radius:8px;
   padding:10px 14px;font-size:13px;color:var(--orange);margin-bottom:12px;}
 
 /* ── AUDIO ── */
 .audio-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
 .btn-play{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#000;
-  border:none;border-radius:50px;padding:12px 22px;font-size:15px;font-weight:700;
+  border:none;border-radius:50px;padding:14px 26px;font-size:17px;font-weight:700;
   cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s;min-width:120px;}
 .btn-play:hover{background:#79b8ff;transform:translateY(-1px);}
 .btn-play.playing{background:var(--yellow);animation:blink 1s infinite;}
@@ -137,7 +137,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .btn-replay:hover{border-color:var(--accent);color:var(--accent);}
 .btn-show{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;
   text-decoration:underline;font-family:'Noto Sans TC',sans-serif;padding:4px 0;}
-.script-box{background:var(--surface2);border-radius:8px;padding:12px 16px;font-size:13px;
+.script-box{background:var(--surface2);border-radius:8px;padding:12px 16px;font-size:15px;
   line-height:1.8;margin-top:8px;display:none;}
 .dlg-m{color:#58a6ff;}.dlg-f{color:#f778ba;}
 
@@ -148,13 +148,13 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .pic-card:hover{border-color:var(--accent);background:rgba(88,166,255,.05);}
 .pic-em{font-size:30px;margin-bottom:4px;}
 .pic-lt{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px;}
-.pic-tx{font-size:12px;color:var(--text);line-height:1.4;}
+.pic-tx{font-size:14px;color:var(--text);line-height:1.4;}
 
 /* ── CHOICE BUTTONS ── */
 .choices{display:flex;flex-direction:column;gap:8px;}
 .choice{display:flex;align-items:center;gap:12px;background:var(--surface2);
-  border:2px solid var(--border);border-radius:12px;padding:12px 16px;cursor:pointer;
-  font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--text);
+  border:2px solid var(--border);border-radius:12px;padding:14px 18px;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;font-size:16px;color:var(--text);
   text-align:left;transition:all .15s;width:100%;}
 .choice:hover:not(:disabled){border-color:var(--accent);background:rgba(88,166,255,.05);}
 .choice-lt{display:flex;align-items:center;justify-content:center;width:30px;height:30px;
@@ -169,7 +169,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 
 /* ── FEEDBACK ── */
 .feedback{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-radius:10px;
-  margin-top:14px;font-size:14px;}
+  margin-top:14px;font-size:16px;}
 .fb-ok{background:rgba(63,185,80,.12);border:1px solid var(--green);}
 .fb-ng{background:rgba(248,81,73,.12);border:1px solid var(--red);}
 .fb-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
@@ -416,6 +416,25 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 </head>
 <body>
 
+<!-- ══ LOGIN MODAL ══ -->
+<div class="modal-overlay" id="login-modal" style="display:none;">
+  <div class="modal-box" style="max-width:340px;">
+    <div style="font-size:48px;margin-bottom:8px;">🎧</div>
+    <h3 style="margin-bottom:12px;">你的名字是？</h3>
+    <p style="margin-bottom:12px;">輸入名字就能在不同裝置保存進度喔！</p>
+    <input type="text" id="login-name" placeholder="輸入你的名字（例：王小明）"
+      style="width:100%;padding:12px;border-radius:10px;border:2px solid var(--border);
+      background:var(--surface2);color:#fff;font-size:16px;font-family:'Noto Sans TC',sans-serif;
+      text-align:center;margin-bottom:12px;outline:none;"
+      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+    <button id="login-btn" onclick="doLogin()"
+      style="width:100%;background:var(--accent);color:#000;border:none;border-radius:10px;
+      padding:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">
+      開始練習！
+    </button>
+  </div>
+</div>
+
 <!-- ══ CONFIRM DIALOG ══ -->
 <div class="modal-overlay" id="modal">
   <div class="modal-box">
@@ -433,13 +452,15 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   <a href="eng9.html" style="display:inline-block;color:rgba(255,255,255,.5);font-size:.95em;padding:8px 0;text-decoration:none">⬅ 回到選單</a>
   <div class="logo">🎧</div>
   <div class="site-title">會考英語聽力特訓</div>
-  <div class="site-sub">29天戰令 ✦ 金幣收集 ✦ 造型解鎖 ✦ AI語音</div>
+  <div class="site-sub">29天戰令 ✦ 每天5題 ✦ 扭蛋收集 ✦ AI語音</div>
 
+  <div id="home-player" style="font-size:14px;color:var(--accent);margin-bottom:8px;font-weight:700;"></div>
   <div class="coin-bar">
     <div class="coin-display">🪙 <span id="home-coins">0</span></div>
     <div class="streak-display">🔥 <span id="home-streak">0</span> 天</div>
     <div class="rank-display" id="home-rank">🥉 青銅</div>
   </div>
+  <div id="sync-status" style="font-size:11px;color:var(--muted);margin-top:4px;margin-bottom:4px;"></div>
 
   <!-- Battle Pass Banner -->
   <div class="bp-banner" id="bp-banner">
@@ -475,11 +496,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 
   <div id="tab-info" style="display:none;">
     <div class="format-box">
-      <div>🔸 <strong style="color:var(--purple)">第一部分 辨識句意</strong>（3題）── 聽英文句子，選符合的圖片</div>
-      <div>🔸 <strong style="color:var(--accent)">第二部分 基本問答</strong>（7題）── 聽問題或句子，選最好的回答</div>
-      <div>🔸 <strong style="color:var(--green)">第三部分 言談理解</strong>（4題）── 聽短對話，回答理解題</div>
+      <div>🔸 <strong style="color:var(--purple)">第一部分 辨識句意</strong>（1題）── 聽英文句子，選符合的圖片</div>
+      <div>🔸 <strong style="color:var(--accent)">第二部分 基本問答</strong>（2題）── 聽問題或句子，選最好的回答</div>
+      <div>🔸 <strong style="color:var(--green)">第三部分 言談理解</strong>（2題）── 聽短對話，回答理解題</div>
       <div style="margin-top:10px;color:var(--muted);font-size:12px;">
-        每天共 14 題 ✦ 約 15–20 分鐘 ✦ 29天題組不重複
+        每天共 5 題 ✦ 約 5–8 分鐘 ✦ 29天題組不重複
       </div>
       <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
         <strong style="color:var(--gold)">🎮 遊戲規則</strong><br>
@@ -526,16 +547,16 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     <div class="r-label" id="r-lbl">學校生活</div>
     <div class="score-ring" id="r-ring">
       <div class="r-num" id="r-sc">0</div>
-      <div class="r-den">/ 14</div>
+      <div class="r-den" id="r-den">/ 5</div>
     </div>
     <div class="r-pct" id="r-pct">0%</div>
     <div class="r-coins-earned">🪙 +<span id="r-coins">0</span> 金幣</div>
     <div id="r-reward-area"></div>
     <div class="r-msg" id="r-msg">繼續加油！</div>
     <div class="breakdown">
-      <div class="bdr"><span>🔸 第一部分 辨識句意</span><span id="r-p1">0/3</span></div>
-      <div class="bdr"><span>🔸 第二部分 基本問答</span><span id="r-p2">0/7</span></div>
-      <div class="bdr"><span>🔸 第三部分 言談理解</span><span id="r-p3">0/4</span></div>
+      <div class="bdr"><span>🔸 第一部分 辨識句意</span><span id="r-p1">0/1</span></div>
+      <div class="bdr"><span>🔸 第二部分 基本問答</span><span id="r-p2">0/2</span></div>
+      <div class="bdr"><span>🔸 第三部分 言談理解</span><span id="r-p3">0/2</span></div>
     </div>
     <div class="r-btns">
       <button class="btn-home2" onclick="goHome()">🏠 首頁</button>
@@ -876,7 +897,7 @@ function pickN(arr,n,rng){const pool=[...arr.map((_,i)=>i)],out=[];for(let i=0;i
 
 function buildDay(day){
   const rng=lcg(day*1234567+89);
-  const p1=pickN(P1,3,rng),p2=pickN(P2,7,rng),p3=pickN(P3,2,rng);
+  const p1=pickN(P1,1,rng),p2=pickN(P2,2,rng),p3=pickN(P3,1,rng);
   const qs=[];
   p1.forEach(q=>qs.push({part:1,type:'p1',...q}));
   p2.forEach(q=>qs.push({part:2,type:'p2',...q}));
@@ -1247,6 +1268,7 @@ function showResults(){
   document.getElementById('r-day').textContent=S.day;
   document.getElementById('r-lbl').textContent=TOPICS[S.day-1]||'';
   document.getElementById('r-sc').textContent=cor;
+  document.getElementById('r-den').textContent='/ '+tot;
   document.getElementById('r-pct').textContent=pct+'%';
   document.getElementById('r-msg').textContent=msg;
   document.getElementById('r-p1').textContent=p1c+'/'+p1t;
@@ -1636,14 +1658,101 @@ function goHome(){stopTTS();renderHome();show('home');}
 function retryDay(){stopTTS();startDay(S.day);}
 
 // ════════════════════════════════════════
+// CLOUD SYNC (跨裝置進度同步)
+// ════════════════════════════════════════
+
+const CLOUD_ENDPOINT = localStorage.getItem('reportEndpoint') ||
+  'https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
+
+let cloudSaveTimer=null;
+function cloudSave(){
+  const name=localStorage.getItem('studentName');
+  if(!name)return;
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer=setTimeout(()=>{
+    const store=getStore();
+    const syncEl=document.getElementById('sync-status');
+    if(syncEl)syncEl.textContent='☁️ 同步中...';
+    fetch(CLOUD_ENDPOINT,{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'save_progress',name,tool:'listening-bp',data:JSON.stringify(store)})
+    }).then(()=>{
+      if(syncEl)syncEl.textContent='☁️ 已同步 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+    }).catch(()=>{
+      if(syncEl)syncEl.textContent='⚠️ 同步失敗（離線模式）';
+    });
+  },1000); // debounce 1s
+}
+
+async function cloudLoad(){
+  const name=localStorage.getItem('studentName');
+  if(!name)return false;
+  const syncEl=document.getElementById('sync-status');
+  if(syncEl)syncEl.textContent='☁️ 載入雲端進度...';
+  try{
+    const url=CLOUD_ENDPOINT+'?action=load_progress&name='+encodeURIComponent(name)+'&tool=listening-bp';
+    const res=await fetch(url);
+    const json=await res.json();
+    if(json.status==='ok'&&json.data){
+      const cloud=JSON.parse(json.data);
+      const local=getStore();
+      // Merge: use whichever has more done days
+      if((cloud.done||[]).length>=(local.done||[]).length){
+        localStorage.setItem('lbp',json.data);
+        if(syncEl)syncEl.textContent='☁️ 雲端進度已載入';
+        return true;
+      }else{
+        if(syncEl)syncEl.textContent='☁️ 本機進度較新，已保留';
+        cloudSave(); // push local to cloud
+        return false;
+      }
+    }
+    if(syncEl)syncEl.textContent='☁️ 新玩家，開始冒險吧！';
+    return false;
+  }catch(e){
+    if(syncEl)syncEl.textContent='⚠️ 離線模式（無法連線雲端）';
+    return false;
+  }
+}
+
+// Override saveStore to auto-sync
+const _origSaveStore=saveStore;
+saveStore=function(s){_origSaveStore(s);cloudSave();};
+
+function doLogin(){
+  const input=document.getElementById('login-name');
+  const name=input.value.trim();
+  if(!name){input.style.borderColor='var(--red)';input.placeholder='請輸入名字！';return;}
+  localStorage.setItem('studentName',name);
+  document.getElementById('login-modal').style.display='none';
+  initAfterLogin();
+}
+
+async function initAfterLogin(){
+  const name=localStorage.getItem('studentName');
+  if(name){
+    document.getElementById('home-player').textContent='👋 '+name+'同學';
+    await cloudLoad();
+  }
+  renderHome();
+  show('home');
+}
+
+// ════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════
 
 if(!window.speechSynthesis){
   document.querySelector('.warn-box').innerHTML='❌ 你的瀏覽器不支援語音功能，<strong>請改用 Chrome 瀏覽器</strong>開啟。';
 }
-renderHome();
-show('home');
+// Check login
+if(localStorage.getItem('studentName')){
+  initAfterLogin();
+}else{
+  renderHome();show('home');
+  document.getElementById('login-modal').style.display='flex';
+}
 </script>
 <script src="report-system.js"></script>
 </body>
