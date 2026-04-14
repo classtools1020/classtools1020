@@ -269,6 +269,13 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .modal-cancel{background:var(--surface2);border:1px solid var(--border);color:var(--text);}
 .modal-confirm{background:var(--accent);border:none;color:#000;}
 
+/* ── STUDENT LOGIN BUTTONS ── */
+.stu-btn{display:flex;flex-direction:column;align-items:center;gap:4px;
+  border-radius:16px;padding:14px 8px;cursor:pointer;
+  font-family:'Noto Sans TC',sans-serif;transition:all .2s;}
+.stu-btn:hover{transform:scale(1.08);filter:brightness(1.3);}
+.stu-btn:active{transform:scale(0.95);}
+
 /* ── ZOO / GACHA ── */
 #zoo{padding:24px 16px 60px;max-width:720px;margin:0 auto;}
 .zoo-header{text-align:center;margin-bottom:20px;}
@@ -418,20 +425,30 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 
 <!-- ══ LOGIN MODAL ══ -->
 <div class="modal-overlay" id="login-modal" style="display:none;">
-  <div class="modal-box" style="max-width:340px;">
-    <div style="font-size:48px;margin-bottom:8px;">🎧</div>
-    <h3 style="margin-bottom:12px;">你的名字是？</h3>
-    <p style="margin-bottom:12px;">輸入名字就能在不同裝置保存進度喔！</p>
-    <input type="text" id="login-name" placeholder="輸入你的名字（例：王小明）"
-      style="width:100%;padding:12px;border-radius:10px;border:2px solid var(--border);
-      background:var(--surface2);color:#fff;font-size:16px;font-family:'Noto Sans TC',sans-serif;
-      text-align:center;margin-bottom:12px;outline:none;"
-      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
-    <button id="login-btn" onclick="doLogin()"
-      style="width:100%;background:var(--accent);color:#000;border:none;border-radius:10px;
-      padding:14px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">
-      開始練習！
-    </button>
+  <div class="modal-box" style="max-width:420px;padding:28px 20px;">
+    <div style="font-size:40px;margin-bottom:6px;">🎧</div>
+    <h3 style="margin-bottom:6px;font-size:20px;">你是誰？</h3>
+    <p style="margin-bottom:16px;font-size:14px;">點你的名字就可以開始囉！</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <button class="stu-btn" onclick="pickStudent('Wendy')" style="background:linear-gradient(135deg,#2d1a00,#1a1000);border:2px solid #f0a050;">
+        <span style="font-size:36px;">🐱</span><span style="font-size:15px;font-weight:900;color:#f0a050;">Wendy</span>
+      </button>
+      <button class="stu-btn" onclick="pickStudent('Lynn')" style="background:linear-gradient(135deg,#001a2d,#00101a);border:2px solid #50b0f0;">
+        <span style="font-size:36px;">🐶</span><span style="font-size:15px;font-weight:900;color:#50b0f0;">Lynn</span>
+      </button>
+      <button class="stu-btn" onclick="pickStudent('Yumi')" style="background:linear-gradient(135deg,#2d0a1a,#1a0010);border:2px solid #f050a0;">
+        <span style="font-size:36px;">🦊</span><span style="font-size:15px;font-weight:900;color:#f050a0;">Yumi</span>
+      </button>
+      <button class="stu-btn" onclick="pickStudent('Fan')" style="background:linear-gradient(135deg,#1a2d00,#101a00);border:2px solid #a0f050;">
+        <span style="font-size:36px;">🐯</span><span style="font-size:15px;font-weight:900;color:#a0f050;">Fan</span>
+      </button>
+      <button class="stu-btn" onclick="pickStudent('Yoyo')" style="background:linear-gradient(135deg,#1a002d,#10001a);border:2px solid #bc8cff;">
+        <span style="font-size:36px;">🐼</span><span style="font-size:15px;font-weight:900;color:#bc8cff;">Yoyo</span>
+      </button>
+      <button class="stu-btn" onclick="pickStudent('Mike')" style="background:linear-gradient(135deg,#2d2d00,#1a1a00);border:2px solid #ffd700;">
+        <span style="font-size:36px;">🦁</span><span style="font-size:15px;font-weight:900;color:#ffd700;">Mike</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -454,7 +471,11 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   <div class="site-title">會考英語聽力特訓</div>
   <div class="site-sub">29天戰令 ✦ 每天5題 ✦ 扭蛋收集 ✦ AI語音</div>
 
-  <div id="home-player" style="font-size:14px;color:var(--accent);margin-bottom:8px;font-weight:700;"></div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;">
+    <div id="home-player" style="font-size:16px;color:var(--accent);font-weight:700;"></div>
+    <button onclick="switchStudent()" style="background:none;border:1px solid var(--border);color:var(--muted);
+      border-radius:20px;padding:2px 10px;font-size:11px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;">換人</button>
+  </div>
   <div class="coin-bar">
     <div class="coin-display">🪙 <span id="home-coins">0</span></div>
     <div class="streak-display">🔥 <span id="home-streak">0</span> 天</div>
@@ -1654,6 +1675,10 @@ function doGachaFromResults(type){
 // NAVIGATION
 // ════════════════════════════════════════
 
+function switchStudent(){
+  localStorage.removeItem('studentName');
+  document.getElementById('login-modal').style.display='flex';
+}
 function goHome(){stopTTS();renderHome();show('home');}
 function retryDay(){stopTTS();startDay(S.day);}
 
@@ -1720,10 +1745,18 @@ async function cloudLoad(){
 const _origSaveStore=saveStore;
 saveStore=function(s){_origSaveStore(s);cloudSave();};
 
+const STUDENT_ANIMALS={Wendy:'🐱',Lynn:'🐶',Yumi:'🦊',Fan:'🐯',Yoyo:'🐼',Mike:'🦁'};
+
+function pickStudent(name){
+  localStorage.setItem('studentName',name);
+  document.getElementById('login-modal').style.display='none';
+  initAfterLogin();
+}
+
 function doLogin(){
   const input=document.getElementById('login-name');
-  const name=input.value.trim();
-  if(!name){input.style.borderColor='var(--red)';input.placeholder='請輸入名字！';return;}
+  const name=input&&input.value.trim();
+  if(!name)return;
   localStorage.setItem('studentName',name);
   document.getElementById('login-modal').style.display='none';
   initAfterLogin();
@@ -1732,7 +1765,8 @@ function doLogin(){
 async function initAfterLogin(){
   const name=localStorage.getItem('studentName');
   if(name){
-    document.getElementById('home-player').textContent='👋 '+name+'同學';
+    const animal=STUDENT_ANIMALS[name]||'👋';
+    document.getElementById('home-player').textContent=animal+' '+name;
     await cloudLoad();
   }
   renderHome();
