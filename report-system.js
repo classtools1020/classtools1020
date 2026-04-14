@@ -472,7 +472,8 @@ const ReportSystem = (() => {
    * @returns {Promise<boolean>} 是否成功
    */
   async function send(data) {
-    const endpoint = localStorage.getItem(LS_KEY_ENDPOINT);
+    const DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
+    const endpoint = localStorage.getItem(LS_KEY_ENDPOINT) || DEFAULT_ENDPOINT;
 
     if (!endpoint) {
       // 沒有設定 endpoint，存本地但標記未同步
