@@ -3,682 +3,253 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>學生練習進度儀表板 — 樂學教室</title>
+<title>教師後台 — 學生進度總覽</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-  background:#0a0e27;
-  font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;
-  color:#fff;
-  min-height:100vh;
-  overflow-x:hidden;
-}
-body::before{
-  content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse at 30% 20%,rgba(255,107,53,.1),transparent 50%),
-             radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.08),transparent 50%);
-  pointer-events:none;
-}
-a{color:#4FC3F7;text-decoration:none;transition:color .2s}
-a:hover{color:#81D4FA}
-
-/* Layout */
-.container{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:20px 24px 60px}
-
-/* Top Bar */
-.top-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px}
-.top-bar h1{font-size:1.5em;font-weight:900;display:flex;align-items:center;gap:8px}
-.top-bar h1 span.gradient{background:linear-gradient(135deg,#4FC3F7,#00BCD4,#8BC34A);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.top-links{display:flex;align-items:center;gap:16px;font-size:.85em;flex-wrap:wrap}
-.top-links a{display:inline-flex;align-items:center;gap:4px;color:rgba(255,255,255,.55)}
-.top-links a:hover{color:#4FC3F7}
-.last-update{color:rgba(255,255,255,.35);font-size:.78em}
-
-/* Setup Prompt */
-.setup-prompt{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:16px;padding:28px 24px;text-align:center;margin-bottom:24px}
-.setup-prompt h2{font-size:1.1em;margin-bottom:12px;color:#CE93D8}
-.setup-prompt p{color:rgba(255,255,255,.5);font-size:.88em;margin-bottom:16px;line-height:1.7}
-.setup-prompt input[type="text"]{
-  width:100%;max-width:600px;
-  background:rgba(0,0,0,.3);border:1.5px solid rgba(255,255,255,.12);border-radius:12px;
-  padding:12px 14px;color:#fff;font-size:.88em;font-family:inherit;outline:none;transition:border-color .2s
-}
-.setup-prompt input[type="text"]:focus{border-color:rgba(129,199,132,.5)}
-.setup-prompt input[type="text"]::placeholder{color:rgba(255,255,255,.25)}
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  border:none;border-radius:12px;padding:10px 22px;font-size:.88em;font-weight:700;
-  font-family:inherit;cursor:pointer;transition:all .25s;color:#fff
-}
-.btn:active{transform:scale(.96)}
-.btn-blue{background:linear-gradient(135deg,#0288D1,#4FC3F7)}
-.btn-blue:hover{box-shadow:0 4px 20px rgba(79,195,247,.3)}
-.btn-green{background:linear-gradient(135deg,#388E3C,#66BB6A)}
-.btn-green:hover{box-shadow:0 4px 20px rgba(102,187,106,.3)}
-.btn-red{background:linear-gradient(135deg,#c62828,#ef5350)}
-.btn-red:hover{box-shadow:0 4px 20px rgba(239,83,80,.3)}
-.btn-sm{padding:7px 14px;font-size:.8em;border-radius:10px}
-.btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
-
-.saved-url{margin-top:12px;font-size:.82em;color:rgba(255,255,255,.4);word-break:break-all}
-.saved-url strong{color:#81C784}
-
-/* Stat Cards */
-.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-@media(max-width:768px){.stat-cards{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:420px){.stat-cards{grid-template-columns:1fr}}
-.stat-card{
-  background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);
-  border-radius:16px;padding:20px 18px;text-align:center;position:relative;overflow:hidden
-}
-.stat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.015));pointer-events:none}
-.stat-icon{font-size:1.8em;margin-bottom:6px}
-.stat-value{font-size:2em;font-weight:900;line-height:1.2}
-.stat-label{font-size:.78em;color:rgba(255,255,255,.45);margin-top:4px}
-.stat-card:nth-child(1) .stat-value{color:#4FC3F7}
-.stat-card:nth-child(2) .stat-value{color:#FFD54F}
-.stat-card:nth-child(3) .stat-value{color:#FF8A65}
-.stat-card:nth-child(4) .stat-value{color:#ef5350}
-
-/* Filters */
-.filter-bar{
-  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-  background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.06);
-  border-radius:14px;padding:14px 18px;margin-bottom:24px
-}
-.filter-bar label{font-size:.82em;color:rgba(255,255,255,.5);font-weight:700}
-.filter-bar select,.filter-bar button{
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
-  color:#fff;border-radius:10px;padding:8px 14px;font-size:.82em;font-family:inherit;
-  cursor:pointer;outline:none;transition:border-color .2s
-}
-.filter-bar select:hover,.filter-bar button:hover{border-color:rgba(79,195,247,.4)}
-.filter-bar select option{background:#1a1a3a;color:#fff}
-
-/* Table */
-.table-wrap{
-  background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.06);
-  border-radius:16px;overflow:hidden;margin-bottom:32px
-}
-.table-header{padding:18px 20px;font-size:1.05em;font-weight:900;color:#4FC3F7;border-bottom:1px solid rgba(255,255,255,.06)}
-table{width:100%;border-collapse:collapse}
-thead th{
-  background:rgba(255,255,255,.04);padding:12px 14px;font-size:.8em;font-weight:700;
-  color:rgba(255,255,255,.6);text-align:left;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.06)
-}
-tbody tr{border-bottom:1px solid rgba(255,255,255,.03);transition:background .15s}
-tbody tr:nth-child(even){background:rgba(255,255,255,.02)}
-tbody tr:hover{background:rgba(79,195,247,.06)}
-tbody td{padding:11px 14px;font-size:.84em;color:rgba(255,255,255,.8);white-space:nowrap}
-tbody td.stars-cell{color:#FFD54F;letter-spacing:1px}
-tbody td.tool-cell{
-  max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
-}
-.no-data-row td{text-align:center;padding:40px 14px;color:rgba(255,255,255,.35);font-size:.92em}
-
-/* Student Summary Cards */
-.summary-section-title{font-size:1.05em;font-weight:900;color:#CE93D8;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-.student-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:32px}
-@media(max-width:420px){.student-cards{grid-template-columns:1fr}}
-.student-card{
-  background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);
-  border-radius:16px;padding:20px 18px;position:relative;overflow:hidden;transition:border-color .2s
-}
-.student-card:hover{border-color:rgba(206,147,216,.3)}
-.student-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.015));pointer-events:none}
-.sc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.sc-name{font-size:1.05em;font-weight:900}
-.sc-badge{font-size:.7em;font-weight:700;padding:3px 10px;border-radius:20px}
-.badge-green{background:rgba(102,187,106,.15);border:1px solid rgba(102,187,106,.3);color:#81C784}
-.badge-yellow{background:rgba(255,213,79,.15);border:1px solid rgba(255,213,79,.3);color:#FFD54F}
-.badge-red{background:rgba(239,83,80,.15);border:1px solid rgba(239,83,80,.3);color:#ef5350}
-.sc-meta{font-size:.78em;color:rgba(255,255,255,.4);margin-bottom:14px}
-.sc-stat-row{display:flex;gap:16px;margin-bottom:12px;font-size:.82em}
-.sc-stat{display:flex;align-items:center;gap:4px;color:rgba(255,255,255,.6)}
-.sc-stat strong{color:rgba(255,255,255,.85)}
-.progress-row{margin-bottom:8px}
-.progress-label{display:flex;justify-content:space-between;font-size:.76em;color:rgba(255,255,255,.5);margin-bottom:4px}
-.progress-bar-bg{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
-.progress-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
-.pf-blue{background:linear-gradient(90deg,#0288D1,#4FC3F7)}
-.pf-green{background:linear-gradient(90deg,#388E3C,#66BB6A)}
-.pf-orange{background:linear-gradient(90deg,#E65100,#FF8A65)}
-.pf-purple{background:linear-gradient(90deg,#7B1FA2,#CE93D8)}
-.pf-gold{background:linear-gradient(90deg,#F57F17,#FFD54F)}
-
-/* Empty state */
-.empty-state{text-align:center;padding:60px 20px}
-.empty-state .icon{font-size:3em;margin-bottom:12px}
-.empty-state p{color:rgba(255,255,255,.4);font-size:.95em;line-height:1.8}
-.empty-state a{color:#4FC3F7;font-weight:700}
-
-/* Loading spinner */
-.loading{text-align:center;padding:40px;color:rgba(255,255,255,.35)}
-.spinner{display:inline-block;width:28px;height:28px;border:3px solid rgba(255,255,255,.1);border-top-color:#4FC3F7;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px}
+body{background:#0a0e27;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;padding:16px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(79,195,247,.08),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(255,107,53,.06),transparent 50%);pointer-events:none}
+.container{position:relative;z-index:1;max-width:1100px;margin:0 auto}
+h1{text-align:center;font-size:1.8em;font-weight:900;background:linear-gradient(135deg,#4FC3F7,#00BCD4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:10px 0 4px}
+.subtitle{text-align:center;color:rgba(255,255,255,.5);font-size:.9em;margin-bottom:16px}
+.toolbar{display:flex;justify-content:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.toolbar button{padding:8px 16px;border:2px solid rgba(255,255,255,.12);border-radius:30px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);font-family:'Noto Sans TC',sans-serif;font-size:.85em;font-weight:700;cursor:pointer;transition:all .2s}
+.toolbar button:hover{border-color:#4FC3F7;color:#4FC3F7}
+.toolbar button.active{background:rgba(79,195,247,.12);border-color:#4FC3F7;color:#4FC3F7}
+.loading{text-align:center;padding:60px;color:rgba(255,255,255,.4);font-size:1.1em}
+.spinner{display:inline-block;width:28px;height:28px;border:3px solid rgba(255,255,255,.1);border-top:3px solid #4FC3F7;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:10px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* Responsive table */
-.table-scroll{overflow-x:auto}
+/* Summary */
+.summary-bar{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:0 auto 16px;padding:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px}
+.sum-item{text-align:center;min-width:70px}
+.sum-val{font-size:1.4em;font-weight:900;color:#ffd700}
+.sum-label{font-size:.65em;color:rgba(255,255,255,.4)}
+
+/* Student Cards */
+.students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+@media(max-width:420px){.students-grid{grid-template-columns:1fr}}
+.student-card{background:rgba(255,255,255,.03);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.08);border-radius:18px;padding:18px;transition:all .3s}
+.student-card:hover{border-color:rgba(79,195,247,.3);box-shadow:0 4px 20px rgba(79,195,247,.08)}
+.sc-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sc-avatar{font-size:2.2em}
+.sc-name{font-size:1.2em;font-weight:900}
+.sc-coins{margin-left:auto;font-size:.95em;color:#ffd700;font-weight:700}
+
+.tool-section{margin:8px 0;padding:8px 10px;background:rgba(255,255,255,.02);border-radius:10px;border-left:3px solid rgba(255,255,255,.08)}
+.tool-section.ts-vocab{border-left-color:#81C784}
+.tool-section.ts-grammar{border-left-color:#4FC3F7}
+.tool-section.ts-listening{border-left-color:#CE93D8}
+.tool-section.ts-rpg{border-left-color:#FF8A65}
+.ts-title{font-size:.8em;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+.ts-body{font-size:.78em;color:rgba(255,255,255,.55);line-height:1.6}
+.ts-body strong{color:#fff}
+.good{color:#00ff88}.warn{color:#ff8a65}.bad{color:#ff4444}
+.mini-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin:3px 0}
+.mini-bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.mb-green{background:linear-gradient(90deg,#00C9A7,#4FC3F7)}
+.mb-blue{background:linear-gradient(90deg,#4FC3F7,#CE93D8)}
+.mb-purple{background:linear-gradient(90deg,#CE93D8,#FF6B35)}
+.mb-orange{background:linear-gradient(90deg,#FF6B35,#FFD700)}
+.day-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.dtag{border-radius:4px;padding:1px 5px;font-size:.68em}
+.dtag-done{background:rgba(0,201,167,.12);border:1px solid rgba(0,201,167,.25);color:#00C9A7}
+.dtag-not{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.18)}
+.ew-tag{background:rgba(255,68,68,.12);border:1px solid rgba(255,68,68,.25);border-radius:5px;padding:1px 6px;font-size:.72em;color:#ff8a65}
+.ew-tag.defeated{background:rgba(0,255,136,.08);border-color:rgba(0,255,136,.25);color:#00ff88;text-decoration:line-through}
+.no-data{color:rgba(255,255,255,.25);font-style:italic}
+
+.back-link{display:inline-block;color:rgba(255,255,255,.4);font-size:.9em;text-decoration:none;margin-bottom:8px}
+.back-link:hover{color:#4FC3F7}
+.refresh-info{text-align:center;color:rgba(255,255,255,.25);font-size:.72em;margin-top:14px}
+
+/* Password */
+.pw-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;display:flex;align-items:center;justify-content:center}
+.pw-box{background:rgba(20,30,70,.95);border:2px solid #4FC3F7;border-radius:20px;padding:28px;text-align:center;max-width:340px;width:90%}
+.pw-box h2{color:#4FC3F7;margin-bottom:10px;font-size:1.3em}
+.pw-box p{color:rgba(255,255,255,.5);font-size:.85em;margin-bottom:12px}
+.pw-box input{width:100%;padding:12px;border-radius:12px;border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;font-size:1.1em;font-family:'Noto Sans TC',sans-serif;text-align:center;margin-bottom:12px}
+.pw-box button{padding:12px 30px;border:none;border-radius:30px;background:linear-gradient(135deg,#4FC3F7,#00BCD4);color:#fff;font-size:1em;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.pw-error{color:#ff4444;font-size:.85em;margin-top:6px}
 </style>
 </head>
 <body>
-<div class="container">
 
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <h1><span>&#x1F4CA;</span> <span class="gradient">學生練習進度儀表板</span></h1>
-    <div class="top-links">
-      <span class="last-update" id="lastUpdate"></span>
-      <a href="setup-report.html">&#x2699;&#xFE0F; 設定回報系統</a>
-      <a href="index.html">&#x1F3E0; 返回首頁</a>
-    </div>
+<div class="pw-overlay" id="pwOverlay">
+  <div class="pw-box">
+    <h2>🔐 教師後台</h2>
+    <p>輸入密碼查看學生進度</p>
+    <input type="password" id="pwInput" placeholder="請輸入密碼" onkeydown="if(event.key==='Enter')checkPw()">
+    <button onclick="checkPw()">進入</button>
+    <div class="pw-error" id="pwError"></div>
+  </div>
+</div>
+
+<div class="container" id="mainContent" style="display:none">
+  <a href="eng9.html" class="back-link">⬅ 回到選單</a>
+  <h1>📊 教師後台</h1>
+  <p class="subtitle">即時查看 6 位學生的雲端進度</p>
+
+  <div class="summary-bar" id="summaryBar"></div>
+
+  <div class="toolbar">
+    <button class="active" onclick="setView('all',this)">👥 全部</button>
+    <button onclick="setView('vocab',this)">📚 單字</button>
+    <button onclick="setView('grammar',this)">📝 句型</button>
+    <button onclick="setView('listening',this)">🎧 聽力</button>
+    <button onclick="setView('rpg',this)">👹 RPG</button>
+    <button onclick="refreshData()" style="border-color:rgba(255,193,7,.3);color:#ffd700">🔄 重新整理</button>
   </div>
 
-  <!-- Setup Prompt (shown when no CSV URL configured) -->
-  <div class="setup-prompt" id="setupPrompt">
-    <h2>&#x1F517; 連結 Google Sheet 資料來源</h2>
-    <p>請在 Google Sheet 中選擇「檔案 &rarr; 分享 &rarr; 發佈到網路」，<br>格式選 <strong>CSV</strong>，然後將產生的網址貼在下方。</p>
-    <input type="text" id="csvUrlInput" placeholder="https://docs.google.com/spreadsheets/d/e/xxxxx/pub?output=csv">
-    <div class="btn-row">
-      <button class="btn btn-green" onclick="saveCsvUrl()">&#x1F4BE; 儲存網址</button>
-      <button class="btn btn-red btn-sm" id="btnClear" onclick="clearCsvUrl()" style="display:none">&#x1F5D1;&#xFE0F; 清除</button>
-    </div>
-    <div class="saved-url" id="savedUrlDisplay"></div>
-  </div>
-
-  <!-- Main Dashboard (hidden until data loaded) -->
-  <div id="dashboard" style="display:none">
-
-    <!-- Stat Cards -->
-    <div class="stat-cards">
-      <div class="stat-card">
-        <div class="stat-icon">&#x1F4DD;</div>
-        <div class="stat-value" id="statToday">0</div>
-        <div class="stat-label">今日回報數</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">&#x1F465;</div>
-        <div class="stat-value" id="statStudents">0</div>
-        <div class="stat-label">活躍學生數</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">&#x2B50;</div>
-        <div class="stat-value" id="statAvgStars">0</div>
-        <div class="stat-label">平均星數</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">&#x1F525;</div>
-        <div class="stat-value" id="statStreak">0</div>
-        <div class="stat-label">最高連續練習天數</div>
-      </div>
-    </div>
-
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-      <label>&#x1F4C5; 日期：</label>
-      <select id="filterDate" onchange="applyFilters()">
-        <option value="today">今天</option>
-        <option value="week">本週</option>
-        <option value="all" selected>全部</option>
-      </select>
-      <label>&#x1F6E0;&#xFE0F; 工具：</label>
-      <select id="filterTool" onchange="applyFilters()">
-        <option value="all">全部</option>
-        <option value="英文冒險RPG">英文冒險RPG</option>
-        <option value="聽力戰令">聽力戰令</option>
-        <option value="句型口訣">句型口訣</option>
-        <option value="聽力金幣">聽力金幣</option>
-        <option value="單字練習">單字練習</option>
-      </select>
-      <label>&#x1F464; 學生：</label>
-      <select id="filterStudent" onchange="applyFilters()">
-        <option value="all">全部</option>
-      </select>
-      <button class="btn btn-sm btn-blue" onclick="fetchData()" style="margin-left:auto">&#x1F504; 重新整理</button>
-    </div>
-
-    <!-- Data Table -->
-    <div class="table-wrap">
-      <div class="table-header">&#x1F4CB; 學生進度紀錄</div>
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>時間</th>
-              <th>姓名</th>
-              <th>工具</th>
-              <th>關卡</th>
-              <th>分數</th>
-              <th>星數</th>
-              <th>金幣</th>
-              <th>驗證碼</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <tr class="no-data-row"><td colspan="8">載入中...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Student Summary Cards -->
-    <div class="summary-section-title">&#x1F464; 每位學生摘要</div>
-    <div class="student-cards" id="studentCards"></div>
-  </div>
-
-  <!-- Empty State -->
-  <div class="empty-state" id="emptyState" style="display:none">
-    <div class="icon">&#x1F4ED;</div>
-    <p>還沒有學生回報紀錄<br>請先完成 <a href="setup-report.html">設定回報系統 &rarr;</a></p>
-  </div>
-
+  <div id="content"><div class="loading"><div class="spinner"></div><br>載入中...</div></div>
+  <div class="refresh-info" id="refreshInfo"></div>
 </div>
 
 <script>
-/* ============================================================
-   Teacher Dashboard — 學生練習進度儀表板
-   ============================================================ */
+const PW='stacey2026';
+const STUDENTS=[{n:'Wendy',e:'🐱'},{n:'Lynn',e:'🐶'},{n:'Yumi',e:'🦊'},{n:'Fan',e:'🐯'},{n:'Yoyo',e:'🐼'},{n:'Mike',e:'🦁'}];
+const TOOLS=['vocabPractice','grammarPractice','listeningBP','errorPool','rpgBoss'];
+const API='https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
+let D={},V='all';
 
-const LS_CSV_KEY = 'sheetCsvUrl';
-let allRecords = [];       // 全部資料（parsed）
-let filteredRecords = [];  // 篩選後資料
-let autoRefreshTimer = null;
-
-// 工具顏色對照
-const toolColors = {
-  '英文冒險RPG': 'pf-blue',
-  '聽力戰令': 'pf-orange',
-  '句型口訣': 'pf-purple',
-  '聽力金幣': 'pf-gold',
-  '單字練習': 'pf-green',
-};
-
-/* ──────────── 初始化 ──────────── */
-document.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem(LS_CSV_KEY);
-  if (saved) {
-    document.getElementById('csvUrlInput').value = saved;
-    showSavedUrl(saved);
-    fetchData();
-  }
-  startAutoRefresh();
-});
-
-/* ──────────── CSV URL 管理 ──────────── */
-function saveCsvUrl() {
-  const url = document.getElementById('csvUrlInput').value.trim();
-  if (!url) { alert('請先貼上 Google Sheet CSV 網址'); return; }
-  localStorage.setItem(LS_CSV_KEY, url);
-  showSavedUrl(url);
-  fetchData();
-}
-
-function clearCsvUrl() {
-  if (!confirm('確定要清除已儲存的網址嗎？')) return;
-  localStorage.removeItem(LS_CSV_KEY);
-  document.getElementById('csvUrlInput').value = '';
-  document.getElementById('savedUrlDisplay').innerHTML = '';
-  document.getElementById('btnClear').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('emptyState').style.display = 'none';
-}
-
-function showSavedUrl(url) {
-  const short = url.length > 70 ? url.substring(0, 70) + '...' : url;
-  document.getElementById('savedUrlDisplay').innerHTML = '<strong>已儲存：</strong>' + short;
-  document.getElementById('btnClear').style.display = '';
-}
-
-/* ──────────── CSV 抓取與解析 ──────────── */
-async function fetchData() {
-  const url = localStorage.getItem(LS_CSV_KEY);
-  if (!url) return;
-
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    allRecords = parseCsv(text);
-    updateLastUpdate();
-    applyFilters();
-    document.getElementById('dashboard').style.display = '';
-    if (allRecords.length === 0) {
-      document.getElementById('emptyState').style.display = '';
-    } else {
-      document.getElementById('emptyState').style.display = 'none';
-    }
-  } catch (err) {
-    console.error('抓取資料失敗：', err);
-    document.getElementById('tableBody').innerHTML =
-      '<tr class="no-data-row"><td colspan="8">無法載入資料，請確認 CSV 網址是否正確</td></tr>';
+function checkPw(){
+  if(document.getElementById('pwInput').value===PW){
+    document.getElementById('pwOverlay').style.display='none';
+    document.getElementById('mainContent').style.display='block';
+    refreshData();
+  } else {
+    document.getElementById('pwError').textContent='密碼錯誤';
+    document.getElementById('pwInput').value='';
   }
 }
 
-/**
- * 簡易 CSV parser（支援引號包裹的欄位）
- */
-function parseCsv(text) {
-  const lines = text.split('\n').map(l => l.replace(/\r$/, ''));
-  if (lines.length < 2) return [];
-
-  const headers = splitCsvLine(lines[0]);
-  const records = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    if (!lines[i].trim()) continue;
-    const cols = splitCsvLine(lines[i]);
-    const obj = {};
-    headers.forEach((h, idx) => { obj[h.trim()] = (cols[idx] || '').trim(); });
-    records.push(obj);
-  }
-  return records;
+function setView(v,btn){
+  V=v;
+  document.querySelectorAll('.toolbar button').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  render();
 }
 
-function splitCsvLine(line) {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (inQuotes) {
-      if (c === '"') {
-        if (i + 1 < line.length && line[i + 1] === '"') {
-          current += '"';
-          i++;
-        } else {
-          inQuotes = false;
-        }
-      } else {
-        current += c;
-      }
-    } else {
-      if (c === '"') {
-        inQuotes = true;
-      } else if (c === ',') {
-        result.push(current);
-        current = '';
-      } else {
-        current += c;
-      }
-    }
-  }
-  result.push(current);
-  return result;
+async function fetchOne(name,tool){
+  try{
+    const r=await fetch(`${API}?action=load_progress&name=${encodeURIComponent(name)}&tool=${encodeURIComponent(tool)}`);
+    const j=await r.json();
+    if(j.status==='ok'&&j.data) return JSON.parse(j.data);
+  }catch(e){}
+  return null;
 }
 
-/* ──────────── 欄位名稱映射 ──────────── */
-// Google Sheet 可能的欄位名稱，統一映射
-function getField(record, ...keys) {
-  for (const k of keys) {
-    if (record[k] !== undefined && record[k] !== '') return record[k];
-  }
-  return '';
-}
-function getTime(r) { return getField(r, 'time', '時間', 'timestamp', 'Timestamp', '時間戳記'); }
-function getName(r) { return getField(r, 'name', '姓名', 'Name', '名字', '學生姓名'); }
-function getTool(r) { return getField(r, 'tool', '工具', 'Tool', '練習工具'); }
-function getLevel(r) { return getField(r, 'level', '關卡', 'Level', '等級'); }
-function getScore(r) { return getField(r, 'score', '分數', 'Score'); }
-function getStars(r) { return getField(r, 'stars', '星數', 'Stars', '星星'); }
-function getCoins(r) { return getField(r, 'coins', '金幣', 'Coins'); }
-function getCode(r) { return getField(r, 'verifyCode', '驗證碼', 'VerifyCode', 'code'); }
-
-/* ──────────── 篩選 ──────────── */
-function applyFilters() {
-  const dateFilter = document.getElementById('filterDate').value;
-  const toolFilter = document.getElementById('filterTool').value;
-  const studentFilter = document.getElementById('filterStudent').value;
-
-  const now = new Date();
-  const todayStr = formatDateStr(now);
-  // 本週一
-  const weekStart = new Date(now);
-  weekStart.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1));
-  weekStart.setHours(0, 0, 0, 0);
-
-  filteredRecords = allRecords.filter(r => {
-    // 日期篩選
-    if (dateFilter !== 'all') {
-      const t = getTime(r);
-      if (!t) return false;
-      const d = new Date(t);
-      if (isNaN(d.getTime())) return false;
-      if (dateFilter === 'today' && formatDateStr(d) !== todayStr) return false;
-      if (dateFilter === 'week' && d < weekStart) return false;
-    }
-    // 工具篩選
-    if (toolFilter !== 'all' && getTool(r) !== toolFilter) return false;
-    // 學生篩選
-    if (studentFilter !== 'all' && getName(r) !== studentFilter) return false;
-    return true;
+async function refreshData(){
+  document.getElementById('content').innerHTML='<div class="loading"><div class="spinner"></div><br>正在從雲端載入 6 位學生資料...</div>';
+  D={};
+  const ps=[];
+  STUDENTS.forEach(s=>{
+    TOOLS.forEach(t=>{
+      ps.push(fetchOne(s.n,t).then(data=>{
+        if(!D[s.n])D[s.n]={};
+        D[s.n][t]=data;
+      }));
+    });
   });
-
-  // 最新的在最上面
-  filteredRecords.sort((a, b) => {
-    const ta = new Date(getTime(a));
-    const tb = new Date(getTime(b));
-    return tb - ta;
-  });
-
-  updateStudentDropdown();
-  updateStats();
-  renderTable();
-  renderStudentCards();
+  await Promise.all(ps);
+  document.getElementById('refreshInfo').textContent='更新時間：'+new Date().toLocaleString('zh-TW');
+  render();
 }
 
-function formatDateStr(d) {
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+function render(){
+  renderSummary();
+  let h='<div class="students-grid">';
+  STUDENTS.forEach(s=>{ h+=renderCard(s,D[s.n]||{}); });
+  h+='</div>';
+  document.getElementById('content').innerHTML=h;
 }
 
-/* ──────────── 更新學生下拉選單 ──────────── */
-function updateStudentDropdown() {
-  const sel = document.getElementById('filterStudent');
-  const current = sel.value;
-  const names = [...new Set(allRecords.map(r => getName(r)).filter(Boolean))].sort();
-  // 保留現有選擇
-  sel.innerHTML = '<option value="all">全部</option>';
-  names.forEach(n => {
-    const opt = document.createElement('option');
-    opt.value = n;
-    opt.textContent = n;
-    if (n === current) opt.selected = true;
-    sel.appendChild(opt);
+function renderSummary(){
+  let tv=0,tg=0,tl=0,te=0,td=0;
+  STUDENTS.forEach(s=>{
+    const d=D[s.n]||{};
+    if(d.vocabPractice) for(let i=1;i<=20;i++) if(d.vocabPractice[`day${i}`]?.learned) tv++;
+    if(d.grammarPractice) for(let i=1;i<=8;i++) if(d.grammarPractice[`unit${i}`]?.done) tg++;
+    if(d.listeningBP?.done) tl+=Object.keys(d.listeningBP.done).filter(k=>d.listeningBP.done[k]).length;
+    if(Array.isArray(d.errorPool)) d.errorPool.forEach(w=>{ if((w.correctInRPG||0)>=2)td++; else te++; });
   });
+  document.getElementById('summaryBar').innerHTML=`
+    <div class="sum-item"><div class="sum-val">${tv}</div><div class="sum-label">單字完成天<br>(滿${6*20})</div></div>
+    <div class="sum-item"><div class="sum-val">${tg}</div><div class="sum-label">句型完成數<br>(滿${6*8})</div></div>
+    <div class="sum-item"><div class="sum-val">${tl}</div><div class="sum-label">聽力完成天<br>(滿${6*29})</div></div>
+    <div class="sum-item"><div class="sum-val" style="color:#ff8a65">${te}</div><div class="sum-label">活怪獸</div></div>
+    <div class="sum-item"><div class="sum-val" style="color:#00ff88">${td}</div><div class="sum-label">已消滅</div></div>`;
 }
 
-/* ──────────── 統計卡片 ──────────── */
-function updateStats() {
-  // 今日回報數
-  const todayStr = formatDateStr(new Date());
-  const todayRecords = allRecords.filter(r => {
-    const d = new Date(getTime(r));
-    return !isNaN(d.getTime()) && formatDateStr(d) === todayStr;
-  });
-  document.getElementById('statToday').textContent = todayRecords.length;
+function renderCard(stu,d){
+  const vp=d.vocabPractice||{}, gp=d.grammarPractice||{}, lp=d.listeningBP||{}, ep=d.errorPool||[], rp=d.rpgBoss||{};
+  const coins=lp.coins||0;
+  let h=`<div class="student-card"><div class="sc-header"><div class="sc-avatar">${stu.e}</div><div class="sc-name">${stu.n}</div><div class="sc-coins">🪙 ${coins}</div></div>`;
 
-  // 活躍學生數（不重複姓名）
-  const activeNames = new Set(allRecords.map(r => getName(r)).filter(Boolean));
-  document.getElementById('statStudents').textContent = activeNames.size;
-
-  // 平均星數
-  const starValues = allRecords.map(r => parseFloat(getStars(r))).filter(v => !isNaN(v));
-  const avg = starValues.length ? (starValues.reduce((a, b) => a + b, 0) / starValues.length) : 0;
-  document.getElementById('statAvgStars').textContent = avg.toFixed(1);
-
-  // 最高連續練習天數
-  document.getElementById('statStreak').textContent = calcMaxStreak();
-}
-
-function calcMaxStreak() {
-  // 對每位學生計算連續天數，回傳最大值
-  const byName = {};
-  allRecords.forEach(r => {
-    const name = getName(r);
-    if (!name) return;
-    const d = new Date(getTime(r));
-    if (isNaN(d.getTime())) return;
-    if (!byName[name]) byName[name] = new Set();
-    byName[name].add(formatDateStr(d));
-  });
-
-  let maxStreak = 0;
-  Object.values(byName).forEach(dateSet => {
-    const sorted = [...dateSet].sort();
-    let streak = 1;
-    let best = 1;
-    for (let i = 1; i < sorted.length; i++) {
-      const prev = new Date(sorted[i - 1]);
-      const curr = new Date(sorted[i]);
-      const diff = (curr - prev) / (1000 * 60 * 60 * 24);
-      if (Math.abs(diff - 1) < 0.01) {
-        streak++;
-        best = Math.max(best, streak);
-      } else {
-        streak = 1;
-      }
-    }
-    maxStreak = Math.max(maxStreak, best);
-  });
-  return maxStreak;
-}
-
-/* ──────────── 表格渲染 ──────────── */
-function renderTable() {
-  const tbody = document.getElementById('tableBody');
-  if (filteredRecords.length === 0) {
-    tbody.innerHTML = '<tr class="no-data-row"><td colspan="8">沒有符合條件的紀錄</td></tr>';
-    return;
+  if(V==='all'||V==='vocab'){
+    let dn=0,st=0;
+    for(let i=1;i<=20;i++){if(vp[`day${i}`]?.learned)dn++;st+=(vp[`day${i}`]?.stars||0);}
+    h+=`<div class="tool-section ts-vocab"><div class="ts-title">📚 單字練習</div><div class="ts-body">
+      ${dn?`<strong>${dn}/20</strong> 天 · ⭐${st}顆`:'<span class="no-data">未開始</span>'}
+      <div class="mini-bar"><div class="mini-bar-fill mb-green" style="width:${dn/20*100}%"></div></div>
+      ${dn?dayTags(vp,20,'day','learned'):''}</div></div>`;
   }
 
-  tbody.innerHTML = filteredRecords.map(r => {
-    const stars = parseInt(getStars(r)) || 0;
-    const starDisplay = stars > 0 ? '\u2B50'.repeat(Math.min(stars, 5)) + (stars > 5 ? '+' : '') : '-';
-    const time = getTime(r);
-    let displayTime = time;
-    try {
-      const d = new Date(time);
-      if (!isNaN(d.getTime())) {
-        displayTime = d.getMonth() + 1 + '/' + d.getDate() + ' ' +
-          String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-      }
-    } catch (e) {}
-
-    return `<tr>
-      <td>${esc(displayTime)}</td>
-      <td><strong>${esc(getName(r))}</strong></td>
-      <td class="tool-cell">${esc(getTool(r))}</td>
-      <td>${esc(getLevel(r))}</td>
-      <td>${esc(getScore(r))}</td>
-      <td class="stars-cell">${starDisplay}</td>
-      <td>${esc(getCoins(r))}</td>
-      <td style="font-family:monospace;font-size:.78em;color:rgba(255,255,255,.4)">${esc(getCode(r))}</td>
-    </tr>`;
-  }).join('');
-}
-
-function esc(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-/* ──────────── 學生摘要卡片 ──────────── */
-function renderStudentCards() {
-  const container = document.getElementById('studentCards');
-  const byName = {};
-
-  // 使用 filteredRecords 分組（但學生卡片展示的工具完成度基於 allRecords）
-  const targetRecords = document.getElementById('filterStudent').value === 'all' ? allRecords : filteredRecords;
-
-  targetRecords.forEach(r => {
-    const name = getName(r);
-    if (!name) return;
-    if (!byName[name]) byName[name] = [];
-    byName[name].push(r);
-  });
-
-  if (Object.keys(byName).length === 0) {
-    container.innerHTML = '<div class="empty-state" style="padding:30px"><p>尚無學生資料</p></div>';
-    return;
+  if(V==='all'||V==='grammar'){
+    const un=['be動詞','do/does','過去式','未來式','進行式','比較級','連接詞','介系詞'];
+    let dn=0,st=0;
+    for(let i=1;i<=8;i++){if(gp[`unit${i}`]?.done)dn++;st+=(gp[`unit${i}`]?.stars||0);}
+    h+=`<div class="tool-section ts-grammar"><div class="ts-title">📝 句型格鬥場</div><div class="ts-body">
+      ${dn?`<strong>${dn}/8</strong> STAGE · ⭐${st}顆`:'<span class="no-data">未開始</span>'}
+      <div class="mini-bar"><div class="mini-bar-fill mb-blue" style="width:${dn/8*100}%"></div></div>
+      ${dn?unitTags(gp,un):''}</div></div>`;
   }
 
-  const now = new Date();
-  const todayStr = formatDateStr(now);
+  if(V==='all'||V==='listening'){
+    let dn=0;
+    if(lp.done) dn=Object.keys(lp.done).filter(k=>lp.done[k]).length;
+    h+=`<div class="tool-section ts-listening"><div class="ts-title">🎧 聽力戰令</div><div class="ts-body">
+      ${dn?`<strong>${dn}/29</strong> 天 · 🪙${coins}`:'<span class="no-data">未開始</span>'}
+      <div class="mini-bar"><div class="mini-bar-fill mb-purple" style="width:${dn/29*100}%"></div></div>
+    </div></div>`;
+  }
 
-  container.innerHTML = Object.entries(byName)
-    .sort((a, b) => a[0].localeCompare(b[0], 'zh-TW'))
-    .map(([name, records]) => {
-      // 最後練習時間
-      let lastDate = null;
-      records.forEach(r => {
-        const d = new Date(getTime(r));
-        if (!isNaN(d.getTime()) && (!lastDate || d > lastDate)) lastDate = d;
-      });
+  if(V==='all'||V==='rpg'){
+    const alive=ep.filter(w=>(w.correctInRPG||0)<2);
+    const dead=ep.filter(w=>(w.correctInRPG||0)>=2);
+    h+=`<div class="tool-section ts-rpg"><div class="ts-title">👹 錯題大魔王</div><div class="ts-body">
+      ${ep.length?`🐉 <strong class="warn">${alive.length}</strong>隻 · 💀 <strong class="good">${dead.length}</strong>已消滅`:'<span class="no-data">沒有錯題</span>'}
+      ${rp.xp?` · Lv.${Math.floor(rp.xp/100)+1}`:''}
+      ${alive.length?`<div class="day-tags">${alive.map(w=>`<span class="ew-tag">${w.en}</span>`).join('')}</div>`:''}
+      ${dead.length?`<div class="day-tags">${dead.map(w=>`<span class="ew-tag defeated">${w.en}</span>`).join('')}</div>`:''}
+    </div></div>`;
+  }
 
-      // 距今天數
-      let daysSince = lastDate ? Math.floor((now - lastDate) / (1000 * 60 * 60 * 24)) : 999;
-      let badgeClass, badgeText;
-      if (daysSince === 0 || (lastDate && formatDateStr(lastDate) === todayStr)) {
-        badgeClass = 'badge-green'; badgeText = '今天有練習';
-      } else if (daysSince === 1) {
-        badgeClass = 'badge-yellow'; badgeText = '1 天沒練習';
-      } else if (daysSince <= 3) {
-        badgeClass = 'badge-yellow'; badgeText = daysSince + ' 天沒練習';
-      } else {
-        badgeClass = 'badge-red'; badgeText = daysSince + ' 天沒練習';
-      }
-
-      // 工具完成度
-      const toolCounts = {};
-      const allTools = ['英文冒險RPG', '聽力戰令', '句型口訣', '聽力金幣', '單字練習'];
-      allTools.forEach(t => toolCounts[t] = 0);
-      records.forEach(r => {
-        const t = getTool(r);
-        if (t) toolCounts[t] = (toolCounts[t] || 0) + 1;
-      });
-      const maxCount = Math.max(1, ...Object.values(toolCounts));
-
-      const lastStr = lastDate
-        ? (lastDate.getMonth() + 1) + '/' + lastDate.getDate() + ' ' +
-          String(lastDate.getHours()).padStart(2, '0') + ':' + String(lastDate.getMinutes()).padStart(2, '0')
-        : '無紀錄';
-
-      const progressBars = allTools.map(tool => {
-        const count = toolCounts[tool] || 0;
-        const pct = Math.round((count / maxCount) * 100);
-        const colorClass = toolColors[tool] || 'pf-blue';
-        return `<div class="progress-row">
-          <div class="progress-label"><span>${esc(tool)}</span><span>${count} 次</span></div>
-          <div class="progress-bar-bg"><div class="progress-bar-fill ${colorClass}" style="width:${pct}%"></div></div>
-        </div>`;
-      }).join('');
-
-      return `<div class="student-card">
-        <div class="sc-header">
-          <span class="sc-name">${esc(name)}</span>
-          <span class="sc-badge ${badgeClass}">${badgeText}</span>
-        </div>
-        <div class="sc-meta">最後練習：${lastStr}</div>
-        <div class="sc-stat-row">
-          <span class="sc-stat">&#x1F4DA; 總練習 <strong>${records.length}</strong> 次</span>
-        </div>
-        ${progressBars}
-      </div>`;
-    }).join('');
+  h+=`</div>`;
+  return h;
 }
 
-/* ──────────── 自動更新 ──────────── */
-function startAutoRefresh() {
-  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-  autoRefreshTimer = setInterval(() => {
-    if (localStorage.getItem(LS_CSV_KEY)) fetchData();
-  }, 60000);
+function dayTags(vp,n,prefix,field){
+  let h='<div class="day-tags">';
+  for(let i=1;i<=n;i++){
+    const d=vp[`${prefix}${i}`];
+    const done=d?.[field];
+    const stars=d?.stars||0;
+    h+=done?`<span class="dtag dtag-done" title="Day${i}: ${stars}⭐">D${i}${'⭐'.repeat(Math.min(stars,3))}</span>`
+           :`<span class="dtag dtag-not">D${i}</span>`;
+  }
+  return h+'</div>';
 }
 
-function updateLastUpdate() {
-  const now = new Date();
-  const str = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-  document.getElementById('lastUpdate').textContent = '上次更新：' + str;
+function unitTags(gp,names){
+  let h='<div class="day-tags">';
+  for(let i=1;i<=8;i++){
+    const u=gp[`unit${i}`];
+    const stars=u?.stars||0;
+    h+=u?.done?`<span class="dtag dtag-done" title="${names[i-1]}: ${stars}⭐">${names[i-1]}${'⭐'.repeat(Math.min(stars,3))}</span>`
+              :`<span class="dtag dtag-not">${names[i-1]}</span>`;
+  }
+  return h+'</div>';
 }
 </script>
 </body>
