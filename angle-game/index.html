@@ -302,7 +302,7 @@ const LEVELS=[
 let S={screen:'splash',name:'',avatar:'🦊',lvIdx:0,qIdx:0,answered:false,attempts:0,lvScore:0};
 
 // check URL param for teacher mode
-if(location.search.includes('teacher')){S.screen='teacherPin';}
+if(location.search.includes('teacher')){S.screen='teacher';}
 
 function db(){try{return JSON.parse(localStorage.getItem('ag2')||'{}')}catch(e){return{}}}
 function dbSet(d){localStorage.setItem('ag2',JSON.stringify(d))}
@@ -621,10 +621,18 @@ function rPin(){
     <div style="font-size:44px">🔑</div><div style="color:#fff;font-size:20px;font-weight:700">老師專區</div>
     <div style="color:var(--text2);font-size:13px">輸入密碼（預設 0000）</div>
     <input type="password" class="pin-input" id="pin" maxlength="4" inputmode="numeric">
+    <button class="btn btn-cyan" id="pinBtn" style="padding:12px 32px">確認</button>
     <button class="btn btn-ghost" onclick="S.screen=${S.name?'\'map\'':'\'splash\''};render()">返回</button>
   </div>`;
   const pin=document.getElementById('pin');
-  pin?.addEventListener('input',()=>{if(pin.value.length===4){if(pin.value===TEACHER_PIN){sfxClick();S.screen='teacher';render();}else{pin.value='';toast('密碼錯誤','var(--pink)');sfxWrong();}}});
+  function tryPin(){
+    const v=pin?.value||'';
+    if(v===TEACHER_PIN){sfxClick();S.screen='teacher';render();}
+    else{if(pin)pin.value='';toast('密碼錯誤','var(--pink)');sfxWrong();}
+  }
+  pin?.addEventListener('input',()=>{if(pin.value.length>=4)tryPin();});
+  pin?.addEventListener('keydown',e=>{if(e.key==='Enter')tryPin();});
+  document.getElementById('pinBtn')?.addEventListener('click',tryPin);
   setTimeout(()=>pin?.focus(),100);
 }
 
