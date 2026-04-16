@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>角度大冒險</title>
+<style>
+:root{--bg1:#0a0a1a;--bg2:#12122a;--cyan:#00d4ff;--pink:#ff4d6d;--gold:#ffd700;--green:#00ff88;--orange:#ff9f43;--purple:#a855f7;--text:#e8eaf0;--text2:rgba(255,255,255,.5);--glass:rgba(255,255,255,.06);--glass-border:rgba(255,255,255,.12);--r:16px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft JhengHei","PingFang TC",sans-serif;background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--text);min-height:100vh;overflow-x:hidden}
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative}
+.glass{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.screen{padding:20px;min-height:100vh;display:flex;flex-direction:column;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 20px rgba(0,212,255,.2)}50%{box-shadow:0 0 40px rgba(0,212,255,.5)}}
+@keyframes star-spin{0%{transform:scale(0) rotate(0)}50%{transform:scale(1.3) rotate(180deg)}100%{transform:scale(1) rotate(360deg)}}
+@keyframes crack{0%{transform:scale(1)}30%{transform:scale(1.1) rotate(-3deg)}60%{transform:scale(1.15) rotate(3deg)}100%{transform:scale(0);opacity:0}}
+@keyframes reward-pop{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes confetti-fall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border:none;border-radius:50px;font-size:17px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.96)}
+.btn-cyan{background:linear-gradient(135deg,var(--cyan),#0091b3);color:#000;box-shadow:0 0 20px rgba(0,212,255,.3)}
+.btn-pink{background:linear-gradient(135deg,var(--pink),#c9184a);color:#fff;box-shadow:0 0 20px rgba(255,77,109,.3)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#e6a800);color:#000;box-shadow:0 0 20px rgba(255,215,0,.3)}
+.btn-ghost{background:var(--glass);border:1px solid var(--glass-border);color:var(--text2)}
+.btn-green{background:linear-gradient(135deg,var(--green),#00cc6a);color:#000;box-shadow:0 0 20px rgba(0,255,136,.3)}
+
+/* splash */
+.splash{justify-content:center;align-items:center;text-align:center;gap:16px}
+.splash-icon{font-size:72px;animation:float 3s ease-in-out infinite}
+.splash h1{font-size:34px;background:linear-gradient(135deg,var(--cyan),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:3px}
+.splash .sub{color:var(--text2);font-size:15px;line-height:1.6}
+.splash .tag{display:inline-block;background:rgba(255,77,109,.12);border:1px solid rgba(255,77,109,.25);color:var(--pink);padding:6px 18px;border-radius:30px;font-size:13px;font-weight:600}
+
+/* login - FIX: use padding-top not justify-content:center */
+.login{align-items:center;gap:14px;padding-top:60px}
+.name-input{width:100%;max-width:300px;background:var(--glass);border:2px solid var(--glass-border);border-radius:14px;padding:14px;color:#fff;font-size:20px;text-align:center;font-family:inherit;outline:none;transition:border-color .2s}
+.name-input:focus{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,212,255,.15)}
+.name-input::placeholder{color:rgba(255,255,255,.25)}
+.avatar-row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.avatar-pick{width:48px;height:48px;border-radius:50%;background:var(--glass);border:2.5px solid transparent;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;transition:all .2s}
+.avatar-pick:hover,.avatar-pick.active{border-color:var(--cyan);background:rgba(0,212,255,.1);transform:scale(1.1)}
+
+/* map */
+.map{padding-top:16px;gap:10px}
+.map-top{display:flex;justify-content:space-between;align-items:center}
+.player-bar{display:flex;align-items:center;gap:10px}
+.player-bar .av{font-size:28px}
+.player-bar .pname{color:#fff;font-size:15px;font-weight:700}
+.player-bar .ptitle{font-size:11px;font-weight:600}
+.power-badge{display:flex;align-items:center;gap:4px;background:linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,159,67,.08));border:1px solid rgba(255,215,0,.2);padding:6px 14px;border-radius:30px;color:var(--gold);font-size:14px;font-weight:800}
+.lv-card{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;cursor:pointer;transition:all .2s}
+.lv-card.glass:hover:not(.locked){border-color:var(--cyan);transform:translateX(4px)}
+.lv-card.locked{opacity:.35;cursor:not-allowed}
+.lv-card.current{border-color:var(--cyan);box-shadow:0 0 15px rgba(0,212,255,.1)}
+.lv-card.done{border-color:rgba(0,255,136,.2)}
+.lv-num{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0}
+.lv-card.done .lv-num{background:linear-gradient(135deg,var(--green),#00b35c)}
+.lv-card.current .lv-num{background:linear-gradient(135deg,var(--cyan),#0091b3)}
+.lv-card.locked .lv-num{background:rgba(255,255,255,.1)}
+.lv-card:not(.done):not(.current):not(.locked) .lv-num{background:rgba(255,255,255,.15)}
+.lv-info{flex:1}.lv-info .lt{color:#fff;font-size:15px;font-weight:700}.lv-info .ld{color:var(--text2);font-size:11px;margin-top:1px}
+.lv-stars{font-size:16px;letter-spacing:1px;color:rgba(255,255,255,.2)}
+.lv-card.done .lv-stars{color:var(--gold)}
+
+/* question */
+.q-screen{gap:10px;padding-top:14px}
+.q-top{display:flex;justify-content:space-between;align-items:center}
+.q-back{width:36px;height:36px;border-radius:50%;border:none;background:var(--glass);color:var(--text2);font-size:16px;cursor:pointer}
+.q-tag{background:rgba(0,212,255,.12);color:var(--cyan);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.q-prog-text{color:var(--text2);font-size:13px;font-weight:600}
+.prog-bar{height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.prog-bar .fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--pink));border-radius:3px;transition:width .4s}
+.q-card{border-radius:20px;padding:20px 18px;flex:1;display:flex;flex-direction:column;gap:14px}
+.q-canvas-wrap{display:flex;justify-content:center;border-radius:14px;overflow:hidden;background:rgba(10,10,26,.6)}
+.q-canvas-wrap canvas{display:block;max-width:100%}
+.q-prompt{font-size:19px;font-weight:700;text-align:center;line-height:1.6;color:#fff}
+.choices{display:flex;flex-direction:column;gap:8px}
+.ch-btn{width:100%;padding:15px 18px;border:2.5px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.03);font-size:17px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s;font-family:inherit;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent}
+.ch-btn:hover{border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.05)}
+.ch-btn:active{transform:scale(.98)}
+.ch-btn .ci{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:rgba(255,255,255,.4);flex-shrink:0}
+.ch-btn.correct{border-color:var(--green);background:rgba(0,255,136,.08);animation:pop .3s}
+.ch-btn.correct .ci{background:var(--green);color:#000}
+.ch-btn.wrong{border-color:var(--pink);background:rgba(255,77,109,.06);animation:shake .4s}
+.ch-btn.wrong .ci{background:var(--pink);color:#fff}
+.ch-btn:disabled{cursor:not-allowed;opacity:.6}
+
+.vis-pick{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.vis-option{border-radius:14px;cursor:pointer;border:3px solid transparent;transition:all .2s;overflow:hidden;background:rgba(10,10,26,.4)}
+.vis-option:hover{border-color:rgba(0,212,255,.3)}
+.vis-option.correct{border-color:var(--green);box-shadow:0 0 20px rgba(0,255,136,.2)}
+.vis-option.wrong{border-color:var(--pink);animation:shake .4s}
+
+/* feedback overlay */
+.fb-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;animation:fadeIn .25s}
+.fb-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px)}
+.fb-card{position:relative;border-radius:24px;padding:30px 22px;text-align:center;max-width:360px;width:100%;animation:pop .35s}
+.fb-emoji{font-size:56px;margin-bottom:10px}
+.fb-title{font-size:22px;font-weight:900;margin-bottom:6px}
+.fb-title.ok{color:var(--green)}.fb-title.hint{color:var(--orange)}
+.fb-msg{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:18px}
+
+/* gacha */
+.gacha{justify-content:center;align-items:center;text-align:center;gap:16px}
+.egg{font-size:100px;cursor:pointer;transition:transform .1s;user-select:none}
+.egg:hover{transform:scale(1.05)}
+.egg.cracking{animation:crack .6s ease forwards}
+.reward-reveal{animation:reward-pop .5s ease;font-size:56px}
+
+/* level done */
+.lv-done{justify-content:center;align-items:center;text-align:center;gap:16px}
+.lv-done .stars{font-size:44px;letter-spacing:6px}
+.lv-done .stars span{display:inline-block;animation:star-spin .5s ease forwards}
+.lv-done .stars span:nth-child(2){animation-delay:.15s}
+.lv-done .stars span:nth-child(3){animation-delay:.3s}
+.lv-done h2{color:#fff;font-size:26px}
+
+/* teacher */
+.teacher{padding-top:16px;gap:14px}
+.teacher h2{color:#fff;font-size:20px}
+.teacher table{width:100%;border-collapse:collapse;border-radius:var(--r);overflow:hidden}
+.teacher th,.teacher td{padding:9px 6px;text-align:center;font-size:12px;color:var(--text);border-bottom:1px solid rgba(255,255,255,.05)}
+.teacher th{background:rgba(255,255,255,.06);font-weight:700;font-size:11px;color:var(--text2)}
+.teacher td:first-child{text-align:left;font-weight:600;font-size:13px}
+.pin-input{background:var(--glass);border:2px solid var(--glass-border);border-radius:12px;padding:14px;color:#fff;font-size:24px;text-align:center;letter-spacing:10px;width:180px;font-family:inherit;outline:none}
+.pin-input:focus{border-color:var(--cyan)}
+.confetti{position:fixed;width:8px;height:8px;border-radius:2px;animation:confetti-fall 2.5s ease forwards;z-index:200;pointer-events:none}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:30px;font-size:14px;font-weight:600;z-index:50;animation:pop .3s;white-space:nowrap;max-width:90vw;text-align:center}
+@media(max-width:380px){.q-prompt{font-size:16px}.ch-btn{font-size:15px;padding:13px 14px}.splash h1{font-size:26px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ============================================================
+// AUDIO ENGINE (Web Audio API — no external files needed)
+// ============================================================
+const AudioCtx=window.AudioContext||window.webkitAudioContext;
+let audioCtx;
+function initAudio(){if(!audioCtx)audioCtx=new AudioCtx();}
+
+function playTone(freq,dur,type='sine',vol=.15){
+  try{
+    initAudio();
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);
+    o.connect(g);g.connect(audioCtx.destination);
+    o.start();o.stop(audioCtx.currentTime+dur);
+  }catch(e){}
+}
+
+function sfxCorrect(){
+  playTone(523,.08,'square',.1);
+  setTimeout(()=>playTone(659,.08,'square',.1),80);
+  setTimeout(()=>playTone(784,.15,'square',.12),160);
+}
+
+function sfxWrong(){
+  playTone(200,.15,'sawtooth',.08);
+  setTimeout(()=>playTone(180,.2,'sawtooth',.06),120);
+}
+
+function sfxClick(){playTone(880,.05,'sine',.06);}
+
+function sfxLevelUp(){
+  [523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,.12,'square',.1),i*100));
+}
+
+function sfxGacha(){
+  playTone(330,.1,'triangle',.1);
+  setTimeout(()=>playTone(440,.1,'triangle',.1),100);
+  setTimeout(()=>playTone(660,.2,'triangle',.12),250);
+}
+
+function sfxCrit(){
+  playTone(880,.05,'square',.12);
+  setTimeout(()=>playTone(1100,.05,'square',.12),60);
+  setTimeout(()=>playTone(1320,.15,'square',.14),120);
+}
+
+function sfxConfetti(){
+  for(let i=0;i<5;i++){setTimeout(()=>playTone(600+Math.random()*800,.06,'sine',.04),i*50);}
+}
+
+// ============================================================
+// CONFIG
+// ============================================================
+const TEACHER_PIN='0000';
+const AVATARS=['🦊','🐻','🐱','🐶','🐰','🦁','🐼','🐸'];
+const TITLES=[
+  {power:0,name:'角度新手',color:'#999'},
+  {power:30,name:'角度學徒',color:'#4a90d9'},
+  {power:80,name:'角度戰士',color:'#00d4ff'},
+  {power:150,name:'角度大師',color:'#a855f7'},
+  {power:300,name:'角度傳說',color:'#ffd700'},
+];
+const GACHA_POOL=[
+  {emoji:'⚡',label:'+10 戰鬥力',type:'power',value:10,w:40},
+  {emoji:'⚡',label:'+20 戰鬥力',type:'power',value:20,w:30},
+  {emoji:'💎',label:'+30 戰鬥力',type:'power',value:30,w:15},
+  {emoji:'🛡️',label:'護盾（答錯不扣星）',type:'item',value:1,w:20},
+  {emoji:'💡',label:'智慧之光（自動提示）',type:'item',value:1,w:20},
+  {emoji:'🔥',label:'暴擊卷軸（雙倍戰力）',type:'item',value:1,w:15},
+  {emoji:'🌟',label:'幸運星（+50 戰鬥力！）',type:'power',value:50,w:5},
+];
+
+const LEVELS=[
+  {id:'l1',title:'角度偵探',desc:'用眼睛看就好，不用算！',icon:'🔍',color:'#4a90d9',
+   questions:[
+    {type:'visual-pick',prompt:'哪一個角最小？點它！',angles:[120,90,40],correctIndex:2,
+     successMsg:'小小的角叫「銳角」✨\n比 90° 小的都是！',hintMsg:'找最「瘦」的那個角！'},
+    {type:'visual-pick',prompt:'哪一個是直角（90°）？',angles:[50,90,140],correctIndex:1,
+     successMsg:'直角 = 剛好 90°\n像 L 一樣！📐',hintMsg:'直角像字母 L'},
+    {type:'choice',visual:{type:'angle',deg:135},prompt:'這個胖胖的角叫什麼？',
+     choices:['銳角（小的）','直角（L形）','鈍角（胖的）'],correct:2,
+     successMsg:'比 90° 大 = 鈍角\n胖胖的，很好認！',hintMsg:'它比 L 還大喔'},
+    {type:'choice',visual:{type:'angle',deg:55},prompt:'這個瘦瘦的角叫什麼？',
+     choices:['銳角（小的）','直角（L形）','鈍角（胖的）'],correct:0,
+     successMsg:'比 90° 小 = 銳角\n尖尖的、瘦瘦的～',hintMsg:'比 L 還要小的角'},
+   ]},
+  {id:'l2',title:'拼角工廠',desc:'兩個角拼在一起！',icon:'🏭',color:'#e67e22',
+   questions:[
+    {type:'choice',visual:{type:'supp',given:60},prompt:'拼成一直線 = 180°\n已經有 60°，還缺幾度？',
+     choices:['90°','100°','120°'],correct:2,
+     successMsg:'60 + 120 = 180！\n兩個角拼成一直線叫「互補」',hintMsg:'180 − 60 = ?'},
+    {type:'choice',visual:{type:'supp',given:90},prompt:'拼成一直線 = 180°\n已經有 90°，還缺幾度？',
+     choices:['60°','80°','90°'],correct:2,
+     successMsg:'90 + 90 = 180！\n兩個直角拼成一直線 ✨',hintMsg:'兩個一樣大的直角…'},
+    {type:'choice',visual:{type:'comp',given:30},prompt:'拼成直角 = 90°\n已經有 30°，還缺幾度？',
+     choices:['50°','60°','70°'],correct:1,
+     successMsg:'30 + 60 = 90！\n加起來等於直角叫「互餘」',hintMsg:'90 − 30 = ?'},
+    {type:'choice',visual:{type:'comp',given:45},prompt:'拼成直角 = 90°\n已經有 45°，還缺幾度？',
+     choices:['35°','45°','55°'],correct:1,
+     successMsg:'45 + 45 = 90！兩個一樣大',hintMsg:'和自己一樣大！'},
+   ]},
+  {id:'l3',title:'交叉路口',desc:'兩條線交叉的秘密',icon:'✖️',color:'#a855f7',
+   questions:[
+    {type:'choice',visual:{type:'vert',a:60},prompt:'兩條線交叉！\n對面的角一定一樣大\n∠1 = 60°，∠3 = ？',
+     choices:['60°','90°','120°'],correct:0,
+     successMsg:'對頂角一定一樣大！\n∠1 = ∠3 = 60° ✨',hintMsg:'對面的角 = 一樣大'},
+    {type:'choice',visual:{type:'vert',a:50},prompt:'∠1 = 50°\n旁邊的 ∠2 呢？\n（隔壁加起來 = 180°）',
+     choices:['50°','90°','130°'],correct:2,
+     successMsg:'隔壁加起來 = 180°\n180 − 50 = 130° 💡',hintMsg:'180 − 50 = ?'},
+    {type:'choice',visual:{type:'vert',a:45},prompt:'∠1 = 45°，∠3 = ？',
+     choices:['45°','90°','135°'],correct:0,
+     successMsg:'對頂角永遠一樣大 🎯',hintMsg:'對頂角 = ？'},
+   ]},
+  {id:'l4',title:'三角密室',desc:'三角形的角加起來 = ?',icon:'🔺',color:'#00ff88',
+   questions:[
+    {type:'choice',visual:{type:'tri',a:[60,60,60]},prompt:'三角形 3 個角加起來\n一定等於多少？',
+     choices:['90°','180°','360°'],correct:1,
+     successMsg:'超重要！內角和 = 180°\n不管什麼三角形都一樣！',hintMsg:'60 + 60 + 60 = ?'},
+    {type:'choice',visual:{type:'tri',a:[90,50,-1],hi:2},prompt:'已知 90° 和 50°\n第三個角 = ？',
+     choices:['30°','40°','50°'],correct:1,
+     successMsg:'180 − 90 − 50 = 40° 🔥',hintMsg:'180 − 90 − 50 = ?'},
+    {type:'choice',visual:{type:'tri',a:[60,80,-1],hi:2},prompt:'已知 60° 和 80°\n第三個角 = ？',
+     choices:['30°','40°','50°'],correct:1,
+     successMsg:'180 − 60 − 80 = 40° ✨',hintMsg:'180 − 60 − 80 = ?'},
+    {type:'choice',visual:{type:'tri',a:[90,45,-1],hi:2},prompt:'直角三角形！\n90° 和 45°，第三個角？',
+     choices:['35°','45°','55°'],correct:1,
+     successMsg:'180 − 90 − 45 = 45° 🎉',hintMsg:'180 − 90 − 45 = ?'},
+   ]},
+  {id:'l5',title:'外角射手',desc:'外角的超能力！',icon:'🎯',color:'#ff4d6d',
+   questions:[
+    {type:'choice',visual:{type:'ext',inner:[40,50]},prompt:'外角 = 對面兩個內角加起來！\n40° + 50° = ？',
+     choices:['80°','90°','100°'],correct:1,
+     successMsg:'外角 = 40 + 50 = 90° ✨\n這就是外角定理！',hintMsg:'40 + 50 = ?'},
+    {type:'choice',visual:{type:'ext',inner:[30,60]},prompt:'外角 = 兩個內角加起來\n30° + 60° = ？',
+     choices:['80°','90°','100°'],correct:1,
+     successMsg:'30 + 60 = 90°！又是直角 💪',hintMsg:'直接加！'},
+    {type:'choice',visual:{type:'ext',inner:[50,40]},prompt:'外角 = 90°\n一個內角是 50°，另一個 = ？',
+     choices:['30°','40°','50°'],correct:1,
+     successMsg:'90 − 50 = 40° 🎯\n反過來算也行！',hintMsg:'90 − 50 = ?'},
+   ]},
+  {id:'l6',title:'多邊形城堡',desc:'數三角形就好！',icon:'🏰',color:'#ffd700',
+   questions:[
+    {type:'choice',visual:{type:'poly',n:4},prompt:'四邊形可以切成\n幾個三角形？',
+     choices:['1 個','2 個','3 個'],correct:1,
+     successMsg:'四邊形 = 2 個三角形！\n內角和 = 2 × 180° = 360°',hintMsg:'從角落畫一條線…'},
+    {type:'choice',visual:{type:'poly',n:4},prompt:'四邊形內角和\n= 2 × 180° = ？',
+     choices:['180°','360°','540°'],correct:1,
+     successMsg:'2 × 180 = 360° ✨',hintMsg:'2 個三角形 = 2 × 180'},
+    {type:'choice',visual:{type:'poly',n:5},prompt:'五邊形可以切成\n幾個三角形？',
+     choices:['2 個','3 個','4 個'],correct:1,
+     successMsg:'五邊形 = 3 個三角形！\n規律：邊數 − 2',hintMsg:'比四邊形多一個'},
+    {type:'choice',visual:{type:'poly',n:6},prompt:'六邊形 = 幾個三角形？\n（邊數 − 2）',
+     choices:['3 個','4 個','5 個'],correct:1,
+     successMsg:'6 − 2 = 4 個！🏰 你找到規律了！',hintMsg:'6 − 2 = ?'},
+   ]},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let S={screen:'splash',name:'',avatar:'🦊',lvIdx:0,qIdx:0,answered:false,attempts:0,lvScore:0};
+
+// check URL param for teacher mode
+if(location.search.includes('teacher')){S.screen='teacherPin';}
+
+function db(){try{return JSON.parse(localStorage.getItem('ag2')||'{}')}catch(e){return{}}}
+function dbSet(d){localStorage.setItem('ag2',JSON.stringify(d))}
+function getPlayer(){const d=db();return d[S.name]||{avatar:S.avatar,power:0,levels:{}};}
+function savePlayer(p){const d=db();d[S.name]=p;dbSet(d);}
+function isUnlocked(idx){if(idx===0)return true;const p=getPlayer();return(p.levels[LEVELS[idx-1].id]||0)>0;}
+function getTitle(pw){let t=TITLES[0];TITLES.forEach(x=>{if(pw>=x.power)t=x});return t;}
+
+// ============================================================
+// CANVAS (with roundRect polyfill)
+// ============================================================
+const DPR=Math.min(window.devicePixelRatio||1,2);
+// polyfill
+if(!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    r=Math.min(r,w/2,h/2);
+    this.moveTo(x+r,y);this.arcTo(x+w,y,x+w,y+h,r);this.arcTo(x+w,y+h,x,y+h,r);
+    this.arcTo(x,y+h,x,y,r);this.arcTo(x,y,x+w,y,r);this.closePath();return this;
+  };
+}
+
+function setupCanvas(id,w,h){
+  const c=document.getElementById(id);if(!c)return null;
+  c.width=w*DPR;c.height=h*DPR;c.style.width=w+'px';c.style.height=h+'px';
+  const ctx=c.getContext('2d');ctx.scale(DPR,DPR);return ctx;
+}
+function gLine(ctx,x1,y1,x2,y2,color,w=3){
+  ctx.save();ctx.shadowColor=color;ctx.shadowBlur=10;ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+}
+function gArc(ctx,cx,cy,r,sa,ea,color,fill=.2,cw=false){
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,sa,ea,cw);ctx.closePath();
+  ctx.fillStyle=color+Math.round(fill*255).toString(16).padStart(2,'0');ctx.fill();
+  ctx.shadowColor=color;ctx.shadowBlur=8;
+  ctx.beginPath();ctx.arc(cx,cy,r,sa,ea,cw);ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
+  ctx.restore();
+}
+function gDot(ctx,x,y,color,label,ox=0,oy=-22){
+  ctx.save();
+  ctx.beginPath();ctx.arc(x,y,14,0,Math.PI*2);ctx.fillStyle=color+'33';ctx.fill();
+  ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+  if(label){ctx.font='bold 16px "Microsoft JhengHei",sans-serif';ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,x+ox,y+oy);}
+  ctx.restore();
+}
+function gText(ctx,t,x,y,color,sz=14){
+  ctx.save();ctx.shadowColor=color;ctx.shadowBlur=6;
+  ctx.font=`bold ${sz}px "Microsoft JhengHei",sans-serif`;ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(t,x,y);ctx.restore();
+}
+function raMark(ctx,cx,cy,a1,a2,sz=14,color='#00ff88'){
+  const mx=cx+sz*Math.cos(a1),my=cy+sz*Math.sin(a1);
+  const ex=mx+sz*Math.cos(a2),ey=my+sz*Math.sin(a2);
+  const nx=cx+sz*Math.cos(a2),ny=cy+sz*Math.sin(a2);
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(ex,ey);ctx.lineTo(nx,ny);ctx.stroke();ctx.restore();
+}
+function bgRect(ctx,W,H){ctx.fillStyle='rgba(10,10,30,.8)';ctx.beginPath();ctx.roundRect(0,0,W,H,10);ctx.fill();}
+
+function drawAngle(id,deg,W=140,H=140){
+  const ctx=setupCanvas(id,W,H);if(!ctx)return;bgRect(ctx,W,H);
+  const vx=W*.18,vy=H*.82,rL=W*.68,rad=deg*Math.PI/180;
+  const col=deg<90?'#4a90d9':deg===90?'#00ff88':'#ff9f43';
+  if(deg===90){raMark(ctx,vx,vy,0,-Math.PI/2,18,col);}else{gArc(ctx,vx,vy,W*.2,-rad,0,col,.2,true);}
+  gLine(ctx,vx,vy,vx+rL,vy,'rgba(255,255,255,.7)');
+  gLine(ctx,vx,vy,vx+rL*Math.cos(-rad),vy+rL*Math.sin(-rad),'rgba(255,255,255,.7)');
+  gDot(ctx,vx,vy,'#fff','',0,0);
+  const lr=W*.2+20,la=-rad/2;gText(ctx,deg+'°',vx+lr*Math.cos(la),vy+lr*Math.sin(la),col,15);
+}
+function drawSupp(id,given,W=320,H=180){
+  const ctx=setupCanvas(id,W,H);if(!ctx)return;bgRect(ctx,W,H);
+  const cy=H*.55,vx=W*.42,rL=W*.38,rad=given*Math.PI/180,arcR=35;
+  const topX=vx+rL*Math.cos(-rad),topY=cy+rL*Math.sin(-rad);
+  gLine(ctx,20,cy,W-20,cy,'rgba(255,255,255,.5)');gLine(ctx,vx,cy,topX,topY,'rgba(255,255,255,.7)');gDot(ctx,vx,cy,'#fff','',0,0);
+  gArc(ctx,vx,cy,arcR,-rad,0,'#4a90d9',.25,true);gText(ctx,given+'°',vx+arcR+18,cy-16,'#4a90d9',16);
+  gArc(ctx,vx,cy,arcR,Math.PI,-rad,'#ff4d6d',.2,true);gText(ctx,'？',vx-arcR-12,cy-16,'#ff4d6d',20);
+  ctx.font='12px sans-serif';ctx.fillStyle='rgba(255,255,255,.3)';ctx.textAlign='center';ctx.fillText('← 180° →',W/2,cy+28);
+}
+function drawComp(id,given,W=200,H=200){
+  const ctx=setupCanvas(id,W,H);if(!ctx)return;bgRect(ctx,W,H);
+  const vx=W*.18,vy=H*.82,rL=W*.65,rad=given*Math.PI/180,arcR=35;
+  gLine(ctx,vx,vy,vx+rL,vy,'rgba(255,255,255,.5)');gLine(ctx,vx,vy,vx,vy-rL,'rgba(255,255,255,.5)');
+  gLine(ctx,vx,vy,vx+rL*Math.cos(-rad),vy+rL*Math.sin(-rad),'rgba(255,255,255,.4)',2);
+  raMark(ctx,vx,vy,0,-Math.PI/2,16,'#00ff88');gDot(ctx,vx,vy,'#fff','',0,0);
+  gArc(ctx,vx,vy,arcR,-rad,0,'#4a90d9',.25,true);gText(ctx,given+'°',vx+arcR+14,vy-10,'#4a90d9',14);
+  gArc(ctx,vx,vy,arcR,-Math.PI/2,-rad,'#ff4d6d',.2,true);gText(ctx,'？',vx+10,vy-arcR-14,'#ff4d6d',18);
+  ctx.font='12px sans-serif';ctx.fillStyle='rgba(0,255,136,.4)';ctx.textAlign='left';ctx.fillText('90°',vx+20,vy+18);
+}
+function drawVert(id,a1,W=260,H=220){
+  const ctx=setupCanvas(id,W,H);if(!ctx)return;bgRect(ctx,W,H);
+  const cx=W/2,cy=H/2,len=W*.38,rad=a1*Math.PI/180;
+  gLine(ctx,cx-len,cy,cx+len,cy,'rgba(255,255,255,.6)');
+  gLine(ctx,cx-len*Math.cos(rad),cy+len*Math.sin(rad),cx+len*Math.cos(rad),cy-len*Math.sin(rad),'rgba(255,255,255,.6)');
+  gDot(ctx,cx,cy,'#fff','',0,0);
+  const ar=28;
+  gArc(ctx,cx,cy,ar,-rad,0,'#4a90d9',.3,true);gArc(ctx,cx,cy,ar,Math.PI-rad,Math.PI,'#4a90d9',.3,true);
+  gArc(ctx,cx,cy,ar,Math.PI,-rad,'#ff9f43',.2,true);gArc(ctx,cx,cy,ar,-Math.PI+rad,0,'#ff9f43',.15,false);
+  gText(ctx,'∠1='+a1+'°',cx+42,cy-22,'#4a90d9',13);gText(ctx,'∠2',cx-42,cy-22,'#ff9f43',13);
+  gText(ctx,'∠3',cx-42,cy+26,'#4a90d9',13);gText(ctx,'∠4',cx+42,cy+26,'#ff9f43',13);
+}
+function drawTri(id,angles,hi=-1,W=220,H=200){
+  const ctx=setupCanvas(id,W,H);if(!ctx)return;bgRect(ctx,W,H);
+  const ax=W*.5,ay=H*.1,bx=W*.1,by=H*.88,cx2=W*.9,cy2=H*.88;
+  ctx.save();ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.fillStyle='rgba(0,212,255,.05)';ctx.fill();ctx.restore();
+  gLine(ctx,ax,ay,bx,by,'rgba(255,255,255,.6)');gLine(ctx,bx,by,cx2,cy2,'rgba(255,255,255,.6)');gLine(ctx,ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
+  const pts=[[ax,ay-18],[bx-8,by+18],[cx2+8,cy2+18]],cols=['#ff6b6b','#4ecdc4','#45b7d1'];
+  angles.forEach((v,i)=>{const isQ=v===-1;gText(ctx,isQ?'？':v+'°',pts[i][0],pts[i][1],(hi===i||isQ)?'#ff4d6d':cols[i],(hi===i||isQ)?18:14);});
+  gDot(ctx,ax,ay,'#ff6b6b','A',0,-20);gDot(ctx,bx,by,'#4ecdc4','B',-16,16);gDot(ctx,cx2,cy2,'#45b7d1','C',16,16);
+}
+function drawExt(id,inner,W=280,H=200){
+  const ctx=setupCanvas(id,W,H);if(!ctx)return;bgRect(ctx,W,H);
+  const ax=W*.45,ay=H*.08,bx=W*.06,by=H*.78,cx2=W*.6,cy2=H*.78,dx2=cx2+(cx2-bx)*.4,dy2=cy2;
+  ctx.save();ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.fillStyle='rgba(0,212,255,.04)';ctx.fill();ctx.restore();
+  gLine(ctx,ax,ay,bx,by,'rgba(255,255,255,.6)');gLine(ctx,bx,by,cx2,cy2,'rgba(255,255,255,.6)');gLine(ctx,ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
+  ctx.save();ctx.setLineDash([8,5]);gLine(ctx,cx2,cy2,dx2,dy2,'#ffd700',2.5);ctx.setLineDash([]);ctx.restore();
+  const aToA=Math.atan2(ay-cy2,ax-cx2),aToD=Math.atan2(dy2-cy2,dx2-cx2);
+  gArc(ctx,cx2,cy2,30,aToD,aToA,'#ffd700',.25);
+  gText(ctx,inner[0]+'°',bx+4,by+16,'#4a90d9',14);gText(ctx,inner[1]+'°',ax,ay-14,'#4ecdc4',14);
+  gText(ctx,'外角＝？',cx2+30,cy2-16,'#ffd700',15);
+  gDot(ctx,ax,ay,'#ff6b6b','A',0,-18);gDot(ctx,bx,by,'#4ecdc4','B',-14,14);gDot(ctx,cx2,cy2,'#45b7d1','C',0,16);gDot(ctx,dx2,dy2,'#ffd700','D',12,14);
+}
+function drawPoly(id,n,W=220,H=220){
+  const ctx=setupCanvas(id,W,H);if(!ctx)return;bgRect(ctx,W,H);
+  const cx=W/2,cy=H/2,r=W*.36,pts=[];
+  for(let i=0;i<n;i++){const a=Math.PI*2*i/n-Math.PI/2;pts.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}
+  ctx.save();ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]));ctx.closePath();ctx.fillStyle='rgba(255,215,0,.05)';ctx.fill();ctx.restore();
+  for(let i=0;i<n;i++){const j=(i+1)%n;gLine(ctx,pts[i][0],pts[i][1],pts[j][0],pts[j][1],'rgba(255,255,255,.5)');}
+  for(let i=2;i<n-1;i++){ctx.save();ctx.setLineDash([5,4]);gLine(ctx,pts[0][0],pts[0][1],pts[i][0],pts[i][1],'#ff4d6d',2);ctx.setLineDash([]);ctx.restore();}
+  for(let i=0;i<n-2;i++){const tx=(pts[0][0]+pts[i+1][0]+pts[i+2][0])/3,ty=(pts[0][1]+pts[i+1][1]+pts[i+2][1])/3;gText(ctx,'△',tx,ty,'#ff4d6d',18);}
+  pts.forEach(p=>gDot(ctx,p[0],p[1],'rgba(255,255,255,.6)',''));
+}
+
+function renderVisual(q){
+  if(!q.visual)return;
+  const v=q.visual;
+  setTimeout(()=>{
+    switch(v.type){
+      case 'angle':drawAngle('qcv',v.deg);break;case 'supp':drawSupp('qcv',v.given);break;
+      case 'comp':drawComp('qcv',v.given);break;case 'vert':drawVert('qcv',v.a);break;
+      case 'tri':drawTri('qcv',v.a,q.hi);break;case 'ext':drawExt('qcv',v.inner);break;
+      case 'poly':drawPoly('qcv',v.n);break;
+    }
+  },30);
+}
+
+// ============================================================
+// RPG
+// ============================================================
+function doGacha(){
+  const total=GACHA_POOL.reduce((a,b)=>a+b.w,0);
+  let r=Math.random()*total;
+  for(const item of GACHA_POOL){r-=item.w;if(r<=0)return item;}
+  return GACHA_POOL[0];
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+const app=document.getElementById('app');
+
+function render(){
+  switch(S.screen){
+    case 'splash':rSplash();break;case 'login':rLogin();break;case 'map':rMap();break;
+    case 'question':rQuestion();break;case 'gacha':rGacha();break;case 'lvDone':rLvDone();break;
+    case 'teacherPin':rPin();break;case 'teacher':rTeacher();break;
+  }
+}
+
+function rSplash(){
+  app.innerHTML=`<div class="screen splash">
+    <div class="splash-icon">⚔️</div>
+    <h1>角度大冒險</h1>
+    <div class="sub">這不是數學課<br>這是你的冒險戰場</div>
+    <div class="tag">🚫 不用背公式 🚫 不用算大數字</div>
+    <button class="btn btn-cyan" onclick="sfxClick();S.screen='login';render()" style="font-size:20px;padding:16px 44px;animation:glow-pulse 2s infinite">開始冒險 🚀</button>
+  </div>`;
+}
+
+function rLogin(){
+  const avs=AVATARS.map(a=>{
+    const cls=S.avatar===a?'avatar-pick active':'avatar-pick';
+    return `<div class="${cls}" data-av="${a}">${a}</div>`;
+  }).join('');
+  app.innerHTML=`<div class="screen login">
+    <div style="font-size:56px;animation:float 2s ease-in-out infinite">${S.avatar}</div>
+    <div style="color:#fff;font-size:22px;font-weight:800">你叫什麼名字？</div>
+    <div style="color:var(--text2);font-size:13px">亂取也可以，老師認得出來就好</div>
+    <input class="name-input" id="ni" placeholder="輸入名字..." maxlength="10">
+    <div style="color:var(--text2);font-size:13px">選一個角色</div>
+    <div class="avatar-row" id="avRow">${avs}</div>
+    <button class="btn btn-cyan" id="enterBtn" style="margin-top:8px;font-size:18px;padding:14px 40px">進入遊戲 →</button>
+  </div>`;
+  // set up events with addEventListener (more reliable than inline onclick)
+  const ni=document.getElementById('ni');
+  if(ni){ni.value=S.name;ni.addEventListener('input',e=>{S.name=e.target.value;});ni.focus();}
+  document.getElementById('avRow')?.addEventListener('click',e=>{
+    const t=e.target.closest('[data-av]');if(!t)return;
+    sfxClick();S.avatar=t.dataset.av;
+    document.querySelectorAll('.avatar-pick').forEach(el=>el.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelector('.login>div:first-child').textContent=S.avatar;
+  });
+  document.getElementById('enterBtn')?.addEventListener('click',enterGame);
+  ni?.addEventListener('keydown',e=>{if(e.key==='Enter')enterGame();});
+}
+
+function enterGame(){
+  if(!S.name.trim()){toast('先取個名字吧！','var(--pink)');sfxWrong();return;}
+  sfxClick();
+  const p=getPlayer();p.avatar=S.avatar;savePlayer(p);
+  S.screen='map';render();
+}
+
+function rMap(){
+  const p=getPlayer();const t=getTitle(p.power);
+  let cards=LEVELS.map((lv,i)=>{
+    const stars=p.levels[lv.id]||0;const unlocked=isUnlocked(i);const done=stars>0;const cur=unlocked&&!done;
+    let cls='lv-card glass';if(done)cls+=' done';else if(cur)cls+=' current';else if(!unlocked)cls+=' locked';
+    const ss=done?'⭐'.repeat(stars)+'☆'.repeat(3-stars):'☆☆☆';
+    return `<div class="${cls}" onclick="${unlocked?`sfxClick();startLv(${i})`:''}">
+      <div class="lv-num">${i+1}</div><div class="lv-info"><div class="lt">${lv.icon} ${lv.title}</div><div class="ld">${lv.desc}</div></div>
+      ${unlocked?`<div class="lv-stars">${ss}</div>`:'<div style="color:var(--text2);font-size:18px">🔒</div>'}
+    </div>`;
+  }).join('');
+  app.innerHTML=`<div class="screen map">
+    <div class="map-top">
+      <div class="player-bar"><div class="av">${S.avatar}</div><div><div class="pname">${S.name}</div><div class="ptitle" style="color:${t.color}">${t.name}</div></div></div>
+      <div class="power-badge">⚔️ ${p.power}</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0">
+      <div style="font-size:20px;font-weight:800;color:#fff">選擇關卡</div>
+      <button class="btn btn-ghost" onclick="sfxClick();S.screen='teacherPin';render()" style="font-size:12px;padding:6px 14px">🔑 老師</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">${cards}</div>
+    <div style="text-align:center;margin-top:12px"><button class="btn btn-ghost" onclick="S.screen='login';render()" style="font-size:13px;padding:8px 20px">← 換人</button></div>
+  </div>`;
+}
+
+function rQuestion(){
+  const lv=LEVELS[S.lvIdx],q=lv.questions[S.qIdx],total=lv.questions.length,prog=(S.qIdx/total)*100;
+  let visHTML='';
+  if(q.type==='visual-pick'){
+    visHTML=`<div class="vis-pick">${q.angles.map((d,i)=>`<div class="vis-option" id="vo${i}" onclick="pickVis(${i})"><canvas id="vc${i}" width="1" height="1" style="width:120px;height:120px"></canvas></div>`).join('')}</div>`;
+  }else if(q.visual){
+    const dims={angle:[140,140],supp:[320,180],comp:[200,200],vert:[260,220],tri:[220,200],ext:[280,200],poly:[220,220]};
+    const d=dims[q.visual.type]||[240,200];
+    visHTML=`<div class="q-canvas-wrap"><canvas id="qcv" width="1" height="1" style="width:${d[0]}px;height:${d[1]}px"></canvas></div>`;
+  }
+  let chHTML='';
+  if(q.type==='choice'){
+    const L=['A','B','C'];
+    chHTML=`<div class="choices">${q.choices.map((ch,i)=>`<button class="ch-btn" id="cb${i}" onclick="pickCh(${i})" ${S.answered?'disabled':''}><span class="ci">${L[i]}</span><span>${ch}</span></button>`).join('')}</div>`;
+  }
+  app.innerHTML=`<div class="screen q-screen">
+    <div class="q-top"><button class="q-back" onclick="S.screen='map';render()">←</button><span class="q-tag">${lv.icon} ${lv.title}</span><span class="q-prog-text">${S.qIdx+1}/${total}</span></div>
+    <div class="prog-bar"><div class="fill" style="width:${prog}%"></div></div>
+    <div class="q-card glass">${visHTML}<div class="q-prompt">${q.prompt.replace(/\n/g,'<br>')}</div>${chHTML}</div>
+  </div>`;
+  if(q.type==='visual-pick'){setTimeout(()=>{q.angles.forEach((d,i)=>drawAngle('vc'+i,d,120,120))},30);}
+  else{renderVisual(q);}
+}
+
+function rGacha(){
+  sfxGacha();
+  app.innerHTML=`<div class="screen gacha">
+    <div style="color:var(--gold);font-size:14px;font-weight:700;letter-spacing:2px">通關獎勵</div>
+    <div style="color:#fff;font-size:22px;font-weight:800">點擊龍蛋！</div>
+    <div class="egg" id="egg" onclick="crackEgg()">🥚</div>
+    <div style="color:var(--text2);font-size:13px">點它就會孵化喔</div>
+  </div>`;
+}
+
+function crackEgg(){
+  const egg=document.getElementById('egg');if(!egg||egg.dataset.cracked)return;
+  egg.dataset.cracked='1';egg.classList.add('cracking');sfxCrit();
+  const reward=doGacha();
+  setTimeout(()=>{
+    const p=getPlayer();const isCrit=Math.random()<.2;
+    let bonus=0;
+    if(reward.type==='power'){bonus=isCrit?reward.value*2:reward.value;p.power+=bonus;}
+    savePlayer(p);sfxConfetti();confetti(20);
+    app.innerHTML=`<div class="screen gacha">
+      <div class="reward-reveal">${reward.emoji}</div>
+      <div style="color:#fff;font-size:22px;font-weight:800">${reward.label}</div>
+      ${isCrit?'<div style="color:var(--pink);font-size:16px;font-weight:800;animation:pulse 1s infinite">🔥 暴擊！雙倍獎勵！</div>':''}
+      <div style="color:var(--text2);font-size:14px">⚔️ 目前戰鬥力：${p.power}</div>
+      <button class="btn btn-gold" onclick="sfxClick();S.screen='lvDone';render()">繼續 →</button>
+    </div>`;
+  },700);
+}
+
+function rLvDone(){
+  const lv=LEVELS[S.lvIdx],total=lv.questions.length;
+  const pct=S.lvScore/total,stars=pct>=.9?3:pct>=.6?2:1;
+  const p=getPlayer();p.levels[lv.id]=Math.max(p.levels[lv.id]||0,stars);savePlayer(p);
+  sfxLevelUp();
+  const msgs=['完成了！繼續加油 💪','表現很好！🌟','完美通關！🏆'];
+  const starH=Array.from({length:3},(_,i)=>`<span style="animation-delay:${i*.15}s">${i<stars?'⭐':'☆'}</span>`).join('');
+  const hasNext=S.lvIdx<LEVELS.length-1;
+  app.innerHTML=`<div class="screen lv-done">
+    <div style="font-size:56px;animation:pop .5s">${lv.icon}</div>
+    <h2 style="color:#fff;font-size:26px">${lv.title} 完成！</h2>
+    <div class="stars" style="font-size:44px;letter-spacing:6px">${starH}</div>
+    <div style="color:var(--gold);font-size:16px;font-weight:700">答對 ${S.lvScore} / ${total} 題</div>
+    <div style="color:var(--text2);font-size:15px">${msgs[stars-1]}</div>
+    <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:280px">
+      ${hasNext?`<button class="btn btn-cyan" onclick="sfxClick();startLv(${S.lvIdx+1})" style="width:100%">下一關 →</button>`:''}
+      <button class="btn btn-ghost" onclick="S.screen='map';render()" style="width:100%">回地圖</button>
+    </div>
+  </div>`;
+  if(stars>=2)confetti(15);
+}
+
+function rPin(){
+  app.innerHTML=`<div class="screen" style="justify-content:center;align-items:center;gap:14px">
+    <div style="font-size:44px">🔑</div><div style="color:#fff;font-size:20px;font-weight:700">老師專區</div>
+    <div style="color:var(--text2);font-size:13px">輸入密碼（預設 0000）</div>
+    <input type="password" class="pin-input" id="pin" maxlength="4" inputmode="numeric">
+    <button class="btn btn-ghost" onclick="S.screen=${S.name?'\'map\'':'\'splash\''};render()">返回</button>
+  </div>`;
+  const pin=document.getElementById('pin');
+  pin?.addEventListener('input',()=>{if(pin.value.length===4){if(pin.value===TEACHER_PIN){sfxClick();S.screen='teacher';render();}else{pin.value='';toast('密碼錯誤','var(--pink)');sfxWrong();}}});
+  setTimeout(()=>pin?.focus(),100);
+}
+
+function rTeacher(){
+  const d=db(),names=Object.keys(d).filter(n=>n);
+  let rows=names.map(n=>{
+    const p=d[n];let cells=LEVELS.map(lv=>{const s=p.levels?.[lv.id]||0;return s>0?`<td style="color:var(--gold)">${'⭐'.repeat(s)}</td>`:`<td style="color:rgba(255,255,255,.15)">—</td>`;}).join('');
+    return `<tr><td>${p.avatar||'👤'} ${n}</td><td style="color:var(--gold)">${p.power||0}</td>${cells}</tr>`;
+  }).join('');
+  if(!names.length)rows=`<tr><td colspan="${LEVELS.length+2}" style="color:var(--text2);padding:20px">還沒有學生資料</td></tr>`;
+  const hd=LEVELS.map((_,i)=>`<th>關${i+1}</th>`).join('');
+  app.innerHTML=`<div class="screen teacher">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h2>📊 學習進度</h2>
+      <button class="btn btn-ghost" onclick="S.screen=${S.name?'\'map\'':'\'splash\''};render()" style="font-size:12px;padding:6px 14px">返回</button>
+    </div>
+    <div style="overflow-x:auto"><table class="glass"><tr><th>學生</th><th>⚔️</th>${hd}</tr>${rows}</table></div>
+    <button class="btn btn-pink" onclick="if(confirm('確定清除全部？')){localStorage.removeItem('ag2');render()}" style="font-size:13px;padding:10px 20px">🗑️ 清除紀錄</button>
+  </div>`;
+}
+
+// ============================================================
+// GAME LOGIC
+// ============================================================
+function startLv(idx){if(!isUnlocked(idx))return;S.lvIdx=idx;S.qIdx=0;S.answered=false;S.attempts=0;S.lvScore=0;S.screen='question';render();}
+
+function pickVis(idx){
+  if(S.answered)return;const q=LEVELS[S.lvIdx].questions[S.qIdx],el=document.getElementById('vo'+idx);
+  if(idx===q.correctIndex){
+    el.classList.add('correct');S.answered=true;if(S.attempts===0)S.lvScore++;addPower(5);sfxCorrect();
+    setTimeout(()=>showFB(true,q.successMsg),300);
+  }else{
+    el.classList.add('wrong');S.attempts++;sfxWrong();
+    setTimeout(()=>el.classList.remove('wrong'),500);
+    if(S.attempts>=2){document.getElementById('vo'+q.correctIndex)?.classList.add('correct');S.answered=true;setTimeout(()=>showFB(true,q.successMsg),500);}
+    else{toast(q.hintMsg,'var(--orange)');}
+  }
+}
+
+function pickCh(idx){
+  if(S.answered)return;const q=LEVELS[S.lvIdx].questions[S.qIdx],el=document.getElementById('cb'+idx);
+  if(idx===q.correct){
+    el.classList.add('correct');S.answered=true;if(S.attempts===0)S.lvScore++;
+    const crit=Math.random()<.15;addPower(crit?20:10);
+    sfxCorrect();if(crit){setTimeout(()=>{toast('🔥 暴擊！+20 戰鬥力！','var(--pink)');sfxCrit();},200);}
+    q.choices.forEach((_,i)=>{document.getElementById('cb'+i).disabled=true;});
+    setTimeout(()=>showFB(true,q.successMsg),400);
+  }else{
+    el.classList.add('wrong');S.attempts++;sfxWrong();
+    setTimeout(()=>el.classList.remove('wrong'),500);
+    if(S.attempts>=2){
+      document.getElementById('cb'+q.correct)?.classList.add('correct');S.answered=true;
+      q.choices.forEach((_,i)=>{document.getElementById('cb'+i).disabled=true;});
+      setTimeout(()=>showFB(true,q.successMsg),500);
+    }else{toast(q.hintMsg,'var(--orange)');}
+  }
+}
+
+function addPower(n){const p=getPlayer();p.power+=n;savePlayer(p);}
+
+function showFB(ok,msg){
+  const lv=LEVELS[S.lvIdx],isLast=S.qIdx>=lv.questions.length-1;
+  const ov=document.createElement('div');ov.className='fb-overlay';
+  ov.innerHTML=`<div class="fb-backdrop"></div><div class="fb-card glass">
+    <div class="fb-emoji">${ok?'🎉':'💡'}</div>
+    <div class="fb-title ${ok?'ok':'hint'}">${ok?'答對了！':'沒關係！'}</div>
+    <div class="fb-msg">${msg.replace(/\n/g,'<br>')}</div>
+    <button class="btn ${ok?'btn-cyan':'btn-gold'}" onclick="sfxClick();nextQ()" style="width:100%">${isLast?'看結果 🏆':'下一題 →'}</button>
+  </div>`;
+  document.body.appendChild(ov);if(ok){confetti(10);sfxConfetti();}
+}
+
+function nextQ(){
+  document.querySelectorAll('.fb-overlay').forEach(e=>e.remove());
+  const lv=LEVELS[S.lvIdx];
+  if(S.qIdx<lv.questions.length-1){S.qIdx++;S.answered=false;S.attempts=0;S.screen='question';render();}
+  else{S.screen='gacha';render();}
+}
+
+// ============================================================
+// EFFECTS
+// ============================================================
+function confetti(n=15){
+  const cols=['#00d4ff','#ff4d6d','#ffd700','#00ff88','#a855f7','#ff9f43'];
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div');p.className='confetti';
+    p.style.left=Math.random()*100+'vw';p.style.top='-10px';
+    p.style.background=cols[Math.floor(Math.random()*cols.length)];
+    p.style.animationDelay=Math.random()*.5+'s';p.style.animationDuration=(2+Math.random())+'s';
+    p.style.width=(5+Math.random()*7)+'px';p.style.height=(5+Math.random()*7)+'px';
+    p.style.borderRadius=Math.random()>.5?'50%':'2px';
+    document.body.appendChild(p);setTimeout(()=>p.remove(),3000);
+  }
+}
+
+function toast(msg,bg='var(--orange)'){
+  const t=document.createElement('div');t.className='toast';
+  t.style.background=bg;t.style.color='#fff';t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2200);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+render();
+</script>
+</body>
+</html>
