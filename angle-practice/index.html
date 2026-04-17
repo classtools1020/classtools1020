@@ -237,12 +237,17 @@ function drawQ(id,q){
       c.save();c.beginPath();c.moveTo(ax,ay);c.lineTo(bx,by);c.lineTo(cx2,cy2);c.closePath();c.fillStyle='rgba(255,215,0,.03)';c.fill();c.restore();
       gL(c,ax,ay,bx,by,'rgba(255,255,255,.6)');gL(c,bx,by,cx2,cy2,'rgba(255,255,255,.6)');gL(c,ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
       c.save();c.setLineDash([8,5]);gL(c,cx2,cy2,dx,dy,'#ffd700',2.5);c.setLineDash([]);c.restore();
-      const aToA=Math.atan2(ay-cy2,ax-cx2),aToD=Math.atan2(dy-cy2,dx-cx2);
-      gA(c,cx2,cy2,28,aToD,aToA,'#ffd700',.25);
+      // exterior angle arc: from ray CA to ray CD, going OUTSIDE (clockwise = below the line)
+      const aCA=Math.atan2(ay-cy2,ax-cx2);  // angle from C toward A
+      const aCD=Math.atan2(dy-cy2,dx-cx2);  // angle from C toward D (= 0, rightward)
+      // We want the arc going from CA down to CD (the exterior side)
+      gA(c,cx2,cy2,28,aCA,aCD,'#ffd700',.25,false);
       // angle labels INSIDE
       [[bx,by,d.a+'°','#4a90d9'],[ax,ay,d.b+'°','#4ecdc4']].forEach(([vx,vy,lb,col])=>{
         const ddx=egcx-vx,ddy=egcy-vy,dd=Math.hypot(ddx,ddy);gT(c,lb,vx+ddx/dd*28,vy+ddy/dd*26,col,13);});
-      gT(c,'外角=？',cx2+32,cy2-14,'#ffd700',14);
+      // exterior angle label positioned outside
+      const extMidA=(aCA+aCD)/2+Math.PI;  // midpoint of exterior arc
+      gT(c,'外角=？',cx2+Math.cos(extMidA)*42,cy2+Math.sin(extMidA)*32,'#ffd700',13);
       gD(c,ax,ay,'#ff6b6b','A',0,-16);gD(c,bx,by,'#4ecdc4','B',-14,14);gD(c,cx2,cy2,'#45b7d1','C',0,14);gD(c,dx,dy,'#ffd700','D',10,14);
       break;}
     case 'ext_rev':{
@@ -251,12 +256,14 @@ function drawQ(id,q){
       c.save();c.beginPath();c.moveTo(ax,ay);c.lineTo(bx,by);c.lineTo(cx2,cy2);c.closePath();c.fillStyle='rgba(255,215,0,.03)';c.fill();c.restore();
       gL(c,ax,ay,bx,by,'rgba(255,255,255,.6)');gL(c,bx,by,cx2,cy2,'rgba(255,255,255,.6)');gL(c,ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
       c.save();c.setLineDash([8,5]);gL(c,cx2,cy2,dx,dy,'#ffd700',2.5);c.setLineDash([]);c.restore();
-      const aToA=Math.atan2(ay-cy2,ax-cx2),aToD=Math.atan2(dy-cy2,dx-cx2);
-      gA(c,cx2,cy2,28,aToD,aToA,'#ffd700',.25);
+      const aCA=Math.atan2(ay-cy2,ax-cx2);
+      const aCD=Math.atan2(dy-cy2,dx-cx2);
+      gA(c,cx2,cy2,28,aCA,aCD,'#ffd700',.25,false);
       // angle labels INSIDE
       {const ddx=egcx2-bx,ddy=egcy2-by,dd=Math.hypot(ddx,ddy);gT(c,d.a+'°',bx+ddx/dd*28,by+ddy/dd*26,'#4a90d9',13);}
       {const ddx=egcx2-ax,ddy=egcy2-ay,dd=Math.hypot(ddx,ddy);gT(c,'∠B=？',ax+ddx/dd*28,ay+ddy/dd*26,'#ff4d6d',14);}
-      gT(c,'外角='+d.ext+'°',cx2+32,cy2-14,'#ffd700',13);
+      const extMidA2=(aCA+aCD)/2+Math.PI;
+      gT(c,'外角='+d.ext+'°',cx2+Math.cos(extMidA2)*42,cy2+Math.sin(extMidA2)*32,'#ffd700',13);
       gD(c,ax,ay,'#ff6b6b','A',0,-16);gD(c,bx,by,'#4ecdc4','B',-14,14);gD(c,cx2,cy2,'#45b7d1','C',0,14);gD(c,dx,dy,'#ffd700','D',10,14);
       break;}
   }

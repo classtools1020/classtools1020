@@ -428,22 +428,35 @@ function drawVert(id,a1,W=260,H=220){
 function drawTri(id,angles,hi=-1,W=220,H=200){
   const ctx=setupCanvas(id,W,H);if(!ctx)return;bgRect(ctx,W,H);
   const ax=W*.5,ay=H*.1,bx=W*.1,by=H*.88,cx2=W*.9,cy2=H*.88;
+  const gcx=(ax+bx+cx2)/3,gcy=(ay+by+cy2)/3;
   ctx.save();ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.fillStyle='rgba(0,212,255,.05)';ctx.fill();ctx.restore();
   gLine(ctx,ax,ay,bx,by,'rgba(255,255,255,.6)');gLine(ctx,bx,by,cx2,cy2,'rgba(255,255,255,.6)');gLine(ctx,ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
-  const pts=[[ax,ay-18],[bx-8,by+18],[cx2+8,cy2+18]],cols=['#ff6b6b','#4ecdc4','#45b7d1'];
-  angles.forEach((v,i)=>{const isQ=v===-1;gText(ctx,isQ?'？':v+'°',pts[i][0],pts[i][1],(hi===i||isQ)?'#ff4d6d':cols[i],(hi===i||isQ)?18:14);});
+  const verts=[[ax,ay],[bx,by],[cx2,cy2]],cols=['#ff6b6b','#4ecdc4','#45b7d1'];
+  verts.forEach(([vx,vy],i)=>{
+    const dx=gcx-vx,dy=gcy-vy,dist=Math.hypot(dx,dy);
+    const px=vx+dx/dist*30,py=vy+dy/dist*28;
+    const isQ=angles[i]===-1;
+    gText(ctx,isQ?'？':angles[i]+'°',px,py,(hi===i||isQ)?'#ff4d6d':cols[i],(hi===i||isQ)?16:13);
+  });
   gDot(ctx,ax,ay,'#ff6b6b','A',0,-20);gDot(ctx,bx,by,'#4ecdc4','B',-16,16);gDot(ctx,cx2,cy2,'#45b7d1','C',16,16);
 }
 function drawExt(id,inner,W=280,H=200){
   const ctx=setupCanvas(id,W,H);if(!ctx)return;bgRect(ctx,W,H);
   const ax=W*.45,ay=H*.08,bx=W*.06,by=H*.78,cx2=W*.6,cy2=H*.78,dx2=cx2+(cx2-bx)*.4,dy2=cy2;
+  const gcx=(ax+bx+cx2)/3,gcy=(ay+by+cy2)/3;
   ctx.save();ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.fillStyle='rgba(0,212,255,.04)';ctx.fill();ctx.restore();
   gLine(ctx,ax,ay,bx,by,'rgba(255,255,255,.6)');gLine(ctx,bx,by,cx2,cy2,'rgba(255,255,255,.6)');gLine(ctx,ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
   ctx.save();ctx.setLineDash([8,5]);gLine(ctx,cx2,cy2,dx2,dy2,'#ffd700',2.5);ctx.setLineDash([]);ctx.restore();
-  const aToA=Math.atan2(ay-cy2,ax-cx2),aToD=Math.atan2(dy2-cy2,dx2-cx2);
-  gArc(ctx,cx2,cy2,30,aToD,aToA,'#ffd700',.25);
-  gText(ctx,inner[0]+'°',bx+4,by+16,'#4a90d9',14);gText(ctx,inner[1]+'°',ax,ay-14,'#4ecdc4',14);
-  gText(ctx,'外角＝？',cx2+30,cy2-16,'#ffd700',15);
+  // exterior angle arc: from ray CA to ray CD (outside the triangle)
+  const aCA=Math.atan2(ay-cy2,ax-cx2),aCD=Math.atan2(dy2-cy2,dx2-cx2);
+  gArc(ctx,cx2,cy2,30,aCA,aCD,'#ffd700',.25,false);
+  // angle labels INSIDE triangle
+  [[bx,by,inner[0]+'°','#4a90d9'],[ax,ay,inner[1]+'°','#4ecdc4']].forEach(([vx,vy,lb,col])=>{
+    const ddx=gcx-vx,ddy=gcy-vy,dd=Math.hypot(ddx,ddy);
+    gText(ctx,lb,vx+ddx/dd*28,vy+ddy/dd*26,col,13);
+  });
+  const extMid=(aCA+aCD)/2+Math.PI;
+  gText(ctx,'外角＝？',cx2+Math.cos(extMid)*44,cy2+Math.sin(extMid)*34,'#ffd700',14);
   gDot(ctx,ax,ay,'#ff6b6b','A',0,-18);gDot(ctx,bx,by,'#4ecdc4','B',-14,14);gDot(ctx,cx2,cy2,'#45b7d1','C',0,16);gDot(ctx,dx2,dy2,'#ffd700','D',12,14);
 }
 function drawPoly(id,n,W=220,H=220){
