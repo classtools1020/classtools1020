@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>3-1 內角與外角 — 練習</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft JhengHei",sans-serif;background:#0b0b2a;color:#fff;overflow:hidden;height:100vh;width:100vw}
+canvas{position:fixed;inset:0;z-index:0}
+#ui{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;pointer-events:none}
+#ui>*{pointer-events:auto}
+
+/* top bar */
+#topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px}
+#topbar .title{font-size:14px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:1px}
+#topbar .prog{font-size:13px;color:rgba(255,255,255,.4)}
+.prog-bar{height:4px;background:rgba(255,255,255,.08);margin:0 20px;border-radius:2px}
+.prog-bar .fill{height:100%;background:linear-gradient(90deg,#00d4ff,#ff4d6d);border-radius:2px;transition:width .4s}
+
+/* center spacer */
+.spacer{flex:1}
+
+/* bottom panel */
+#panel{
+  background:rgba(15,15,50,.85);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid rgba(255,255,255,.08);
+  padding:16px 20px 24px;
+  max-width:600px;
+  width:100%;
+  margin:0 auto;
+}
+.concept-tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:8px}
+.q-text{font-size:17px;font-weight:700;line-height:1.6;margin-bottom:12px;white-space:pre-line}
+.input-row{display:flex;gap:8px;align-items:center}
+.ans-input{flex:1;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:12px 16px;color:#fff;font-size:20px;font-weight:700;font-family:inherit;outline:none;text-align:center;max-width:160px}
+.ans-input:focus{border-color:#00d4ff;box-shadow:0 0 15px rgba(0,212,255,.2)}
+.ans-unit{font-size:18px;color:rgba(255,255,255,.4);font-weight:700}
+.btn{padding:12px 28px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.96)}
+.btn-check{background:linear-gradient(135deg,#00d4ff,#0091b3);color:#000;box-shadow:0 0 15px rgba(0,212,255,.3)}
+.btn-next{background:linear-gradient(135deg,#00ff88,#00cc6a);color:#000;box-shadow:0 0 15px rgba(0,255,136,.3)}
+.btn-start{background:linear-gradient(135deg,#00d4ff,#0091b3);color:#000;font-size:20px;padding:16px 48px;box-shadow:0 0 25px rgba(0,212,255,.3)}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:14px;padding:10px 20px}
+
+.feedback{font-size:15px;font-weight:700;margin-top:8px;min-height:22px}
+.feedback.ok{color:#00ff88}.feedback.ng{color:#ff9f43}
+.hint{font-size:13px;color:rgba(255,255,255,.4);margin-top:4px}
+
+/* splash */
+.splash{position:fixed;inset:0;z-index:10;background:#0b0b2a;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;padding:20px}
+.splash h1{font-size:28px;background:linear-gradient(135deg,#00d4ff,#ff4d6d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.splash .sub{color:rgba(255,255,255,.5);font-size:14px;line-height:1.6}
+.splash.hidden{display:none}
+
+/* done */
+.done-screen{position:fixed;inset:0;z-index:10;background:#0b0b2a;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;padding:20px}
+.done-screen.hidden{display:none}
+.done-screen .big{font-size:64px}
+.done-screen h2{font-size:26px}
+.done-screen .score{font-size:20px;color:#ffd700;font-weight:800}
+
+/* confetti */
+.confetti{position:fixed;width:8px;height:8px;border-radius:2px;z-index:200;pointer-events:none}
+@keyframes cfall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="splash" id="splash">
+  <div style="font-size:64px">📐</div>
+  <h1>3-1 內角與外角 練習</h1>
+  <div class="sub">共 10 題，用到今天學的所有概念<br>在答案欄輸入數字就好（不用打°）</div>
+  <div style="color:rgba(255,255,255,.3);font-size:12px;margin-top:8px">數字不一定是整數的倍數喔，要算清楚！</div>
+  <button class="btn btn-start" onclick="startPractice()">開始練習 ✏️</button>
+</div>
+
+<div class="done-screen hidden" id="done">
+  <div class="big">🏆</div>
+  <h2>練習完成！</h2>
+  <div class="score" id="finalScore"></div>
+  <div style="color:rgba(255,255,255,.5);font-size:14px" id="finalMsg"></div>
+  <button class="btn btn-start" onclick="location.reload()">再練一次</button>
+</div>
+
+<div id="ui" style="display:none">
+  <div id="topbar">
+    <div class="title">3-1 內角與外角</div>
+    <div class="prog" id="progText">1 / 10</div>
+  </div>
+  <div class="prog-bar"><div class="fill" id="progFill" style="width:0%"></div></div>
+  <div class="spacer"></div>
+  <div id="panel">
+    <div class="concept-tag" id="tag"></div>
+    <div class="q-text" id="qtext"></div>
+    <div class="input-row">
+      <input class="ans-input" id="ans" type="number" inputmode="decimal" placeholder="？">
+      <span class="ans-unit">°</span>
+      <button class="btn btn-check" id="checkBtn" onclick="checkAnswer()">確認</button>
+      <button class="btn btn-next" id="nextBtn" onclick="nextProblem()" style="display:none">下一題 →</button>
+    </div>
+    <div class="feedback" id="fb"></div>
+    <div class="hint" id="hintArea"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// PROBLEMS
+// ============================================================
+const P=[
+  {concept:'互補',color:'#4a90d9',tag:'bg:rgba(74,144,217,.15);color:#4a90d9',
+   draw:'supp',params:{given:125},
+   q:'兩角互補（加起來 = 180°）\n已知一個角是 125°，另一個角 = ？',
+   ans:55,hint:'180 − 125 = ?'},
+
+  {concept:'互補',color:'#4a90d9',tag:'bg:rgba(74,144,217,.15);color:#4a90d9',
+   draw:'supp',params:{given:73},
+   q:'兩角互補\n已知一個角是 73°，另一個角 = ？',
+   ans:107,hint:'180 − 73 = ?'},
+
+  {concept:'互餘',color:'#00ff88',tag:'bg:rgba(0,255,136,.1);color:#00ff88',
+   draw:'comp',params:{given:37},
+   q:'兩角互餘（加起來 = 90°）\n已知一個角是 37°，另一個角 = ？',
+   ans:53,hint:'90 − 37 = ?'},
+
+  {concept:'互餘',color:'#00ff88',tag:'bg:rgba(0,255,136,.1);color:#00ff88',
+   draw:'comp',params:{given:58},
+   q:'兩角互餘\n已知一個角是 58°，另一個角 = ？',
+   ans:32,hint:'90 − 58 = ?'},
+
+  {concept:'對頂角',color:'#a855f7',tag:'bg:rgba(168,85,247,.12);color:#a855f7',
+   draw:'vert',params:{a:65,ask:'opp'},
+   q:'兩直線相交，∠1 = 65°\n對頂角 ∠3 = ？',
+   ans:65,hint:'對頂角一定相等！'},
+
+  {concept:'對頂角',color:'#a855f7',tag:'bg:rgba(168,85,247,.12);color:#a855f7',
+   draw:'vert',params:{a:42,ask:'adj'},
+   q:'兩直線相交，∠1 = 42°\n旁邊的 ∠2 = ？（∠1 + ∠2 = 180°）',
+   ans:138,hint:'180 − 42 = ?'},
+
+  {concept:'三角形內角和',color:'#ff6b6b',tag:'bg:rgba(255,107,107,.12);color:#ff6b6b',
+   draw:'tri',params:{a:50,b:63,c:-1},
+   q:'△ABC 中，∠A = 50°，∠B = 63°\n∠C = ？（三個角加起來 = 180°）',
+   ans:67,hint:'180 − 50 − 63 = ?'},
+
+  {concept:'三角形內角和',color:'#ff6b6b',tag:'bg:rgba(255,107,107,.12);color:#ff6b6b',
+   draw:'tri',params:{a:90,b:35,c:-1},
+   q:'直角三角形 △ABC\n∠A = 90°，∠B = 35°，∠C = ？',
+   ans:55,hint:'180 − 90 − 35 = ?'},
+
+  {concept:'外角定理',color:'#ffd700',tag:'bg:rgba(255,215,0,.1);color:#ffd700',
+   draw:'ext',params:{a:48,b:57},
+   q:'外角 = 不相鄰的兩個內角之和\n∠A = 48°，∠B = 57°，外角 = ？',
+   ans:105,hint:'48 + 57 = ?'},
+
+  {concept:'外角定理',color:'#ffd700',tag:'bg:rgba(255,215,0,.1);color:#ffd700',
+   draw:'ext_rev',params:{ext:115,a:68},
+   q:'外角 = 115°，其中一個內角 ∠A = 68°\n另一個內角 ∠B = ？',
+   ans:47,hint:'115 − 68 = ?'},
+];
+
+let cur=0,score=0,answered=false,attempts=0;
+
+// ============================================================
+// CANVAS
+// ============================================================
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+let W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',()=>{resize();if(document.getElementById('ui').style.display!=='none')drawProblem();});
+
+function grid(){
+  ctx.strokeStyle='rgba(100,140,255,0.04)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+}
+
+function gLine(x1,y1,x2,y2,color='rgba(255,255,255,.7)',w=3){
+  ctx.save();ctx.shadowColor=color;ctx.shadowBlur=10;ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+}
+
+function gArcFill(cx,cy,r,sa,ea,color,alpha=.25,ccw=false){
+  ctx.save();
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,sa,ea,ccw);ctx.closePath();
+  ctx.fillStyle=color+Math.round(alpha*255).toString(16).padStart(2,'0');ctx.fill();
+  ctx.shadowColor=color;ctx.shadowBlur=8;
+  ctx.beginPath();ctx.arc(cx,cy,r,sa,ea,ccw);ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
+  ctx.restore();
+}
+
+function gDot(x,y,color,label,ox=0,oy=-28){
+  ctx.save();
+  ctx.beginPath();ctx.arc(x,y,16,0,Math.PI*2);ctx.fillStyle=color+'33';ctx.fill();
+  ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+  ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+  if(label){ctx.font='bold 22px "Microsoft JhengHei",sans-serif';ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,x+ox,y+oy);}
+  ctx.restore();
+}
+
+function gText(t,x,y,color,sz=18){
+  ctx.save();ctx.shadowColor=color;ctx.shadowBlur=8;
+  ctx.font=`bold ${sz}px "Microsoft JhengHei",sans-serif`;ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(t,x,y);ctx.restore();
+}
+
+function raSquare(cx,cy,a1,a2,sz=16,color='#00ff88'){
+  const mx=cx+sz*Math.cos(a1),my=cy+sz*Math.sin(a1);
+  const ex=mx+sz*Math.cos(a2),ey=my+sz*Math.sin(a2);
+  const nx=cx+sz*Math.cos(a2),ny=cy+sz*Math.sin(a2);
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.shadowColor=color;ctx.shadowBlur=4;
+  ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(ex,ey);ctx.lineTo(nx,ny);ctx.stroke();ctx.restore();
+}
+
+// ============================================================
+// DRAWING FUNCTIONS
+// ============================================================
+function getCenter(){
+  // Drawing area: center of screen, above the bottom panel (~200px)
+  const panelH=200;
+  return {x:W/2,y:(H-panelH)/2};
+}
+
+function drawSupp(given){
+  const {x:cx,y:cy}=getCenter();
+  const len=Math.min(W,H)*.3;
+  const rad=given*Math.PI/180;
+  const miss=180-given;
+
+  // baseline
+  gLine(cx-len,cy,cx+len,cy,'rgba(255,255,255,.5)');
+  // angled ray
+  const tx=cx+len*Math.cos(-rad),ty=cy+len*Math.sin(-rad);
+  gLine(cx,cy,tx,ty,'rgba(255,255,255,.7)');
+  gDot(cx,cy,'#fff','');
+
+  // given arc
+  const ar=50;
+  gArcFill(cx,cy,ar,-rad,0,'#4a90d9',.3,true);
+  gText(given+'°',cx+ar+24,cy-18,'#4a90d9',20);
+
+  // missing arc
+  gArcFill(cx,cy,ar,Math.PI,-rad,'#ff4d6d',.2,true);
+  gText('？',cx-ar-20,cy-18,'#ff4d6d',24);
+
+  // 180° label
+  ctx.save();ctx.font='14px sans-serif';ctx.fillStyle='rgba(255,255,255,.25)';ctx.textAlign='center';
+  ctx.fillText('← 180° →',cx,cy+30);ctx.restore();
+}
+
+function drawComp(given){
+  const {x:cx,y:cy}=getCenter();
+  const len=Math.min(W,H)*.28;
+  const rad=given*Math.PI/180;
+  const ar=45;
+
+  // horizontal
+  gLine(cx,cy,cx+len,cy,'rgba(255,255,255,.5)');
+  // vertical
+  gLine(cx,cy,cx,cy-len,'rgba(255,255,255,.5)');
+  // middle ray
+  const mx=cx+len*Math.cos(-rad),my=cy+len*Math.sin(-rad);
+  gLine(cx,cy,mx,my,'rgba(255,255,255,.6)');
+
+  raSquare(cx,cy,0,-Math.PI/2,18,'#00ff88');
+  gDot(cx,cy,'#fff','');
+
+  // given arc
+  gArcFill(cx,cy,ar,-rad,0,'#4a90d9',.3,true);
+  gText(given+'°',cx+ar+20,cy-12,'#4a90d9',18);
+
+  // missing arc
+  gArcFill(cx,cy,ar,-Math.PI/2,-rad,'#ff4d6d',.25,true);
+  gText('？',cx+12,cy-ar-18,'#ff4d6d',22);
+
+  ctx.save();ctx.font='14px sans-serif';ctx.fillStyle='rgba(0,255,136,.35)';ctx.textAlign='left';
+  ctx.fillText('90°',cx+22,cy+22);ctx.restore();
+}
+
+function drawVert(a,ask){
+  const {x:cx,y:cy}=getCenter();
+  const len=Math.min(W,H)*.28;
+  const rad=a*Math.PI/180;
+
+  // line 1 horizontal
+  gLine(cx-len,cy,cx+len,cy,'rgba(255,255,255,.5)');
+  // line 2 angled
+  gLine(cx-len*Math.cos(rad),cy+len*Math.sin(rad),cx+len*Math.cos(rad),cy-len*Math.sin(rad),'rgba(255,255,255,.5)');
+  gDot(cx,cy,'#fff','');
+
+  const ar=35;
+  // ∠1 top-right (given)
+  gArcFill(cx,cy,ar,-rad,0,'#4a90d9',.35,true);
+  gText('∠1='+a+'°',cx+50,cy-30,'#4a90d9',16);
+
+  if(ask==='opp'){
+    // ∠3 bottom-left (asking)
+    gArcFill(cx,cy,ar,Math.PI-rad,Math.PI,'#ff4d6d',.3,true);
+    gText('∠3=？',cx-50,cy+35,'#ff4d6d',18);
+    // ∠2, ∠4 dimmed
+    gArcFill(cx,cy,ar,Math.PI,-rad,'rgba(255,255,255,.3)',.08,true);
+    gText('∠2',cx-50,cy-25,'rgba(255,255,255,.3)',14);
+    gText('∠4',cx+50,cy+30,'rgba(255,255,255,.3)',14);
+  }else{
+    // ∠2 top-left (asking)
+    gArcFill(cx,cy,ar,Math.PI,-rad,'#ff4d6d',.25,true);
+    gText('∠2=？',cx-55,cy-28,'#ff4d6d',18);
+    // ∠3, ∠4 dimmed
+    gArcFill(cx,cy,ar,Math.PI-rad,Math.PI,'rgba(255,255,255,.3)',.08,true);
+    gText('∠3',cx-50,cy+35,'rgba(255,255,255,.3)',14);
+    gText('∠4',cx+50,cy+30,'rgba(255,255,255,.3)',14);
+  }
+}
+
+function drawTri(a,b,c){
+  const {x:mx,y:my}=getCenter();
+  const s=Math.min(W,H)*.25;
+  const ax=mx,ay=my-s*.9;
+  const bx=mx-s,by=my+s*.5;
+  const cx2=mx+s*.8,cy2=my+s*.5;
+
+  // triangle fill
+  ctx.save();ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.closePath();
+  ctx.fillStyle='rgba(255,107,107,.04)';ctx.fill();ctx.restore();
+
+  gLine(ax,ay,bx,by,'rgba(255,255,255,.6)');
+  gLine(bx,by,cx2,cy2,'rgba(255,255,255,.6)');
+  gLine(ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
+
+  // angle labels
+  const vals=[a,b,c];
+  const pts=[[ax,ay-24],[bx-12,by+24],[cx2+12,cy2+24]];
+  const cols=['#ff6b6b','#4ecdc4','#45b7d1'];
+  const names=['∠A','∠B','∠C'];
+
+  vals.forEach((v,i)=>{
+    const isQ=v===-1;
+    const label=isQ?names[i]+'=？':names[i]+'='+v+'°';
+    const col=isQ?'#ff4d6d':cols[i];
+    gText(label,pts[i][0],pts[i][1],col,isQ?18:16);
+  });
+
+  gDot(ax,ay,'#ff6b6b','A',0,-24);
+  gDot(bx,by,'#4ecdc4','B',-18,18);
+  gDot(cx2,cy2,'#45b7d1','C',18,18);
+}
+
+function drawExt(a,b){
+  const {x:mx,y:my}=getCenter();
+  const s=Math.min(W,H)*.22;
+  const ax=mx-s*.3,ay=my-s;
+  const bx=mx-s*1.1,by=my+s*.5;
+  const cx2=mx+s*.4,cy2=my+s*.5;
+  const dx=cx2+(cx2-bx)*.35,dy=cy2;
+
+  // triangle
+  ctx.save();ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.closePath();
+  ctx.fillStyle='rgba(255,215,0,.03)';ctx.fill();ctx.restore();
+  gLine(ax,ay,bx,by,'rgba(255,255,255,.6)');
+  gLine(bx,by,cx2,cy2,'rgba(255,255,255,.6)');
+  gLine(ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
+
+  // extension dashed
+  ctx.save();ctx.setLineDash([10,6]);gLine(cx2,cy2,dx,dy,'#ffd700',2.5);ctx.setLineDash([]);ctx.restore();
+
+  // exterior angle arc
+  const aToA=Math.atan2(ay-cy2,ax-cx2);
+  const aToD=Math.atan2(dy-cy2,dx-cx2);
+  gArcFill(cx2,cy2,40,aToD,aToA,'#ffd700',.25);
+
+  gText('∠A='+a+'°',bx-5,by+22,'#4a90d9',16);
+  gText('∠B='+b+'°',ax,ay-22,'#4ecdc4',16);
+  gText('外角=？',cx2+40,cy2-22,'#ffd700',18);
+
+  gDot(ax,ay,'#ff6b6b','',0,0);
+  gDot(bx,by,'#4ecdc4','',0,0);
+  gDot(cx2,cy2,'#45b7d1','',0,0);
+  gDot(dx,dy,'#ffd700','D',14,18);
+}
+
+function drawExtRev(ext,a){
+  const {x:mx,y:my}=getCenter();
+  const s=Math.min(W,H)*.22;
+  const ax=mx-s*.3,ay=my-s;
+  const bx=mx-s*1.1,by=my+s*.5;
+  const cx2=mx+s*.4,cy2=my+s*.5;
+  const dx=cx2+(cx2-bx)*.35,dy=cy2;
+
+  ctx.save();ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.closePath();
+  ctx.fillStyle='rgba(255,215,0,.03)';ctx.fill();ctx.restore();
+  gLine(ax,ay,bx,by,'rgba(255,255,255,.6)');
+  gLine(bx,by,cx2,cy2,'rgba(255,255,255,.6)');
+  gLine(ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
+  ctx.save();ctx.setLineDash([10,6]);gLine(cx2,cy2,dx,dy,'#ffd700',2.5);ctx.setLineDash([]);ctx.restore();
+
+  const aToA=Math.atan2(ay-cy2,ax-cx2);
+  const aToD=Math.atan2(dy-cy2,dx-cx2);
+  gArcFill(cx2,cy2,40,aToD,aToA,'#ffd700',.25);
+
+  gText('∠A='+a+'°',bx-5,by+22,'#4a90d9',16);
+  gText('∠B=？',ax,ay-22,'#ff4d6d',18);
+  gText('外角='+ext+'°',cx2+40,cy2-22,'#ffd700',16);
+
+  gDot(ax,ay,'#ff6b6b','',0,0);
+  gDot(bx,by,'#4ecdc4','',0,0);
+  gDot(cx2,cy2,'#45b7d1','',0,0);
+  gDot(dx,dy,'#ffd700','D',14,18);
+}
+
+function drawProblem(){
+  ctx.clearRect(0,0,W,H);grid();
+  const p=P[cur];
+  switch(p.draw){
+    case 'supp':drawSupp(p.params.given);break;
+    case 'comp':drawComp(p.params.given);break;
+    case 'vert':drawVert(p.params.a,p.params.ask);break;
+    case 'tri':drawTri(p.params.a,p.params.b,p.params.c);break;
+    case 'ext':drawExt(p.params.a,p.params.b);break;
+    case 'ext_rev':drawExtRev(p.params.ext,p.params.a);break;
+  }
+}
+
+// ============================================================
+// AUDIO
+// ============================================================
+const AC=window.AudioContext||window.webkitAudioContext;let ac;
+function ia(){if(!ac)ac=new AC();}
+function tone(f,d,t='sine',v=.12){try{ia();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);}catch(e){}}
+function sfxOk(){tone(523,.08,'square',.1);setTimeout(()=>tone(659,.08,'square',.1),80);setTimeout(()=>tone(784,.15,'square',.12),160);}
+function sfxNg(){tone(200,.15,'sawtooth',.06);setTimeout(()=>tone(180,.2,'sawtooth',.05),120);}
+function sfxDone(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.12,'square',.1),i*100));}
+
+function confetti(n=12){
+  const cols=['#00d4ff','#ff4d6d','#ffd700','#00ff88','#a855f7'];
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div');p.className='confetti';
+    p.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${cols[i%cols.length]};width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;border-radius:${Math.random()>.5?'50%':'2px'};animation:cfall ${2+Math.random()}s ease ${Math.random()*.3}s forwards`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),3000);
+  }
+}
+
+// ============================================================
+// GAME FLOW
+// ============================================================
+function startPractice(){
+  document.getElementById('splash').classList.add('hidden');
+  document.getElementById('ui').style.display='flex';
+  loadProblem();
+}
+
+function loadProblem(){
+  const p=P[cur];
+  document.getElementById('progText').textContent=`${cur+1} / ${P.length}`;
+  document.getElementById('progFill').style.width=`${(cur/P.length)*100}%`;
+  const [bg,col]=p.tag.split(';');
+  const tag=document.getElementById('tag');
+  tag.textContent=p.concept;tag.style.background=bg.replace('bg:','');tag.style.color=col.replace('color:','');
+  document.getElementById('qtext').textContent=p.q;
+  document.getElementById('ans').value='';
+  document.getElementById('ans').disabled=false;
+  document.getElementById('fb').textContent='';document.getElementById('fb').className='feedback';
+  document.getElementById('hintArea').textContent='';
+  document.getElementById('checkBtn').style.display='';
+  document.getElementById('nextBtn').style.display='none';
+  answered=false;attempts=0;
+  drawProblem();
+  setTimeout(()=>document.getElementById('ans').focus(),100);
+}
+
+function checkAnswer(){
+  if(answered)return;
+  const p=P[cur];
+  const val=parseFloat(document.getElementById('ans').value);
+  if(isNaN(val)){document.getElementById('fb').textContent='請輸入數字！';document.getElementById('fb').className='feedback ng';sfxNg();return;}
+
+  if(Math.abs(val-p.ans)<0.5){
+    // correct
+    answered=true;
+    if(attempts===0)score++;
+    document.getElementById('fb').textContent='✅ 答對了！答案是 '+p.ans+'°';
+    document.getElementById('fb').className='feedback ok';
+    document.getElementById('ans').disabled=true;
+    document.getElementById('checkBtn').style.display='none';
+    document.getElementById('nextBtn').style.display='';
+    document.getElementById('nextBtn').textContent=cur<P.length-1?'下一題 →':'看結果 🏆';
+    sfxOk();confetti(8);
+  }else{
+    attempts++;
+    if(attempts>=2){
+      // show answer
+      answered=true;
+      document.getElementById('fb').textContent='答案是 '+p.ans+'°';
+      document.getElementById('fb').className='feedback ng';
+      document.getElementById('hintArea').textContent='💡 '+p.hint;
+      document.getElementById('ans').disabled=true;
+      document.getElementById('checkBtn').style.display='none';
+      document.getElementById('nextBtn').style.display='';
+      document.getElementById('nextBtn').textContent=cur<P.length-1?'下一題 →':'看結果 🏆';
+      sfxNg();
+    }else{
+      document.getElementById('fb').textContent='再想想看！';
+      document.getElementById('fb').className='feedback ng';
+      document.getElementById('hintArea').textContent='💡 '+p.hint;
+      document.getElementById('ans').value='';
+      document.getElementById('ans').focus();
+      sfxNg();
+    }
+  }
+}
+
+function nextProblem(){
+  if(cur<P.length-1){
+    cur++;loadProblem();
+  }else{
+    // done
+    document.getElementById('ui').style.display='none';
+    const d=document.getElementById('done');d.classList.remove('hidden');
+    document.getElementById('finalScore').textContent=`答對 ${score} / ${P.length} 題`;
+    const pct=score/P.length;
+    document.getElementById('finalMsg').textContent=pct>=.9?'太厲害了！角度大師！🏆':pct>=.6?'表現不錯，繼續加油！💪':'沒關係，多練幾次就會了！📐';
+    sfxDone();confetti(20);
+  }
+}
+
+// Enter key to check
+document.getElementById('ans').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(!answered)checkAnswer();
+    else nextProblem();
+  }
+});
+
+// Initial canvas draw (splash background)
+ctx.clearRect(0,0,W,H);grid();
+</script>
+</body>
+</html>
