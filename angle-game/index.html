@@ -301,15 +301,37 @@ const LEVELS=[
 // ============================================================
 let S={screen:'splash',name:'',avatar:'🦊',lvIdx:0,qIdx:0,answered:false,attempts:0,lvScore:0};
 
-// check URL param for teacher mode
-if(location.search.includes('teacher')){S.screen='teacher';}
+// URL params
+const _params=new URLSearchParams(location.search);
+if(_params.has('teacher')){S.screen='teacher';}
+// ?api=URL to set API endpoint
+const _apiParam=_params.get('api');
+if(_apiParam){localStorage.setItem('ag2-api',_apiParam);toast('✅ API 已設定！','var(--green)');}
 
 function db(){try{return JSON.parse(localStorage.getItem('ag2')||'{}')}catch(e){return{}}}
 function dbSet(d){localStorage.setItem('ag2',JSON.stringify(d))}
 function getPlayer(){const d=db();return d[S.name]||{avatar:S.avatar,power:0,levels:{}};}
-function savePlayer(p){const d=db();d[S.name]=p;dbSet(d);}
+function savePlayer(p){const d=db();d[S.name]=p;dbSet(d);syncToCloud();}
 function isUnlocked(idx){if(idx===0)return true;const p=getPlayer();return(p.levels[LEVELS[idx-1].id]||0)>0;}
 function getTitle(pw){let t=TITLES[0];TITLES.forEach(x=>{if(pw>=x.power)t=x});return t;}
+
+// ============================================================
+// CLOUD SYNC (Google Apps Script backend)
+// ============================================================
+function getApiUrl(){return localStorage.getItem('ag2-api')||'';}
+
+function syncToCloud(){
+  const url=getApiUrl();if(!url||!S.name)return;
+  const p=getPlayer();
+  const body={name:S.name,avatar:p.avatar,power:p.power};
+  LEVELS.forEach(lv=>{body[lv.id]=p.levels[lv.id]||0;});
+  fetch(url,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body),redirect:'follow'}).catch(()=>{});
+}
+
+async function fetchCloud(){
+  const url=getApiUrl();if(!url)return null;
+  try{const r=await fetch(url+'?action=getAll',{redirect:'follow'});return await r.json();}catch(e){return null;}
+}
 
 // ============================================================
 // CANVAS (with roundRect polyfill)
@@ -637,21 +659,49 @@ function rPin(){
 }
 
 function rTeacher(){
-  const d=db(),names=Object.keys(d).filter(n=>n);
-  let rows=names.map(n=>{
-    const p=d[n];let cells=LEVELS.map(lv=>{const s=p.levels?.[lv.id]||0;return s>0?`<td style="color:var(--gold)">${'⭐'.repeat(s)}</td>`:`<td style="color:rgba(255,255,255,.15)">—</td>`;}).join('');
-    return `<tr><td>${p.avatar||'👤'} ${n}</td><td style="color:var(--gold)">${p.power||0}</td>${cells}</tr>`;
-  }).join('');
-  if(!names.length)rows=`<tr><td colspan="${LEVELS.length+2}" style="color:var(--text2);padding:20px">還沒有學生資料</td></tr>`;
   const hd=LEVELS.map((_,i)=>`<th>關${i+1}</th>`).join('');
+  const apiUrl=getApiUrl();
+  const apiStatus=apiUrl?'<span style="color:var(--green);font-size:12px">☁️ 雲端已連線</span>':'<span style="color:var(--pink);font-size:12px">⚠️ 未連線雲端</span>';
+
+  // Show loading first
   app.innerHTML=`<div class="screen teacher">
     <div style="display:flex;justify-content:space-between;align-items:center">
       <h2>📊 學習進度</h2>
       <button class="btn btn-ghost" onclick="S.screen=${S.name?'\'map\'':'\'splash\''};render()" style="font-size:12px;padding:6px 14px">返回</button>
     </div>
-    <div style="overflow-x:auto"><table class="glass"><tr><th>學生</th><th>⚔️</th>${hd}</tr>${rows}</table></div>
-    <button class="btn btn-pink" onclick="if(confirm('確定清除全部？')){localStorage.removeItem('ag2');render()}" style="font-size:13px;padding:10px 20px">🗑️ 清除紀錄</button>
+    ${apiStatus}
+    <div style="color:var(--text2);text-align:center;padding:40px 0">載入中...</div>
   </div>`;
+
+  // Fetch cloud data, then render
+  fetchCloud().then(cloudData=>{
+    const merged=cloudData||db();
+    const names=Object.keys(merged).filter(n=>n);
+    let rows=names.map(n=>{
+      const p=merged[n];
+      const lvs=p.levels||{};
+      let cells=LEVELS.map(lv=>{const s=lvs[lv.id]||0;return s>0?`<td style="color:var(--gold)">${'⭐'.repeat(s)}</td>`:`<td style="color:rgba(255,255,255,.15)">—</td>`;}).join('');
+      return `<tr><td>${p.avatar||'👤'} ${n}</td><td style="color:var(--gold)">${p.power||0}</td>${cells}</tr>`;
+    }).join('');
+    if(!names.length)rows=`<tr><td colspan="${LEVELS.length+2}" style="color:var(--text2);padding:20px">還沒有學生資料</td></tr>`;
+
+    app.innerHTML=`<div class="screen teacher">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2>📊 學習進度</h2>
+        <div>
+          <button class="btn btn-ghost" onclick="rTeacher()" style="font-size:12px;padding:6px 14px;margin-right:6px">🔄 重整</button>
+          <button class="btn btn-ghost" onclick="S.screen=${S.name?'\'map\'':'\'splash\''};render()" style="font-size:12px;padding:6px 14px">返回</button>
+        </div>
+      </div>
+      ${apiStatus}
+      <div style="overflow-x:auto"><table class="glass"><tr><th>學生</th><th>⚔️</th>${hd}</tr>${rows}</table></div>
+      ${!apiUrl?`<div class="glass" style="padding:14px;font-size:13px;color:var(--text2);line-height:1.8">
+        <div style="color:var(--orange);font-weight:700;margin-bottom:4px">⚠️ 目前只有本機資料</div>
+        要看到學生在其他裝置的作答結果，需要設定雲端同步。<br>
+        請依照老師給你的說明完成 Google Apps Script 設定。
+      </div>`:''}
+    </div>`;
+  });
 }
 
 // ============================================================
