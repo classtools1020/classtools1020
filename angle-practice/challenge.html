@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>3-1 內角與外角 — 挑戰版 🔥</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft JhengHei",sans-serif;background:#1a0a1e;color:#fff;overflow:hidden;height:100vh;width:100vw}
+canvas{position:fixed;inset:0;z-index:0}
+#ui{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;pointer-events:none}
+#ui>*{pointer-events:auto}
+#topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px}
+#topbar .title{font-size:14px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:1px}
+#topbar .prog{font-size:13px;color:rgba(255,255,255,.4)}
+.prog-bar{height:4px;background:rgba(255,255,255,.08);margin:0 20px;border-radius:2px}
+.prog-bar .fill{height:100%;background:linear-gradient(90deg,#ffd700,#ff4d6d);border-radius:2px;transition:width .4s}
+.streak-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:6px 0}
+.streak{font-size:13px;font-weight:700;color:#ffd700}
+.spacer{flex:1}
+#panel{background:rgba(20,10,30,.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(255,215,0,.1);padding:16px 20px 24px;max-width:600px;width:100%;margin:0 auto}
+.concept-tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:8px}
+.q-text{font-size:17px;font-weight:700;line-height:1.6;margin-bottom:12px;white-space:pre-line}
+.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.ch{width:100%;padding:14px 18px;border:2.5px solid rgba(255,215,0,.1);border-radius:14px;background:rgba(255,215,0,.02);font-size:18px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent}
+.ch:hover{border-color:rgba(255,215,0,.35);background:rgba(255,215,0,.05)}
+.ch:active{transform:scale(.98)}
+.ch .ci{width:34px;height:34px;border-radius:50%;background:rgba(255,215,0,.08);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:rgba(255,215,0,.4);flex-shrink:0}
+.ch.correct{border-color:#00ff88;background:rgba(0,255,136,.08)}
+.ch.correct .ci{background:#00ff88;color:#000}
+.ch.wrong{border-color:#ff4d6d;background:rgba(255,77,109,.06)}
+.ch.wrong .ci{background:#ff4d6d;color:#fff}
+.ch:disabled{cursor:not-allowed;opacity:.5}
+@keyframes pop{0%{transform:scale(.95)}60%{transform:scale(1.03)}100%{transform:scale(1)}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ch.correct{animation:pop .3s}.ch.wrong{animation:shk .35s}
+.btn{padding:12px 28px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.96)}
+.btn-next{background:linear-gradient(135deg,#ffd700,#e6a800);color:#000;box-shadow:0 0 15px rgba(255,215,0,.3)}
+.btn-start{background:linear-gradient(135deg,#ffd700,#ff4d6d);color:#000;font-size:20px;padding:16px 48px;box-shadow:0 0 25px rgba(255,215,0,.3)}
+.feedback{font-size:15px;font-weight:700;margin-top:8px;min-height:22px}
+.feedback.ok{color:#00ff88}.feedback.ng{color:#ff9f43}
+.hint{font-size:13px;color:rgba(255,255,255,.4);margin-top:4px}
+.splash{position:fixed;inset:0;z-index:10;background:#1a0a1e;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;padding:20px}
+.splash h1{font-size:28px;background:linear-gradient(135deg,#ffd700,#ff4d6d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.splash .sub{color:rgba(255,255,255,.5);font-size:14px;line-height:1.6}
+.splash.hidden{display:none}
+.done-screen{position:fixed;inset:0;z-index:10;background:#1a0a1e;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;text-align:center;padding:20px}
+.done-screen.hidden{display:none}
+.done-screen .big{font-size:64px}
+.done-screen h2{font-size:26px}
+.done-screen .score{font-size:20px;color:#ffd700;font-weight:800}
+.confetti{position:fixed;width:8px;height:8px;border-radius:2px;z-index:200;pointer-events:none}
+@keyframes cfall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="splash" id="splash">
+  <div style="font-size:64px">🔥</div>
+  <h1>3-1 內角與外角 挑戰版</h1>
+  <div class="sub">15 題！混合所有概念<br>看你能連對幾題！</div>
+  <div style="color:rgba(255,215,0,.4);font-size:12px;margin-top:8px">⚡ 包含多邊形和綜合題 ⚡</div>
+  <button class="btn btn-start" onclick="startPractice()">接受挑戰 🔥</button>
+</div>
+
+<div class="done-screen hidden" id="done">
+  <div class="big" id="doneEmoji">🏆</div>
+  <h2 id="doneTitle">挑戰完成！</h2>
+  <div class="score" id="finalScore"></div>
+  <div style="color:rgba(255,255,255,.5);font-size:14px" id="finalMsg"></div>
+  <div style="color:#ffd700;font-size:16px;font-weight:700" id="streakMsg"></div>
+  <button class="btn btn-start" onclick="location.reload()" style="margin-top:8px">再挑戰一次</button>
+</div>
+
+<div id="ui" style="display:none">
+  <div id="topbar">
+    <div class="title">🔥 挑戰版</div>
+    <div class="prog" id="progText">1 / 15</div>
+  </div>
+  <div class="prog-bar"><div class="fill" id="progFill" style="width:0%"></div></div>
+  <div class="streak-bar">
+    <span class="streak" id="streakDisplay">🔥 連對 0 題</span>
+    <span style="color:rgba(255,255,255,.3);font-size:12px" id="scoreDisplay">✅ 0</span>
+  </div>
+  <div class="spacer"></div>
+  <div id="panel">
+    <div class="concept-tag" id="tag"></div>
+    <div class="q-text" id="qtext"></div>
+    <div class="choices" id="choices"></div>
+    <div class="feedback" id="fb"></div>
+    <div class="hint" id="hintArea"></div>
+    <button class="btn btn-next" id="nextBtn" onclick="nextProblem()" style="display:none;margin-top:8px;width:100%">下一題 →</button>
+  </div>
+</div>
+
+<script>
+const P=[
+  // 1-2: 互補
+  {concept:'互補',tag:'bg:rgba(74,144,217,.15);color:#4a90d9',
+   draw:'supp',params:{given:147},
+   q:'兩角互補\n已知一個角是 147°，另一個 = ？',
+   choices:['23°','33°','43°'],correct:1,hint:'180 − 147 = 33'},
+
+  {concept:'互補',tag:'bg:rgba(74,144,217,.15);color:#4a90d9',
+   draw:'supp',params:{given:89},
+   q:'兩角互補\n已知一個角是 89°，另一個 = ？',
+   choices:['81°','91°','101°'],correct:1,hint:'180 − 89 = 91'},
+
+  // 3-4: 互餘
+  {concept:'互餘',tag:'bg:rgba(0,255,136,.1);color:#00ff88',
+   draw:'comp',params:{given:26},
+   q:'兩角互餘\n已知一個角是 26°，另一個 = ？',
+   choices:['54°','64°','74°'],correct:1,hint:'90 − 26 = 64'},
+
+  {concept:'互餘',tag:'bg:rgba(0,255,136,.1);color:#00ff88',
+   draw:'comp',params:{given:71},
+   q:'兩角互餘\n已知一個角是 71°，另一個 = ？',
+   choices:['9°','19°','29°'],correct:1,hint:'90 − 71 = 19'},
+
+  // 5-6: 對頂角
+  {concept:'對頂角',tag:'bg:rgba(168,85,247,.12);color:#a855f7',
+   draw:'vert',params:{a:78,ask:'opp'},
+   q:'兩直線相交，∠1 = 78°\n對頂角 ∠3 = ？',
+   choices:['68°','78°','102°'],correct:1,hint:'對頂角相等！'},
+
+  {concept:'對頂角',tag:'bg:rgba(168,85,247,.12);color:#a855f7',
+   draw:'vert',params:{a:53,ask:'adj'},
+   q:'兩直線相交，∠1 = 53°\n旁邊的 ∠2 = ？',
+   choices:['117°','127°','137°'],correct:1,hint:'180 − 53 = 127'},
+
+  // 7-9: 三角形內角和
+  {concept:'三角形內角和',tag:'bg:rgba(255,107,107,.12);color:#ff6b6b',
+   draw:'tri',params:{a:47,b:68,c:-1},
+   q:'△ABC，∠A = 47°，∠B = 68°\n∠C = ？',
+   choices:['55°','65°','75°'],correct:1,hint:'180 − 47 − 68 = 65'},
+
+  {concept:'三角形內角和',tag:'bg:rgba(255,107,107,.12);color:#ff6b6b',
+   draw:'tri',params:{a:90,b:28,c:-1},
+   q:'直角三角形，∠A = 90°，∠B = 28°\n∠C = ？',
+   choices:['52°','62°','72°'],correct:1,hint:'180 − 90 − 28 = 62'},
+
+  {concept:'等腰三角形',tag:'bg:rgba(255,107,107,.12);color:#ff6b6b',
+   draw:'tri',params:{a:50,b:-1,c:-1},
+   q:'等腰三角形，頂角 = 50°\n兩個底角一樣大，底角 = ？',
+   choices:['55°','65°','75°'],correct:1,hint:'(180 − 50) ÷ 2 = 65'},
+
+  // 10-12: 外角定理
+  {concept:'外角定理',tag:'bg:rgba(255,215,0,.1);color:#ffd700',
+   draw:'ext',params:{a:35,b:49},
+   q:'外角 = 兩個內角加起來\n∠A = 35°，∠B = 49°，外角 = ？',
+   choices:['74°','84°','94°'],correct:1,hint:'35 + 49 = 84'},
+
+  {concept:'外角定理',tag:'bg:rgba(255,215,0,.1);color:#ffd700',
+   draw:'ext_rev',params:{ext:128,a:73},
+   q:'外角 = 128°，∠A = 73°\n另一個內角 ∠B = ？',
+   choices:['45°','55°','65°'],correct:1,hint:'128 − 73 = 55'},
+
+  {concept:'外角定理',tag:'bg:rgba(255,215,0,.1);color:#ffd700',
+   draw:'ext',params:{a:47,b:43},
+   q:'∠A = 47°，∠B = 43°\n外角 = ？',
+   choices:['80°','90°','100°'],correct:1,hint:'47 + 43 = 90'},
+
+  // 13-14: 多邊形
+  {concept:'多邊形',tag:'bg:rgba(255,159,67,.12);color:#ff9f43',
+   draw:'poly',params:{n:5},
+   q:'五邊形可以切成幾個三角形？\n（邊數 − 2）',
+   choices:['2 個','3 個','4 個'],correct:1,hint:'5 − 2 = 3'},
+
+  {concept:'多邊形',tag:'bg:rgba(255,159,67,.12);color:#ff9f43',
+   draw:'poly',params:{n:6},
+   q:'六邊形的內角和 = ？\n（先算三角形個數 × 180°）',
+   choices:['540°','720°','900°'],correct:1,hint:'(6−2) × 180 = 4 × 180 = 720'},
+
+  // 15: 綜合
+  {concept:'綜合題 ⭐',tag:'bg:rgba(255,215,0,.15);color:#ffd700',
+   draw:'ext',params:{a:40,b:75},
+   q:'△ABC，∠A = 40°，∠B = 75°\n∠C 的外角 = ？\n（提示：外角 = ∠A + ∠B）',
+   choices:['105°','115°','125°'],correct:1,hint:'外角 = 40 + 75 = 115'},
+];
+
+let cur=0,score=0,answered=false,attempts=0,streak=0,maxStreak=0;
+
+// ============================================================
+// CANVAS
+// ============================================================
+const canvas=document.getElementById('c');
+const ctx=canvas.getContext('2d');
+let W,H;
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',()=>{resize();if(document.getElementById('ui').style.display!=='none')drawProblem();});
+
+function grid(){
+  ctx.strokeStyle='rgba(180,100,255,0.03)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+}
+function gLine(x1,y1,x2,y2,color='rgba(255,255,255,.7)',w=3){
+  ctx.save();ctx.shadowColor=color;ctx.shadowBlur=10;ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+}
+function gArcFill(cx,cy,r,sa,ea,color,alpha=.25,ccw=false){
+  ctx.save();ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,sa,ea,ccw);ctx.closePath();
+  ctx.fillStyle=color+Math.round(alpha*255).toString(16).padStart(2,'0');ctx.fill();
+  ctx.shadowColor=color;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(cx,cy,r,sa,ea,ccw);ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();ctx.restore();
+}
+function gDot(x,y,color,label,ox=0,oy=-28){
+  ctx.save();ctx.beginPath();ctx.arc(x,y,16,0,Math.PI*2);ctx.fillStyle=color+'33';ctx.fill();
+  ctx.beginPath();ctx.arc(x,y,8,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2.5;ctx.stroke();
+  if(label){ctx.font='bold 22px "Microsoft JhengHei",sans-serif';ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,x+ox,y+oy);}
+  ctx.restore();
+}
+function gText(t,x,y,color,sz=18){
+  ctx.save();ctx.shadowColor=color;ctx.shadowBlur=8;ctx.font=`bold ${sz}px "Microsoft JhengHei",sans-serif`;ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,x,y);ctx.restore();
+}
+function raSquare(cx,cy,a1,a2,sz=16,color='#00ff88'){
+  const mx=cx+sz*Math.cos(a1),my=cy+sz*Math.sin(a1);const ex=mx+sz*Math.cos(a2),ey=my+sz*Math.sin(a2);const nx=cx+sz*Math.cos(a2),ny=cy+sz*Math.sin(a2);
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.shadowColor=color;ctx.shadowBlur=4;ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(ex,ey);ctx.lineTo(nx,ny);ctx.stroke();ctx.restore();
+}
+
+function getCenter(){const panelH=220;return{x:W/2,y:(H-panelH)/2};}
+
+function drawSupp(given){
+  const{x:cx,y:cy}=getCenter();const len=Math.min(W,H)*.3;const rad=given*Math.PI/180;
+  gLine(cx-len,cy,cx+len,cy,'rgba(255,255,255,.5)');
+  gLine(cx,cy,cx+len*Math.cos(-rad),cy+len*Math.sin(-rad),'rgba(255,255,255,.7)');
+  gDot(cx,cy,'#fff','');
+  const ar=50;
+  gArcFill(cx,cy,ar,-rad,0,'#4a90d9',.3,true);gText(given+'°',cx+ar+24,cy-18,'#4a90d9',20);
+  gArcFill(cx,cy,ar,Math.PI,-rad,'#ff4d6d',.2,true);gText('？',cx-ar-20,cy-18,'#ff4d6d',24);
+  ctx.save();ctx.font='14px sans-serif';ctx.fillStyle='rgba(255,255,255,.25)';ctx.textAlign='center';ctx.fillText('← 180° →',cx,cy+30);ctx.restore();
+}
+
+function drawComp(given){
+  const{x:cx,y:cy}=getCenter();const len=Math.min(W,H)*.28;const rad=given*Math.PI/180;const ar=45;
+  gLine(cx,cy,cx+len,cy,'rgba(255,255,255,.5)');gLine(cx,cy,cx,cy-len,'rgba(255,255,255,.5)');
+  gLine(cx,cy,cx+len*Math.cos(-rad),cy+len*Math.sin(-rad),'rgba(255,255,255,.6)');
+  raSquare(cx,cy,0,-Math.PI/2,18,'#00ff88');gDot(cx,cy,'#fff','');
+  gArcFill(cx,cy,ar,-rad,0,'#4a90d9',.3,true);gText(given+'°',cx+ar+20,cy-12,'#4a90d9',18);
+  gArcFill(cx,cy,ar,-Math.PI/2,-rad,'#ff4d6d',.25,true);gText('？',cx+12,cy-ar-18,'#ff4d6d',22);
+  ctx.save();ctx.font='14px sans-serif';ctx.fillStyle='rgba(0,255,136,.35)';ctx.textAlign='left';ctx.fillText('90°',cx+22,cy+22);ctx.restore();
+}
+
+function drawVert(a,ask){
+  const{x:cx,y:cy}=getCenter();const len=Math.min(W,H)*.28;const rad=a*Math.PI/180;
+  gLine(cx-len,cy,cx+len,cy,'rgba(255,255,255,.5)');
+  gLine(cx-len*Math.cos(rad),cy+len*Math.sin(rad),cx+len*Math.cos(rad),cy-len*Math.sin(rad),'rgba(255,255,255,.5)');
+  gDot(cx,cy,'#fff','');const ar=35;
+  gArcFill(cx,cy,ar,-rad,0,'#4a90d9',.35,true);gText('∠1='+a+'°',cx+50,cy-30,'#4a90d9',16);
+  if(ask==='opp'){
+    gArcFill(cx,cy,ar,Math.PI-rad,Math.PI,'#ff4d6d',.3,true);gText('∠3=？',cx-50,cy+35,'#ff4d6d',18);
+    gText('∠2',cx-50,cy-25,'rgba(255,255,255,.3)',14);gText('∠4',cx+50,cy+30,'rgba(255,255,255,.3)',14);
+  }else{
+    gArcFill(cx,cy,ar,Math.PI,-rad,'#ff4d6d',.25,true);gText('∠2=？',cx-55,cy-28,'#ff4d6d',18);
+    gText('∠3',cx-50,cy+35,'rgba(255,255,255,.3)',14);gText('∠4',cx+50,cy+30,'rgba(255,255,255,.3)',14);
+  }
+}
+
+function drawTri(a,b,c){
+  const{x:mx,y:my}=getCenter();const s=Math.min(W,H)*.25;
+  const ax=mx,ay=my-s*.9,bx=mx-s,by=my+s*.5,cx2=mx+s*.8,cy2=my+s*.5;
+  ctx.save();ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.fillStyle='rgba(255,107,107,.04)';ctx.fill();ctx.restore();
+  gLine(ax,ay,bx,by,'rgba(255,255,255,.6)');gLine(bx,by,cx2,cy2,'rgba(255,255,255,.6)');gLine(ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
+  const vals=[a,b,c],pts=[[ax,ay-24],[bx-12,by+24],[cx2+12,cy2+24]],cols=['#ff6b6b','#4ecdc4','#45b7d1'],names=['∠A','∠B','∠C'];
+  vals.forEach((v,i)=>{const isQ=v===-1;gText(isQ?names[i]+'=？':names[i]+'='+v+'°',pts[i][0],pts[i][1],isQ?'#ff4d6d':cols[i],isQ?18:16);});
+  gDot(ax,ay,'#ff6b6b','A',0,-24);gDot(bx,by,'#4ecdc4','B',-18,18);gDot(cx2,cy2,'#45b7d1','C',18,18);
+}
+
+function drawExt(a,b){
+  const{x:mx,y:my}=getCenter();const s=Math.min(W,H)*.22;
+  const ax=mx-s*.3,ay=my-s,bx=mx-s*1.1,by=my+s*.5,cx2=mx+s*.4,cy2=my+s*.5,dx=cx2+(cx2-bx)*.35,dy=cy2;
+  ctx.save();ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.fillStyle='rgba(255,215,0,.03)';ctx.fill();ctx.restore();
+  gLine(ax,ay,bx,by,'rgba(255,255,255,.6)');gLine(bx,by,cx2,cy2,'rgba(255,255,255,.6)');gLine(ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
+  ctx.save();ctx.setLineDash([10,6]);gLine(cx2,cy2,dx,dy,'#ffd700',2.5);ctx.setLineDash([]);ctx.restore();
+  const aToA=Math.atan2(ay-cy2,ax-cx2),aToD=Math.atan2(dy-cy2,dx-cx2);
+  gArcFill(cx2,cy2,40,aToD,aToA,'#ffd700',.25);
+  gText('∠A='+a+'°',bx-5,by+22,'#4a90d9',16);gText('∠B='+b+'°',ax,ay-22,'#4ecdc4',16);
+  gText('外角=？',cx2+40,cy2-22,'#ffd700',18);
+  gDot(ax,ay,'#ff6b6b','',0,0);gDot(bx,by,'#4ecdc4','',0,0);gDot(cx2,cy2,'#45b7d1','',0,0);gDot(dx,dy,'#ffd700','D',14,18);
+}
+
+function drawExtRev(ext,a){
+  const{x:mx,y:my}=getCenter();const s=Math.min(W,H)*.22;
+  const ax=mx-s*.3,ay=my-s,bx=mx-s*1.1,by=my+s*.5,cx2=mx+s*.4,cy2=my+s*.5,dx=cx2+(cx2-bx)*.35,dy=cy2;
+  ctx.save();ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.lineTo(cx2,cy2);ctx.closePath();ctx.fillStyle='rgba(255,215,0,.03)';ctx.fill();ctx.restore();
+  gLine(ax,ay,bx,by,'rgba(255,255,255,.6)');gLine(bx,by,cx2,cy2,'rgba(255,255,255,.6)');gLine(ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
+  ctx.save();ctx.setLineDash([10,6]);gLine(cx2,cy2,dx,dy,'#ffd700',2.5);ctx.setLineDash([]);ctx.restore();
+  const aToA=Math.atan2(ay-cy2,ax-cx2),aToD=Math.atan2(dy-cy2,dx-cx2);
+  gArcFill(cx2,cy2,40,aToD,aToA,'#ffd700',.25);
+  gText('∠A='+a+'°',bx-5,by+22,'#4a90d9',16);gText('∠B=？',ax,ay-22,'#ff4d6d',18);
+  gText('外角='+ext+'°',cx2+40,cy2-22,'#ffd700',16);
+  gDot(ax,ay,'#ff6b6b','',0,0);gDot(bx,by,'#4ecdc4','',0,0);gDot(cx2,cy2,'#45b7d1','',0,0);gDot(dx,dy,'#ffd700','D',14,18);
+}
+
+function drawPoly(n){
+  const{x:cx,y:cy}=getCenter();const r=Math.min(W,H)*.22;const pts=[];
+  for(let i=0;i<n;i++){const a=Math.PI*2*i/n-Math.PI/2;pts.push([cx+r*Math.cos(a),cy+r*Math.sin(a)]);}
+  ctx.save();ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]));ctx.closePath();ctx.fillStyle='rgba(255,215,0,.04)';ctx.fill();ctx.restore();
+  for(let i=0;i<n;i++){const j=(i+1)%n;gLine(pts[i][0],pts[i][1],pts[j][0],pts[j][1],'rgba(255,255,255,.5)');}
+  for(let i=2;i<n-1;i++){ctx.save();ctx.setLineDash([5,4]);gLine(pts[0][0],pts[0][1],pts[i][0],pts[i][1],'#ff4d6d',2);ctx.setLineDash([]);ctx.restore();}
+  for(let i=0;i<n-2;i++){const tx=(pts[0][0]+pts[i+1][0]+pts[i+2][0])/3,ty=(pts[0][1]+pts[i+1][1]+pts[i+2][1])/3;gText('△',tx,ty,'#ff4d6d',18);}
+  pts.forEach(p=>gDot(p[0],p[1],'rgba(255,255,255,.6)',''));
+}
+
+function drawProblem(){
+  ctx.clearRect(0,0,W,H);grid();
+  const p=P[cur];
+  switch(p.draw){
+    case 'supp':drawSupp(p.params.given);break;
+    case 'comp':drawComp(p.params.given);break;
+    case 'vert':drawVert(p.params.a,p.params.ask);break;
+    case 'tri':drawTri(p.params.a,p.params.b,p.params.c);break;
+    case 'ext':drawExt(p.params.a,p.params.b);break;
+    case 'ext_rev':drawExtRev(p.params.ext,p.params.a);break;
+    case 'poly':drawPoly(p.params.n);break;
+  }
+}
+
+// ============================================================
+// AUDIO
+// ============================================================
+const AC=window.AudioContext||window.webkitAudioContext;let ac;
+function ia(){if(!ac)ac=new AC();}
+function tone(f,d,t='sine',v=.12){try{ia();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);}catch(e){}}
+function sfxOk(){tone(523,.08,'square',.1);setTimeout(()=>tone(659,.08,'square',.1),80);setTimeout(()=>tone(784,.15,'square',.12),160);}
+function sfxStreak(){tone(784,.06,'square',.1);setTimeout(()=>tone(988,.06,'square',.1),60);setTimeout(()=>tone(1175,.12,'square',.14),120);}
+function sfxNg(){tone(200,.15,'sawtooth',.06);setTimeout(()=>tone(180,.2,'sawtooth',.05),120);}
+function sfxDone(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.12,'square',.1),i*100));}
+function confetti(n=12){
+  const cols=['#ffd700','#ff4d6d','#00ff88','#a855f7','#00d4ff'];
+  for(let i=0;i<n;i++){const p=document.createElement('div');p.className='confetti';p.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${cols[i%cols.length]};width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;border-radius:${Math.random()>.5?'50%':'2px'};animation:cfall ${2+Math.random()}s ease ${Math.random()*.3}s forwards`;document.body.appendChild(p);setTimeout(()=>p.remove(),3000);}
+}
+
+// ============================================================
+// GAME FLOW
+// ============================================================
+function startPractice(){
+  document.getElementById('splash').classList.add('hidden');
+  document.getElementById('ui').style.display='flex';
+  loadProblem();
+}
+
+function loadProblem(){
+  const p=P[cur];
+  document.getElementById('progText').textContent=`${cur+1} / ${P.length}`;
+  document.getElementById('progFill').style.width=`${(cur/P.length)*100}%`;
+  const[bg,col]=p.tag.split(';');
+  const tag=document.getElementById('tag');
+  tag.textContent=p.concept;tag.style.background=bg.replace('bg:','');tag.style.color=col.replace('color:','');
+  document.getElementById('qtext').textContent=p.q;
+  document.getElementById('fb').textContent='';document.getElementById('fb').className='feedback';
+  document.getElementById('hintArea').textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  answered=false;attempts=0;
+  updateStreak();
+
+  const labels=['A','B','C'];
+  document.getElementById('choices').innerHTML=p.choices.map((ch,i)=>
+    `<button class="ch" id="ch${i}" onclick="pick(${i})"><span class="ci">${labels[i]}</span><span>${ch}</span></button>`
+  ).join('');
+  drawProblem();
+}
+
+function updateStreak(){
+  document.getElementById('streakDisplay').textContent=streak>0?`🔥 連對 ${streak} 題`:'🔥 連對 0 題';
+  document.getElementById('scoreDisplay').textContent=`✅ ${score}`;
+  if(streak>=3)document.getElementById('streakDisplay').style.color='#ff4d6d';
+  else if(streak>=2)document.getElementById('streakDisplay').style.color='#ffd700';
+  else document.getElementById('streakDisplay').style.color='rgba(255,255,255,.4)';
+}
+
+function pick(idx){
+  if(answered)return;
+  const p=P[cur],el=document.getElementById('ch'+idx);
+  if(idx===p.correct){
+    el.classList.add('correct');answered=true;
+    if(attempts===0){score++;streak++;if(streak>maxStreak)maxStreak=streak;}
+    else{streak=0;}
+    p.choices.forEach((_,i)=>{document.getElementById('ch'+i).disabled=true;});
+    document.getElementById('fb').textContent=streak>=3?'🔥🔥🔥 連對 '+streak+' 題！':streak>=2?'🔥 連續答對！':'✅ 答對了！';
+    document.getElementById('fb').className='feedback ok';
+    document.getElementById('hintArea').textContent='💡 '+p.hint;
+    document.getElementById('nextBtn').style.display='';
+    document.getElementById('nextBtn').textContent=cur<P.length-1?'下一題 →':'看結果 🏆';
+    updateStreak();
+    if(streak>=3){sfxStreak();confetti(15);}else{sfxOk();confetti(6);}
+  }else{
+    el.classList.add('wrong');el.disabled=true;attempts++;streak=0;updateStreak();sfxNg();
+    if(attempts>=2){
+      answered=true;
+      document.getElementById('ch'+p.correct).classList.add('correct');
+      p.choices.forEach((_,i)=>{document.getElementById('ch'+i).disabled=true;});
+      document.getElementById('fb').textContent='正確答案是 '+p.choices[p.correct];
+      document.getElementById('fb').className='feedback ng';
+      document.getElementById('hintArea').textContent='💡 '+p.hint;
+      document.getElementById('nextBtn').style.display='';
+      document.getElementById('nextBtn').textContent=cur<P.length-1?'下一題 →':'看結果 🏆';
+    }else{
+      document.getElementById('fb').textContent='再想想看！還有一次機會';
+      document.getElementById('fb').className='feedback ng';
+      document.getElementById('hintArea').textContent='💡 '+p.hint;
+    }
+  }
+}
+
+function nextProblem(){
+  if(cur<P.length-1){cur++;loadProblem();}
+  else{
+    document.getElementById('ui').style.display='none';
+    const d=document.getElementById('done');d.classList.remove('hidden');
+    document.getElementById('finalScore').textContent=`答對 ${score} / ${P.length} 題`;
+    const pct=score/P.length;
+    document.getElementById('doneEmoji').textContent=pct>=.9?'🏆':pct>=.6?'⭐':'💪';
+    document.getElementById('doneTitle').textContent=pct>=.9?'挑戰成功！太強了！':pct>=.6?'挑戰完成！不錯喔！':'挑戰結束！再來一次！';
+    document.getElementById('finalMsg').textContent=pct>=.9?'你根本就是角度大師！':pct>=.6?'繼續練習就能更好！':'沒關係，多練幾次一定會的！';
+    document.getElementById('streakMsg').textContent=maxStreak>=3?`🔥 最高連對紀錄：${maxStreak} 題！`:'';
+    sfxDone();confetti(25);
+  }
+}
+
+ctx.clearRect(0,0,W,H);grid();
+</script>
+</body>
+</html>
