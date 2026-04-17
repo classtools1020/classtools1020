@@ -33,13 +33,21 @@ canvas{position:fixed;inset:0;z-index:0}
 }
 .concept-tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:8px}
 .q-text{font-size:17px;font-weight:700;line-height:1.6;margin-bottom:12px;white-space:pre-line}
-.input-row{display:flex;gap:8px;align-items:center}
-.ans-input{flex:1;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);border-radius:12px;padding:12px 16px;color:#fff;font-size:20px;font-weight:700;font-family:inherit;outline:none;text-align:center;max-width:160px}
-.ans-input:focus{border-color:#00d4ff;box-shadow:0 0 15px rgba(0,212,255,.2)}
-.ans-unit{font-size:18px;color:rgba(255,255,255,.4);font-weight:700}
+.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.ch{width:100%;padding:14px 18px;border:2.5px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.03);font-size:18px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s;font-family:inherit;display:flex;align-items:center;gap:12px;-webkit-tap-highlight-color:transparent}
+.ch:hover{border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.05)}
+.ch:active{transform:scale(.98)}
+.ch .ci{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:rgba(255,255,255,.4);flex-shrink:0}
+.ch.correct{border-color:#00ff88;background:rgba(0,255,136,.08)}
+.ch.correct .ci{background:#00ff88;color:#000}
+.ch.wrong{border-color:#ff4d6d;background:rgba(255,77,109,.06)}
+.ch.wrong .ci{background:#ff4d6d;color:#fff}
+.ch:disabled{cursor:not-allowed;opacity:.5}
+@keyframes pop{0%{transform:scale(.95)}60%{transform:scale(1.03)}100%{transform:scale(1)}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ch.correct{animation:pop .3s}.ch.wrong{animation:shk .35s}
 .btn{padding:12px 28px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;-webkit-tap-highlight-color:transparent}
 .btn:active{transform:scale(.96)}
-.btn-check{background:linear-gradient(135deg,#00d4ff,#0091b3);color:#000;box-shadow:0 0 15px rgba(0,212,255,.3)}
 .btn-next{background:linear-gradient(135deg,#00ff88,#00cc6a);color:#000;box-shadow:0 0 15px rgba(0,255,136,.3)}
 .btn-start{background:linear-gradient(135deg,#00d4ff,#0091b3);color:#000;font-size:20px;padding:16px 48px;box-shadow:0 0 25px rgba(0,212,255,.3)}
 .btn-ghost{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:14px;padding:10px 20px}
@@ -72,8 +80,8 @@ canvas{position:fixed;inset:0;z-index:0}
 <div class="splash" id="splash">
   <div style="font-size:64px">📐</div>
   <h1>3-1 內角與外角 練習</h1>
-  <div class="sub">共 10 題，用到今天學的所有概念<br>在答案欄輸入數字就好（不用打°）</div>
-  <div style="color:rgba(255,255,255,.3);font-size:12px;margin-top:8px">數字不一定是整數的倍數喔，要算清楚！</div>
+  <div class="sub">共 10 題，用到今天學的所有概念<br>每題選一個答案就好！</div>
+  <div style="color:rgba(255,255,255,.3);font-size:12px;margin-top:8px">看圖 → 想一想 → 選答案</div>
   <button class="btn btn-start" onclick="startPractice()">開始練習 ✏️</button>
 </div>
 
@@ -95,14 +103,10 @@ canvas{position:fixed;inset:0;z-index:0}
   <div id="panel">
     <div class="concept-tag" id="tag"></div>
     <div class="q-text" id="qtext"></div>
-    <div class="input-row">
-      <input class="ans-input" id="ans" type="number" inputmode="decimal" placeholder="？">
-      <span class="ans-unit">°</span>
-      <button class="btn btn-check" id="checkBtn" onclick="checkAnswer()">確認</button>
-      <button class="btn btn-next" id="nextBtn" onclick="nextProblem()" style="display:none">下一題 →</button>
-    </div>
+    <div class="choices" id="choices"></div>
     <div class="feedback" id="fb"></div>
     <div class="hint" id="hintArea"></div>
+    <button class="btn btn-next" id="nextBtn" onclick="nextProblem()" style="display:none;margin-top:8px;width:100%">下一題 →</button>
   </div>
 </div>
 
@@ -111,55 +115,55 @@ canvas{position:fixed;inset:0;z-index:0}
 // PROBLEMS
 // ============================================================
 const P=[
-  {concept:'互補',color:'#4a90d9',tag:'bg:rgba(74,144,217,.15);color:#4a90d9',
+  {concept:'互補',tag:'bg:rgba(74,144,217,.15);color:#4a90d9',
    draw:'supp',params:{given:125},
    q:'兩角互補（加起來 = 180°）\n已知一個角是 125°，另一個角 = ？',
-   ans:55,hint:'180 − 125 = ?'},
+   choices:['45°','55°','65°'],correct:1,hint:'180 − 125 = 55'},
 
-  {concept:'互補',color:'#4a90d9',tag:'bg:rgba(74,144,217,.15);color:#4a90d9',
+  {concept:'互補',tag:'bg:rgba(74,144,217,.15);color:#4a90d9',
    draw:'supp',params:{given:73},
    q:'兩角互補\n已知一個角是 73°，另一個角 = ？',
-   ans:107,hint:'180 − 73 = ?'},
+   choices:['97°','107°','117°'],correct:1,hint:'180 − 73 = 107'},
 
-  {concept:'互餘',color:'#00ff88',tag:'bg:rgba(0,255,136,.1);color:#00ff88',
+  {concept:'互餘',tag:'bg:rgba(0,255,136,.1);color:#00ff88',
    draw:'comp',params:{given:37},
    q:'兩角互餘（加起來 = 90°）\n已知一個角是 37°，另一個角 = ？',
-   ans:53,hint:'90 − 37 = ?'},
+   choices:['43°','53°','63°'],correct:1,hint:'90 − 37 = 53'},
 
-  {concept:'互餘',color:'#00ff88',tag:'bg:rgba(0,255,136,.1);color:#00ff88',
+  {concept:'互餘',tag:'bg:rgba(0,255,136,.1);color:#00ff88',
    draw:'comp',params:{given:58},
    q:'兩角互餘\n已知一個角是 58°，另一個角 = ？',
-   ans:32,hint:'90 − 58 = ?'},
+   choices:['22°','32°','42°'],correct:1,hint:'90 − 58 = 32'},
 
-  {concept:'對頂角',color:'#a855f7',tag:'bg:rgba(168,85,247,.12);color:#a855f7',
+  {concept:'對頂角',tag:'bg:rgba(168,85,247,.12);color:#a855f7',
    draw:'vert',params:{a:65,ask:'opp'},
-   q:'兩直線相交，∠1 = 65°\n對頂角 ∠3 = ？',
-   ans:65,hint:'對頂角一定相等！'},
+   q:'兩直線相交，∠1 = 65°\n對面的 ∠3 = ？',
+   choices:['55°','65°','115°'],correct:1,hint:'對頂角一定相等！'},
 
-  {concept:'對頂角',color:'#a855f7',tag:'bg:rgba(168,85,247,.12);color:#a855f7',
+  {concept:'對頂角',tag:'bg:rgba(168,85,247,.12);color:#a855f7',
    draw:'vert',params:{a:42,ask:'adj'},
    q:'兩直線相交，∠1 = 42°\n旁邊的 ∠2 = ？（∠1 + ∠2 = 180°）',
-   ans:138,hint:'180 − 42 = ?'},
+   choices:['128°','138°','148°'],correct:1,hint:'180 − 42 = 138'},
 
-  {concept:'三角形內角和',color:'#ff6b6b',tag:'bg:rgba(255,107,107,.12);color:#ff6b6b',
+  {concept:'三角形內角和',tag:'bg:rgba(255,107,107,.12);color:#ff6b6b',
    draw:'tri',params:{a:50,b:63,c:-1},
-   q:'△ABC 中，∠A = 50°，∠B = 63°\n∠C = ？（三個角加起來 = 180°）',
-   ans:67,hint:'180 − 50 − 63 = ?'},
+   q:'△ABC，∠A = 50°，∠B = 63°\n∠C = ？（三個角加起來 = 180°）',
+   choices:['57°','67°','77°'],correct:1,hint:'180 − 50 − 63 = 67'},
 
-  {concept:'三角形內角和',color:'#ff6b6b',tag:'bg:rgba(255,107,107,.12);color:#ff6b6b',
+  {concept:'三角形內角和',tag:'bg:rgba(255,107,107,.12);color:#ff6b6b',
    draw:'tri',params:{a:90,b:35,c:-1},
-   q:'直角三角形 △ABC\n∠A = 90°，∠B = 35°，∠C = ？',
-   ans:55,hint:'180 − 90 − 35 = ?'},
+   q:'直角三角形，∠A = 90°，∠B = 35°\n∠C = ？',
+   choices:['45°','55°','65°'],correct:1,hint:'180 − 90 − 35 = 55'},
 
-  {concept:'外角定理',color:'#ffd700',tag:'bg:rgba(255,215,0,.1);color:#ffd700',
+  {concept:'外角定理',tag:'bg:rgba(255,215,0,.1);color:#ffd700',
    draw:'ext',params:{a:48,b:57},
-   q:'外角 = 不相鄰的兩個內角之和\n∠A = 48°，∠B = 57°，外角 = ？',
-   ans:105,hint:'48 + 57 = ?'},
+   q:'外角 = 兩個內角加起來\n∠A = 48°，∠B = 57°，外角 = ？',
+   choices:['95°','105°','115°'],correct:1,hint:'48 + 57 = 105'},
 
-  {concept:'外角定理',color:'#ffd700',tag:'bg:rgba(255,215,0,.1);color:#ffd700',
+  {concept:'外角定理',tag:'bg:rgba(255,215,0,.1);color:#ffd700',
    draw:'ext_rev',params:{ext:115,a:68},
-   q:'外角 = 115°，其中一個內角 ∠A = 68°\n另一個內角 ∠B = ？',
-   ans:47,hint:'115 − 68 = ?'},
+   q:'外角 = 115°，∠A = 68°\n另一個內角 ∠B = ？',
+   choices:['37°','47°','57°'],correct:1,hint:'115 − 68 = 47'},
 ];
 
 let cur=0,score=0,answered=false,attempts=0;
@@ -460,54 +464,55 @@ function loadProblem(){
   const tag=document.getElementById('tag');
   tag.textContent=p.concept;tag.style.background=bg.replace('bg:','');tag.style.color=col.replace('color:','');
   document.getElementById('qtext').textContent=p.q;
-  document.getElementById('ans').value='';
-  document.getElementById('ans').disabled=false;
   document.getElementById('fb').textContent='';document.getElementById('fb').className='feedback';
   document.getElementById('hintArea').textContent='';
-  document.getElementById('checkBtn').style.display='';
   document.getElementById('nextBtn').style.display='none';
   answered=false;attempts=0;
+
+  // render choices
+  const labels=['A','B','C'];
+  document.getElementById('choices').innerHTML=p.choices.map((ch,i)=>
+    `<button class="ch" id="ch${i}" onclick="pick(${i})"><span class="ci">${labels[i]}</span><span>${ch}</span></button>`
+  ).join('');
+
   drawProblem();
-  setTimeout(()=>document.getElementById('ans').focus(),100);
 }
 
-function checkAnswer(){
+function pick(idx){
   if(answered)return;
   const p=P[cur];
-  const val=parseFloat(document.getElementById('ans').value);
-  if(isNaN(val)){document.getElementById('fb').textContent='請輸入數字！';document.getElementById('fb').className='feedback ng';sfxNg();return;}
+  const el=document.getElementById('ch'+idx);
 
-  if(Math.abs(val-p.ans)<0.5){
-    // correct
+  if(idx===p.correct){
+    el.classList.add('correct');
     answered=true;
     if(attempts===0)score++;
-    document.getElementById('fb').textContent='✅ 答對了！答案是 '+p.ans+'°';
+    p.choices.forEach((_,i)=>{document.getElementById('ch'+i).disabled=true;});
+    document.getElementById('fb').textContent='✅ 答對了！';
     document.getElementById('fb').className='feedback ok';
-    document.getElementById('ans').disabled=true;
-    document.getElementById('checkBtn').style.display='none';
+    document.getElementById('hintArea').textContent='💡 '+p.hint;
     document.getElementById('nextBtn').style.display='';
     document.getElementById('nextBtn').textContent=cur<P.length-1?'下一題 →':'看結果 🏆';
     sfxOk();confetti(8);
   }else{
+    el.classList.add('wrong');
+    el.disabled=true;
     attempts++;
+    sfxNg();
     if(attempts>=2){
-      // show answer
+      // show correct answer
       answered=true;
-      document.getElementById('fb').textContent='答案是 '+p.ans+'°';
+      document.getElementById('ch'+p.correct).classList.add('correct');
+      p.choices.forEach((_,i)=>{document.getElementById('ch'+i).disabled=true;});
+      document.getElementById('fb').textContent='正確答案是 '+p.choices[p.correct];
       document.getElementById('fb').className='feedback ng';
       document.getElementById('hintArea').textContent='💡 '+p.hint;
-      document.getElementById('ans').disabled=true;
-      document.getElementById('checkBtn').style.display='none';
       document.getElementById('nextBtn').style.display='';
       document.getElementById('nextBtn').textContent=cur<P.length-1?'下一題 →':'看結果 🏆';
-      sfxNg();
     }else{
-      document.getElementById('fb').textContent='再想想看！';
+      document.getElementById('fb').textContent='再想想看！還有一次機會';
       document.getElementById('fb').className='feedback ng';
       document.getElementById('hintArea').textContent='💡 '+p.hint;
-      document.getElementById('ans').value='';
-      document.getElementById('ans').focus();
-      sfxNg();
     }
   }
 }
@@ -516,7 +521,6 @@ function nextProblem(){
   if(cur<P.length-1){
     cur++;loadProblem();
   }else{
-    // done
     document.getElementById('ui').style.display='none';
     const d=document.getElementById('done');d.classList.remove('hidden');
     document.getElementById('finalScore').textContent=`答對 ${score} / ${P.length} 題`;
@@ -525,14 +529,6 @@ function nextProblem(){
     sfxDone();confetti(20);
   }
 }
-
-// Enter key to check
-document.getElementById('ans').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    if(!answered)checkAnswer();
-    else nextProblem();
-  }
-});
 
 // Initial canvas draw (splash background)
 ctx.clearRect(0,0,W,H);grid();
