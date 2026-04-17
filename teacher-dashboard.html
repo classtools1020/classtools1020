@@ -108,7 +108,7 @@ h1{text-align:center;font-size:1.8em;font-weight:900;background:linear-gradient(
 <script>
 const PW='stacey2026';
 const STUDENTS=[{n:'Wendy',e:'🐱'},{n:'Lynn',e:'🐶'},{n:'Yumi',e:'🦊'},{n:'Fan',e:'🐯'},{n:'Yoyo',e:'🐼'},{n:'Mike',e:'🦁'}];
-const TOOLS=['vocabPractice','grammarPractice','listeningBP','errorPool','rpgBoss'];
+const TOOLS=['vocabPractice','grammarPractice','listening-bp','errorPool','rpgBoss','lbpProgress'];
 const API='https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
 let D={},V='all';
 
@@ -170,7 +170,11 @@ function renderSummary(){
     const d=D[s.n]||{};
     if(d.vocabPractice) for(let i=1;i<=20;i++) if(d.vocabPractice[`day${i}`]?.learned) tv++;
     if(d.grammarPractice) for(let i=1;i<=8;i++) if(d.grammarPractice[`unit${i}`]?.done) tg++;
-    if(d.listeningBP?.done) tl+=Object.keys(d.listeningBP.done).filter(k=>d.listeningBP.done[k]).length;
+    const lbp=d['listening-bp'];
+    if(lbp?.done){
+      if(Array.isArray(lbp.done)) tl+=lbp.done.length;
+      else tl+=Object.keys(lbp.done).filter(k=>lbp.done[k]).length;
+    }
     if(Array.isArray(d.errorPool)) d.errorPool.forEach(w=>{ if((w.correctInRPG||0)>=2)td++; else te++; });
   });
   document.getElementById('summaryBar').innerHTML=`
@@ -182,8 +186,8 @@ function renderSummary(){
 }
 
 function renderCard(stu,d){
-  const vp=d.vocabPractice||{}, gp=d.grammarPractice||{}, lp=d.listeningBP||{}, ep=d.errorPool||[], rp=d.rpgBoss||{};
-  const coins=lp.coins||0;
+  const vp=d.vocabPractice||{}, gp=d.grammarPractice||{}, lp=d['listening-bp']||{}, ep=d.errorPool||[], rp=d.rpgBoss||{}, lbpP=d.lbpProgress||{};
+  const coins=(lp.coins||0)+(lbpP.coins||0);
   let h=`<div class="student-card"><div class="sc-header"><div class="sc-avatar">${stu.e}</div><div class="sc-name">${stu.n}</div><div class="sc-coins">🪙 ${coins}</div></div>`;
 
   if(V==='all'||V==='vocab'){
@@ -206,11 +210,16 @@ function renderCard(stu,d){
   }
 
   if(V==='all'||V==='listening'){
-    let dn=0;
-    if(lp.done) dn=Object.keys(lp.done).filter(k=>lp.done[k]).length;
+    let dn=0,doneList=[];
+    if(lp.done){
+      if(Array.isArray(lp.done)){doneList=lp.done.slice();dn=doneList.length;}
+      else {doneList=Object.keys(lp.done).filter(k=>lp.done[k]).map(Number);dn=doneList.length;}
+    }
+    const streak=lp.streak||0,pets=new Set(lp.pets||[]).size;
     h+=`<div class="tool-section ts-listening"><div class="ts-title">🎧 聽力戰令</div><div class="ts-body">
-      ${dn?`<strong>${dn}/29</strong> 天 · 🪙${coins}`:'<span class="no-data">未開始</span>'}
+      ${dn?`<strong>${dn}/29</strong> 天 · 🔥連${streak} · 🐾${pets}寵 · 🪙${lp.coins||0}`:'<span class="no-data">未開始</span>'}
       <div class="mini-bar"><div class="mini-bar-fill mb-purple" style="width:${dn/29*100}%"></div></div>
+      ${dn?listeningTags(doneList,29):''}
     </div></div>`;
   }
 
@@ -237,6 +246,16 @@ function dayTags(vp,n,prefix,field){
     const stars=d?.stars||0;
     h+=done?`<span class="dtag dtag-done" title="Day${i}: ${stars}⭐">D${i}${'⭐'.repeat(Math.min(stars,3))}</span>`
            :`<span class="dtag dtag-not">D${i}</span>`;
+  }
+  return h+'</div>';
+}
+
+function listeningTags(doneArr,n){
+  const set=new Set(doneArr.map(Number));
+  let h='<div class="day-tags">';
+  for(let i=1;i<=n;i++){
+    h+=set.has(i)?`<span class="dtag dtag-done" title="Day${i} 完成">D${i}</span>`
+                 :`<span class="dtag dtag-not">D${i}</span>`;
   }
   return h+'</div>';
 }
