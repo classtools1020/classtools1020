@@ -216,33 +216,48 @@ function drawQ(id,q){
       break;}
     case 'tri':{
       const ax=W*.5,ay=H*.08,bx=W*.1,by=H*.85,cx2=W*.9,cy2=H*.85;
+      // centroid for "inside" direction
+      const gcx=(ax+bx+cx2)/3,gcy=(ay+by+cy2)/3;
       c.save();c.beginPath();c.moveTo(ax,ay);c.lineTo(bx,by);c.lineTo(cx2,cy2);c.closePath();c.fillStyle='rgba(0,212,255,.04)';c.fill();c.restore();
       gL(c,ax,ay,bx,by,'rgba(255,255,255,.6)');gL(c,bx,by,cx2,cy2,'rgba(255,255,255,.6)');gL(c,ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
-      const vals=[d.a,d.b,d.c],pts=[[ax,ay-16],[bx-6,by+16],[cx2+6,cy2+16]],cols=['#ff6b6b','#4ecdc4','#45b7d1'];
-      vals.forEach((v,i)=>{const isQ=v===-1;gT(c,isQ?'？':v+'°',pts[i][0],pts[i][1],isQ?'#ff4d6d':cols[i],isQ?16:13);});
+      // labels INSIDE: push each vertex toward centroid
+      const verts=[[ax,ay],[bx,by],[cx2,cy2]],vals=[d.a,d.b,d.c],cols=['#ff6b6b','#4ecdc4','#45b7d1'];
+      verts.forEach(([vx,vy],i)=>{
+        const dx=gcx-vx,dy=gcy-vy,dist=Math.hypot(dx,dy);
+        const px=vx+dx/dist*30,py=vy+dy/dist*28;
+        const isQ=vals[i]===-1;
+        gT(c,isQ?'？':vals[i]+'°',px,py,isQ?'#ff4d6d':cols[i],isQ?15:13);
+      });
+      // vertex labels OUTSIDE
       gD(c,ax,ay,'#ff6b6b','A',0,-18);gD(c,bx,by,'#4ecdc4','B',-14,14);gD(c,cx2,cy2,'#45b7d1','C',14,14);
       break;}
     case 'ext':{
       const ax=W*.42,ay=H*.06,bx=W*.06,by=H*.76,cx2=W*.58,cy2=H*.76,dx=cx2+(cx2-bx)*.32,dy=cy2;
+      const egcx=(ax+bx+cx2)/3,egcy=(ay+by+cy2)/3;
       c.save();c.beginPath();c.moveTo(ax,ay);c.lineTo(bx,by);c.lineTo(cx2,cy2);c.closePath();c.fillStyle='rgba(255,215,0,.03)';c.fill();c.restore();
       gL(c,ax,ay,bx,by,'rgba(255,255,255,.6)');gL(c,bx,by,cx2,cy2,'rgba(255,255,255,.6)');gL(c,ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
       c.save();c.setLineDash([8,5]);gL(c,cx2,cy2,dx,dy,'#ffd700',2.5);c.setLineDash([]);c.restore();
       const aToA=Math.atan2(ay-cy2,ax-cx2),aToD=Math.atan2(dy-cy2,dx-cx2);
       gA(c,cx2,cy2,28,aToD,aToA,'#ffd700',.25);
-      gT(c,d.a+'°',bx+2,by+16,'#4a90d9',13);gT(c,d.b+'°',ax,ay-14,'#4ecdc4',13);
+      // angle labels INSIDE
+      [[bx,by,d.a+'°','#4a90d9'],[ax,ay,d.b+'°','#4ecdc4']].forEach(([vx,vy,lb,col])=>{
+        const ddx=egcx-vx,ddy=egcy-vy,dd=Math.hypot(ddx,ddy);gT(c,lb,vx+ddx/dd*28,vy+ddy/dd*26,col,13);});
       gT(c,'外角=？',cx2+32,cy2-14,'#ffd700',14);
-      gD(c,ax,ay,'#ff6b6b','',0,0);gD(c,bx,by,'#4ecdc4','',0,0);gD(c,cx2,cy2,'#45b7d1','',0,0);gD(c,dx,dy,'#ffd700','D',10,14);
+      gD(c,ax,ay,'#ff6b6b','A',0,-16);gD(c,bx,by,'#4ecdc4','B',-14,14);gD(c,cx2,cy2,'#45b7d1','C',0,14);gD(c,dx,dy,'#ffd700','D',10,14);
       break;}
     case 'ext_rev':{
       const ax=W*.42,ay=H*.06,bx=W*.06,by=H*.76,cx2=W*.58,cy2=H*.76,dx=cx2+(cx2-bx)*.32,dy=cy2;
+      const egcx2=(ax+bx+cx2)/3,egcy2=(ay+by+cy2)/3;
       c.save();c.beginPath();c.moveTo(ax,ay);c.lineTo(bx,by);c.lineTo(cx2,cy2);c.closePath();c.fillStyle='rgba(255,215,0,.03)';c.fill();c.restore();
       gL(c,ax,ay,bx,by,'rgba(255,255,255,.6)');gL(c,bx,by,cx2,cy2,'rgba(255,255,255,.6)');gL(c,ax,ay,cx2,cy2,'rgba(255,255,255,.6)');
       c.save();c.setLineDash([8,5]);gL(c,cx2,cy2,dx,dy,'#ffd700',2.5);c.setLineDash([]);c.restore();
       const aToA=Math.atan2(ay-cy2,ax-cx2),aToD=Math.atan2(dy-cy2,dx-cx2);
       gA(c,cx2,cy2,28,aToD,aToA,'#ffd700',.25);
-      gT(c,d.a+'°',bx+2,by+16,'#4a90d9',13);gT(c,'∠B=？',ax,ay-14,'#ff4d6d',14);
+      // angle labels INSIDE
+      {const ddx=egcx2-bx,ddy=egcy2-by,dd=Math.hypot(ddx,ddy);gT(c,d.a+'°',bx+ddx/dd*28,by+ddy/dd*26,'#4a90d9',13);}
+      {const ddx=egcx2-ax,ddy=egcy2-ay,dd=Math.hypot(ddx,ddy);gT(c,'∠B=？',ax+ddx/dd*28,ay+ddy/dd*26,'#ff4d6d',14);}
       gT(c,'外角='+d.ext+'°',cx2+32,cy2-14,'#ffd700',13);
-      gD(c,ax,ay,'#ff6b6b','',0,0);gD(c,bx,by,'#4ecdc4','',0,0);gD(c,cx2,cy2,'#45b7d1','',0,0);gD(c,dx,dy,'#ffd700','D',10,14);
+      gD(c,ax,ay,'#ff6b6b','A',0,-16);gD(c,bx,by,'#4ecdc4','B',-14,14);gD(c,cx2,cy2,'#45b7d1','C',0,14);gD(c,dx,dy,'#ffd700','D',10,14);
       break;}
   }
 }
@@ -254,7 +269,7 @@ const app=document.getElementById('app');
 function render(){
   switch(S.screen){
     case 'splash':rSplash();break;case 'login':rLogin();break;case 'map':rMap();break;
-    case 'question':rQ();break;case 'gacha':rGacha();break;case 'lvDone':rLvDone();break;
+    case 'question':rQ();break;case 'gacha':rGacha();break;case 'lvDone':rLvDone();break;case 'ending':rEnding();break;
   }
 }
 
@@ -377,7 +392,7 @@ function rLvDone(){
     <div style="color:var(--text2);font-size:14px">${msgs[stars-1]}</div>
     <div style="display:flex;flex-direction:column;gap:8px;width:100%;max-width:260px">
       ${hasNext?`<button class="btn btn-cyan" onclick="startLv(${S.lvIdx+1})" style="width:100%">下一關 →</button>`
-      :'<div style="color:var(--green);font-size:16px;font-weight:800;text-align:center">🎉 全部過關！作業完成！</div>'}
+      :`<button class="btn btn-green" onclick="S.screen='ending';render()" style="width:100%;font-size:18px">🎉 回家慶祝！</button>`}
       <button class="btn btn-ghost" onclick="S.screen='map';render()" style="width:100%">回地圖</button>
     </div>
   </div>`;
@@ -438,6 +453,88 @@ function confetti(n=10){
   for(let i=0;i<n;i++){const p=document.createElement('div');p.className='confetti';p.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${cols[i%cols.length]};width:${5+Math.random()*6}px;height:${5+Math.random()*6}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-delay:${Math.random()*.4}s;animation-duration:${2+Math.random()}s`;document.body.appendChild(p);setTimeout(()=>p.remove(),3000);}
 }
 function toast(msg,bg='var(--orange)'){const t=document.createElement('div');t.className='toast';t.style.background=bg;t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2500);}
+
+// ============================================================
+// ELEVATOR ENDING
+// ============================================================
+function rEnding(){
+  sfxLvUp();
+  const p=gp(),t=title(p.power);
+  app.innerHTML=`<div class="screen" style="justify-content:center;align-items:center;padding:0;overflow:hidden;background:#1a1a2e;position:relative">
+    <!-- Building background -->
+    <div id="building" style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center">
+      <!-- Floors -->
+      ${Array.from({length:8},(_,i)=>`
+        <div style="width:180px;height:40px;border:2px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);display:flex;align-items:center;justify-content:center;position:relative">
+          <span style="position:absolute;left:-30px;color:rgba(255,255,255,.2);font-size:11px;font-weight:700">${8-i}F</span>
+          ${i===0?'<span style="color:var(--gold);font-size:11px;font-weight:700">🏠 HOME</span>':''}
+          ${i===7?'<span style="color:rgba(255,255,255,.2);font-size:10px">START</span>':''}
+        </div>
+      `).join('')}
+    </div>
+    <!-- Elevator shaft -->
+    <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:0;width:100px;height:100%">
+      <!-- Elevator car -->
+      <div id="elevator" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:80px;height:70px;background:linear-gradient(180deg,#3a3a5c,#2a2a4c);border:3px solid #5a5a8a;border-radius:8px 8px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:bottom 4s cubic-bezier(.2,.8,.3,1);box-shadow:0 0 20px rgba(90,90,138,.3)">
+        <div style="font-size:28px" id="elvChar">${S.avatar}</div>
+        <div style="font-size:8px;color:rgba(255,255,255,.5);margin-top:2px">${S.name}</div>
+        <!-- Elevator doors -->
+        <div style="position:absolute;top:0;left:0;width:50%;height:100%;border-right:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.02)"></div>
+      </div>
+      <!-- Cable -->
+      <div id="cable" style="position:absolute;top:0;left:50%;width:2px;background:linear-gradient(180deg,#5a5a8a,transparent);height:calc(100% - 80px);transform:translateX(-50%)"></div>
+    </div>
+    <!-- Floor indicator -->
+    <div id="floorNum" style="position:absolute;top:30px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);border:2px solid #5a5a8a;border-radius:8px;padding:6px 16px;font-size:20px;font-weight:900;color:var(--green);font-family:monospace;letter-spacing:2px">1F</div>
+    <!-- Message area -->
+    <div id="endMsg" style="position:absolute;top:80px;left:50%;transform:translateX(-50%);text-align:center;opacity:0;transition:opacity 1s">
+      <div style="font-size:24px;font-weight:900;color:#fff">作業完成！回家囉～</div>
+      <div style="font-size:14px;color:var(--gold);margin-top:4px">${t.n} ⚔️${p.power}</div>
+    </div>
+    <!-- Replay button -->
+    <div id="endBtns" style="position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:8px;opacity:0;transition:opacity .5s">
+      <button class="btn btn-ghost" onclick="S.screen='map';render()" style="font-size:13px">回地圖</button>
+      <button class="btn btn-cyan" onclick="location.reload()" style="font-size:13px">再玩一次</button>
+    </div>
+  </div>`;
+
+  // Animate elevator going up
+  let floor=1;
+  const elv=document.getElementById('elevator');
+  const floorNum=document.getElementById('floorNum');
+
+  setTimeout(()=>{
+    // Move elevator to top
+    elv.style.bottom='calc(100% - 90px)';
+
+    // Update floor numbers
+    const interval=setInterval(()=>{
+      floor++;
+      floorNum.textContent=floor+'F';
+      if(floor>=8){
+        clearInterval(interval);
+        floorNum.textContent='🏠';
+        floorNum.style.color='var(--gold)';
+        // Arrival!
+        setTimeout(()=>{
+          document.getElementById('endMsg').style.opacity='1';
+          document.getElementById('endBtns').style.opacity='1';
+          confetti(30);
+          // Character celebrates
+          const ch=document.getElementById('elvChar');
+          let bounce=0;
+          const bounceInterval=setInterval(()=>{
+            ch.style.transform=bounce%2===0?'translateY(-8px) scale(1.2)':'translateY(0) scale(1)';
+            bounce++;
+            if(bounce>10)clearInterval(bounceInterval);
+          },300);
+          // Ding sound!
+          tone(880,.15,'sine',.15);setTimeout(()=>tone(1175,.2,'sine',.12),200);
+        },500);
+      }
+    },500);
+  },500);
+}
 
 render();
 </script>
