@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📊 教師後台 — 角度練習</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft JhengHei",sans-serif;background:#0a0a1a;color:#e8eaf0;min-height:100vh;padding:20px}
+.wrap{max-width:800px;margin:0 auto}
+h1{font-size:22px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+h2{font-size:17px;margin:20px 0 10px;color:#fff;display:flex;align-items:center;gap:8px}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;margin-bottom:12px}
+.card h3{font-size:15px;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 6px;text-align:center;border-bottom:1px solid rgba(255,255,255,.05)}
+th{color:rgba(255,255,255,.4);font-size:11px;font-weight:700;text-transform:uppercase}
+td:first-child{text-align:left;font-weight:600;font-size:14px}
+.gold{color:#ffd700}
+.dim{color:rgba(255,255,255,.15)}
+.empty{color:rgba(255,255,255,.3);text-align:center;padding:20px;font-size:14px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn:active{transform:scale(.97)}
+.btn-red{background:rgba(255,77,109,.15);border:1px solid rgba(255,77,109,.2);color:#ff4d6d}
+.btn-blue{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:#00d4ff}
+.btn-ghost{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
+.links{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.link-card{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px 16px;cursor:pointer;transition:all .15s;text-decoration:none;color:inherit}
+.link-card:hover{border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.03)}
+.link-icon{font-size:28px;flex-shrink:0}
+.link-info{flex:1}
+.link-info .lt{font-size:14px;font-weight:700;color:#fff}
+.link-info .lu{font-size:11px;color:rgba(255,255,255,.3);word-break:break-all;margin-top:2px}
+.link-actions{display:flex;gap:6px}
+.copy-btn{padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.copy-btn:hover{border-color:rgba(0,212,255,.3);color:#00d4ff}
+.tabs{display:flex;gap:4px;margin-bottom:14px}
+.tab{padding:8px 16px;border-radius:10px;border:none;background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.tab.active{background:rgba(0,212,255,.12);color:#00d4ff}
+.refresh-note{font-size:11px;color:rgba(255,255,255,.2);margin-top:4px}
+.title-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="title-row">
+    <h1>📊 教師後台</h1>
+    <button class="btn btn-blue" onclick="location.reload()">🔄 重新整理</button>
+  </div>
+
+  <!-- 網站連結 -->
+  <h2>🔗 網站連結</h2>
+  <div class="links" id="links"></div>
+
+  <!-- 進度查看 -->
+  <div class="tabs">
+    <button class="tab active" id="tabHw" onclick="showTab('hw')">🛡️ 守衛戰（作業）</button>
+    <button class="tab" id="tabCh" onclick="showTab('ch')">⚔️ 競技場（挑戰）</button>
+  </div>
+
+  <div id="hwPanel"></div>
+  <div id="chPanel" style="display:none"></div>
+
+  <!-- 管理 -->
+  <h2>⚙️ 管理</h2>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-red" onclick="clearData('ag-hw')">🗑️ 清除守衛戰紀錄</button>
+    <button class="btn btn-red" onclick="clearData('ag-ch')">🗑️ 清除競技場紀錄</button>
+  </div>
+  <div class="refresh-note" style="margin-top:12px">
+    ⚠️ 目前資料存在每台裝置的瀏覽器中（localStorage）<br>
+    你只能看到「在這台裝置上」玩過的學生紀錄
+  </div>
+</div>
+
+<script>
+const BASE='https://classtools1020.github.io/classtools1020/angle-practice/';
+
+const SITES=[
+  {icon:'🛡️',name:'角度守衛戰（回家作業）',url:BASE,desc:'3關 × 選擇題，BOSS 制'},
+  {icon:'⚔️',name:'角度競技場（挑戰版）',url:BASE+'challenge.html',desc:'5關 × BOSS + 連勝'},
+  {icon:'📊',name:'教師後台（本頁）',url:BASE+'teacher.html',desc:'查看學生進度'},
+];
+
+const HW_LEVELS=[{id:'hw1',t:'互補互餘'},{id:'hw2',t:'對頂角'},{id:'hw3',t:'三角形外角'}];
+const CH_LEVELS=[{id:'ch1',t:'速攻'},{id:'ch2',t:'交叉'},{id:'ch3',t:'三角'},{id:'ch4',t:'外角'},{id:'ch5',t:'最終'}];
+
+// Render links
+document.getElementById('links').innerHTML=SITES.map(s=>`
+  <div class="link-card" onclick="window.open('${s.url}','_blank')">
+    <div class="link-icon">${s.icon}</div>
+    <div class="link-info">
+      <div class="lt">${s.name}</div>
+      <div class="lu">${s.url}</div>
+    </div>
+    <button class="copy-btn" onclick="event.stopPropagation();copyUrl('${s.url}',this)">複製</button>
+  </div>
+`).join('');
+
+function copyUrl(url,btn){
+  navigator.clipboard.writeText(url).then(()=>{btn.textContent='已複製 ✓';btn.style.color='#00ff88';setTimeout(()=>{btn.textContent='複製';btn.style.color='';},1500);});
+}
+
+// Render tables
+function renderTable(key,levels,panelId){
+  const panel=document.getElementById(panelId);
+  let data;
+  try{data=JSON.parse(localStorage.getItem(key)||'{}');}catch(e){data={};}
+  const names=Object.keys(data).filter(n=>n);
+
+  if(!names.length){
+    panel.innerHTML=`<div class="card"><div class="empty">還沒有學生資料<br>學生在這台裝置上玩過才會出現</div></div>`;
+    return;
+  }
+
+  const headers=levels.map(l=>`<th>${l.t}</th>`).join('');
+  const rows=names.map(n=>{
+    const p=data[n];
+    const pw=p.power||0;
+    const cells=levels.map(l=>{
+      const s=p.levels?.[l.id]||0;
+      return s>0?`<td class="gold">${'⭐'.repeat(s)}</td>`:`<td class="dim">—</td>`;
+    }).join('');
+    return `<tr><td>${p.avatar||'👤'} ${n}</td><td class="gold">${pw}</td>${cells}</tr>`;
+  }).join('');
+
+  panel.innerHTML=`<div class="card">
+    <table>
+      <tr><th style="text-align:left">學生</th><th>⚔️ 戰力</th>${headers}</tr>
+      ${rows}
+    </table>
+  </div>`;
+}
+
+function showTab(tab){
+  document.getElementById('tabHw').classList.toggle('active',tab==='hw');
+  document.getElementById('tabCh').classList.toggle('active',tab==='ch');
+  document.getElementById('hwPanel').style.display=tab==='hw'?'':'none';
+  document.getElementById('chPanel').style.display=tab==='ch'?'':'none';
+}
+
+function clearData(key){
+  if(confirm('確定清除？這無法復原！')){
+    localStorage.removeItem(key);
+    init();
+  }
+}
+
+function init(){
+  renderTable('ag-hw',HW_LEVELS,'hwPanel');
+  renderTable('ag-ch',CH_LEVELS,'chPanel');
+}
+
+init();
+</script>
+</body>
+</html>
