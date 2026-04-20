@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>禮拜五 4/25 上課流程 | 今天吃咖哩！</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    background: linear-gradient(135deg, #F5E6D3 0%, #E8D0B3 100%);
+    min-height: 100vh;
+    padding: 15px;
+    color: #6B3A1F;
+    line-height: 1.6;
+  }
+  .container { max-width: 750px; margin: 0 auto; }
+  .back-btn {
+    display: inline-block;
+    background: #8B4513;
+    color: #FFF8E7;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    min-height: 48px;
+    line-height: 1.5;
+  }
+  .header {
+    background: linear-gradient(135deg, #D2691E 0%, #8B4513 100%);
+    color: #FFF8E7;
+    padding: 25px 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(139,69,19,0.3);
+  }
+  h1 { font-size: 2rem; margin-bottom: 5px; }
+  .date-label { font-size: 1.1rem; color: #F5E6D3; }
+
+  .core-concept {
+    background: #FFF8E7;
+    border: 3px solid #D4A574;
+    border-radius: 15px;
+    padding: 18px;
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+  .core-concept strong { color: #D2691E; font-size: 1.2rem; }
+
+  .quick-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+  .big-btn {
+    display: block;
+    background: #D4A574;
+    color: #FFF8E7;
+    padding: 18px 20px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(139,69,19,0.25);
+    border: 3px solid #8B4513;
+    min-height: 48px;
+  }
+  .big-btn.gamma { background: #D2691E; color: #FFF8E7; }
+  .big-btn.worksheet { background: #D4A574; color: #6B3A1F; }
+
+  .flow-steps {
+    background: #FFF8E7;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(139,69,19,0.15);
+  }
+  .step {
+    display: flex;
+    gap: 15px;
+    padding: 15px 10px;
+    border-bottom: 2px dashed #D4A574;
+    align-items: flex-start;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    background: #D2691E;
+    color: #FFF8E7;
+    min-width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+  .step-content { flex: 1; }
+  .step-time {
+    background: #6B3A1F;
+    color: #FFF8E7;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .step-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #D2691E;
+    margin-bottom: 8px;
+  }
+  .step-detail {
+    font-size: 1.05rem;
+    color: #6B3A1F;
+    line-height: 1.7;
+  }
+  .highlight-box {
+    background: #FFE5CC;
+    border: 2px solid #FF8C00;
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 10px;
+  }
+  .highlight-box strong { color: #D2691E; }
+  .warning {
+    background: #FFF3CD;
+    border-left: 5px solid #FF8C00;
+    padding: 12px 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  .warning strong { color: #D2691E; }
+  .special-tip {
+    background: linear-gradient(135deg, #FFE5CC 0%, #FFD4A3 100%);
+    border: 3px solid #D2691E;
+    border-radius: 15px;
+    padding: 18px;
+    margin-top: 20px;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+  .special-tip strong { color: #D2691E; font-size: 1.2rem; }
+  @media (max-width: 480px) {
+    h1 { font-size: 1.6rem; }
+    .step-num { min-width: 42px; height: 42px; font-size: 1.2rem; }
+    .step-title { font-size: 1.1rem; }
+    .big-btn { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="index.html" class="back-btn">← 回代課老師首頁</a>
+
+  <div class="header">
+    <h1>🍛 今天吃咖哩！</h1>
+    <div class="date-label">禮拜五・4/25・實作體驗課</div>
+  </div>
+
+  <div class="core-concept">
+    <strong>今天要做什麼</strong><br>
+    <span style="font-size:1.15rem;">學生動手做＋吃＋學印度文化</span><br>
+    <span style="font-size:1rem;color:#8B4513;">吐司沾咖哩＝像印度人用烤餅沾咖哩！</span>
+  </div>
+
+  <div class="quick-links">
+    <a href="https://gamma.app/generations/9PzhSjZOUk7SvsgoHL7ix" target="_blank" class="big-btn gamma">
+      📊 打開 Gamma 投影片
+    </a>
+    <a href="worksheet-fri.html" class="big-btn worksheet">
+      📝 打開學習單（吃飽再發）
+    </a>
+  </div>
+
+  <div class="flow-steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <span class="step-time">0-3 分鐘</span>
+        <div class="step-title">🎉 開場：宣布今天吃咖哩！</div>
+        <div class="step-detail">
+          跟學生說：<br>
+          <strong style="color:#D2691E;">「今天我們要吃昨天講過的——印度咖哩！」</strong><br>
+          讓學生期待一下，問問他們：<br>
+          👉「印度咖哩是什麼味道？」（辣、香）<br>
+          👉「印度人怎麼吃咖哩？」（用烤餅沾）
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <span class="step-time">3-6 分鐘</span>
+        <div class="step-title">♨️ 微波咖哩調理包</div>
+        <div class="step-detail">
+          咖哩調理包放微波爐 <strong>3 分鐘</strong>。<br>
+          <strong style="color:#D2691E;">請小心燙！</strong>拿出來的時候用毛巾或夾子。
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <span class="step-time">6-8 分鐘</span>
+        <div class="step-title">🍞 切吐司＋發手套</div>
+        <div class="step-detail">
+          把吐司切成<strong>三角形</strong>（像印度烤餅的形狀）。<br>
+          給每個學生<strong>一雙塑膠手套</strong>戴上。<br>
+          <div class="highlight-box">
+            <strong>💡 小秘訣：</strong>吐司切三角形是為了模擬印度烤餅 Naan 的樣子！戴手套是因為印度人用手吃。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <span class="step-time">8-10 分鐘</span>
+        <div class="step-title">🍚 盛飯分碗，淋咖哩</div>
+        <div class="step-detail">
+          每個學生一個碗，裝飯後淋上咖哩。<br>
+          旁邊放一片三角吐司。<br>
+          <strong style="color:#D2691E;">咖哩別淋太多，夠沾就好！</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <span class="step-time">10-20 分鐘</span>
+        <div class="step-title">🍽️ 開動！邊吃邊看投影片</div>
+        <div class="step-detail">
+          大家一起吃！老師可以示範用手套捏吐司沾咖哩。<br>
+          邊吃邊翻 Gamma 投影片，講一下印度文化。<br>
+          <a href="https://gamma.app/generations/9PzhSjZOUk7SvsgoHL7ix" target="_blank" class="big-btn gamma" style="font-size:1rem;padding:12px;">📊 點我打開投影片</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <span class="step-time">20-35 分鐘</span>
+        <div class="step-title">📝 吃完發學習單</div>
+        <div class="step-detail">
+          吃完、擦手、脫手套後發學習單。<br>
+          <a href="worksheet-fri.html" target="_blank" class="big-btn worksheet" style="font-size:1rem;padding:12px;">📝 點我打開學習單</a><br><br>
+          全部是圈選題！趁著味道還在嘴巴裡，邊回想邊圈。
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-content">
+        <span class="step-time">35-45 分鐘</span>
+        <div class="step-title">📦 收學習單＋收拾</div>
+        <div class="step-detail">
+          收學習單放我桌上，收拾碗盤、垃圾袋綁好就完成啦！<br>
+          跟學生說一句：<strong style="color:#D2691E;">「今天你們也是小小印度人了！」</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="special-tip">
+    <strong>🌟 今天的重點體驗</strong><br>
+    <span style="font-size:1.05rem;">讓學生<strong>戴手套用手沾吐司沾咖哩</strong>，就像印度人用烤餅沾！</span><br>
+    <span style="font-size:1rem;color:#8B4513;">這是今天整堂課的靈魂 👉 用身體記住文化！</span>
+  </div>
+
+  <div class="warning">
+    <strong>💡 特教班提醒：</strong><br>
+    • <strong>A（肢障）</strong>：老師幫忙切吐司、盛飯。<br>
+    • <strong>B（癲癇）</strong>：吃飯慢一點沒關係，不要催。<br>
+    • <strong>C（ADHD）</strong>：讓他當發碗的小幫手，有事做比較不會分心。<br>
+    • <strong>D（聽障）</strong>：確認助聽器，動作示範多一點。<br>
+    • <strong>全部學生</strong>：確認沒有咖哩過敏！若有不吃辣的，可以只淋一點點。
+  </div>
+</div>
+</body>
+</html>

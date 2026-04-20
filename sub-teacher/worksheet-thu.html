@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>禮拜四學習單 | 環遊世界美食偵探</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    background: #F5E6D3;
+    color: #1a3a5c;
+    line-height: 1.7;
+    padding: 20px;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #FFF8E7;
+    border: 5px solid #4A7BA7;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 6px 20px rgba(139,69,19,0.2);
+  }
+  .back-btn {
+    display: inline-block;
+    background: #8B4513;
+    color: #FFF8E7;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #4A7BA7;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    border-bottom: 4px solid #D4A574;
+    padding-bottom: 15px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #8B4513;
+    font-size: 1.15rem;
+    margin-bottom: 20px;
+  }
+  .name-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #E8D0B3;
+    border-radius: 10px;
+    font-size: 1.15rem;
+  }
+  .name-row span {
+    border-bottom: 2px solid #8B4513;
+    min-width: 100px;
+    padding: 0 30px;
+  }
+  .question {
+    background: #FFF;
+    border: 3px solid #4A7BA7;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .q-num {
+    background: #4A7BA7;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 10px;
+    font-size: 1.25rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .q-title {
+    font-size: 1.3rem;
+    color: #1a3a5c;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+  .q-hint {
+    font-size: 1.05rem;
+    color: #5A7B9A;
+    margin-bottom: 15px;
+    font-style: italic;
+  }
+
+  /* 連連看 */
+  .match-box {
+    display: flex;
+    justify-content: space-around;
+    gap: 40px;
+    padding: 20px 10px;
+    font-size: 1.3rem;
+  }
+  .match-col {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+  .match-item {
+    background: #E3F2FD;
+    border: 3px solid #4A7BA7;
+    padding: 15px 20px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 1.3rem;
+    min-width: 140px;
+  }
+
+  /* 圈選 */
+  .choice-group { margin-bottom: 20px; }
+  .choice-q {
+    font-size: 1.25rem;
+    color: #1a3a5c;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  .choice-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-left: 10px;
+  }
+  .choice-opt {
+    background: #FFE5CC;
+    border: 3px solid #D4A574;
+    border-radius: 50px;
+    padding: 10px 22px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #6B3A1F;
+    min-width: 80px;
+    text-align: center;
+  }
+
+  /* 表格 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 1.1rem;
+  }
+  th, td {
+    border: 2px solid #4A7BA7;
+    padding: 12px;
+    text-align: center;
+  }
+  th {
+    background: #4A7BA7;
+    color: white;
+  }
+  td { background: #F5F9FC; }
+
+  /* 畫圖區 */
+  .draw-box {
+    background: #FFF;
+    border: 3px dashed #4A7BA7;
+    border-radius: 15px;
+    min-height: 180px;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #AAA;
+    font-size: 1rem;
+  }
+
+  .formula {
+    background: linear-gradient(135deg, #E8D0B3 0%, #D4A574 100%);
+    border: 3px solid #8B4513;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 25px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #6B3A1F;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .container { box-shadow: none; border: 3px solid #4A7BA7; padding: 20px; }
+    .back-btn { display: none; }
+    .draw-box { min-height: 150px; }
+  }
+  @media (max-width: 600px) {
+    h1 { font-size: 1.5rem; }
+    .q-title { font-size: 1.1rem; }
+    .match-box { flex-direction: column; gap: 15px; }
+    .match-col { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+    .match-item { min-width: auto; font-size: 1.1rem; padding: 10px 15px; }
+    .choice-opt { font-size: 1.15rem; padding: 8px 16px; }
+  }
+</style>
+</head>
+<body>
+<a href="thursday.html" class="back-btn">← 回禮拜四流程</a>
+<div class="container">
+  <h1>🌍 環遊世界美食偵探</h1>
+  <div class="subtitle">禮拜四學習單・全部圈選就好！</div>
+
+  <div class="name-row">
+    <div>姓名：<span>　　　</span></div>
+    <div>日期：<span>4/24</span></div>
+  </div>
+
+  <!-- 第1題 -->
+  <div class="question">
+    <span class="q-num">第 1 題</span>
+    <div class="q-title">🔗 連連看：哪一國吃什麼？</div>
+    <div class="q-hint">用筆把左邊的國家連到右邊的食物</div>
+    <div class="match-box">
+      <div class="match-col">
+        <div class="match-item">🇯🇵 日本</div>
+        <div class="match-item">🇮🇳 印度</div>
+        <div class="match-item">🌍 非洲</div>
+      </div>
+      <div class="match-col">
+        <div class="match-item">🍛 咖哩</div>
+        <div class="match-item">🌾 小米</div>
+        <div class="match-item">🍣 壽司</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第2題 -->
+  <div class="question">
+    <span class="q-num">第 2 題</span>
+    <div class="q-title">✏️ 圈出正確答案</div>
+
+    <div class="choice-group">
+      <div class="choice-q">(1) 日本為什麼吃壽司？</div>
+      <div class="choice-row">
+        <div class="choice-opt">🌊 靠海</div>
+        <div class="choice-opt">🏔️ 靠山</div>
+        <div class="choice-opt">🏜️ 沙漠</div>
+      </div>
+    </div>
+
+    <div class="choice-group">
+      <div class="choice-q">(2) 印度為什麼咖哩要加很多香料？</div>
+      <div class="choice-row">
+        <div class="choice-opt">🌡️ 天氣熱</div>
+        <div class="choice-opt">❄️ 天氣冷</div>
+        <div class="choice-opt">🌧️ 下雨</div>
+      </div>
+    </div>
+
+    <div class="choice-group">
+      <div class="choice-q">(3) 非洲人吃什麼跟原住民一樣？</div>
+      <div class="choice-row">
+        <div class="choice-opt">🍚 白米</div>
+        <div class="choice-opt">🌾 小米</div>
+        <div class="choice-opt">🍜 麵條</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第3題 -->
+  <div class="question">
+    <span class="q-num">第 3 題</span>
+    <div class="q-title">🧭 是「住的地方」還是「規矩」？</div>
+    <div class="q-hint">圈出答案</div>
+
+    <div class="choice-group">
+      <div class="choice-q">(1) 日本四面環海，所以吃海鮮 →</div>
+      <div class="choice-row">
+        <div class="choice-opt">🏠 住的地方</div>
+        <div class="choice-opt">📜 規矩</div>
+      </div>
+    </div>
+
+    <div class="choice-group">
+      <div class="choice-q">(2) 印度人不吃牛肉 →</div>
+      <div class="choice-row">
+        <div class="choice-opt">🏠 住的地方</div>
+        <div class="choice-opt">📜 規矩</div>
+      </div>
+    </div>
+
+    <div class="choice-group">
+      <div class="choice-q">(3) 原住民住山上，吃小米 →</div>
+      <div class="choice-row">
+        <div class="choice-opt">🏠 住的地方</div>
+        <div class="choice-opt">📜 規矩</div>
+      </div>
+    </div>
+
+    <div class="choice-group">
+      <div class="choice-q">(4) 日本人要說「我開動了」才能吃 →</div>
+      <div class="choice-row">
+        <div class="choice-opt">🏠 住的地方</div>
+        <div class="choice-opt">📜 規矩</div>
+      </div>
+    </div>
+
+    <div class="choice-group">
+      <div class="choice-q">(5) 非洲熱又乾，所以種小米不種水稻 →</div>
+      <div class="choice-row">
+        <div class="choice-opt">🏠 住的地方</div>
+        <div class="choice-opt">📜 規矩</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 第4題 -->
+  <div class="question">
+    <span class="q-num">第 4 題</span>
+    <div class="q-title">🎨 加分畫圖題</div>
+    <div class="q-hint">畫一樣你今天最喜歡、最想吃的食物！</div>
+    <div class="draw-box">（在這裡畫圖）</div>
+  </div>
+
+  <div class="formula">
+    🏠 住的地方 ＋ 📜 規矩 ＝ 🍱 食物！
+  </div>
+</div>
+</body>
+</html>
