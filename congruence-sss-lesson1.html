@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>蠟筆小新的玩具工廠｜全等 SSS ｜老師帶領版</title>
+<title>全等 SSS｜哆啦A夢陪你過一天的三角形</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#FAFAFA;color:#2C3E50;
@@ -14,14 +14,13 @@ body{display:flex;flex-direction:column}
   --bg:#FAFAFA; --text:#2C3E50; --text-sub:#5D6D7E;
   --sss:#E74C3C; --sss-lt:#FADBD8;
   --sas1:#3498DB; --sas1-lt:#D6EAF8;
-  --sas2:#F39C12;
   --cong:#9B59B6; --cong-lt:#E8DAEF;
-  --ok:#27AE60; --ok-lt:#D5F5E3;
+  --ok:#27AE60;
   --warn:#E67E22;
   --shadow:0 4px 12px rgba(0,0,0,.12);
 }
 
-/* ============ 頂部：老師提示卡（永遠顯示）============ */
+/* 老師提示卡 */
 #teacher-tip{background:#FFF8E1;border-bottom:4px solid var(--warn);
   padding:14px 24px;min-height:80px;display:flex;align-items:center;gap:14px}
 #teacher-tip .badge{background:var(--warn);color:#fff;padding:6px 14px;
@@ -31,17 +30,24 @@ body{display:flex;flex-direction:column}
 #teacher-tip .scene-tag{background:var(--cong);color:#fff;padding:4px 10px;
   border-radius:10px;font-size:14px;font-weight:700;white-space:nowrap}
 
-/* ============ 主舞台 ============ */
+/* 主舞台 */
 #stage{flex:1;position:relative;overflow:hidden;background:var(--bg)}
 #canvas{width:100%;height:100%;display:block}
-
-/* 學生看的大字旁白 */
 #narration{position:absolute;top:14px;left:50%;transform:translateX(-50%);
   max-width:80%;background:#fff;border:4px solid var(--cong);
   border-radius:18px;padding:16px 26px;font-size:28px;font-weight:700;
   box-shadow:var(--shadow);z-index:20;line-height:1.4;text-align:center;
   color:var(--text);pointer-events:none;display:none}
-#narration.visible{display:block}
+#narration.visible{display:block;animation:nFadeIn .4s ease}
+@keyframes nFadeIn{from{opacity:0;transform:translate(-50%,-10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* 時間標籤 (左上) */
+#time-stamp{position:absolute;top:14px;left:14px;z-index:15;
+  background:linear-gradient(135deg,#F1C40F,#F39C12);
+  color:#fff;padding:8px 18px;border-radius:30px;font-weight:800;
+  font-size:22px;box-shadow:var(--shadow);display:none}
+#time-stamp.visible{display:block;animation:tsIn .5s ease}
+@keyframes tsIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
 
 /* 下方控制列 */
 #control-bar{background:#fff;padding:12px 20px;box-shadow:0 -4px 12px rgba(0,0,0,.08);
@@ -57,7 +63,6 @@ body{display:flex;flex-direction:column}
   font-family:inherit;gap:6px}
 .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
 .btn:active{transform:translateY(1px)}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .btn-next{background:var(--cong);color:#fff;border-color:var(--cong);
   min-width:200px;font-size:26px;animation:glow 2s infinite}
 .btn-next:hover{background:#7D3C98}
@@ -78,61 +83,87 @@ body{display:flex;flex-direction:column}
 .prog-seg.done{background:var(--cong)}
 .prog-seg.current{background:#F4D03F;animation:pulse 1.4s infinite}
 @keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
-.prog-label{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);
-  font-size:11px;color:var(--text-sub);padding:2px 4px;white-space:nowrap}
 
-/* 慶祝彩帶 */
+/* 彩帶 */
 .confetti{position:fixed;width:12px;height:16px;z-index:50;
   animation:fall 2.8s linear;pointer-events:none}
 @keyframes fall{0%{transform:translateY(-20vh) rotate(0)}100%{transform:translateY(110vh) rotate(540deg)}}
 
-/* 答對/答錯 閃現 */
+/* 閃現 */
 .flash{position:absolute;inset:0;pointer-events:none;z-index:18;
   display:flex;align-items:center;justify-content:center;font-size:160px;
   animation:flashIn .6s ease}
 @keyframes flashIn{0%{opacity:0;transform:scale(.5)}50%{opacity:1;transform:scale(1.3)}
   100%{opacity:0;transform:scale(1)}}
 
-/* 手機排版 */
+/* SVG 動畫效果 */
+.pulsate{animation:svgPulse 1.4s ease-in-out infinite}
+@keyframes svgPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.shake{animation:svgShake .4s ease}
+@keyframes svgShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}
+  75%{transform:translateX(6px)}}
+
 @media (max-width:720px){
   #teacher-tip{padding:8px 12px;min-height:auto;flex-wrap:wrap}
   #teacher-tip .content{font-size:16px}
   #narration{font-size:20px;padding:10px 16px;max-width:92%}
   .btn{font-size:18px;padding:8px 14px;min-height:48px}
   .btn-next,.btn-scene-next{min-width:140px;font-size:20px}
+  #time-stamp{font-size:16px;padding:6px 12px}
 }
 </style>
 </head>
 <body>
 
-<!-- 老師提示區 (永遠顯示, 提醒老師現在要說什麼) -->
 <div id="teacher-tip">
   <div class="badge">👩‍🏫 老師</div>
-  <div class="content" id="tip-content">準備好開始！按右下角「▶ 下一步」開始第一幕。</div>
+  <div class="content" id="tip-content">準備好！按「▶ 下一步」和哆啦A夢去看生活中的三角形。</div>
   <div class="scene-tag" id="scene-tag">1/6</div>
 </div>
 
-<!-- 進度條 -->
 <div id="progress">
-  <div class="prog-seg current"><span class="prog-label">疊合</span></div>
-  <div class="prog-seg"><span class="prog-label">對應邊</span></div>
-  <div class="prog-seg"><span class="prog-label">SSS</span></div>
-  <div class="prog-seg"><span class="prog-label">卡比派對</span></div>
-  <div class="prog-seg"><span class="prog-label">測驗</span></div>
-  <div class="prog-seg"><span class="prog-label">通關</span></div>
+  <div class="prog-seg current"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
 </div>
 
-<!-- 主舞台 -->
 <div id="stage">
   <svg id="canvas" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <!-- 漸層 -->
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FEF9E7"/>
+        <stop offset="100%" stop-color="#FDEBD0"/>
+      </linearGradient>
+      <linearGradient id="bread" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#F5DEB3"/>
+        <stop offset="100%" stop-color="#DEB887"/>
+      </linearGradient>
+      <linearGradient id="rice" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFFEF5"/>
+        <stop offset="100%" stop-color="#F5F5DC"/>
+      </linearGradient>
+      <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#D7A871"/>
+        <stop offset="100%" stop-color="#B8864A"/>
+      </linearGradient>
+      <pattern id="sesame" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+        <circle cx="5" cy="5" r="1" fill="#5D4037"/>
+        <circle cx="15" cy="12" r="1" fill="#5D4037"/>
+        <circle cx="8" cy="16" r="1" fill="#5D4037"/>
+      </pattern>
+    </defs>
     <g id="scene-root"></g>
   </svg>
+  <div id="time-stamp"></div>
   <div id="narration"></div>
 </div>
 
-<!-- 下方控制列 -->
 <div id="control-bar">
-  <div id="progress-info">📍 場景 <span id="s-n">1</span> / 6</div>
+  <div id="progress-info">📍 <span id="s-name">早上</span> · <span id="s-n">1</span>/6</div>
   <div id="main-actions">
     <button class="btn btn-next" id="btn-next">▶ 下一步</button>
   </div>
@@ -144,79 +175,55 @@ body{display:flex;flex-direction:column}
 </div>
 
 <script>
-// ============================================================
-// 狀態
-// ============================================================
-const state = {
-  sceneIdx: 0,
-  stepIdx: -1,     // 目前在哪一小步 (-1 = 還沒開始)
-  audioOn: true,
-};
+const state = { sceneIdx: 0, stepIdx: -1, audioOn: true };
 
-// ============================================================
 // 音效
-// ============================================================
 let audioCtx = null;
 function ensureAudio(){
-  if(!audioCtx){
-    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-    catch(e){}
-  }
-  if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+  if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
 }
-function beep(freq, dur=0.15, type="sine", gain=0.2){
-  if(!state.audioOn || !audioCtx) return;
-  const osc = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-  osc.type = type; osc.frequency.value = freq;
-  g.gain.setValueAtTime(gain, audioCtx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-  osc.connect(g); g.connect(audioCtx.destination);
-  osc.start(); osc.stop(audioCtx.currentTime + dur);
+function beep(f,d=0.15,t="sine",g=0.2){
+  if(!state.audioOn||!audioCtx) return;
+  const o=audioCtx.createOscillator(), gn=audioCtx.createGain();
+  o.type=t; o.frequency.value=f;
+  gn.gain.setValueAtTime(g, audioCtx.currentTime);
+  gn.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+d);
+  o.connect(gn); gn.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime+d);
 }
 const SFX = {
-  click(){ beep(600, 0.05, "square", 0.1); },
-  reveal(){ beep(440, 0.12, "sine", 0.15); },
-  pop(){ beep(880, 0.08, "triangle", 0.15); },
-  success(){
-    beep(523, 0.15, "sine", 0.18);
-    setTimeout(()=>beep(659, 0.15, "sine", 0.18), 140);
-    setTimeout(()=>beep(784, 0.25, "sine", 0.2), 280);
-  },
-  gentle(){ beep(330, 0.2, "sine", 0.14);
-    setTimeout(()=>beep(262, 0.25, "sine", 0.14), 180); },
+  click(){ beep(600,0.05,"square",0.1); },
+  reveal(){ beep(440,0.12,"sine",0.15); },
+  pop(){ beep(880,0.08,"triangle",0.15); },
+  ding(){ beep(1047,0.15,"sine",0.18); setTimeout(()=>beep(1319,0.2,"sine",0.18),140); },
+  success(){ beep(523,0.15,"sine",0.18);
+    setTimeout(()=>beep(659,0.15,"sine",0.18),140);
+    setTimeout(()=>beep(784,0.25,"sine",0.2),280); },
+  gentle(){ beep(330,0.2,"sine",0.14); setTimeout(()=>beep(262,0.25,"sine",0.14),180); },
   win(){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,0.18,"sine",0.22),i*130)); }
 };
 
-// ============================================================
-// 幾何 (跟前版相同)
-// ============================================================
-function triangleFromSSS(a,b,c){
-  if(a+b<=c || b+c<=a || a+c<=b) return null;
-  const x = (c*c + a*a - b*b) / (2*a);
-  const y = Math.sqrt(Math.max(c*c - x*x, 0));
-  return [
-    {x:x,y:-y,label:"A"},
-    {x:0,y:0,label:"B"},
-    {x:a,y:0,label:"C"},
-  ];
+// 幾何
+function triFromSSS(a,b,c){
+  if(a+b<=c||b+c<=a||a+c<=b) return null;
+  const x=(c*c+a*a-b*b)/(2*a);
+  const y=Math.sqrt(Math.max(c*c-x*x,0));
+  return [{x,y:-y,label:"A"},{x:0,y:0,label:"B"},{x:a,y:0,label:"C"}];
 }
-function transform(pts, cx, cy, scale=20){
-  const mx = pts.reduce((s,p)=>s+p.x,0)/3;
-  const my = pts.reduce((s,p)=>s+p.y,0)/3;
-  return pts.map(p => ({x:cx+(p.x-mx)*scale, y:cy+(p.y-my)*scale, label:p.label}));
+function tform(pts,cx,cy,scale=20){
+  const mx=pts.reduce((s,p)=>s+p.x,0)/3, my=pts.reduce((s,p)=>s+p.y,0)/3;
+  return pts.map(p=>({x:cx+(p.x-mx)*scale, y:cy+(p.y-my)*scale, label:p.label}));
 }
 function lerp(a,b,t){ return a+(b-a)*t; }
 function lerpPts(p1,p2,t){
   return p1.map((p,i)=>({x:lerp(p.x,p2[i].x,t), y:lerp(p.y,p2[i].y,t), label:p.label}));
 }
 
-// ============================================================
-// SVG helpers
-// ============================================================
-const SVGNS = "http://www.w3.org/2000/svg";
-function el(tag, attrs={}, parent=null){
-  const e = document.createElementNS(SVGNS, tag);
+// SVG
+const NS = "http://www.w3.org/2000/svg";
+function el(tag,attrs={},parent=null){
+  const e = document.createElementNS(NS, tag);
   for(const k in attrs) e.setAttribute(k, attrs[k]);
   if(parent) parent.appendChild(e);
   return e;
@@ -226,54 +233,156 @@ function clearScene(){
   r.innerHTML = "";
   return r;
 }
-function triPath(pts){
-  return `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y} Z`;
-}
-function drawTri(parent, pts, opts={}){
-  const {fill="#E8DAEF", stroke="#9B59B6", sw=4, id="", labels=true, showLen=null} = opts;
+function triPath(pts){ return `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y} Z`; }
+function drawTri(parent,pts,opts={}){
+  const {fill="#E8DAEF",stroke="#9B59B6",sw=4,id="",showLen=null,labels=false} = opts;
   const g = el("g", id?{id}:{}, parent);
   el("path", {d:triPath(pts), fill, stroke, "stroke-width":sw,
-    "stroke-linejoin":"round", "stroke-linecap":"round"}, g);
+    "stroke-linejoin":"round","stroke-linecap":"round"}, g);
   if(labels){
-    pts.forEach(p => {
+    pts.forEach(p=>{
       const dx = p.label==="A"?0:(p.label==="B"?-20:20);
       const dy = p.label==="A"?-18:24;
-      el("text", {x:p.x+dx, y:p.y+dy, "font-size":24, "font-weight":800,
-        fill:stroke, "text-anchor":"middle"}, g).textContent = p.label;
+      el("text",{x:p.x+dx,y:p.y+dy,"font-size":22,"font-weight":800,
+        fill:stroke,"text-anchor":"middle"},g).textContent = p.label;
     });
   }
   if(showLen){
-    // showLen = {AB:5, BC:7, CA:8}
-    const midAB = {x:(pts[0].x+pts[1].x)/2, y:(pts[0].y+pts[1].y)/2};
-    const midBC = {x:(pts[1].x+pts[2].x)/2, y:(pts[1].y+pts[2].y)/2};
-    const midCA = {x:(pts[2].x+pts[0].x)/2, y:(pts[2].y+pts[0].y)/2};
-    el("text", {x:midAB.x-32, y:midAB.y+8, "font-size":26, "font-weight":800,
-      fill:stroke}, g).textContent = showLen.AB;
-    el("text", {x:midBC.x, y:midBC.y+34, "font-size":26, "font-weight":800,
-      fill:stroke, "text-anchor":"middle"}, g).textContent = showLen.BC;
-    el("text", {x:midCA.x+22, y:midCA.y+8, "font-size":26, "font-weight":800,
-      fill:stroke}, g).textContent = showLen.CA;
+    const m = (a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+    const mAB=m(pts[0],pts[1]), mBC=m(pts[1],pts[2]), mCA=m(pts[2],pts[0]);
+    el("text",{x:mAB.x-32,y:mAB.y+8,"font-size":24,"font-weight":800,fill:stroke},g).textContent=showLen.AB;
+    el("text",{x:mBC.x,y:mBC.y+30,"font-size":24,"font-weight":800,fill:stroke,"text-anchor":"middle"},g).textContent=showLen.BC;
+    el("text",{x:mCA.x+22,y:mCA.y+8,"font-size":24,"font-weight":800,fill:stroke},g).textContent=showLen.CA;
   }
   return g;
 }
 
-// ============================================================
-// 角色 SVG
-// ============================================================
-function addShinchan(parent, cx, cy, scale=1){
-  const g = el("g", {transform:`translate(${cx},${cy}) scale(${scale})`}, parent);
-  el("ellipse", {cx:0,cy:0,rx:55,ry:60,fill:"#FAD7A0",stroke:"#7E5109","stroke-width":3}, g);
-  el("ellipse", {cx:0,cy:-55,rx:22,ry:18,fill:"#1B2631"}, g);
-  el("rect", {x:-28,y:-20,width:24,height:8,fill:"#1B2631",transform:"rotate(-8 -16 -16)"}, g);
-  el("rect", {x:4,y:-20,width:24,height:8,fill:"#1B2631",transform:"rotate(8 16 -16)"}, g);
-  el("circle", {cx:-15,cy:-5,r:5,fill:"#1B2631"}, g);
-  el("circle", {cx:15,cy:-5,r:5,fill:"#1B2631"}, g);
-  el("ellipse", {cx:0,cy:18,rx:18,ry:8,fill:"#C0392B",stroke:"#7B241C","stroke-width":2}, g);
-  el("rect", {x:-45,y:55,width:90,height:50,fill:"#F1C40F",stroke:"#9A7D0A","stroke-width":2,rx:8}, g);
-  el("rect", {x:-35,y:100,width:70,height:30,fill:"#C0392B",stroke:"#7B241C","stroke-width":2}, g);
+// ===========================================================
+// 生活物件 SVG
+// ===========================================================
+
+// 三明治 (三角形, 吐司紋理 + 芝麻)
+function drawSandwich(parent, pts, opts={}){
+  const {id="", highlight=false} = opts;
+  const g = el("g", id?{id}:{}, parent);
+  // 主體吐司
+  el("path", {d:triPath(pts), fill:"url(#bread)",
+    stroke: highlight ? "#9B59B6" : "#8B6F47",
+    "stroke-width": highlight ? 6 : 4,
+    "stroke-linejoin":"round"}, g);
+  // 芝麻點 (在三角形內部)
+  const cx = pts.reduce((s,p)=>s+p.x,0)/3;
+  const cy = pts.reduce((s,p)=>s+p.y,0)/3;
+  for(let i=0;i<8;i++){
+    const ang = Math.random()*Math.PI*2;
+    const r = Math.random()*25;
+    el("circle", {cx:cx+Math.cos(ang)*r, cy:cy+Math.sin(ang)*r,
+      r:1.8, fill:"#3E2723"}, g);
+  }
+  // 起司條 (黃色橫線)
+  const midAB = {x:(pts[0].x+pts[1].x)/2, y:(pts[0].y+pts[1].y)/2};
+  const midAC = {x:(pts[0].x+pts[2].x)/2, y:(pts[0].y+pts[2].y)/2};
+  el("line", {x1:midAB.x, y1:midAB.y, x2:midAC.x, y2:midAC.y,
+    stroke:"#F1C40F", "stroke-width":5, "stroke-linecap":"round", opacity:.85}, g);
+  // 生菜 (綠色波浪)
+  el("path", {
+    d:`M${midAB.x+10},${midAB.y+6} Q${cx},${cy-8} ${midAC.x-10},${midAC.y+6}`,
+    fill:"none", stroke:"#2ECC71", "stroke-width":4, "stroke-linecap":"round"
+  }, g);
   return g;
 }
-function addDoraemon(parent, cx, cy, scale=1){
+
+// 三角板 (黃色塑膠/木頭, 有刻度)
+function drawRuler(parent, pts, opts={}){
+  const {id="", color="url(#wood)", showLen=null} = opts;
+  const g = el("g", id?{id}:{}, parent);
+  el("path", {d:triPath(pts), fill:color,
+    stroke:"#8B5A2B", "stroke-width":4, "stroke-linejoin":"round"}, g);
+  // 刻度 (三邊各畫幾個小刻度線)
+  const tick = (p1, p2, n=5) => {
+    for(let i=1;i<n;i++){
+      const t = i/n;
+      const mx = p1.x+(p2.x-p1.x)*t, my = p1.y+(p2.y-p1.y)*t;
+      const dx = -(p2.y-p1.y), dy = p2.x-p1.x;
+      const len = Math.sqrt(dx*dx+dy*dy);
+      const ux = dx/len*6, uy = dy/len*6;
+      el("line", {x1:mx-ux, y1:my-uy, x2:mx+ux, y2:my+uy,
+        stroke:"#3E2723", "stroke-width":2}, g);
+    }
+  };
+  tick(pts[0], pts[1]); tick(pts[1], pts[2]); tick(pts[2], pts[0]);
+  // 數字 "30" 樣
+  const cx = pts.reduce((s,p)=>s+p.x,0)/3;
+  const cy = pts.reduce((s,p)=>s+p.y,0)/3;
+  el("text", {x:cx, y:cy+6, "font-size":20, "font-weight":800,
+    fill:"#3E2723", "text-anchor":"middle"}, g).textContent = "三角板";
+  if(showLen){
+    const m = (a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+    const mAB=m(pts[0],pts[1]), mBC=m(pts[1],pts[2]), mCA=m(pts[2],pts[0]);
+    el("text",{x:mAB.x-28,y:mAB.y+6,"font-size":22,"font-weight":800,fill:"#E74C3C"},g).textContent=showLen.AB;
+    el("text",{x:mBC.x,y:mBC.y+28,"font-size":22,"font-weight":800,fill:"#3498DB","text-anchor":"middle"},g).textContent=showLen.BC;
+    el("text",{x:mCA.x+20,y:mCA.y+6,"font-size":22,"font-weight":800,fill:"#27AE60"},g).textContent=showLen.CA;
+  }
+  return g;
+}
+
+// 房子 (屋頂三角 + 矩形身體)
+function drawHouse(parent, cx, cy, roofPts, scale=1, opts={}){
+  const {id="", highlight=false} = opts;
+  const g = el("g", id?{id}:{}, parent);
+  // 身體 (矩形)
+  const bodyW = 180, bodyH = 140;
+  el("rect", {x:cx-bodyW/2, y:cy, width:bodyW, height:bodyH,
+    fill:"#FADBD8", stroke:"#7B241C", "stroke-width":3, rx:4}, g);
+  // 門
+  el("rect", {x:cx-25, y:cy+60, width:50, height:80,
+    fill:"#6E2C00", stroke:"#3E2723", "stroke-width":2, rx:4}, g);
+  el("circle", {cx:cx+15, cy:cy+100, r:3, fill:"#F1C40F"}, g);
+  // 窗
+  el("rect", {x:cx-70, y:cy+25, width:30, height:30,
+    fill:"#AED6F1", stroke:"#3E2723", "stroke-width":2}, g);
+  el("rect", {x:cx+40, y:cy+25, width:30, height:30,
+    fill:"#AED6F1", stroke:"#3E2723", "stroke-width":2}, g);
+  // 屋頂
+  el("path", {d:triPath(roofPts), fill:"#C0392B",
+    stroke: highlight?"#9B59B6":"#7B241C", "stroke-width": highlight?6:4,
+    "stroke-linejoin":"round"}, g);
+  return g;
+}
+
+// 三角飯糰 (白米 + 海苔黑帶)
+function drawOnigiri(parent, pts, opts={}){
+  const g = el("g", {}, parent);
+  // 米飯本體
+  el("path", {d:triPath(pts), fill:"url(#rice)",
+    stroke:"#BEBE8C", "stroke-width":2, "stroke-linejoin":"round"}, g);
+  // 海苔 (底部黑色矩形帶, 跟三角形底邊貼合)
+  const b = pts[1], c = pts[2];
+  const bandH = 16;
+  const dx = c.x - b.x, dy = c.y - b.y;
+  const len = Math.sqrt(dx*dx + dy*dy);
+  const nx = -dy/len, ny = dx/len;
+  const noriPts = [
+    {x: b.x + nx*3, y: b.y + ny*3},
+    {x: c.x + nx*3, y: c.y + ny*3},
+    {x: c.x - nx*bandH, y: c.y - ny*bandH},
+    {x: b.x - nx*bandH, y: b.y - ny*bandH}
+  ];
+  el("path", {d:`M${noriPts[0].x},${noriPts[0].y} L${noriPts[1].x},${noriPts[1].y} L${noriPts[2].x},${noriPts[2].y} L${noriPts[3].x},${noriPts[3].y} Z`,
+    fill:"#2C3E50"}, g);
+  // 海苔高光
+  el("line", {x1:(noriPts[0].x+noriPts[3].x)/2, y1:(noriPts[0].y+noriPts[3].y)/2,
+    x2:(noriPts[1].x+noriPts[2].x)/2, y2:(noriPts[1].y+noriPts[2].y)/2,
+    stroke:"#5D6D7E", "stroke-width":1}, g);
+  // 紅色梅干 (中心點)
+  const cx = pts.reduce((s,p)=>s+p.x,0)/3;
+  const cy = pts.reduce((s,p)=>s+p.y,0)/3;
+  el("circle", {cx:cx, cy:cy-3, r:3, fill:"#C0392B"}, g);
+  return g;
+}
+
+// 哆啦A夢
+function drawDoraemon(parent, cx, cy, scale=1){
   const g = el("g", {transform:`translate(${cx},${cy}) scale(${scale})`}, parent);
   el("ellipse", {cx:0,cy:0,rx:65,ry:60,fill:"#3498DB",stroke:"#1B4F72","stroke-width":3}, g);
   el("ellipse", {cx:0,cy:15,rx:50,ry:40,fill:"#fff",stroke:"#1B4F72","stroke-width":2}, g);
@@ -284,69 +393,82 @@ function addDoraemon(parent, cx, cy, scale=1){
   el("circle", {cx:0,cy:5,r:10,fill:"#C0392B",stroke:"#7B241C","stroke-width":2}, g);
   for(const [x1,y1,x2,y2] of [[-10,15,-35,10],[-10,20,-35,22],[-10,25,-35,34],
                                [10,15,35,10],[10,20,35,22],[10,25,35,34]]){
-    el("line", {x1,y1,x2,y2,stroke:"#1B2631","stroke-width":2}, g);
+    el("line",{x1,y1,x2,y2,stroke:"#1B2631","stroke-width":2},g);
   }
-  el("path", {d:"M-10,32 Q0,40 10,32",fill:"none",stroke:"#1B2631","stroke-width":2}, g);
-  el("rect", {x:-30,y:55,width:60,height:8,fill:"#C0392B"}, g);
-  el("circle", {cx:0,cy:70,r:14,fill:"#F1C40F",stroke:"#9A7D0A","stroke-width":2}, g);
-  el("line", {x1:-10,y1:70,x2:10,y2:70,stroke:"#1B2631","stroke-width":2}, g);
-  el("circle", {cx:0,cy:75,r:2,fill:"#1B2631"}, g);
+  el("path",{d:"M-10,32 Q0,40 10,32",fill:"none",stroke:"#1B2631","stroke-width":2},g);
+  el("rect",{x:-30,y:55,width:60,height:8,fill:"#C0392B"},g);
+  el("circle",{cx:0,cy:70,r:14,fill:"#F1C40F",stroke:"#9A7D0A","stroke-width":2},g);
+  el("line",{x1:-10,y1:70,x2:10,y2:70,stroke:"#1B2631","stroke-width":2},g);
+  el("circle",{cx:0,cy:75,r:2,fill:"#1B2631"},g);
   return g;
 }
-function addKirby(parent, cx, cy, scale=1){
-  const g = el("g", {transform:`translate(${cx},${cy}) scale(${scale})`}, parent);
-  el("circle", {cx:0,cy:0,r:55,fill:"#F5B7B1",stroke:"#922B21","stroke-width":3}, g);
-  el("ellipse", {cx:-25,cy:55,rx:22,ry:14,fill:"#C0392B",stroke:"#7B241C","stroke-width":2}, g);
-  el("ellipse", {cx:25,cy:55,rx:22,ry:14,fill:"#C0392B",stroke:"#7B241C","stroke-width":2}, g);
-  el("ellipse", {cx:-14,cy:-10,rx:5,ry:11,fill:"#1B2631"}, g);
-  el("ellipse", {cx:14,cy:-10,rx:5,ry:11,fill:"#1B2631"}, g);
-  el("ellipse", {cx:-28,cy:8,rx:10,ry:6,fill:"#E74C3C"}, g);
-  el("ellipse", {cx:28,cy:8,rx:10,ry:6,fill:"#E74C3C"}, g);
-  el("ellipse", {cx:0,cy:10,rx:8,ry:4,fill:"#922B21"}, g);
+function drawKirby(parent,cx,cy,scale=1){
+  const g = el("g",{transform:`translate(${cx},${cy}) scale(${scale})`},parent);
+  el("circle",{cx:0,cy:0,r:55,fill:"#F5B7B1",stroke:"#922B21","stroke-width":3},g);
+  el("ellipse",{cx:-25,cy:55,rx:22,ry:14,fill:"#C0392B",stroke:"#7B241C","stroke-width":2},g);
+  el("ellipse",{cx:25,cy:55,rx:22,ry:14,fill:"#C0392B",stroke:"#7B241C","stroke-width":2},g);
+  el("ellipse",{cx:-14,cy:-10,rx:5,ry:11,fill:"#1B2631"},g);
+  el("ellipse",{cx:14,cy:-10,rx:5,ry:11,fill:"#1B2631"},g);
+  el("ellipse",{cx:-28,cy:8,rx:10,ry:6,fill:"#E74C3C"},g);
+  el("ellipse",{cx:28,cy:8,rx:10,ry:6,fill:"#E74C3C"},g);
+  el("ellipse",{cx:0,cy:10,rx:8,ry:4,fill:"#922B21"},g);
   return g;
 }
-function addShirokuma(parent, cx, cy, scale=1){
-  const g = el("g", {transform:`translate(${cx},${cy}) scale(${scale})`}, parent);
-  el("ellipse", {cx:0,cy:5,rx:58,ry:50,fill:"#FDEBD0",stroke:"#7E5109","stroke-width":3}, g);
-  el("circle", {cx:-40,cy:-35,r:16,fill:"#FDEBD0",stroke:"#7E5109","stroke-width":2}, g);
-  el("circle", {cx:40,cy:-35,r:16,fill:"#FDEBD0",stroke:"#7E5109","stroke-width":2}, g);
-  el("circle", {cx:-18,cy:-5,r:5,fill:"#1B2631"}, g);
-  el("circle", {cx:18,cy:-5,r:5,fill:"#1B2631"}, g);
-  el("ellipse", {cx:-32,cy:15,rx:10,ry:6,fill:"#F5B7B1"}, g);
-  el("ellipse", {cx:32,cy:15,rx:10,ry:6,fill:"#F5B7B1"}, g);
-  el("ellipse", {cx:0,cy:12,rx:6,ry:4,fill:"#7E5109"}, g);
-  el("path", {d:"M-8,22 Q0,28 8,22",fill:"none",stroke:"#7E5109","stroke-width":2}, g);
-  return g;
-}
-function addBubble(parent, x, y, w, h, text, tail="left"){
-  const g = el("g", {}, parent);
-  el("rect", {x,y,width:w,height:h,rx:18,ry:18,fill:"#fff",stroke:"#34495E","stroke-width":3}, g);
+
+// 對話氣泡
+function addBubble(parent,x,y,w,h,text,tail="left"){
+  const g = el("g",{},parent);
+  el("rect",{x,y,width:w,height:h,rx:18,ry:18,fill:"#fff",stroke:"#34495E","stroke-width":3},g);
   const tx = tail==="left" ? x-12 : x+w+12;
   const ty = y + h*0.65;
-  el("path", {
+  el("path",{
     d: tail==="left" ? `M${x+20},${ty} L${tx},${ty+5} L${x+25},${ty+20} Z`
                      : `M${x+w-20},${ty} L${tx},${ty+5} L${x+w-25},${ty+20} Z`,
     fill:"#fff", stroke:"#34495E", "stroke-width":3
-  }, g);
+  },g);
   const lines = text.split("\n");
   const lh = Math.min(30, h/(lines.length+1));
   lines.forEach((ln,i)=>{
-    el("text", {x:x+w/2, y:y+h/2-(lines.length-1)*lh/2+i*lh,
+    el("text",{x:x+w/2, y:y+h/2-(lines.length-1)*lh/2+i*lh,
       "text-anchor":"middle","dominant-baseline":"middle",
-      "font-size":Math.min(22,lh*0.75), "font-weight":700,
-      fill:"#2C3E50","font-family":"Microsoft JhengHei,sans-serif"}, g)
+      "font-size":Math.min(22,lh*0.75),"font-weight":700,
+      fill:"#2C3E50","font-family":"Microsoft JhengHei,sans-serif"},g)
       .textContent = ln;
   });
   return g;
 }
 
-// ============================================================
+// 場景標題 (頂部大字)
+function sceneBanner(parent, text, color="#9B59B6"){
+  el("text", {x:800, y:80, "text-anchor":"middle", "font-size":36,
+    "font-weight":900, fill:color}, parent).textContent = text;
+}
+
+// 太陽/月亮裝飾
+function drawSun(parent, cx, cy, r=40){
+  const g = el("g",{},parent);
+  el("circle",{cx,cy,r,fill:"#F1C40F",stroke:"#F39C12","stroke-width":3},g);
+  for(let i=0;i<8;i++){
+    const a = i*Math.PI/4;
+    el("line", {x1:cx+Math.cos(a)*(r+6), y1:cy+Math.sin(a)*(r+6),
+      x2:cx+Math.cos(a)*(r+20), y2:cy+Math.sin(a)*(r+20),
+      stroke:"#F39C12", "stroke-width":4, "stroke-linecap":"round"}, g);
+  }
+  return g;
+}
+
+// ===========================================================
 // 旁白 / 提示
-// ============================================================
+// ===========================================================
 function setNarration(text){
   const n = document.getElementById("narration");
   if(text){ n.textContent = text; n.classList.add("visible"); }
-  else { n.classList.remove("visible"); }
+  else n.classList.remove("visible");
+}
+function setTimeStamp(text){
+  const t = document.getElementById("time-stamp");
+  if(text){ t.textContent = text; t.classList.add("visible"); }
+  else t.classList.remove("visible");
 }
 function setTeacherTip(text){
   document.getElementById("tip-content").innerHTML = text;
@@ -354,130 +476,149 @@ function setTeacherTip(text){
 function flashCorrect(){
   SFX.success();
   const f = document.createElement("div");
-  f.className = "flash"; f.textContent = "✅";
+  f.className="flash"; f.textContent="✅";
   document.getElementById("stage").appendChild(f);
-  setTimeout(()=>f.remove(), 700);
+  setTimeout(()=>f.remove(),700);
   confetti(20);
 }
 function flashRetry(){
   SFX.gentle();
   const f = document.createElement("div");
-  f.className = "flash"; f.textContent = "💛 再想想";
-  f.style.fontSize = "60px"; f.style.color = "#E67E22";
+  f.className="flash"; f.textContent="💛 再想想";
+  f.style.fontSize="60px"; f.style.color="#E67E22";
   document.getElementById("stage").appendChild(f);
-  setTimeout(()=>f.remove(), 900);
+  setTimeout(()=>f.remove(),900);
 }
 function confetti(n=20){
   const colors = ["#E74C3C","#3498DB","#F39C12","#9B59B6","#27AE60","#F4D03F"];
   for(let i=0;i<n;i++){
     const d = document.createElement("div");
-    d.className = "confetti";
+    d.className="confetti";
     d.style.left = Math.random()*100+"vw";
     d.style.background = colors[i%colors.length];
     d.style.animationDelay = (Math.random()*0.6)+"s";
     document.body.appendChild(d);
-    setTimeout(()=>d.remove(), 3200);
+    setTimeout(()=>d.remove(),3200);
   }
 }
 
-// ============================================================
-// 場景資料: 每個場景有 step[] 陣列
-// 每步 {tip: 老師提示, narrate: 學生看的大字, action: 要做什麼}
-// ============================================================
+let animId = 0;
+function animateTri(elemId, from, to, frames, onDone){
+  cancelAnimationFrame(animId);
+  let f = 0;
+  const tick = () => {
+    f++;
+    const t = f/frames;
+    const cur = lerpPts(from, to, t);
+    const pth = document.querySelector(`#${elemId} path`);
+    if(pth) pth.setAttribute("d", triPath(cur));
+    if(f < frames) animId = requestAnimationFrame(tick);
+    else if(onDone) onDone();
+  };
+  tick();
+}
+
+// ===========================================================
+// 場景
+// ===========================================================
 const scenes = [
-// ============ 場景 1: 疊合 ============
+
+// ============ S1 早上 · 早餐店三明治 ============
 {
-  name: "疊合實驗",
+  name: "早上 · 早餐店",
+  time: "🌅 早上 7:00",
   init(){
     const root = clearScene();
-    const A = triangleFromSSS(6, 8, 10);
-    const pts1 = transform(A, 500, 460, 30);
-    const pts2 = transform(A, 1100, 460, 30);
-    drawTri(root, pts1, {fill:"#FADBD8", stroke:"#E74C3C", sw:5, id:"t1"});
-    drawTri(root, pts2, {fill:"#D6EAF8", stroke:"#3498DB", sw:5, id:"t2"});
-    addShinchan(root, 180, 700, 1.1);
-    addBubble(root, 280, 580, 280, 100, "我要兩個\n一樣的三角積木！");
+    drawSun(root, 1450, 150, 50);
+    // 早餐店背景 (簡單雲朵)
+    el("ellipse", {cx:200, cy:180, rx:70, ry:24, fill:"#fff", opacity:.7}, root);
+    el("ellipse", {cx:350, cy:140, rx:60, ry:20, fill:"#fff", opacity:.7}, root);
+    sceneBanner(root, "早餐店：兩個一樣的三明治");
+    const A = triFromSSS(6, 8, 10);
+    const pts1 = tform(A, 500, 500, 28);
+    const pts2 = tform(A, 1100, 500, 28);
+    drawSandwich(root, pts1, {id:"t1"});
+    drawSandwich(root, pts2, {id:"t2"});
+    drawDoraemon(root, 180, 620, 1.0);
+    addBubble(root, 280, 540, 280, 100, "老闆切了兩個\n這樣算一樣嗎？");
     this._orig = pts2;
     this._target = pts1;
   },
   steps: [
     {
-      tip:"說：『小新訂了兩個一樣的三角積木。怎麼證明它們一樣？』<br><b>先讓學生猜 10 秒</b>再按下一步。",
-      narrate:"怎麼確認兩個三角形一樣？",
-      run(){ /* 只顯示初始畫面 */ }
+      tip:"說：『早上去早餐店，點兩個一樣大的三明治。老闆切給你——<b>怎麼確認他沒有A你？</b>』讓學生想 10 秒。",
+      narrate:"兩個三明治是一樣的嗎？",
+      run(){}
     },
     {
-      tip:"說：『想一想，如果兩個東西一樣——疊起來會怎樣？』然後按下一步，看畫面自動把藍色疊到紅色上。",
-      narrate:"試試看：把藍色疊到紅色上！",
+      tip:"說：『<b>最簡單的方法：疊起來看！</b>』按下一步——右邊的三明治會自己飛到左邊疊上。",
+      narrate:"疊起來看看！",
       run(){
-        // 動畫把 t2 平移到 t1
-        const from = this._orig;
-        const to = this._target;
-        animateTri("t2", from, to, 60, () => {
-          // 改成紫色 = 全等
-          const t2p = document.querySelector("#t2 path");
-          if(t2p){ t2p.setAttribute("fill","#E8DAEF"); t2p.setAttribute("stroke","#9B59B6"); }
+        animateTri("t2", this._orig, this._target, 60, ()=>{
+          const p = document.querySelector("#t2 path");
+          if(p){ p.setAttribute("stroke","#9B59B6"); p.setAttribute("stroke-width","6"); }
           SFX.success();
         });
       }
     },
     {
-      tip:"說：『完全疊上了！這種『完全一樣』叫「全等」，符號是 ≅，唸作「全等於」。』",
+      tip:"說：『完美疊上了！就是真的一樣。這種『完全疊合』數學上叫 <b>全等</b>，符號 ≅ 唸作「全等於」。』",
       narrate:"完全疊合 = 全等 ≅",
       run(){
         const root = document.getElementById("scene-root");
-        el("text", {x:800, y:250, "text-anchor":"middle", "font-size":140,
-          "font-weight":900, fill:"#9B59B6", id:"big-cong"}, root).textContent = "≅";
-        el("text", {x:800, y:330, "text-anchor":"middle", "font-size":32,
+        el("text", {x:800, y:300, "text-anchor":"middle", "font-size":140,
+          "font-weight":900, fill:"#9B59B6"}, root).textContent = "≅";
+        el("text", {x:800, y:370, "text-anchor":"middle", "font-size":28,
           "font-weight":700, fill:"#9B59B6"}, root).textContent = "唸作「全等於」";
         SFX.reveal();
       }
     },
   ],
-  afterSteps:{
-    tip:"本幕完成！學生若有反應再聊 30 秒，然後按「進入下一幕」。",
-    narrate:"第一幕完成！"
+  afterSteps: {
+    tip:"<b>本幕重點</b>：兩個三角形『完全疊合』就是全等，符號 ≅。準備好按『進入下一幕』。",
+    narrate:"一樣 = 可以疊合 = 全等 ≅"
   }
 },
 
-// ============ 場景 2: 對應邊 (自動演示) ============
+// ============ S2 上學 · 書包裡的三角板 ============
 {
-  name: "對應邊",
+  name: "上學 · 三角板",
+  time: "🏫 上學 8:00",
   init(){
     const root = clearScene();
-    const A = triangleFromSSS(5, 7, 8);
-    const pts1 = transform(A, 420, 460, 35);
-    const pts2 = transform(A, 1150, 460, 35);
-    drawTri(root, pts1, {fill:"#fff", stroke:"#2C3E50", sw:3, id:"t1"});
-    drawTri(root, pts2, {fill:"#fff", stroke:"#2C3E50", sw:3, id:"t2"});
-    // 記住邊
+    sceneBanner(root, "書包裡的三角板：找對應邊");
+    const A = triFromSSS(5, 7, 8);
+    const pts1 = tform(A, 420, 480, 32);
+    const pts2 = tform(A, 1150, 480, 32);
+    drawRuler(root, pts1, {id:"r1"});
+    drawRuler(root, pts2, {id:"r2"});
+    // 書包 (左下)
+    el("rect", {x:60, y:640, width:140, height:120, rx:14, fill:"#8E44AD", stroke:"#5B2C6F", "stroke-width":3}, root);
+    el("rect", {x:80, y:660, width:100, height:20, fill:"#BB8FCE"}, root);
+    el("text", {x:130, y:720, "font-size":22, "font-weight":800, fill:"#fff", "text-anchor":"middle"}, root).textContent = "書包";
+    addBubble(root, 220, 660, 280, 90, "我跟同學的三角板\n是同款嗎？");
+    // 存起來邊座標
     this._t1 = [[pts1[0],pts1[1]],[pts1[1],pts1[2]],[pts1[2],pts1[0]]];
     this._t2 = [[pts2[0],pts2[1]],[pts2[1],pts2[2]],[pts2[2],pts2[0]]];
-    // 建線條 (一開始灰色)
-    const edges = [
-      {id:"e1", color:"#E74C3C", name:"AB ↔ AB"},
-      {id:"e2", color:"#3498DB", name:"BC ↔ BC"},
-      {id:"e3", color:"#27AE60", name:"CA ↔ CA"},
-    ];
-    edges.forEach((e, i) => {
+    // 三對邊 (灰色起始)
+    for(let i=0;i<3;i++){
       el("line", {id:`l1-${i}`, x1:this._t1[i][0].x, y1:this._t1[i][0].y,
         x2:this._t1[i][1].x, y2:this._t1[i][1].y,
         stroke:"#BBB", "stroke-width":10, "stroke-linecap":"round"}, root);
       el("line", {id:`l2-${i}`, x1:this._t2[i][0].x, y1:this._t2[i][0].y,
         x2:this._t2[i][1].x, y2:this._t2[i][1].y,
         stroke:"#BBB", "stroke-width":10, "stroke-linecap":"round"}, root);
-    });
-    this._edges = edges;
+    }
   },
   steps: [
     {
-      tip:"說：『兩個三角形都是 5、7、8 公分三條邊。<b>每條邊要一一配對</b>才算一樣。我按下一步，給你們看一對。』",
-      narrate:"每條邊都要配對！",
+      tip:"說：『上學路上，你拿出自己的三角板，同學也拿出他的。<b>怎麼確認是『同款』？</b>量三邊看看！』",
+      narrate:"兩把三角板是同款嗎？要量三邊！",
       run(){}
     },
     {
-      tip:"說：『看——兩個紅色的邊是一對，都是 AB（或最短那條）。這就是「對應邊」！』",
-      narrate:"紅色這兩條是對應邊 ✨",
+      tip:"說：『看——兩個紅色邊是一對。這叫「對應邊」，長度一樣。』",
+      narrate:"🔴 紅色兩邊是一對（對應邊）",
       run(){
         document.getElementById("l1-0").setAttribute("stroke","#E74C3C");
         document.getElementById("l2-0").setAttribute("stroke","#E74C3C");
@@ -485,8 +626,8 @@ const scenes = [
       }
     },
     {
-      tip:"說：『再看藍色——兩條都是 BC。也是一對！』",
-      narrate:"藍色也配對！",
+      tip:"說：『再看藍色——也是對應邊。』",
+      narrate:"🔵 藍色對應邊",
       run(){
         document.getElementById("l1-1").setAttribute("stroke","#3498DB");
         document.getElementById("l2-1").setAttribute("stroke","#3498DB");
@@ -494,8 +635,8 @@ const scenes = [
       }
     },
     {
-      tip:"說：『最後綠色 CA 也配對。三對邊全部對上！』",
-      narrate:"綠色配對 → 三對都對應！",
+      tip:"說：『綠色也對應！<b>三對邊都一樣 → 同款三角板！</b>』",
+      narrate:"🟢 三對邊都對應 = 同款！",
       run(){
         document.getElementById("l1-2").setAttribute("stroke","#27AE60");
         document.getElementById("l2-2").setAttribute("stroke","#27AE60");
@@ -503,199 +644,229 @@ const scenes = [
         setTimeout(()=>{ SFX.success(); confetti(15); }, 400);
       }
     },
-    {
-      tip:"說：『同樣地，3 個角也有「對應角」。<b>所以全等 = 3 對邊 + 3 對角全部對應相等。』</b>",
-      narrate:"3 對邊 + 3 對角 全部一樣 = 全等 ≅",
-      run(){
-        const root = document.getElementById("scene-root");
-        // 顯示三個對應角標記
-        el("circle", {cx:this._t1[0][1].x, cy:this._t1[0][1].y, r:22,
-          fill:"none", stroke:"#E74C3C", "stroke-width":4}, root);
-        el("circle", {cx:this._t2[0][1].x, cy:this._t2[0][1].y, r:22,
-          fill:"none", stroke:"#E74C3C", "stroke-width":4}, root);
-      }
-    }
   ],
-  afterSteps:{
-    tip:"問學生：『那如果三邊都一樣，角會不會自動一樣？』留個懸念，按下一幕。",
-    narrate:"問題：三邊一樣，就會全等嗎？"
+  afterSteps: {
+    tip:"問學生：『那是不是<b>每條邊都要配對</b>？如果只量一條夠嗎？』留懸念，進下一幕。",
+    narrate:"三對邊 = 對應邊 → 同款 = 全等"
   }
 },
 
-// ============ 場景 3: SSS 三滑桿 ============
+// ============ S3 下午 · 蓋屋頂 (SSS 的意義) ============
 {
-  name: "SSS 三邊決定",
+  name: "下午 · 蓋屋頂",
+  time: "🏗️ 下午 3:00",
   init(){
     this.a = 5; this.b = 7; this.c = 8;
     this._redraw();
   },
   _redraw(){
     const root = clearScene();
-    addDoraemon(root, 1300, 350, 1.2);
-    addBubble(root, 1150, 490, 280, 110, "三邊決定\n形狀就鎖死！\n這叫 SSS 🔴");
-    const pts = triangleFromSSS(this.a, this.b, this.c);
+    // 太陽 (偏西)
+    drawSun(root, 1400, 200, 45);
+    sceneBanner(root, "工地：為什麼屋頂都是三角形？");
+    // 兩間房子 (設計圖 + 實際蓋的)
+    const pts = triFromSSS(this.a, this.b, this.c);
     if(!pts){
-      el("text", {x:700, y:460, "text-anchor":"middle", "font-size":40,
-        "font-weight":700, fill:"#E67E22"}, root).textContent = `${this.a}+${this.b}+${this.c} 做不出三角形喔～`;
+      // 不合法
+      el("text", {x:800, y:420, "text-anchor":"middle", "font-size":44,
+        "font-weight":800, fill:"#E67E22"}, root).textContent = `${this.a}、${this.b}、${this.c} 做不出屋頂！`;
+      el("text", {x:800, y:480, "text-anchor":"middle", "font-size":24,
+        "font-weight":600, fill:"#2C3E50"}, root).textContent = "兩邊加起來要大於第三邊";
+      drawHouse(root, 800, 560, tform(triFromSSS(3,3,3), 800, 480, 25), 1);
       return;
     }
-    const tpts = transform(pts, 700, 450, 30);
-    drawTri(root, tpts, {fill:"#FADBD8", stroke:"#E74C3C", sw:6,
-      showLen:{AB:this.c, BC:this.a, CA:this.b}});
+    // 設計圖 (左)
+    const roof1 = tform(pts, 450, 420, 22);
+    drawHouse(root, 450, 500, roof1, 1);
+    el("text", {x:450, y:380, "text-anchor":"middle", "font-size":22,
+      "font-weight":800, fill:"#9B59B6"}, root).textContent = "📐 設計圖";
+    // 實際蓋的 (右)
+    const roof2 = tform(pts, 1150, 420, 22);
+    drawHouse(root, 1150, 500, roof2, 1, {highlight:true});
+    el("text", {x:1150, y:380, "text-anchor":"middle", "font-size":22,
+      "font-weight":800, fill:"#27AE60"}, root).textContent = "🏠 蓋好的";
+    // 邊長標註 (在屋頂三角形)
+    const mid = (a,b) => ({x:(a.x+b.x)/2, y:(a.y+b.y)/2});
+    const m1 = mid(roof1[0], roof1[1]), m2 = mid(roof1[1], roof1[2]), m3 = mid(roof1[2], roof1[0]);
+    el("text", {x:m1.x-14, y:m1.y, "font-size":22, "font-weight":800, fill:"#E74C3C"}, root).textContent = this.c;
+    el("text", {x:m2.x, y:m2.y+20, "font-size":22, "font-weight":800, fill:"#E74C3C", "text-anchor":"middle"}, root).textContent = this.a;
+    el("text", {x:m3.x+10, y:m3.y, "font-size":22, "font-weight":800, fill:"#E74C3C"}, root).textContent = this.b;
+
+    drawDoraemon(root, 130, 660, 0.9);
+    addBubble(root, 220, 600, 280, 90, `三邊 ${this.a}、${this.b}、${this.c}\n做出來一樣！`);
   },
   steps: [
     {
-      tip:"說：『大雄想做哆啦A夢的時光機腳架。三邊都一樣，做出來會一樣嗎？我來試 5、7、8。』按下一步後會出現。",
-      narrate:"試試三邊 5、7、8",
+      tip:"說：『下午經過工地，看到工人蓋屋頂。<b>只要告訴工人三邊長，他們就能蓋出一模一樣的屋頂。』</b>試 5、7、8！",
+      narrate:"屋頂三邊：5、7、8",
       run(){
         scenes[2].a=5; scenes[2].b=7; scenes[2].c=8;
-        scenes[2]._redraw();
-        SFX.reveal();
+        scenes[2]._redraw(); SFX.reveal();
       }
     },
     {
-      tip:"說：『換個邊長試試。三邊 3、4、5 看看。』每次只要三邊固定，<b>形狀就永遠一樣</b>。",
-      narrate:"換試 3、4、5",
+      tip:"說：『換蓋小一點的屋頂——3、4、5。看，設計圖和實際蓋的<b>還是一模一樣</b>！』",
+      narrate:"換試 3、4、5 → 還是一樣！",
       run(){
         scenes[2].a=3; scenes[2].b=4; scenes[2].c=5;
-        scenes[2]._redraw();
-        SFX.reveal();
+        scenes[2]._redraw(); SFX.reveal();
       }
     },
     {
-      tip:"說：『試個極端的——4、5、10。咦？做不出來！為什麼？<b>兩邊加起來要大於第三邊。</b>』",
-      narrate:"試試 4、5、10？",
+      tip:"說：『試個失敗的——4、5、10。<b>做不出來！</b>因為 4+5 < 10。這是「數感」！』",
+      narrate:"4、5、10？做不出屋頂！",
       run(){
         scenes[2].a=4; scenes[2].b=5; scenes[2].c=10;
-        scenes[2]._redraw();
-        SFX.gentle();
+        scenes[2]._redraw(); SFX.gentle();
       }
     },
     {
-      tip:"說：『回到正常的 6、6、6——正三角形！三邊一樣，<b>就是 SSS 全等條件</b>。』",
+      tip:"說：『蓋一間正三角小屋——6、6、6。<b>只要三邊定，形狀就鎖死！這就是 SSS 定理。</b>』",
       narrate:"SSS：三邊相同 → 全等 ≅",
       run(){
         scenes[2].a=6; scenes[2].b=6; scenes[2].c=6;
-        scenes[2]._redraw();
-        SFX.success();
+        scenes[2]._redraw(); SFX.success();
         const root = document.getElementById("scene-root");
-        el("text", {x:400, y:200, "text-anchor":"middle", "font-size":60,
-          "font-weight":900, fill:"#E74C3C"}, root).textContent = "SSS";
-        el("text", {x:400, y:260, "text-anchor":"middle", "font-size":24,
-          "font-weight":700, fill:"#2C3E50"}, root).textContent = "Side · Side · Side";
+        el("text", {x:800, y:150, "text-anchor":"middle", "font-size":54,
+          "font-weight":900, fill:"#E74C3C"}, root).textContent = "SSS = Side·Side·Side";
       }
     }
   ],
-  afterSteps:{
-    tip:"總結：『SSS = 三邊對應相等 → 全等 ≅』。按下一幕看卡比的大量製造。",
-    narrate:"SSS 就是三邊相等！"
+  afterSteps: {
+    tip:"<b>核心重點</b>：SSS = 三邊相等 → 一定全等。工人、工程師每天都在用這個定理！",
+    narrate:"SSS：三邊一樣就全等！"
   }
 },
 
-// ============ 場景 4: 卡比 100 蛋糕 ============
+// ============ S4 傍晚 · 卡比的飯糰工廠 ============
 {
-  name: "卡比派對",
+  name: "傍晚 · 飯糰工廠",
+  time: "🍙 傍晚 6:00",
   init(){
     const root = clearScene();
-    addKirby(root, 180, 480, 1.4);
-    addBubble(root, 320, 390, 320, 120, "三邊 6、6、6！\n做 100 個蛋糕～");
-    this._idx = 0;
+    sceneBanner(root, "便利商店：100 個一樣的三角飯糰");
+    drawKirby(root, 180, 480, 1.3);
+    addBubble(root, 320, 400, 320, 120, "便利商店訂 100 個飯糰！\n三邊都 6、6、6 ✨");
     this._grid = [];
     for(let i=0;i<10;i++) for(let j=0;j<10;j++){
-      this._grid.push({x: 750 + i*70, y: 130 + j*50});
+      this._grid.push({x:750+i*70, y:160+j*50});
     }
   },
   steps: [
     {
-      tip:"說：『卡比要開派對，訂做 100 個三角蛋糕，三邊都 6、6、6 公分。』按下一步，看 100 個蛋糕湧出。",
-      narrate:"卡比訂做 100 個三角蛋糕！",
+      tip:"說：『傍晚去超商買飯糰——發現貨架上每個三角飯糰都一樣大！<b>為什麼？因為工廠用 SSS 量產！』</b>",
+      narrate:"一樣的飯糰！",
       run(){}
     },
     {
-      tip:"讓學生看動畫。三角形會逐個冒出來。<b>強調：『每一個都一模一樣！這就是 SSS 的威力。』</b>",
-      narrate:"🎂 量產中⋯ 每個都一模一樣！",
+      tip:"按下一步，100 個三角飯糰會一個個冒出來。<b>每個三邊都是 6、6、6 → 全部一模一樣。</b>",
+      narrate:"🍙 量產中⋯ 100 個都一樣！",
       run(){
         const root = document.getElementById("scene-root");
-        const tbase = triangleFromSSS(6, 6, 6);
-        const grid = scenes[3]._grid;
+        const tbase = triFromSSS(6, 6, 6);
         let idx = 0;
+        const grid = scenes[3]._grid;
         const spawn = () => {
           if(idx >= 100){
             SFX.win();
-            setNarration("🎂 100 個全部一樣！SSS 萬歲！");
-            confetti(25);
+            setNarration("🎉 100 個飯糰 · 全部全等！");
+            confetti(30);
             return;
           }
           const p = grid[idx];
-          const tpts = transform(tbase, p.x, p.y, 5);
-          drawTri(root, tpts, {fill:"#FADBD8", stroke:"#E74C3C", sw:1.5, labels:false});
+          const tpts = tform(tbase, p.x, p.y, 4.5);
+          drawOnigiri(root, tpts);
           SFX.pop();
           idx++;
-          setTimeout(spawn, idx<20 ? 60 : 25);
+          setTimeout(spawn, idx<15 ? 70 : 28);
         };
         spawn();
       }
     }
   ],
-  afterSteps:{
-    tip:"問學生：『這 100 個蛋糕都全等嗎？為什麼？』確認他們能說出「三邊都一樣 = SSS」。",
-    narrate:"這就是 SSS 的超能力！"
+  afterSteps: {
+    tip:"問學生：『所以為什麼超商飯糰都一樣大？』引導答出『SSS』或『三邊一樣』。",
+    narrate:"100 個飯糰 = 100 個 SSS 全等！"
   }
 },
 
-// ============ 場景 5: 測驗 4 題 (學生要動了) ============
+// ============ S5 晚上 · 驗收測驗 ============
 {
-  name: "NBA 定位測驗",
+  name: "晚上 · 自我驗收",
+  time: "📝 晚上 9:00",
   _quizzes: [
-    {a:5,b:7,c:8, a2:5,b2:7,c2:8, correct:true,  why:"三邊都一樣！SSS 全等 ✅"},
-    {a:6,b:6,c:6, a2:6,b2:6,c2:9, correct:false, why:"第三邊不一樣！不全等 ❌"},
-    {a:4,b:5,c:6, a2:4,b2:5,c2:6, correct:true,  why:"三邊完全對應！✅"},
-    {a:3,b:4,c:5, a2:5,b2:4,c2:3, correct:true,  why:"順序不同沒關係，三邊還是一樣 ✅"},
+    {
+      icon:"🥪", desc:"兩個三明治",
+      a:5,b:7,c:8, a2:5,b2:7,c2:8, correct:true,
+      why:"三邊都一樣！全等 ✅"
+    },
+    {
+      icon:"📐", desc:"兩把三角板",
+      a:6,b:6,c:6, a2:6,b2:6,c2:9, correct:false,
+      why:"第三邊不一樣！不同款 ❌"
+    },
+    {
+      icon:"🏠", desc:"兩個屋頂",
+      a:4,b:5,c:6, a2:4,b2:5,c2:6, correct:true,
+      why:"三邊對應相等 → 全等 ✅"
+    },
+    {
+      icon:"🍙", desc:"兩個飯糰",
+      a:3,b:4,c:5, a2:5,b2:4,c2:3, correct:true,
+      why:"順序不同沒關係，三邊還是一樣 ✅"
+    },
   ],
-  _q: 0,
-  _score: 0,
-  init(){
-    this._q = 0;
-    this._score = 0;
-    this._render();
-  },
+  _q:0, _score:0,
+  init(){ this._q=0; this._score=0; this._render(); },
   _render(){
     const root = clearScene();
     if(this._q >= this._quizzes.length){
-      // 結束
-      el("text", {x:800, y:300, "text-anchor":"middle", "font-size":64,
-        "font-weight":900, fill:"#9B59B6"}, root).textContent = "🏆 完成！";
-      el("text", {x:800, y:400, "text-anchor":"middle", "font-size":48,
+      el("text", {x:800, y:280, "text-anchor":"middle", "font-size":60,
+        "font-weight":900, fill:"#9B59B6"}, root).textContent = "🏆 完成測驗！";
+      el("text", {x:800, y:380, "text-anchor":"middle", "font-size":48,
         "font-weight":800, fill:"#27AE60"}, root).textContent = `得分：${this._score} / 4`;
       SFX.win();
       confetti(40);
-      setNarration(this._score===4 ? "全對！你是 SSS 大師！" : "很棒了！再想想就更好～");
+      setNarration(this._score===4 ? "全對！SSS 大師！" : "很棒了！再想想更棒～");
       return;
     }
     const cur = this._quizzes[this._q];
-    const p1 = transform(triangleFromSSS(cur.a, cur.b, cur.c), 450, 480, 35);
-    const p2 = transform(triangleFromSSS(cur.a2, cur.b2, cur.c2), 1100, 480, 35);
-    drawTri(root, p1, {fill:"#FADBD8", stroke:"#E74C3C", sw:5,
-      showLen:{AB:cur.c, BC:cur.a, CA:cur.b}});
-    drawTri(root, p2, {fill:"#FADBD8", stroke:"#E74C3C", sw:5,
-      showLen:{AB:cur.c2, BC:cur.a2, CA:cur.b2}});
-    el("text", {x:800, y:130, "text-anchor":"middle", "font-size":36,
+    sceneBanner(root, `${cur.icon} ${cur.desc}`);
+    const p1 = tform(triFromSSS(cur.a,cur.b,cur.c), 450, 500, 32);
+    const p2 = tform(triFromSSS(cur.a2,cur.b2,cur.c2), 1100, 500, 32);
+    // 依題目類型畫不同物件
+    if(cur.icon==="🥪"){ drawSandwich(root,p1); drawSandwich(root,p2); }
+    else if(cur.icon==="📐"){ drawRuler(root,p1,{showLen:{AB:cur.c,BC:cur.a,CA:cur.b}}); drawRuler(root,p2,{showLen:{AB:cur.c2,BC:cur.a2,CA:cur.b2}}); }
+    else if(cur.icon==="🏠"){ drawHouse(root,450,540,p1,1); drawHouse(root,1150,540,p2,1); }
+    else if(cur.icon==="🍙"){ drawOnigiri(root,p1); drawOnigiri(root,p2); }
+    // 標邊長 (所有題目都顯示)
+    if(cur.icon!=="📐"){
+      const showL = (pts, L) => {
+        const m=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+        const m1=m(pts[0],pts[1]), m2=m(pts[1],pts[2]), m3=m(pts[2],pts[0]);
+        el("text",{x:m1.x-22,y:m1.y+4,"font-size":24,"font-weight":800,fill:"#E74C3C"},root).textContent = L.AB;
+        el("text",{x:m2.x,y:m2.y+30,"font-size":24,"font-weight":800,fill:"#E74C3C","text-anchor":"middle"},root).textContent = L.BC;
+        el("text",{x:m3.x+16,y:m3.y+4,"font-size":24,"font-weight":800,fill:"#E74C3C"},root).textContent = L.CA;
+      };
+      showL(p1, {AB:cur.c, BC:cur.a, CA:cur.b});
+      showL(p2, {AB:cur.c2, BC:cur.a2, CA:cur.b2});
+    }
+    el("text", {x:800, y:150, "text-anchor":"middle", "font-size":32,
       "font-weight":900, fill:"#9B59B6"}, root).textContent = `第 ${this._q+1} / 4 題`;
-    el("text", {x:800, y:200, "text-anchor":"middle", "font-size":30,
-      "font-weight":700, fill:"#2C3E50"}, root).textContent = "兩個三角形全等嗎？依據 SSS？";
+    el("text", {x:800, y:230, "text-anchor":"middle", "font-size":28,
+      "font-weight":700, fill:"#2C3E50"}, root).textContent = "兩個全等嗎？";
   },
   steps: [
     {
-      tip:"說：『現在輪你們答！我問你們『全等嗎？』，你們<b>舉手喊「是」或「不」</b>，我幫你們按按鈕。』",
-      narrate:"看三邊，全等嗎？",
+      tip:"說：『晚上回家，我們來驗收一下！我念題目，你們<b>舉手喊是或不是</b>，我幫你們按。』",
+      narrate:"看看今天學會了嗎～",
       run(){}
     }
   ],
-  afterSteps:{
-    tip:"測驗中：答對 ✅ 答錯 💛（不會紅叉叉）。答完 4 題會顯示成績。",
+  afterSteps: {
+    tip:"測驗進行中：答對 ✅、答錯 💛（不會紅叉叉，給學生安全感）",
     narrate:""
   },
-  // 特殊：這幕步驟跑完後，顯示答題按鈕
   onFinalStep(){
     const actions = document.getElementById("main-actions");
     actions.innerHTML = "";
@@ -707,25 +878,17 @@ const scenes = [
     no.className = "btn btn-answer btn-warn";
     no.textContent = "❌ 不全等";
     no.onclick = () => this.answer(false);
-    actions.appendChild(yes);
-    actions.appendChild(no);
+    actions.appendChild(yes); actions.appendChild(no);
   },
   answer(ans){
     SFX.click();
     const cur = this._quizzes[this._q];
-    if(ans === cur.correct){
-      flashCorrect();
-      setNarration(cur.why);
-      this._score++;
-    } else {
-      flashRetry();
-      setNarration("💛 " + cur.why);
-    }
+    if(ans === cur.correct){ flashCorrect(); setNarration(cur.why); this._score++; }
+    else { flashRetry(); setNarration("💛 " + cur.why); }
     setTimeout(() => {
       this._q++;
       this._render();
       if(this._q >= this._quizzes.length){
-        // 顯示下一幕按鈕
         const actions = document.getElementById("main-actions");
         actions.innerHTML = "";
         const nx = document.createElement("button");
@@ -734,111 +897,110 @@ const scenes = [
         nx.onclick = () => nextScene();
         actions.appendChild(nx);
       } else {
-        // 繼續答題
         scenes[4].onFinalStep();
       }
     }, 1800);
   }
 },
 
-// ============ 場景 6: 通關 ============
+// ============ S6 通關 ============
 {
   name: "通關彩蛋",
+  time: "🌙 晚安",
   init(){
     const root = clearScene();
-    addShinchan(root, 250, 450, 1.4);
-    addDoraemon(root, 550, 450, 1.3);
-    addKirby(root, 850, 460, 1.4);
-    addShirokuma(root, 1150, 450, 1.4);
-    el("text", {x:800, y:130, "text-anchor":"middle", "font-size":72,
-      "font-weight":900, fill:"#9B59B6"}, root).textContent = "🎉 全等小達人！";
-    el("text", {x:800, y:680, "text-anchor":"middle", "font-size":48,
-      "font-weight":800, fill:"#E74C3C"}, root).textContent = "SSS ＝ 三邊相等 → 全等 ≅";
-    el("text", {x:800, y:750, "text-anchor":"middle", "font-size":28,
-      "font-weight":600, fill:"#2C3E50"}, root).textContent = "下節課：SAS（兩邊 + 夾角）";
+    // 月亮
+    el("circle", {cx:1400, cy:150, r:50, fill:"#FFF9C4", stroke:"#F1C40F", "stroke-width":3}, root);
+    el("circle", {cx:1380, cy:140, r:45, fill:"#FEF9E7"}, root);
+    // 星星
+    for(let i=0;i<8;i++){
+      const sx = 100 + i*180 + Math.random()*50;
+      const sy = 80 + Math.random()*100;
+      el("text", {x:sx, y:sy, "font-size":28, fill:"#F1C40F"}, root).textContent = "✨";
+    }
+    // 中央獎牌
+    el("circle", {cx:800, cy:450, r:120, fill:"#F1C40F", stroke:"#9A7D0A", "stroke-width":6}, root);
+    el("circle", {cx:800, cy:450, r:100, fill:"#F7DC6F", stroke:"#9A7D0A", "stroke-width":3}, root);
+    el("text", {x:800, y:470, "text-anchor":"middle", "font-size":70,
+      "font-weight":900, fill:"#7E5109"}, root).textContent = "🏆";
+    // 標題
+    el("text", {x:800, y:200, "text-anchor":"middle", "font-size":72,
+      "font-weight":900, fill:"#9B59B6"}, root).textContent = "全等小達人！";
+    // 回顧 4 個場景
+    const items = [
+      {emoji:"🥪", label:"早餐三明治", x:300},
+      {emoji:"📐", label:"書包三角板", x:560},
+      {emoji:"🏠", label:"工地屋頂", x:1040},
+      {emoji:"🍙", label:"便利商店飯糰", x:1300},
+    ];
+    items.forEach(it => {
+      el("circle", {cx:it.x, cy:650, r:40, fill:"#E8DAEF", stroke:"#9B59B6", "stroke-width":3}, root);
+      el("text", {x:it.x, y:662, "font-size":36, "text-anchor":"middle"}, root).textContent = it.emoji;
+      el("text", {x:it.x, y:720, "font-size":18, "font-weight":700,
+        fill:"#2C3E50", "text-anchor":"middle"}, root).textContent = it.label;
+    });
+    // 下方金句
+    el("text", {x:800, y:800, "text-anchor":"middle", "font-size":34,
+      "font-weight":800, fill:"#E74C3C"}, root).textContent = "SSS：三邊相同 → 全等 ≅";
+
     SFX.win();
     confetti(50);
     setTimeout(()=>confetti(30), 900);
     setTimeout(()=>confetti(30), 1800);
   },
-  steps:[
+  steps: [
     {
-      tip:"說：『辛苦啦！今天學會 SSS 三邊一樣就全等。下節課學 SAS——兩邊+夾角也可以。』",
-      narrate:"辛苦啦！今天你們超棒 👏",
+      tip:"說：『今天你們跟哆啦A夢走了一天，遇到 4 個三角形——早餐三明治、書包三角板、工地屋頂、便利商店飯糰。<b>它們都在告訴你：SSS！</b>』",
+      narrate:"生活到處都有三角形～你是全等小達人！",
       run(){}
     }
   ],
-  afterSteps:{
-    tip:"回饋：讓學生分享一個今天印象最深的畫面。",
-    narrate:""
+  afterSteps: {
+    tip:"<b>收尾</b>：讓學生分享『你家裡還看過什麼三角形？』結束本節課。下節課要學 SAS！",
+    narrate:"明天我們學 SAS：兩邊 + 夾角 →"
   }
 }
 ];
 
-// ============================================================
-// 三角形動畫 (補間)
-// ============================================================
-let animId = 0;
-function animateTri(elemId, from, to, frames, onDone){
-  cancelAnimationFrame(animId);
-  let f = 0;
-  const tick = () => {
-    f++;
-    const t = f / frames;
-    const cur = lerpPts(from, to, t);
-    const p = document.querySelector(`#${elemId} path`);
-    if(p) p.setAttribute("d", triPath(cur));
-    if(f < frames) animId = requestAnimationFrame(tick);
-    else if(onDone) onDone();
-  };
-  tick();
-}
-
-// ============================================================
-// 控制：下一步 / 場景切換
-// ============================================================
+// ===========================================================
+// 控制
+// ===========================================================
 function renderScene(){
   const scene = scenes[state.sceneIdx];
   state.stepIdx = -1;
   scene.init && scene.init();
   setNarration("");
+  setTimeStamp(scene.time || "");
   setTeacherTip(`<b>🎬 第 ${state.sceneIdx+1} 幕：${scene.name}</b><br>按「▶ 下一步」開始`);
   document.getElementById("s-n").textContent = state.sceneIdx + 1;
+  document.getElementById("s-name").textContent = scene.name;
   document.getElementById("scene-tag").textContent = `${state.sceneIdx+1}/6`;
-  // 進度條
   document.querySelectorAll(".prog-seg").forEach((s,i)=>{
     s.classList.remove("done","current");
     if(i < state.sceneIdx) s.classList.add("done");
     else if(i === state.sceneIdx) s.classList.add("current");
   });
-  // 按鈕恢復預設
   const actions = document.getElementById("main-actions");
   actions.innerHTML = "";
   const b = document.createElement("button");
   b.className = "btn btn-next";
-  b.id = "btn-next";
   b.textContent = "▶ 下一步";
   b.onclick = advanceStep;
   actions.appendChild(b);
 }
-
 function advanceStep(){
-  SFX.click();
-  ensureAudio();
+  SFX.click(); ensureAudio();
   const scene = scenes[state.sceneIdx];
   state.stepIdx++;
   if(state.stepIdx < scene.steps.length){
-    // 執行步驟
     const step = scene.steps[state.stepIdx];
     setTeacherTip(`<b>🎬 第 ${state.sceneIdx+1}.${state.stepIdx+1} 步</b><br>${step.tip}`);
     setNarration(step.narrate);
     step.run && step.run.call(scene);
-    // 如果是場景5 且是最後一步, 顯示答題按鈕
     if(scene.onFinalStep && state.stepIdx === scene.steps.length - 1){
       setTimeout(()=>scene.onFinalStep(), 600);
     }
   } else {
-    // 步驟完成 → 顯示「進入下一幕」按鈕
     if(scene.afterSteps){
       setTeacherTip(`<b>✅ 本幕完成</b><br>${scene.afterSteps.tip}`);
       if(scene.afterSteps.narrate) setNarration(scene.afterSteps.narrate);
@@ -849,51 +1011,32 @@ function advanceStep(){
       const nx = document.createElement("button");
       nx.className = "btn btn-scene-next";
       nx.textContent = "▶ 進入下一幕";
-      nx.onclick = () => nextScene();
+      nx.onclick = nextScene;
       actions.appendChild(nx);
     } else {
       const rst = document.createElement("button");
       rst.className = "btn btn-scene-next";
       rst.textContent = "🔁 再來一次";
-      rst.onclick = () => { state.sceneIdx = 0; renderScene(); };
+      rst.onclick = () => { state.sceneIdx=0; renderScene(); };
       actions.appendChild(rst);
     }
   }
 }
+function nextScene(){ SFX.click(); if(state.sceneIdx<scenes.length-1){state.sceneIdx++; renderScene();} }
+function prevScene(){ SFX.click(); if(state.sceneIdx>0){state.sceneIdx--; renderScene();} }
 
-function nextScene(){
-  SFX.click();
-  if(state.sceneIdx < scenes.length - 1){
-    state.sceneIdx++;
-    renderScene();
-  }
-}
-function prevScene(){
-  SFX.click();
-  if(state.sceneIdx > 0){
-    state.sceneIdx--;
-    renderScene();
-  }
-}
-
-// ============================================================
-// 初始化
-// ============================================================
 document.addEventListener("click", ensureAudio, {once:true});
 document.addEventListener("touchstart", ensureAudio, {once:true});
 document.getElementById("btn-prev").onclick = prevScene;
-document.getElementById("btn-restart").onclick = () => {
-  SFX.click();
-  state.sceneIdx = 0; renderScene();
-};
+document.getElementById("btn-restart").onclick = () => { SFX.click(); state.sceneIdx=0; renderScene(); };
 document.getElementById("btn-mute").onclick = (e) => {
   state.audioOn = !state.audioOn;
   e.currentTarget.textContent = state.audioOn ? "🔊" : "🔇";
   if(state.audioOn) SFX.click();
 };
-document.addEventListener("keydown", (e) => {
-  if(e.key === "ArrowRight" || e.key === " "){ e.preventDefault(); advanceStep(); }
-  if(e.key === "ArrowLeft") prevScene();
+document.addEventListener("keydown", e => {
+  if(e.key==="ArrowRight" || e.key===" "){ e.preventDefault(); advanceStep(); }
+  if(e.key==="ArrowLeft") prevScene();
 });
 
 renderScene();
