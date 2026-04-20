@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>蠟筆小新的玩具工廠｜全等三角形 SSS 互動劇場</title>
+<style>
+/* ============================================================
+   基礎重置 & 排版
+============================================================ */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#FAFAFA;color:#2C3E50;
+  font-family:"Microsoft JhengHei","微軟正黑體","PingFang TC",sans-serif;
+  font-size:20px;user-select:none;touch-action:manipulation}
+body{display:flex;flex-direction:column}
+
+/* ============================================================
+   顏色變數
+============================================================ */
+:root{
+  --bg:#FAFAFA; --bg-alt:#FFF5E6;
+  --text:#2C3E50; --text-sub:#5D6D7E;
+  --sss:#E74C3C; --sss-lt:#FADBD8;
+  --sas1:#3498DB; --sas2:#F39C12;
+  --cong:#9B59B6; --cong-lt:#E8DAEF;
+  --ok:#27AE60; --ok-lt:#D5F5E3;
+  --warn:#E67E22;
+  --hint:#F4D03F;
+  --shadow:0 4px 12px rgba(0,0,0,.12);
+}
+
+/* ============================================================
+   頂部工具列
+============================================================ */
+#topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:#fff;box-shadow:var(--shadow);z-index:10;
+  min-height:60px}
+.level-switcher,.mode-switcher{display:flex;gap:6px}
+.btn{background:#fff;border:2px solid #D5DBDB;border-radius:12px;
+  padding:8px 12px;font-size:22px;cursor:pointer;min-width:60px;min-height:60px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-weight:700;color:var(--text);transition:all .15s ease;
+  font-family:inherit}
+.btn:hover{background:var(--bg-alt);transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn.active{background:var(--cong);color:#fff;border-color:var(--cong)}
+.btn-lg{min-width:120px;min-height:60px;font-size:20px}
+.btn-ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.btn-ok:hover{background:#1E8449}
+.btn-sss{background:var(--sss);color:#fff;border-color:var(--sss)}
+.btn-sas{background:var(--sas1);color:#fff;border-color:var(--sas1)}
+.btn-cong{background:var(--cong);color:#fff;border-color:var(--cong)}
+
+#title{font-size:22px;font-weight:800;color:var(--cong);text-align:center;flex:1;
+  margin:0 10px}
+
+/* ============================================================
+   進度條
+============================================================ */
+#progress{height:8px;background:#ECF0F1;display:flex;position:relative;z-index:5}
+.prog-seg{flex:1;background:transparent;border-right:2px solid #fff;transition:background .3s}
+.prog-seg.done{background:var(--cong)}
+.prog-seg.current{background:var(--hint);animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* ============================================================
+   主舞台
+============================================================ */
+#stage{flex:1;position:relative;overflow:hidden;background:var(--bg)}
+#canvas{width:100%;height:100%;display:block}
+
+/* 旁白區 */
+#narration{position:absolute;top:18px;left:50%;transform:translateX(-50%);
+  max-width:80%;background:rgba(255,255,255,.95);border:3px solid var(--cong);
+  border-radius:18px;padding:14px 22px;font-size:22px;font-weight:600;
+  box-shadow:var(--shadow);z-index:20;line-height:1.5;text-align:center;
+  pointer-events:none}
+
+/* 底部按鈕區 */
+#hud{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+  display:flex;gap:10px;z-index:15;flex-wrap:wrap;justify-content:center;
+  max-width:95%}
+
+/* 鷹架隱藏：Star 模式文字減量 */
+body[data-level="star"] .moon-only,
+body[data-level="star"] .sun-only{display:none}
+body[data-level="moon"] .sun-only{display:none}
+body[data-level="sun"] .star-only-min{display:none}
+
+/* 右下浮動控制 */
+#corner-controls{position:fixed;right:12px;bottom:12px;display:flex;flex-direction:column;
+  gap:8px;z-index:30}
+#corner-controls .btn{min-width:50px;min-height:50px;font-size:20px;
+  background:rgba(255,255,255,.9)}
+
+/* SOP 浮動卡 */
+#sop-panel{position:fixed;right:70px;bottom:12px;width:360px;max-width:90vw;
+  max-height:70vh;overflow-y:auto;background:rgba(255,248,230,.96);
+  border:3px solid var(--warn);border-radius:16px;padding:18px 20px;
+  box-shadow:var(--shadow);z-index:40;display:none;font-size:16px;line-height:1.6}
+#sop-panel.visible{display:block}
+#sop-panel h3{color:var(--warn);margin-bottom:8px;font-size:20px}
+#sop-panel .sop-sec{margin-bottom:12px;padding:8px;border-radius:8px;background:#fff}
+#sop-panel .sop-sec strong{display:block;color:var(--cong);margin-bottom:4px}
+
+/* 手勢提示 */
+.gesture-hint{position:absolute;width:60px;height:60px;border-radius:50%;
+  background:radial-gradient(circle,rgba(244,208,63,.7) 0%,rgba(244,208,63,0) 70%);
+  pointer-events:none;animation:ghint 1.2s infinite;z-index:25}
+.gesture-hint::after{content:"👆";position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);font-size:36px}
+@keyframes ghint{0%,100%{transform:scale(.8);opacity:.4}50%{transform:scale(1.1);opacity:1}}
+
+/* 慶祝彩帶 */
+.confetti{position:fixed;width:10px;height:14px;z-index:50;
+  animation:fall 2.5s linear;pointer-events:none}
+@keyframes fall{0%{transform:translateY(-20vh) rotate(0)}100%{transform:translateY(110vh) rotate(540deg)}}
+
+/* 答對答錯 */
+.flash{position:absolute;inset:0;pointer-events:none;z-index:18;
+  display:flex;align-items:center;justify-content:center;font-size:140px;
+  animation:flashIn .5s ease}
+@keyframes flashIn{0%{opacity:0;transform:scale(.5)}50%{opacity:1;transform:scale(1.2)}
+  100%{opacity:0;transform:scale(1)}}
+
+/* 測驗題目卡 */
+.quiz-card{background:#fff;border:3px solid var(--cong);border-radius:20px;
+  padding:22px;box-shadow:var(--shadow);max-width:560px}
+.quiz-card h2{font-size:24px;color:var(--cong);margin-bottom:12px}
+.quiz-options{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+
+/* 對話氣泡 (SVG 內使用) */
+.bubble-text{font-family:"Microsoft JhengHei","微軟正黑體",sans-serif;
+  font-weight:700;font-size:18px;fill:var(--text)}
+
+/* Scene 過場 */
+#stage.fading #canvas{transition:opacity .4s;opacity:.2}
+
+/* 手機排版 */
+@media (max-width:720px){
+  #topbar{flex-wrap:wrap;min-height:auto;padding:6px 8px;gap:4px}
+  #title{font-size:16px;flex:1 1 100%;order:-1;margin:4px 0}
+  .btn{min-width:48px;min-height:48px;font-size:18px;padding:6px 8px}
+  #narration{font-size:16px;padding:10px 14px;max-width:92%}
+  #hud{gap:6px}
+  #sop-panel{width:calc(100vw - 90px);font-size:14px}
+}
+</style>
+</head>
+<body data-level="moon" data-mode="theater">
+
+<!-- ============================================================
+     頂部工具列
+============================================================ -->
+<div id="topbar">
+  <div class="level-switcher" title="鷹架等級">
+    <button class="btn" data-level="star" title="Star 基礎">⭐</button>
+    <button class="btn active" data-level="moon" title="Moon 標準">🌙</button>
+    <button class="btn" data-level="sun" title="Sun 挑戰">☀️</button>
+  </div>
+  <div id="title">🏭 蠟筆小新的玩具工廠｜全等 · SSS</div>
+  <div class="mode-switcher" title="模式">
+    <button class="btn active" data-mode="theater" title="劇場模式">🎬</button>
+    <button class="btn" data-mode="interactive" title="互動模式">🎮</button>
+    <button class="btn" data-mode="quiz" title="測驗模式">📝</button>
+  </div>
+</div>
+
+<!-- 進度條 -->
+<div id="progress">
+  <div class="prog-seg current"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+</div>
+
+<!-- 主舞台 -->
+<div id="stage">
+  <svg id="canvas" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <!-- 紅色邊樣式 -->
+      <filter id="glow-sss" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="4"/>
+      </filter>
+      <filter id="glow-cong" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="6"/>
+      </filter>
+      <!-- 箭頭 -->
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+              markerWidth="8" markerHeight="8" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="#2C3E50"/>
+      </marker>
+    </defs>
+    <g id="scene-root"></g>
+  </svg>
+  <div id="narration"></div>
+  <div id="hud"></div>
+</div>
+
+<!-- 右下控制 -->
+<div id="corner-controls">
+  <button class="btn" id="btn-sop" title="老師 SOP (F1)">📖</button>
+  <button class="btn" id="btn-mute" title="靜音">🔊</button>
+  <button class="btn" id="btn-prev" title="上一幕">◀</button>
+  <button class="btn" id="btn-next" title="下一幕">▶</button>
+</div>
+
+<!-- SOP 浮動卡 -->
+<div id="sop-panel">
+  <h3>📖 老師小提醒</h3>
+  <div id="sop-body"></div>
+</div>
+
+<script>
+// ============================================================
+// 狀態
+// ============================================================
+const state = {
+  sceneIdx: 0,
+  mode: "theater",     // theater | interactive | quiz
+  level: "moon",       // star | moon | sun
+  audioOn: true,
+  sopOpen: false,
+  idleTimer: null,
+  autoplayTimer: null,
+  animId: 0,
+};
+
+const TOTAL_SCENES = 6;
+
+// ============================================================
+// 音效 (Web Audio API, 不依賴外部檔)
+// ============================================================
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e){ console.warn("Audio not supported"); }
+  }
+  if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+}
+function beep(freq, dur=0.15, type="sine", gain=0.2){
+  if(!state.audioOn || !audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = type; osc.frequency.value = freq;
+  g.gain.setValueAtTime(gain, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+  osc.connect(g); g.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + dur);
+}
+const SFX = {
+  click(){ beep(600, 0.05, "square", 0.1); },
+  success(){
+    // C-E-G 上升三音
+    beep(523, 0.15, "sine", 0.18);
+    setTimeout(()=>beep(659, 0.15, "sine", 0.18), 140);
+    setTimeout(()=>beep(784, 0.25, "sine", 0.2), 280);
+  },
+  gentle(){  // 提示音, 不刺耳
+    beep(330, 0.2, "sine", 0.14);
+    setTimeout(()=>beep(262, 0.25, "sine", 0.14), 180);
+  },
+  pop(){ beep(880, 0.08, "triangle", 0.15); },
+  win(){   // 通關音
+    const notes = [523, 659, 784, 1047];
+    notes.forEach((f,i)=>setTimeout(()=>beep(f, 0.18, "sine", 0.22), i*130));
+  }
+};
+
+// ============================================================
+// 幾何工具
+// ============================================================
+// 給三邊 a=BC, b=CA, c=AB 求三頂點 (B 原點, C 在 x 軸)
+function triangleFromSSS(a,b,c){
+  if(a+b<=c || b+c<=a || a+c<=b) return null; // 不合法
+  const x = (c*c + a*a - b*b) / (2*a);
+  const y = Math.sqrt(Math.max(c*c - x*x, 0));
+  return [
+    {x: x, y: -y, label: "A"},
+    {x: 0, y: 0,  label: "B"},
+    {x: a, y: 0,  label: "C"},
+  ];
+}
+// 平移 + 縮放
+function transform(pts, cx, cy, scale=20){
+  // 置中三角形
+  const mx = pts.reduce((s,p)=>s+p.x,0)/3;
+  const my = pts.reduce((s,p)=>s+p.y,0)/3;
+  return pts.map(p => ({
+    x: cx + (p.x - mx) * scale,
+    y: cy + (p.y - my) * scale,
+    label: p.label
+  }));
+}
+// 平移
+function translatePts(pts, dx, dy){
+  return pts.map(p => ({x:p.x+dx, y:p.y+dy, label:p.label}));
+}
+// 旋轉 (繞中心)
+function rotatePts(pts, angle){
+  const cx = pts.reduce((s,p)=>s+p.x,0)/3;
+  const cy = pts.reduce((s,p)=>s+p.y,0)/3;
+  const cos = Math.cos(angle), sin = Math.sin(angle);
+  return pts.map(p => ({
+    x: cx + (p.x-cx)*cos - (p.y-cy)*sin,
+    y: cy + (p.x-cx)*sin + (p.y-cy)*cos,
+    label: p.label
+  }));
+}
+// 翻轉 (左右)
+function flipPts(pts){
+  const cx = pts.reduce((s,p)=>s+p.x,0)/3;
+  return pts.map(p => ({x: 2*cx - p.x, y: p.y, label:p.label}));
+}
+// 線性插值
+function lerp(a,b,t){ return a + (b-a)*t; }
+function lerpPts(pts1, pts2, t){
+  return pts1.map((p,i) => ({
+    x: lerp(p.x, pts2[i].x, t),
+    y: lerp(p.y, pts2[i].y, t),
+    label: p.label
+  }));
+}
+
+// ============================================================
+// SVG 小工具
+// ============================================================
+const SVGNS = "http://www.w3.org/2000/svg";
+function el(tag, attrs={}, parent=null){
+  const e = document.createElementNS(SVGNS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(e);
+  return e;
+}
+function clearScene(){
+  const root = document.getElementById("scene-root");
+  root.innerHTML = "";
+  return root;
+}
+
+// 三角形 path
+function triPath(pts){
+  return `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y} Z`;
+}
+
+// 加三角形
+function drawTri(parent, pts, opts={}){
+  const {fill="#E8DAEF", stroke="#9B59B6", sw=4, id="", opacity=1, labels=true} = opts;
+  const g = el("g", {id, opacity}, parent);
+  el("path", {d:triPath(pts), fill, stroke, "stroke-width":sw,
+    "stroke-linejoin":"round", "stroke-linecap":"round"}, g);
+  if(labels){
+    pts.forEach(p => {
+      const dx = p.label==="A"?0 : (p.label==="B"?-18:18);
+      const dy = p.label==="A"?-14:18;
+      el("text", {x:p.x+dx, y:p.y+dy, "font-size":20, "font-weight":700,
+        fill:stroke, "text-anchor":"middle"}, g).textContent = p.label;
+    });
+  }
+  return g;
+}
+
+// ============================================================
+// 角色 SVG (致敬版, 純幾何拼)
+// ============================================================
+function addShinchan(parent, cx, cy, scale=1){
+  const g = el("g", {transform:`translate(${cx},${cy}) scale(${scale})`}, parent);
+  // 臉
+  el("ellipse", {cx:0, cy:0, rx:55, ry:60, fill:"#FAD7A0", stroke:"#7E5109", "stroke-width":3}, g);
+  // 頭髮一撮
+  el("ellipse", {cx:0, cy:-55, rx:22, ry:18, fill:"#1B2631"}, g);
+  // 眉毛 (粗黑)
+  el("rect", {x:-28, y:-20, width:24, height:8, fill:"#1B2631", transform:"rotate(-8 -16 -16)"}, g);
+  el("rect", {x:4,   y:-20, width:24, height:8, fill:"#1B2631", transform:"rotate(8 16 -16)"}, g);
+  // 眼
+  el("circle", {cx:-15, cy:-5, r:5, fill:"#1B2631"}, g);
+  el("circle", {cx:15,  cy:-5, r:5, fill:"#1B2631"}, g);
+  // 嘴
+  el("ellipse", {cx:0, cy:18, rx:18, ry:8, fill:"#C0392B", stroke:"#7B241C", "stroke-width":2}, g);
+  // 身體: 黃上衣 + 紅褲
+  el("rect", {x:-45, y:55, width:90, height:50, fill:"#F1C40F", stroke:"#9A7D0A", "stroke-width":2, rx:8}, g);
+  el("rect", {x:-35, y:100, width:70, height:30, fill:"#C0392B", stroke:"#7B241C", "stroke-width":2}, g);
+  return g;
+}
+
+function addDoraemon(parent, cx, cy, scale=1){
+  const g = el("g", {transform:`translate(${cx},${cy}) scale(${scale})`}, parent);
+  // 頭 (藍)
+  el("ellipse", {cx:0, cy:0, rx:65, ry:60, fill:"#3498DB", stroke:"#1B4F72", "stroke-width":3}, g);
+  // 臉 (白)
+  el("ellipse", {cx:0, cy:15, rx:50, ry:40, fill:"#fff", stroke:"#1B4F72", "stroke-width":2}, g);
+  // 眼白
+  el("ellipse", {cx:-15, cy:-10, rx:12, ry:16, fill:"#fff", stroke:"#1B4F72", "stroke-width":2}, g);
+  el("ellipse", {cx:15,  cy:-10, rx:12, ry:16, fill:"#fff", stroke:"#1B4F72", "stroke-width":2}, g);
+  // 黑眼珠
+  el("circle", {cx:-12, cy:-6, r:4, fill:"#1B2631"}, g);
+  el("circle", {cx:12,  cy:-6, r:4, fill:"#1B2631"}, g);
+  // 紅鼻
+  el("circle", {cx:0, cy:5, r:10, fill:"#C0392B", stroke:"#7B241C", "stroke-width":2}, g);
+  // 鬍鬚
+  for(const [x1,y1,x2,y2] of [[-10,15,-35,10],[-10,20,-35,22],[-10,25,-35,34],
+                               [10,15,35,10],[10,20,35,22],[10,25,35,34]]){
+    el("line", {x1, y1, x2, y2, stroke:"#1B2631", "stroke-width":2}, g);
+  }
+  // 嘴
+  el("path", {d:"M-10,32 Q0,40 10,32", fill:"none", stroke:"#1B2631", "stroke-width":2}, g);
+  // 鈴鐺
+  el("rect", {x:-30, y:55, width:60, height:8, fill:"#C0392B"}, g); // 頸帶
+  el("circle", {cx:0, cy:70, r:14, fill:"#F1C40F", stroke:"#9A7D0A", "stroke-width":2}, g);
+  el("line", {x1:-10, y1:70, x2:10, y2:70, stroke:"#1B2631", "stroke-width":2}, g);
+  el("circle", {cx:0, cy:75, r:2, fill:"#1B2631"}, g);
+  return g;
+}
+
+function addKirby(parent, cx, cy, scale=1){
+  const g = el("g", {transform:`translate(${cx},${cy}) scale(${scale})`}, parent);
+  // 身體
+  el("circle", {cx:0, cy:0, r:55, fill:"#F5B7B1", stroke:"#922B21", "stroke-width":3}, g);
+  // 腳
+  el("ellipse", {cx:-25, cy:55, rx:22, ry:14, fill:"#C0392B", stroke:"#7B241C", "stroke-width":2}, g);
+  el("ellipse", {cx:25,  cy:55, rx:22, ry:14, fill:"#C0392B", stroke:"#7B241C", "stroke-width":2}, g);
+  // 眼
+  el("ellipse", {cx:-14, cy:-10, rx:5, ry:11, fill:"#1B2631"}, g);
+  el("ellipse", {cx:14,  cy:-10, rx:5, ry:11, fill:"#1B2631"}, g);
+  // 紅頰
+  el("ellipse", {cx:-28, cy:8, rx:10, ry:6, fill:"#E74C3C"}, g);
+  el("ellipse", {cx:28,  cy:8, rx:10, ry:6, fill:"#E74C3C"}, g);
+  // 嘴
+  el("ellipse", {cx:0, cy:10, rx:8, ry:4, fill:"#922B21"}, g);
+  return g;
+}
+
+function addShirokuma(parent, cx, cy, scale=1){
+  const g = el("g", {transform:`translate(${cx},${cy}) scale(${scale})`}, parent);
+  // 頭
+  el("ellipse", {cx:0, cy:5, rx:58, ry:50, fill:"#FDEBD0", stroke:"#7E5109", "stroke-width":3}, g);
+  // 耳
+  el("circle", {cx:-40, cy:-35, r:16, fill:"#FDEBD0", stroke:"#7E5109", "stroke-width":2}, g);
+  el("circle", {cx:40,  cy:-35, r:16, fill:"#FDEBD0", stroke:"#7E5109", "stroke-width":2}, g);
+  // 眼
+  el("circle", {cx:-18, cy:-5, r:5, fill:"#1B2631"}, g);
+  el("circle", {cx:18,  cy:-5, r:5, fill:"#1B2631"}, g);
+  // 紅頰
+  el("ellipse", {cx:-32, cy:15, rx:10, ry:6, fill:"#F5B7B1"}, g);
+  el("ellipse", {cx:32,  cy:15, rx:10, ry:6, fill:"#F5B7B1"}, g);
+  // 鼻
+  el("ellipse", {cx:0, cy:12, rx:6, ry:4, fill:"#7E5109"}, g);
+  // 嘴
+  el("path", {d:"M-8,22 Q0,28 8,22", fill:"none", stroke:"#7E5109", "stroke-width":2}, g);
+  return g;
+}
+
+// 對話氣泡
+function addBubble(parent, x, y, w, h, text, tail="left"){
+  const g = el("g", {}, parent);
+  el("rect", {x, y, width:w, height:h, rx:18, ry:18,
+    fill:"#fff", stroke:"#34495E", "stroke-width":3}, g);
+  // 尾巴
+  const tx = tail==="left" ? x-12 : x+w+12;
+  const ty = y + h*0.65;
+  el("path", {
+    d: tail==="left" ? `M${x+20},${ty} L${tx},${ty+5} L${x+25},${ty+20} Z`
+                     : `M${x+w-20},${ty} L${tx},${ty+5} L${x+w-25},${ty+20} Z`,
+    fill:"#fff", stroke:"#34495E", "stroke-width":3
+  }, g);
+  // 文字 (多行)
+  const lines = text.split("\n");
+  const lh = Math.min(32, h / (lines.length+1));
+  lines.forEach((ln,i) => {
+    el("text", {x:x+w/2, y:y + h/2 - (lines.length-1)*lh/2 + i*lh,
+      "text-anchor":"middle", "dominant-baseline":"middle",
+      "font-size":Math.min(22, lh*0.75), "font-weight":700,
+      fill:"#2C3E50", "font-family":"Microsoft JhengHei,sans-serif"}, g)
+      .textContent = ln;
+  });
+  return g;
+}
+
+// ============================================================
+// 旁白 / HUD 工具
+// ============================================================
+function setNarration(text){
+  const n = document.getElementById("narration");
+  n.textContent = text;
+  n.style.display = text ? "block" : "none";
+}
+function clearHUD(){ document.getElementById("hud").innerHTML = ""; }
+function addButton(label, cls, onClick){
+  const b = document.createElement("button");
+  b.className = "btn btn-lg " + (cls || "");
+  b.textContent = label;
+  b.onclick = (e) => { SFX.click(); resetIdleTimer(); onClick(e); };
+  document.getElementById("hud").appendChild(b);
+  return b;
+}
+
+// 答對/答錯 閃現
+function flashCorrect(){
+  SFX.success();
+  const f = document.createElement("div");
+  f.className = "flash"; f.textContent = "✅";
+  document.getElementById("stage").appendChild(f);
+  setTimeout(()=>f.remove(), 700);
+  confetti(18);
+}
+function flashTryAgain(){
+  SFX.gentle();
+  const f = document.createElement("div");
+  f.className = "flash"; f.textContent = "💛 再想想";
+  f.style.fontSize = "60px"; f.style.color = "#E67E22";
+  document.getElementById("stage").appendChild(f);
+  setTimeout(()=>f.remove(), 900);
+}
+function confetti(n=20){
+  const colors = ["#E74C3C","#3498DB","#F39C12","#9B59B6","#27AE60","#F4D03F"];
+  for(let i=0;i<n;i++){
+    const d = document.createElement("div");
+    d.className = "confetti";
+    d.style.left = Math.random()*100 + "vw";
+    d.style.background = colors[i % colors.length];
+    d.style.animationDelay = (Math.random()*0.6)+"s";
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(), 3000);
+  }
+}
+
+// 手勢提示 (空閒超過 N 秒)
+function showGestureAt(x, y){
+  removeGesture();
+  const d = document.createElement("div");
+  d.className = "gesture-hint";
+  d.style.left = (x-30)+"px"; d.style.top = (y-30)+"px";
+  d.id = "gesture-hint";
+  document.getElementById("stage").appendChild(d);
+}
+function removeGesture(){
+  const g = document.getElementById("gesture-hint");
+  if(g) g.remove();
+}
+function resetIdleTimer(){
+  removeGesture();
+  if(state.idleTimer) clearTimeout(state.idleTimer);
+  state.idleTimer = setTimeout(()=>{
+    const scene = scenes[state.sceneIdx];
+    if(scene.hintAt && state.mode!=="theater"){
+      const rect = document.getElementById("stage").getBoundingClientRect();
+      const [rx, ry] = scene.hintAt;
+      showGestureAt(rect.width*rx, rect.height*ry);
+    }
+  }, 5000);
+}
+
+// ============================================================
+// 場景定義
+// ============================================================
+const scenes = [
+// ----- SCENE 1: 疊合實驗 -----
+{
+  title: "場景 1 · 疊疊看",
+  narration: "小新訂了兩個一樣的三角積木，\n玩具工廠怎麼確認它們真的一樣？",
+  hintAt: [0.5, 0.82],
+  sop: {
+    say: "「同學看，小新要兩個一模一樣的三角積木。怎麼證明它們一樣？」",
+    react: "可能答：長一樣／疊起來看／一模一樣就是一樣。",
+    fallback: "如果沒人回答，直接點『平移』按鈕示範，邊做邊問：『看，移過去對不對？』"
+  },
+  setup(){
+    const root = clearScene();
+    // 左三角 (固定)
+    const A = triangleFromSSS(6, 8, 10);
+    const pts1 = transform(A, 500, 500, 30);
+    // 右三角 (待疊)
+    const pts2 = transform(A, 1100, 500, 30);
+    // 先畫兩個
+    drawTri(root, pts1, {fill:"#FADBD8", stroke:"#E74C3C", sw:5, id:"t1"});
+    drawTri(root, pts2, {fill:"#D6EAF8", stroke:"#3498DB", sw:5, id:"t2"});
+
+    // 小新 (左下)
+    addShinchan(root, 180, 700, 1.2);
+    addBubble(root, 280, 580, 280, 100, "我要兩個\n一樣的三角積木！");
+
+    clearHUD();
+    addButton("🔀 平移", "btn-lg", () => doTransform("translate"));
+    addButton("🔄 旋轉", "btn-lg", () => doTransform("rotate"));
+    addButton("🪞 翻轉", "btn-lg", () => doTransform("flip"));
+
+    // 儲存狀態到閉包
+    scenes[0]._orig2 = pts2;
+    scenes[0]._target = pts1;
+    scenes[0]._current = pts2;
+    scenes[0]._done = false;
+
+    function doTransform(type){
+      if(scenes[0]._done) return;
+      let target;
+      if(type==="translate") target = scenes[0]._target.map(p=>({...p}));
+      else if(type==="rotate"){
+        target = rotatePts(scenes[0]._current, Math.PI/2);
+      } else if(type==="flip"){
+        target = flipPts(scenes[0]._current);
+      }
+      animatePts("t2", scenes[0]._current, target, 60, () => {
+        scenes[0]._current = target;
+        // 判定是否疊合
+        const dx = Math.abs(target[0].x - scenes[0]._target[0].x);
+        const dy = Math.abs(target[0].y - scenes[0]._target[0].y);
+        if(dx < 20 && dy < 20 && type==="translate"){
+          onOverlap();
+        }
+      });
+    }
+
+    function onOverlap(){
+      scenes[0]._done = true;
+      // 改成紫色顯示已疊合
+      const t2 = document.querySelector("#t2 path");
+      if(t2){ t2.setAttribute("fill","#E8DAEF"); t2.setAttribute("stroke","#9B59B6"); }
+      flashCorrect();
+      setNarration("完美疊合！這叫做 全等 ≅");
+      // 顯示大 ≅ 符號
+      el("text", {x:800, y:300, "text-anchor":"middle", "font-size":120,
+        "font-weight":900, fill:"#9B59B6"}, document.getElementById("scene-root"))
+        .textContent = "≅";
+      // 下一幕按鈕
+      clearHUD();
+      addButton("下一幕 ▶", "btn-cong", () => nextScene());
+    }
+
+    resetIdleTimer();
+  }
+},
+
+// ----- SCENE 2: 對應邊對應角 -----
+{
+  title: "場景 2 · 對應邊",
+  narration: "風間說：每條邊都要一一配對才算一樣！\n（碰邊就會發光）",
+  hintAt: [0.3, 0.5],
+  sop: {
+    say: "「兩個全等三角形，每條邊都有對應的『好朋友』。用滑鼠碰碰看哪條配哪條。」",
+    react: "通常答對 2 條後就理解規律。如果一直答錯，手動帶他找最短邊對最短邊。",
+    fallback: "⭐ Star 模式會自動示範，不必學生操作。"
+  },
+  setup(){
+    const root = clearScene();
+    const A = triangleFromSSS(5, 7, 8);
+    const pts1 = transform(A, 420, 460, 35);
+    const pts2 = transform(A, 1150, 460, 35);
+    drawTri(root, pts1, {fill:"#fff", stroke:"#2C3E50", sw:3, id:"t1"});
+    drawTri(root, pts2, {fill:"#fff", stroke:"#2C3E50", sw:3, id:"t2"});
+
+    // 定義三對對應邊 (顏色)
+    const edges = [
+      {color:"#E74C3C", name:"AB"},  // AB 紅
+      {color:"#3498DB", name:"BC"},  // BC 藍
+      {color:"#27AE60", name:"CA"},  // CA 綠
+    ];
+
+    // 畫三邊 (t1)
+    const t1Edges = [
+      [pts1[0], pts1[1]],  // AB
+      [pts1[1], pts1[2]],  // BC
+      [pts1[2], pts1[0]],  // CA
+    ];
+    const t2Edges = [
+      [pts2[0], pts2[1]],
+      [pts2[1], pts2[2]],
+      [pts2[2], pts2[0]],
+    ];
+
+    let matched = 0;
+    const foundPairs = new Set();
+
+    t1Edges.forEach((e,i) => {
+      const line = el("line", {
+        x1:e[0].x, y1:e[0].y, x2:e[1].x, y2:e[1].y,
+        stroke:"#888", "stroke-width":10, "stroke-linecap":"round",
+        "data-pair":i, style:"cursor:pointer"
+      }, root);
+      line.addEventListener("pointerenter", () => highlightPair(i, "left"));
+      line.addEventListener("pointerleave", () => { if(!foundPairs.has(i)) unhighlight(); });
+      line.addEventListener("click", () => tryMatch(i));
+    });
+    t2Edges.forEach((e,i) => {
+      const line = el("line", {
+        x1:e[0].x, y1:e[0].y, x2:e[1].x, y2:e[1].y,
+        stroke:"#888", "stroke-width":10, "stroke-linecap":"round",
+        "data-pair-right":i, style:"cursor:pointer"
+      }, root);
+      line.addEventListener("pointerenter", () => highlightPair(i, "right"));
+      line.addEventListener("pointerleave", () => { if(!foundPairs.has(i)) unhighlight(); });
+    });
+
+    function highlightPair(i, side){
+      if(foundPairs.has(i)) return;
+      const l1 = document.querySelector(`[data-pair="${i}"]`);
+      const l2 = document.querySelector(`[data-pair-right="${i}"]`);
+      if(l1) l1.setAttribute("stroke", edges[i].color);
+      if(l2) l2.setAttribute("stroke", edges[i].color);
+    }
+    function unhighlight(){
+      document.querySelectorAll("[data-pair],[data-pair-right]").forEach(l => {
+        const i = l.getAttribute("data-pair") ?? l.getAttribute("data-pair-right");
+        if(!foundPairs.has(Number(i))) l.setAttribute("stroke", "#888");
+      });
+    }
+    function tryMatch(i){
+      if(foundPairs.has(i)) return;
+      foundPairs.add(i);
+      matched++;
+      SFX.pop();
+      setNarration(`找到對應邊！共 ${matched}/3`);
+      if(matched === 3){
+        setTimeout(() => {
+          flashCorrect();
+          setNarration("太神了！三對邊都找到！");
+          clearHUD();
+          addButton("下一幕 ▶", "btn-cong", () => nextScene());
+        }, 400);
+      }
+    }
+
+    addShinchan(root, 120, 780, 0.9); // 小新在旁
+    clearHUD();
+    if(state.level === "star"){
+      // Star 模式自動示範
+      addButton("自動示範", "btn-lg", () => {
+        [0,1,2].forEach((i) => setTimeout(() => { highlightPair(i, "left"); tryMatch(i); }, i*900));
+      });
+    } else {
+      addButton("提示：先點最短邊", "btn-lg", () => {
+        highlightPair(0, "left");
+        setTimeout(() => unhighlight(), 1500);
+      });
+    }
+    resetIdleTimer();
+  }
+},
+
+// ----- SCENE 3: SSS 三邊實驗 -----
+{
+  title: "場景 3 · SSS 三邊決定",
+  narration: "哆啦A夢的時光機腳架：只要三邊一樣，\n做出來一定長得一樣！拉滑桿試試看～",
+  hintAt: [0.5, 0.82],
+  sop: {
+    say: "「這是真正的數學實驗喔。拉 a、b、c 滑桿，看形狀怎麼變。再按『再畫一次』，你會發現——不管怎麼換，只要三邊沒變，形狀一樣！」",
+    react: "有學生會想把滑桿拉到很誇張（如 1, 1, 10），這是好事，正好教『三邊組不成三角形』。",
+    fallback: "如果時間不夠，按『示範 5-7-8』直接跳到標準組合。"
+  },
+  setup(){
+    const root = clearScene();
+    let a = 6, b = 8, c = 10;
+    const cx = 700, cy = 450;
+
+    function redraw(){
+      // 清掉舊三角形
+      const old = document.getElementById("live-tri");
+      if(old) old.remove();
+      const pts = triangleFromSSS(a, b, c);
+      if(!pts){
+        setNarration(`${a}+${b}+${c} 這三邊組不成三角形～再調調看`);
+        return;
+      }
+      const tpts = transform(pts, cx, cy, 30);
+      drawTri(root, tpts, {fill:"#FADBD8", stroke:"#E74C3C", sw:6, id:"live-tri"});
+      // 標邊長
+      // AB
+      el("text", {x: (tpts[0].x+tpts[1].x)/2 - 30, y: (tpts[0].y+tpts[1].y)/2,
+        "font-size":28, "font-weight":700, fill:"#E74C3C"},
+        document.getElementById("live-tri")).textContent = c;
+      // BC
+      el("text", {x: (tpts[1].x+tpts[2].x)/2, y: (tpts[1].y+tpts[2].y)/2 + 32,
+        "font-size":28, "font-weight":700, fill:"#E74C3C",
+        "text-anchor":"middle"},
+        document.getElementById("live-tri")).textContent = a;
+      // CA
+      el("text", {x: (tpts[2].x+tpts[0].x)/2 + 20, y: (tpts[2].y+tpts[0].y)/2,
+        "font-size":28, "font-weight":700, fill:"#E74C3C"},
+        document.getElementById("live-tri")).textContent = b;
+      setNarration(`三邊 ${a}、${b}、${c} → 一定長這樣！`);
+    }
+    redraw();
+
+    // 哆啦A夢
+    addDoraemon(root, 1300, 350, 1.2);
+    addBubble(root, 1150, 500, 280, 110, "三邊決定了\n形狀就鎖死！\n這叫 SSS 🔴");
+
+    // HUD: 三個滑桿
+    const hud = document.getElementById("hud");
+    hud.innerHTML = "";
+    hud.style.background = "rgba(255,255,255,.9)";
+    hud.style.padding = "12px 18px";
+    hud.style.borderRadius = "16px";
+    hud.style.border = "3px solid #E74C3C";
+
+    function makeSlider(label, val, min, max, onCh){
+      const wrap = document.createElement("div");
+      wrap.style.display = "flex"; wrap.style.alignItems = "center"; wrap.style.gap = "8px";
+      wrap.style.marginRight = "14px";
+      wrap.innerHTML = `<span style="font-weight:700;color:#E74C3C;font-size:18px">${label}</span>
+        <input type="range" min="${min}" max="${max}" value="${val}" style="width:110px">
+        <span class="val" style="font-weight:700;width:30px;text-align:center">${val}</span>`;
+      const inp = wrap.querySelector("input");
+      const spn = wrap.querySelector(".val");
+      inp.oninput = () => { spn.textContent = inp.value; onCh(+inp.value); resetIdleTimer(); };
+      hud.appendChild(wrap);
+    }
+    makeSlider("a", a, 3, 15, v => { a=v; redraw(); });
+    makeSlider("b", b, 3, 15, v => { b=v; redraw(); });
+    makeSlider("c", c, 3, 15, v => { c=v; redraw(); });
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "btn btn-cong btn-lg";
+    nextBtn.textContent = "下一幕 ▶";
+    nextBtn.onclick = () => { SFX.click(); nextScene(); };
+    hud.appendChild(nextBtn);
+
+    resetIdleTimer();
+  }
+},
+
+// ----- SCENE 4: 卡比 100 個蛋糕 -----
+{
+  title: "場景 4 · 卡比派對",
+  narration: "卡比要做 100 個三角蛋糕，三邊都是 6、6、6！",
+  hintAt: [0.5, 0.82],
+  sop: {
+    say: "「卡比最愛甜食。他下訂 100 個蛋糕，三邊都 6 公分，結果全部一模一樣——這就是 SSS 的威力。」",
+    react: "學生看到一堆小三角湧出會驚嘆，這一幕目的就是『視覺衝擊建立印象』。",
+    fallback: "按『再來一次』可以重播動畫。"
+  },
+  setup(){
+    const root = clearScene();
+    addKirby(root, 180, 500, 1.5);
+    addBubble(root, 320, 400, 320, 120, "三邊 6、6、6！\n來吧瓦豆魯迪～");
+
+    setNarration("正在量產中...");
+    const cakes = [];
+    const tbase = triangleFromSSS(6, 6, 6); // 正三角形
+
+    // 10x10 grid 位置
+    const grid = [];
+    for(let i=0;i<10;i++) for(let j=0;j<10;j++){
+      grid.push({x: 750 + i*70, y: 130 + j*50});
+    }
+    let idx = 0;
+    clearHUD();
+
+    function spawn(){
+      if(idx >= 100){
+        SFX.win();
+        flashCorrect();
+        setNarration("🎂 100 個全部一樣！SSS 萬歲！");
+        clearHUD();
+        addButton("下一幕 ▶", "btn-cong", () => nextScene());
+        return;
+      }
+      const p = grid[idx];
+      const tpts = transform(tbase, p.x, p.y, 5);
+      drawTri(root, tpts, {fill:"#FADBD8", stroke:"#E74C3C", sw:1, labels:false});
+      SFX.pop();
+      idx++;
+      setTimeout(spawn, idx<20 ? 60 : 25);  // 前慢後快
+    }
+    setTimeout(spawn, 300);
+
+    addButton("⏭️ 跳過動畫", "btn-lg", () => {
+      while(idx < 100){
+        const p = grid[idx];
+        const tpts = transform(tbase, p.x, p.y, 5);
+        drawTri(root, tpts, {fill:"#FADBD8", stroke:"#E74C3C", sw:1, labels:false});
+        idx++;
+      }
+      SFX.win();
+      flashCorrect();
+      setNarration("🎂 100 個全部一樣！SSS 萬歲！");
+      clearHUD();
+      addButton("下一幕 ▶", "btn-cong", () => nextScene());
+    });
+
+    resetIdleTimer();
+  }
+},
+
+// ----- SCENE 5: NBA 三分球測驗 -----
+{
+  title: "場景 5 · NBA 定位測驗",
+  narration: "勇士隊教練要重畫罰球區，要確認兩邊球場是否全等！",
+  hintAt: null,
+  sop: {
+    say: "「真人測驗時間！兩個球場畫面，你判斷是不是全等。如果三邊都一樣就是 SSS 全等。」",
+    react: "答對有歡呼、答錯不會紅叉（改橘色提示），安全。",
+    fallback: "⭐ Star 模式會把『三邊標示出來』減少判斷難度。"
+  },
+  setup(){
+    const quizzes = [
+      {a:5, b:7, c:8, a2:5, b2:7, c2:8, correct:true,  why:"三邊都一樣！SSS 全等 ✅"},
+      {a:6, b:6, c:6, a2:6, b2:6, c2:9, correct:false, why:"第三邊不一樣！不全等 ❌"},
+      {a:4, b:5, c:6, a2:4, b2:5, c2:6, correct:true,  why:"三邊完全對應！✅"},
+      {a:3, b:4, c:5, a2:5, b2:4, c2:3, correct:true,  why:"換順序還是一樣三邊！✅"},
+    ];
+    let q = 0, score = 0;
+
+    function render(){
+      const root = clearScene();
+      const cur = quizzes[q];
+      const p1 = transform(triangleFromSSS(cur.a, cur.b, cur.c), 450, 450, 35);
+      const p2 = transform(triangleFromSSS(cur.a2, cur.b2, cur.c2), 1100, 450, 35);
+      drawTri(root, p1, {fill:"#FADBD8", stroke:"#E74C3C", sw:5});
+      drawTri(root, p2, {fill:"#FADBD8", stroke:"#E74C3C", sw:5});
+
+      // ⭐ Star 模式: 標三邊長
+      if(state.level === "star" || state.level === "moon"){
+        el("text", {x:p1[0].x-30, y:(p1[0].y+p1[1].y)/2, "font-size":28,
+          "font-weight":700, fill:"#E74C3C"}, root).textContent = cur.c;
+        el("text", {x:(p1[1].x+p1[2].x)/2, y:p1[1].y+32, "font-size":28,
+          "font-weight":700, fill:"#E74C3C","text-anchor":"middle"}, root).textContent = cur.a;
+        el("text", {x:(p1[2].x+p1[0].x)/2+15, y:(p1[2].y+p1[0].y)/2, "font-size":28,
+          "font-weight":700, fill:"#E74C3C"}, root).textContent = cur.b;
+        el("text", {x:p2[0].x-30, y:(p2[0].y+p2[1].y)/2, "font-size":28,
+          "font-weight":700, fill:"#E74C3C"}, root).textContent = cur.c2;
+        el("text", {x:(p2[1].x+p2[2].x)/2, y:p2[1].y+32, "font-size":28,
+          "font-weight":700, fill:"#E74C3C","text-anchor":"middle"}, root).textContent = cur.a2;
+        el("text", {x:(p2[2].x+p2[0].x)/2+15, y:(p2[2].y+p2[0].y)/2, "font-size":28,
+          "font-weight":700, fill:"#E74C3C"}, root).textContent = cur.b2;
+      }
+
+      el("text", {x:800, y:150, "font-size":40, "font-weight":900,
+        fill:"#9B59B6", "text-anchor":"middle"}, root).textContent = `第 ${q+1} / ${quizzes.length} 題`;
+      el("text", {x:800, y:210, "font-size":32, "font-weight":700,
+        fill:"#2C3E50", "text-anchor":"middle"}, root).textContent = "兩個三角形全等嗎？依據 SSS？";
+
+      clearHUD();
+      addButton("✅ 是，全等", "btn-ok", () => answer(true));
+      addButton("❌ 不，不全等", "btn-sss", () => answer(false));
+    }
+
+    function answer(ans){
+      const cur = quizzes[q];
+      if(ans === cur.correct){
+        flashCorrect();
+        setNarration(cur.why + "　教練：三分球！🏀");
+        score++;
+      } else {
+        flashTryAgain();
+        setNarration("💛 " + cur.why + "　再看一下三邊～");
+      }
+      setTimeout(() => {
+        q++;
+        if(q >= quizzes.length){
+          finish();
+        } else {
+          render();
+        }
+      }, 1800);
+    }
+
+    function finish(){
+      const root = clearScene();
+      el("text", {x:800, y:300, "font-size":60, "font-weight":900,
+        fill:"#9B59B6", "text-anchor":"middle"}, root).textContent = "🏆 測驗完成！";
+      el("text", {x:800, y:400, "font-size":50, "font-weight":700,
+        fill:"#27AE60", "text-anchor":"middle"}, root).textContent = `得分：${score} / ${quizzes.length}`;
+      SFX.win(); confetti(30);
+      setNarration(score===quizzes.length ? "全對！你是 SSS 大師！" : "很棒了！再挑戰一次會更好～");
+      clearHUD();
+      addButton("下一幕 ▶", "btn-cong", () => nextScene());
+    }
+
+    render();
+    resetIdleTimer();
+  }
+},
+
+// ----- SCENE 6: 通關彩蛋 -----
+{
+  title: "場景 6 · 通關！",
+  narration: "恭喜你通關第一節！",
+  hintAt: null,
+  sop: {
+    say: "「辛苦了！記得 SSS 就是『三邊對應相等』就全等。明天我們學另一個——SAS。」",
+    react: "請學生口頭回答：『SSS 的 S 是什麼？』（Side=邊）",
+    fallback: "按『再玩一次』可以從頭開始。"
+  },
+  setup(){
+    const root = clearScene();
+    // 多角色慶祝
+    addShinchan(root, 250, 450, 1.5);
+    addDoraemon(root, 550, 450, 1.4);
+    addKirby(root, 850, 460, 1.5);
+    addShirokuma(root, 1150, 450, 1.5);
+
+    el("text", {x:800, y:120, "font-size":72, "font-weight":900,
+      fill:"#9B59B6", "text-anchor":"middle"}, root).textContent = "🎉 全等小達人！";
+    el("text", {x:800, y:680, "font-size":48, "font-weight":700,
+      fill:"#E74C3C", "text-anchor":"middle"}, root).textContent = "SSS ＝ 三邊相等 → 全等 ≅";
+    el("text", {x:800, y:750, "font-size":28, "font-weight":600,
+      fill:"#2C3E50", "text-anchor":"middle"}, root).textContent = "下一節課：SAS（兩邊 + 夾角）→ 也全等！";
+
+    SFX.win();
+    confetti(50);
+    setTimeout(()=>confetti(30), 800);
+    setTimeout(()=>confetti(30), 1600);
+
+    clearHUD();
+    addButton("🔁 再玩一次", "btn-lg", () => gotoScene(0));
+    addButton("🏠 回開頭", "btn-lg", () => gotoScene(0));
+    resetIdleTimer();
+  }
+}
+];
+
+// ============================================================
+// 場景切換 & 動畫
+// ============================================================
+function renderScene(){
+  const scene = scenes[state.sceneIdx];
+  // 旁白
+  setNarration(scene.narration || "");
+  // 建立
+  clearHUD();
+  scene.setup();
+  // 進度條
+  document.querySelectorAll(".prog-seg").forEach((s,i) => {
+    s.classList.remove("done","current");
+    if(i < state.sceneIdx) s.classList.add("done");
+    else if(i === state.sceneIdx) s.classList.add("current");
+  });
+  // 更新 SOP 內容
+  updateSOP();
+  // 標題
+  document.getElementById("title").textContent = `🏭 ${scene.title}`;
+}
+
+function nextScene(){
+  if(state.sceneIdx < scenes.length - 1){
+    state.sceneIdx++;
+    renderScene();
+  }
+}
+function prevScene(){
+  if(state.sceneIdx > 0){
+    state.sceneIdx--;
+    renderScene();
+  }
+}
+function gotoScene(i){
+  state.sceneIdx = Math.max(0, Math.min(scenes.length-1, i));
+  renderScene();
+}
+
+// 三角形補間動畫
+function animatePts(elemId, from, to, frames, onDone){
+  let f = 0;
+  cancelAnimationFrame(state.animId);
+  const tick = () => {
+    f++;
+    const t = f / frames;
+    const cur = lerpPts(from, to, t);
+    const pathEl = document.querySelector(`#${elemId} path`);
+    if(pathEl) pathEl.setAttribute("d", triPath(cur));
+    if(f < frames) state.animId = requestAnimationFrame(tick);
+    else if(onDone) onDone();
+  };
+  tick();
+}
+
+// ============================================================
+// SOP 面板
+// ============================================================
+function updateSOP(){
+  const scene = scenes[state.sceneIdx];
+  const body = document.getElementById("sop-body");
+  body.innerHTML = "";
+  const sop = scene.sop || {};
+  body.innerHTML = `
+    <div class="sop-sec"><strong>🗣️ 老師可以說</strong>${sop.say || "—"}</div>
+    <div class="sop-sec"><strong>👂 學生可能反應</strong>${sop.react || "—"}</div>
+    <div class="sop-sec"><strong>🆘 緊急備援</strong>${sop.fallback || "—"}</div>
+  `;
+}
+function toggleSOP(){
+  state.sopOpen = !state.sopOpen;
+  document.getElementById("sop-panel").classList.toggle("visible", state.sopOpen);
+}
+
+// ============================================================
+// 模式控制 (劇場自動播放)
+// ============================================================
+function setMode(m){
+  state.mode = m;
+  document.body.dataset.mode = m;
+  document.querySelectorAll("[data-mode]").forEach(b => {
+    b.classList.toggle("active", b.dataset.mode === m);
+  });
+  // 劇場自動播
+  if(state.autoplayTimer) clearInterval(state.autoplayTimer);
+  if(m === "theater"){
+    // 每 12 秒推進一場 (學生沒操作時)
+    state.autoplayTimer = setInterval(() => {
+      if(state.sceneIdx < scenes.length - 1) nextScene();
+      else clearInterval(state.autoplayTimer);
+    }, 18000);
+  }
+  renderScene();
+}
+
+// ============================================================
+// 層級控制
+// ============================================================
+function setLevel(l){
+  state.level = l;
+  document.body.dataset.level = l;
+  document.querySelectorAll("[data-level]").forEach(b => {
+    b.classList.toggle("active", b.dataset.level === l);
+  });
+  renderScene();
+}
+
+// ============================================================
+// 初始化
+// ============================================================
+document.addEventListener("click", () => ensureAudio(), { once: true });
+document.addEventListener("touchstart", () => ensureAudio(), { once: true });
+
+document.querySelectorAll("[data-level]").forEach(b => {
+  b.onclick = () => { SFX.click(); setLevel(b.dataset.level); };
+});
+document.querySelectorAll("[data-mode]").forEach(b => {
+  b.onclick = () => { SFX.click(); setMode(b.dataset.mode); };
+});
+document.getElementById("btn-next").onclick = () => { SFX.click(); nextScene(); };
+document.getElementById("btn-prev").onclick = () => { SFX.click(); prevScene(); };
+document.getElementById("btn-sop").onclick = () => { SFX.click(); toggleSOP(); };
+document.getElementById("btn-mute").onclick = (e) => {
+  state.audioOn = !state.audioOn;
+  e.currentTarget.textContent = state.audioOn ? "🔊" : "🔇";
+  if(state.audioOn) SFX.click();
+};
+document.addEventListener("keydown", (e) => {
+  if(e.key === "F1"){ e.preventDefault(); toggleSOP(); }
+  if(e.key === "ArrowRight") nextScene();
+  if(e.key === "ArrowLeft")  prevScene();
+});
+
+// 首次渲染
+renderScene();
+</script>
+</body>
+</html>
