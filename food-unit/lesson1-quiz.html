@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>小米大解密！學習單</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    background: linear-gradient(135deg, #FFFCF5 0%, #F5E6D3 100%);
+    color: #6B3A1F;
+    min-height: 100vh;
+    line-height: 1.6;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  body { padding: 15px; }
+  .container { max-width: 780px; margin: 0 auto; }
+
+  /* 標頭 */
+  .header {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    color: #FFFCF5;
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(139,69,19,0.3);
+  }
+  h1 { font-size: 1.8rem; margin-bottom: 5px; }
+  .subtitle { font-size: 1rem; color: #F5E6D3; opacity: 0.95; }
+
+  /* 老師模式提示 */
+  .teacher-banner {
+    background: #D32F2F;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: none;
+  }
+  body.teacher-mode .teacher-banner { display: block; }
+
+  /* 姓名欄 */
+  .name-box {
+    background: #FFF8E7;
+    border: 3px solid #D4A574;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .name-box label { font-size: 1.2rem; font-weight: bold; color: #8B4513; min-width: 80px; }
+  .name-box input {
+    flex: 1;
+    min-width: 150px;
+    font-size: 1.3rem;
+    padding: 12px 15px;
+    border: 2px solid #D4A574;
+    border-radius: 10px;
+    font-family: inherit;
+    color: #6B3A1F;
+    background: #FFFCF5;
+    min-height: 50px;
+  }
+  .name-box input:focus { outline: none; border-color: #8B4513; background: #FFFDF8; }
+
+  /* 進度條 */
+  .progress-box {
+    background: #FFF8E7;
+    border: 3px solid #D4A574;
+    border-radius: 50px;
+    padding: 5px;
+    margin-bottom: 15px;
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-bar {
+    background: linear-gradient(90deg, #D4A574 0%, #8B4513 100%);
+    height: 35px;
+    border-radius: 50px;
+    width: 0%;
+    transition: width 0.4s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    min-width: 80px;
+  }
+
+  /* 題目卡片 */
+  .question-card {
+    background: #FFFCF5;
+    border: 4px solid #D4A574;
+    border-radius: 20px;
+    padding: 25px 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 6px 16px rgba(139,69,19,0.15);
+    animation: fadeIn 0.4s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .q-num {
+    background: #8B4513;
+    color: white;
+    padding: 8px 18px;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+  .q-title {
+    font-size: 1.5rem;
+    color: #6B3A1F;
+    font-weight: bold;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .q-hint {
+    font-size: 1rem;
+    color: #A0522D;
+    margin-bottom: 18px;
+    font-style: italic;
+  }
+
+  /* 選項按鈕 */
+  .options { display: flex; flex-direction: column; gap: 12px; }
+  .options.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .options.grid-2-big {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+  .option {
+    background: #FFF8E7;
+    border: 3px solid #D4A574;
+    border-radius: 15px;
+    padding: 18px 20px;
+    font-size: 1.35rem;
+    color: #6B3A1F;
+    cursor: pointer;
+    min-height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    transition: transform 0.15s, background 0.2s, border-color 0.2s;
+    position: relative;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .option:active { transform: scale(0.97); }
+  .option.selected {
+    background: #F5E6D3;
+    border-color: #8B4513;
+    border-width: 4px;
+    box-shadow: 0 4px 12px rgba(139,69,19,0.3);
+    transform: scale(1.02);
+  }
+  .option.selected::before {
+    content: "✓";
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    color: #8B4513;
+    font-size: 1.8rem;
+    font-weight: bold;
+    animation: checkPop 0.3s ease-out;
+  }
+  @keyframes checkPop {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+  body.teacher-mode .option.correct::after {
+    content: "✅ 正解";
+    position: absolute;
+    top: -12px;
+    right: 10px;
+    background: #D32F2F;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .option-big {
+    padding: 30px 20px;
+    font-size: 2rem;
+    min-height: 100px;
+  }
+  .option .emoji { font-size: 2.4rem; }
+
+  /* 配對題 */
+  .match-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 10px;
+  }
+  .match-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .match-col h3 {
+    text-align: center;
+    font-size: 1.15rem;
+    color: #8B4513;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #D4A574;
+    margin-bottom: 5px;
+  }
+  .match-item {
+    background: #FFF8E7;
+    border: 3px solid #D4A574;
+    border-radius: 12px;
+    padding: 16px 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #6B3A1F;
+    cursor: pointer;
+    min-height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: all 0.2s;
+    line-height: 1.4;
+  }
+  .match-item:active { transform: scale(0.97); }
+  .match-item.active {
+    background: #FFD700;
+    border-color: #8B4513;
+    border-width: 4px;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(255,215,0,0.5);
+  }
+  .match-item.matched {
+    background: linear-gradient(135deg, #FFD700 0%, #D4A574 100%);
+    border-color: #8B4513;
+    color: white;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .match-item.matched::before {
+    content: "🔗 ";
+    font-size: 1rem;
+    margin-right: 3px;
+  }
+
+  /* 下一題按鈕 */
+  .nav-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .btn {
+    flex: 1;
+    padding: 20px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    min-height: 65px;
+    font-family: inherit;
+    transition: transform 0.15s, box-shadow 0.2s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, #D4A574 0%, #8B4513 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139,69,19,0.3);
+  }
+  .btn-primary:active { box-shadow: 0 2px 6px rgba(139,69,19,0.3); }
+  .btn-secondary {
+    background: #FFF8E7;
+    color: #8B4513;
+    border: 3px solid #D4A574;
+  }
+  .btn-back {
+    background: #FFF8E7;
+    color: #8B4513;
+    border: 3px solid #D4A574;
+    flex: 0.5;
+  }
+
+  /* 成績頁 */
+  .result-card {
+    background: #FFFCF5;
+    border: 4px solid #D4A574;
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(139,69,19,0.2);
+  }
+  .score-label { font-size: 1.3rem; color: #8B4513; margin-bottom: 10px; }
+  .score-big {
+    font-size: 4.5rem;
+    font-weight: bold;
+    color: #8B4513;
+    margin: 15px 0;
+    animation: scoreIn 0.8s ease-out;
+  }
+  @keyframes scoreIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .score-msg {
+    font-size: 1.6rem;
+    color: #6B3A1F;
+    margin: 20px 0;
+    padding: 20px;
+    background: #FFF8E7;
+    border-radius: 15px;
+    border: 3px solid #D4A574;
+    line-height: 1.6;
+  }
+  .score-emoji { font-size: 4rem; display: block; margin-bottom: 10px; }
+
+  /* 煙火 canvas */
+  #fireworks {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+  }
+
+  /* 答對/答錯標記 */
+  .answer-review {
+    background: #FFF8E7;
+    border: 2px solid #D4A574;
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 15px;
+    text-align: left;
+    font-size: 1rem;
+  }
+  .answer-review .row {
+    padding: 6px 0;
+    border-bottom: 1px dashed #D4A574;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .answer-review .row:last-child { border-bottom: none; }
+  .answer-review .mark-ok { color: #388E3C; font-weight: bold; }
+  .answer-review .mark-x { color: #D32F2F; font-weight: bold; }
+
+  /* 手機 */
+  @media (max-width: 500px) {
+    h1 { font-size: 1.5rem; }
+    .q-title { font-size: 1.3rem; }
+    .option { font-size: 1.2rem; padding: 16px 12px; }
+    .option-big { font-size: 1.6rem; padding: 24px 15px; }
+    .score-big { font-size: 3.5rem; }
+    .score-msg { font-size: 1.3rem; }
+    .match-item { font-size: 1rem; padding: 14px 8px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="fireworks"></canvas>
+
+<div class="container">
+  <div class="teacher-banner">👩‍🏫 老師模式：正確答案已標記 ✅</div>
+
+  <div class="header">
+    <h1>🌾 小米大解密！學習單</h1>
+    <div class="subtitle">芎林國中 集中式特教班 A 組・社會科</div>
+  </div>
+
+  <div class="name-box" id="nameBox">
+    <label>👤 姓名：</label>
+    <input type="text" id="studentName" placeholder="請輸入名字（可以跳過）" autocomplete="off">
+  </div>
+
+  <div class="progress-box">
+    <div class="progress-bar" id="progressBar">0 / 6</div>
+  </div>
+
+  <div id="quizArea"></div>
+</div>
+
+<script>
+/* ---------- 題庫 ---------- */
+const QUESTIONS = [
+  {
+    type: 'single',
+    title: '台灣有幾個主要族群？',
+    hint: '選一個答案',
+    options: [
+      { text: '2 個', emoji: '🙂' },
+      { text: '4 個', emoji: '👨‍👩‍👧‍👦', correct: true },
+      { text: '10 個', emoji: '🤔' },
+      { text: '100 個', emoji: '🤯' },
+    ]
+  },
+  {
+    type: 'single',
+    title: '原住民住在哪裡？',
+    hint: '選一個答案',
+    options: [
+      { text: '住在海邊', emoji: '🏖️' },
+      { text: '住在山上', emoji: '⛰️', correct: true },
+      { text: '住在城市', emoji: '🏙️' },
+    ]
+  },
+  {
+    type: 'single',
+    title: '原住民為什麼吃小米，不吃白飯？',
+    hint: '動動腦！',
+    options: [
+      { text: '因為小米比較好吃', emoji: '😋' },
+      { text: '住山上水會流走，種不了水稻', emoji: '💧', correct: true },
+      { text: '因為小米比較便宜', emoji: '💰' },
+    ]
+  },
+  {
+    type: 'multi',
+    title: '哪些是原住民的食物？',
+    hint: '可以選好幾個喔！',
+    grid: true,
+    options: [
+      { text: '小米', emoji: '🌾', correct: true },
+      { text: '山豬肉', emoji: '🐗', correct: true },
+      { text: '披薩', emoji: '🍕' },
+      { text: '馬告', emoji: '🌿', correct: true },
+    ]
+  },
+  {
+    type: 'single',
+    title: '「住的地方」決定你吃什麼，對還是錯？',
+    hint: '選一個答案',
+    big: true,
+    options: [
+      { text: '對！', emoji: '⭕', correct: true },
+      { text: '錯！', emoji: '❌' },
+    ]
+  },
+  {
+    type: 'match',
+    title: '連連看！哪個族群住在哪裡？',
+    hint: '先點左邊，再點右邊配對',
+    left: [
+      { id: 'a', text: '原住民', emoji: '🏔️' },
+      { id: 'b', text: '閩南人', emoji: '🌊' },
+      { id: 'c', text: '客家人', emoji: '🌾' },
+      { id: 'd', text: '新住民', emoji: '✈️' },
+    ],
+    right: [
+      { id: 'r1', text: '山上' },
+      { id: 'r2', text: '海邊平地' },
+      { id: 'r3', text: '丘陵山邊' },
+      { id: 'r4', text: '從其他國家來的' },
+    ],
+    correct: { a: 'r1', b: 'r2', c: 'r3', d: 'r4' }
+  }
+];
+
+/* ---------- 狀態 ---------- */
+const state = {
+  current: 0,
+  answers: Array(QUESTIONS.length).fill(null),
+  matchSelected: null,
+  matchPairs: {},
+};
+const isTeacher = new URLSearchParams(location.search).get('teacher') === 'true';
+if (isTeacher) document.body.classList.add('teacher-mode');
+
+/* ---------- 音效 ---------- */
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  return audioCtx;
+}
+function beep(freq, duration, type='sine', volume=0.15) {
+  const ctx = getAudio();
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(volume, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + duration);
+}
+function soundTap() { beep(660, 0.1, 'sine', 0.12); }
+function soundMatch() {
+  beep(523, 0.12, 'sine', 0.15);
+  setTimeout(() => beep(784, 0.15, 'sine', 0.15), 100);
+}
+function soundCelebrate() {
+  const notes = [523, 659, 784, 1046];
+  notes.forEach((n, i) => setTimeout(() => beep(n, 0.2, 'triangle', 0.18), i * 130));
+}
+
+/* ---------- 渲染 ---------- */
+const quizArea = document.getElementById('quizArea');
+const progressBar = document.getElementById('progressBar');
+
+function updateProgress() {
+  const total = QUESTIONS.length;
+  const done = Math.min(state.current, total);
+  const pct = (done / total) * 100;
+  progressBar.style.width = pct + '%';
+  progressBar.textContent = `${done} / ${total}`;
+}
+
+function render() {
+  if (state.current >= QUESTIONS.length) { renderResult(); return; }
+  updateProgress();
+  const q = QUESTIONS[state.current];
+  if (q.type === 'single') renderSingle(q);
+  else if (q.type === 'multi') renderMulti(q);
+  else if (q.type === 'match') renderMatch(q);
+}
+
+function buildCard(q, innerHTML) {
+  return `
+    <div class="question-card">
+      <span class="q-num">第 ${state.current + 1} 題</span>
+      <div class="q-title">${q.title}</div>
+      <div class="q-hint">${q.hint}</div>
+      ${innerHTML}
+      <div class="nav-btns">
+        ${state.current > 0 ? '<button class="btn btn-back" onclick="prevQuestion()">← 上一題</button>' : ''}
+        <button class="btn btn-primary" onclick="nextQuestion()">${state.current === QUESTIONS.length - 1 ? '看成績 🎉' : '下一題 →'}</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderSingle(q) {
+  const selected = state.answers[state.current];
+  const gridClass = q.big ? 'options grid-2-big' : 'options';
+  const bigClass = q.big ? 'option-big' : '';
+  const html = `<div class="${gridClass}">
+    ${q.options.map((opt, i) => `
+      <div class="option ${bigClass} ${selected === i ? 'selected' : ''} ${isTeacher && opt.correct ? 'correct' : ''}"
+           onclick="pickSingle(${i})">
+        <span class="emoji">${opt.emoji}</span>
+        <span>${opt.text}</span>
+      </div>
+    `).join('')}
+  </div>`;
+  quizArea.innerHTML = buildCard(q, html);
+}
+
+function renderMulti(q) {
+  const selected = state.answers[state.current] || [];
+  const gridClass = q.grid ? 'options grid-2' : 'options';
+  const html = `<div class="${gridClass}">
+    ${q.options.map((opt, i) => `
+      <div class="option ${selected.includes(i) ? 'selected' : ''} ${isTeacher && opt.correct ? 'correct' : ''}"
+           onclick="pickMulti(${i})">
+        <span class="emoji">${opt.emoji}</span>
+        <span>${opt.text}</span>
+      </div>
+    `).join('')}
+  </div>`;
+  quizArea.innerHTML = buildCard(q, html);
+}
+
+function renderMatch(q) {
+  const pairs = state.answers[state.current] || {};
+  const leftHtml = q.left.map(item => {
+    const matched = pairs[item.id];
+    const active = state.matchSelected === item.id;
+    return `<div class="match-item ${matched ? 'matched' : ''} ${active ? 'active' : ''}"
+            onclick="pickMatchLeft('${item.id}')">
+      <div><span style="font-size:1.6rem;display:block;">${item.emoji}</span>${item.text}</div>
+    </div>`;
+  }).join('');
+  const usedRights = Object.values(pairs);
+  const rightHtml = q.right.map(item => {
+    const matched = usedRights.includes(item.id);
+    const isCorrect = isTeacher && Object.entries(q.correct).find(([,v]) => v === item.id);
+    return `<div class="match-item ${matched ? 'matched' : ''}"
+            onclick="pickMatchRight('${item.id}')">
+      <div>${item.text}${isCorrect ? '<br><small style="color:#D32F2F;">↔ '+q.left.find(l=>l.id===isCorrect[0]).text+'</small>' : ''}</div>
+    </div>`;
+  }).join('');
+
+  const html = `
+    <div class="match-area">
+      <div class="match-col"><h3>族群</h3>${leftHtml}</div>
+      <div class="match-col"><h3>住哪裡</h3>${rightHtml}</div>
+    </div>
+    <div style="text-align:center;margin-top:15px;">
+      <button class="btn btn-secondary" onclick="resetMatch()" style="padding:12px 25px;font-size:1rem;min-height:auto;">🔄 重新配對</button>
+    </div>
+  `;
+  quizArea.innerHTML = buildCard(q, html);
+}
+
+/* ---------- 互動 ---------- */
+function pickSingle(idx) {
+  state.answers[state.current] = idx;
+  soundTap();
+  render();
+}
+function pickMulti(idx) {
+  const arr = state.answers[state.current] || [];
+  const i = arr.indexOf(idx);
+  if (i >= 0) arr.splice(i, 1); else arr.push(idx);
+  state.answers[state.current] = arr;
+  soundTap();
+  render();
+}
+function pickMatchLeft(id) {
+  const pairs = state.answers[state.current] || {};
+  if (pairs[id]) return;
+  state.matchSelected = state.matchSelected === id ? null : id;
+  soundTap();
+  render();
+}
+function pickMatchRight(id) {
+  if (!state.matchSelected) { soundTap(); return; }
+  const pairs = state.answers[state.current] || {};
+  if (Object.values(pairs).includes(id)) return;
+  pairs[state.matchSelected] = id;
+  state.answers[state.current] = pairs;
+  state.matchSelected = null;
+  soundMatch();
+  render();
+}
+function resetMatch() {
+  state.answers[state.current] = {};
+  state.matchSelected = null;
+  soundTap();
+  render();
+}
+function nextQuestion() {
+  state.current++;
+  state.matchSelected = null;
+  soundTap();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  render();
+}
+function prevQuestion() {
+  if (state.current > 0) {
+    state.current--;
+    state.matchSelected = null;
+    soundTap();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    render();
+  }
+}
+
+/* ---------- 計分 ---------- */
+function scoreQuestion(q, ans) {
+  if (ans === null || ans === undefined) return false;
+  if (q.type === 'single') return q.options[ans] && q.options[ans].correct === true;
+  if (q.type === 'multi') {
+    if (!Array.isArray(ans)) return false;
+    const correctIdx = q.options.map((o,i) => o.correct ? i : -1).filter(i => i >= 0);
+    if (ans.length !== correctIdx.length) return false;
+    return correctIdx.every(i => ans.includes(i));
+  }
+  if (q.type === 'match') {
+    if (!ans || typeof ans !== 'object') return false;
+    const keys = Object.keys(q.correct);
+    return keys.every(k => ans[k] === q.correct[k]);
+  }
+  return false;
+}
+
+function renderResult() {
+  updateProgress();
+  let score = 0;
+  const details = QUESTIONS.map((q, i) => {
+    const ok = scoreQuestion(q, state.answers[i]);
+    if (ok) score++;
+    return { q: i+1, title: q.title, ok };
+  });
+
+  let msg, emoji, celebrate = false;
+  if (score === 6) {
+    msg = '你是小米大師！🏆'; emoji = '🎉'; celebrate = true;
+  } else if (score >= 4) {
+    msg = '超棒的！快要滿分了！'; emoji = '🌟'; celebrate = true;
+  } else if (score >= 2) {
+    msg = '很好！繼續加油！'; emoji = '💪';
+  } else {
+    msg = '沒關係！下次會更好！'; emoji = '😊';
+  }
+
+  const name = document.getElementById('studentName').value.trim();
+  const greet = name ? `${name}，` : '';
+
+  quizArea.innerHTML = `
+    <div class="result-card">
+      <div class="score-label">${greet}你答對了</div>
+      <div class="score-big">${score} / 6</div>
+      <div class="score-msg">
+        <span class="score-emoji">${emoji}</span>
+        ${msg}
+      </div>
+      <div class="answer-review">
+        ${details.map(d => `
+          <div class="row">
+            <span>第 ${d.q} 題：${d.title}</span>
+            <span class="${d.ok ? 'mark-ok' : 'mark-x'}">${d.ok ? '✓ 答對' : '✗ 答錯'}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="nav-btns" style="margin-top:20px;">
+        <button class="btn btn-primary" onclick="restart()">🔄 再玩一次</button>
+        <button class="btn btn-secondary" onclick="location.href='../index.html'">🏠 回首頁</button>
+      </div>
+    </div>
+  `;
+
+  if (celebrate) {
+    soundCelebrate();
+    setTimeout(launchFireworks, 200);
+  }
+}
+
+function restart() {
+  state.current = 0;
+  state.answers = Array(QUESTIONS.length).fill(null);
+  state.matchSelected = null;
+  soundTap();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  render();
+}
+
+/* ---------- 煙火（不閃爍，柔和） ---------- */
+function launchFireworks() {
+  const canvas = document.getElementById('fireworks');
+  canvas.style.display = 'block';
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+  const colors = ['#FFD700', '#FF8C00', '#FFA500', '#D4A574', '#8B4513', '#E8A87C'];
+
+  function spawn() {
+    const cx = Math.random() * canvas.width;
+    const cy = canvas.height * (0.2 + Math.random() * 0.4);
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    for (let i = 0; i < 40; i++) {
+      const angle = (Math.PI * 2 * i) / 40;
+      const speed = 2 + Math.random() * 3;
+      particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 60 + Math.random() * 20,
+        color
+      });
+    }
+  }
+
+  let burstCount = 0;
+  const burstInterval = setInterval(() => {
+    spawn();
+    burstCount++;
+    if (burstCount >= 5) clearInterval(burstInterval);
+  }, 400);
+
+  function loop() {
+    ctx.fillStyle = 'rgba(255, 252, 245, 0.2)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p, i) => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.08;
+      p.life--;
+      if (p.life <= 0) { particles.splice(i, 1); return; }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = Math.max(0, p.life / 80);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    if (particles.length > 0 || burstCount < 5) {
+      requestAnimationFrame(loop);
+    } else {
+      canvas.style.display = 'none';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  loop();
+}
+
+/* ---------- 啟動 ---------- */
+render();
+</script>
+</body>
+</html>
