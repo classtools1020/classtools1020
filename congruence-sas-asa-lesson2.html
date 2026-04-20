@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>⚔️ 全等戰場 · SAS + ASA 新技能登場</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;
+  font-family:"Microsoft JhengHei","微軟正黑體","Impact",sans-serif;
+  font-size:20px;user-select:none;touch-action:manipulation;color:#fff}
+body{display:flex;flex-direction:column;
+  background:
+    radial-gradient(ellipse at top, rgba(138,43,226,.25) 0%, transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(0,201,255,.15) 0%, transparent 60%),
+    linear-gradient(135deg, #0A0E27 0%, #1A0F3E 40%, #2D1B4E 100%)}
+
+:root{
+  --gold:#FFD700; --gold-dk:#C9A227;
+  --cyan:#00F5FF; --cyan-dk:#00B8D4;
+  --red:#FF3B30; --red-dk:#C00A03;
+  --purple:#B967FF; --purple-dk:#7D2AE8;
+  --green:#39FF14; --green-dk:#00C853;
+  --orange:#FF8A00; --orange-dk:#E67E00;
+  --bg-dark:#0A0E27; --bg-mid:#1A1F3A;
+  --text:#FFFFFF; --text-dim:#B8C5D6;
+  --shadow:0 4px 20px rgba(0,0,0,.5);
+  --glow-gold:0 0 20px rgba(255,215,0,.6),0 0 40px rgba(255,215,0,.3);
+  --glow-cyan:0 0 20px rgba(0,245,255,.6),0 0 40px rgba(0,245,255,.3);
+  --glow-purple:0 0 20px rgba(185,103,255,.6),0 0 40px rgba(185,103,255,.3);
+  --glow-red:0 0 20px rgba(255,59,48,.6),0 0 40px rgba(255,59,48,.3);
+}
+
+/* ==================== 星空背景 ==================== */
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 30% 70%, #fff, transparent),
+    radial-gradient(1px 1px at 50% 40%, #FFD700, transparent),
+    radial-gradient(2px 2px at 70% 25%, #00F5FF, transparent),
+    radial-gradient(1px 1px at 85% 60%, #fff, transparent),
+    radial-gradient(1px 1px at 15% 85%, #B967FF, transparent),
+    radial-gradient(1px 1px at 95% 90%, #fff, transparent),
+    radial-gradient(2px 2px at 40% 10%, #fff, transparent),
+    radial-gradient(1px 1px at 60% 55%, #39FF14, transparent),
+    radial-gradient(1px 1px at 25% 45%, #FFD700, transparent);
+  background-size:200% 200%; animation:starMove 60s linear infinite}
+@keyframes starMove{0%{background-position:0 0}100%{background-position:200% 200%}}
+
+/* ==================== 老師提示列 ==================== */
+#teacher-tip{background:linear-gradient(90deg,rgba(255,215,0,.15),rgba(255,215,0,.05));
+  border-bottom:3px solid var(--gold);padding:12px 20px;min-height:74px;
+  display:flex;align-items:center;gap:12px;position:relative;z-index:3;
+  backdrop-filter:blur(10px)}
+#teacher-tip .badge{background:linear-gradient(135deg,var(--gold),var(--orange));
+  color:#1A0F3E;padding:6px 14px;border-radius:20px;font-weight:900;
+  font-size:15px;white-space:nowrap;box-shadow:var(--glow-gold)}
+#teacher-tip .content{flex:1;font-size:19px;line-height:1.5;color:#fff;
+  font-weight:600;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+#teacher-tip .content b{color:var(--gold);text-shadow:0 0 10px rgba(255,215,0,.5)}
+#teacher-tip .scene-tag{background:linear-gradient(135deg,var(--purple),var(--purple-dk));
+  color:#fff;padding:6px 12px;border-radius:10px;font-size:14px;font-weight:900;
+  white-space:nowrap;box-shadow:var(--glow-purple)}
+
+/* ==================== 進度條 ==================== */
+#progress{height:12px;background:rgba(0,0,0,.5);display:flex;
+  position:relative;z-index:3;border-bottom:2px solid var(--cyan-dk)}
+.prog-seg{flex:1;background:transparent;border-right:2px solid rgba(255,255,255,.1);
+  transition:background .3s;position:relative}
+.prog-seg:last-child{border-right:none}
+.prog-seg.done{background:linear-gradient(90deg,var(--purple),var(--cyan))}
+.prog-seg.current{background:linear-gradient(90deg,var(--gold),var(--orange));
+  animation:progPulse 1.4s infinite}
+@keyframes progPulse{0%,100%{opacity:.8;box-shadow:0 0 10px var(--gold)}
+  50%{opacity:1;box-shadow:0 0 20px var(--gold)}}
+
+/* ==================== 主舞台 ==================== */
+#stage{flex:1;position:relative;overflow:hidden;z-index:2}
+#canvas{width:100%;height:100%;display:block;position:relative;z-index:2}
+
+/* 旁白大字 (學生看的) */
+#narration{position:absolute;top:20px;left:50%;transform:translateX(-50%);
+  max-width:80%;background:linear-gradient(135deg,rgba(10,14,39,.85),rgba(45,27,78,.85));
+  border:3px solid var(--gold);border-radius:20px;padding:16px 32px;
+  font-size:30px;font-weight:900;color:#fff;text-align:center;line-height:1.3;
+  box-shadow:var(--glow-gold);z-index:20;display:none;
+  text-shadow:0 0 10px rgba(255,215,0,.5);
+  backdrop-filter:blur(6px);letter-spacing:1px}
+#narration.visible{display:block;animation:narIn .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes narIn{from{opacity:0;transform:translate(-50%,-20px) scale(.9)}
+  to{opacity:1;transform:translate(-50%,0) scale(1)}}
+
+/* 關卡標籤 */
+#stage-label{position:absolute;top:18px;left:20px;z-index:15;
+  background:linear-gradient(135deg,var(--red),var(--orange));
+  color:#fff;padding:8px 20px;border-radius:6px;font-weight:900;
+  font-size:20px;box-shadow:var(--glow-red);display:none;
+  clip-path:polygon(12% 0, 100% 0, 88% 100%, 0 100%);
+  padding-left:28px; padding-right:28px}
+#stage-label.visible{display:block;animation:stageIn .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes stageIn{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
+
+/* ==================== 控制列 ==================== */
+#control-bar{background:linear-gradient(0deg,rgba(10,14,39,.95),rgba(26,15,62,.9));
+  padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;z-index:15;border-top:3px solid var(--purple);
+  box-shadow:0 -4px 20px rgba(185,103,255,.3)}
+#progress-info{font-size:17px;color:var(--cyan);font-weight:800;min-width:140px;
+  text-shadow:0 0 8px var(--cyan-dk);letter-spacing:.5px}
+#main-actions{display:flex;gap:10px;flex:1;justify-content:center;flex-wrap:wrap}
+#side-controls{display:flex;gap:6px}
+
+/* 按鈕 - 遊戲技能感 */
+.btn{background:linear-gradient(135deg,#2C3E50,#1A252F);
+  border:3px solid var(--cyan-dk);border-radius:12px;
+  padding:12px 22px;font-size:20px;cursor:pointer;min-height:60px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-weight:900;color:#fff;transition:all .2s;
+  font-family:inherit;gap:8px;letter-spacing:.5px;
+  text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.btn:hover{transform:translateY(-2px) scale(1.03);
+  box-shadow:var(--glow-cyan)}
+.btn:active{transform:translateY(0) scale(.98)}
+
+/* 主按鈕 - 金色技能 */
+.btn-next{background:linear-gradient(135deg,#FFD700,#FF8A00);
+  border:3px solid var(--gold);color:#1A0F3E;
+  min-width:220px;font-size:24px;font-weight:900;
+  box-shadow:var(--glow-gold);animation:skillGlow 1.8s infinite;
+  text-shadow:0 1px 2px rgba(255,255,255,.5)}
+.btn-next:hover{background:linear-gradient(135deg,#FFF200,#FF9F1A);
+  transform:translateY(-2px) scale(1.05);
+  box-shadow:0 0 30px rgba(255,215,0,.8),0 0 60px rgba(255,215,0,.4)}
+@keyframes skillGlow{0%,100%{box-shadow:0 0 20px rgba(255,215,0,.5)}
+  50%{box-shadow:0 0 40px rgba(255,215,0,.9),0 0 60px rgba(255,138,0,.4)}}
+
+/* 下一關按鈕 - 紫色終技 */
+.btn-scene-next{background:linear-gradient(135deg,var(--purple),var(--purple-dk));
+  border:3px solid var(--purple);color:#fff;min-width:240px;font-size:22px;
+  box-shadow:var(--glow-purple)}
+.btn-scene-next:hover{background:linear-gradient(135deg,#D690FF,#9B4DEF);
+  transform:translateY(-2px) scale(1.05);
+  box-shadow:0 0 30px rgba(185,103,255,.9)}
+
+/* 答題按鈕 */
+.btn-answer{min-width:220px;font-size:24px;padding:16px 24px}
+.btn-ok{background:linear-gradient(135deg,var(--green),var(--green-dk));
+  border-color:var(--green);color:#0A0E27;
+  box-shadow:0 0 20px rgba(57,255,20,.5)}
+.btn-ok:hover{box-shadow:0 0 30px rgba(57,255,20,.9)}
+.btn-warn{background:linear-gradient(135deg,var(--red),var(--red-dk));
+  border-color:var(--red);color:#fff;
+  box-shadow:0 0 20px rgba(255,59,48,.5)}
+.btn-warn:hover{box-shadow:0 0 30px rgba(255,59,48,.9)}
+
+/* 小按鈕 */
+.btn-small{min-height:48px;padding:8px 14px;font-size:18px;min-width:auto;
+  background:linear-gradient(135deg,#2C3E50,#1A252F);
+  border-color:rgba(255,255,255,.3)}
+
+/* ==================== Combo 顯示 ==================== */
+#combo-display{position:absolute;top:100px;right:30px;z-index:22;
+  display:flex;flex-direction:column;align-items:center;
+  pointer-events:none;transition:all .4s;opacity:0;transform:scale(.5)}
+#combo-display.visible{opacity:1;transform:scale(1)}
+#combo-display .combo-x{font-size:24px;font-weight:900;color:var(--gold);
+  text-shadow:0 0 10px var(--gold),0 0 20px rgba(255,215,0,.5);letter-spacing:2px}
+#combo-display .combo-n{font-size:80px;font-weight:900;color:var(--gold);
+  line-height:1;text-shadow:0 0 20px var(--gold),0 0 40px rgba(255,215,0,.6),
+  0 4px 0 rgba(0,0,0,.3);letter-spacing:-2px}
+#combo-display .combo-label{font-size:18px;font-weight:900;color:var(--cyan);
+  text-shadow:0 0 10px var(--cyan);letter-spacing:3px;margin-top:-4px}
+
+/* ==================== 分數顯示 ==================== */
+#score-display{position:absolute;top:20px;right:20px;z-index:15;
+  background:linear-gradient(135deg,rgba(10,14,39,.9),rgba(26,15,62,.9));
+  border:2px solid var(--gold);border-radius:10px;padding:8px 16px;
+  color:var(--gold);font-weight:900;font-size:18px;
+  box-shadow:var(--glow-gold);display:none;
+  text-shadow:0 0 8px var(--gold)}
+#score-display.visible{display:block}
+
+/* ==================== 彩帶 ==================== */
+.confetti{position:fixed;width:14px;height:18px;z-index:50;
+  animation:fall 3s linear;pointer-events:none;border-radius:2px;
+  box-shadow:0 0 8px currentColor}
+@keyframes fall{0%{transform:translateY(-20vh) rotate(0)}100%{transform:translateY(110vh) rotate(720deg)}}
+
+/* ==================== 閃現文字 ==================== */
+.flash{position:absolute;inset:0;pointer-events:none;z-index:25;
+  display:flex;align-items:center;justify-content:center;
+  animation:flashIn .7s ease}
+.flash-text{font-size:120px;font-weight:900;
+  text-shadow:0 0 20px currentColor,0 0 40px currentColor,
+  0 6px 0 rgba(0,0,0,.3);letter-spacing:-2px}
+@keyframes flashIn{0%{opacity:0;transform:scale(.3) rotate(-10deg)}
+  50%{opacity:1;transform:scale(1.3) rotate(5deg)}
+  100%{opacity:0;transform:scale(1) rotate(0)}}
+
+/* ==================== 粒子光效 ==================== */
+.spark{position:absolute;width:8px;height:8px;border-radius:50%;
+  pointer-events:none;z-index:24}
+
+@media (max-width:720px){
+  #teacher-tip{padding:8px 12px;flex-wrap:wrap;min-height:auto}
+  #teacher-tip .content{font-size:15px}
+  #narration{font-size:22px;padding:12px 20px;max-width:92%}
+  .btn{font-size:17px;padding:8px 14px;min-height:48px}
+  .btn-next,.btn-scene-next{min-width:150px;font-size:18px}
+  #combo-display .combo-n{font-size:50px}
+  #stage-label{font-size:14px;padding:6px 16px}
+}
+</style>
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<div id="teacher-tip">
+  <div class="badge">👩‍🏫 老師</div>
+  <div class="content" id="tip-content">點「▶ 發動技能」開始召喚師訓練！</div>
+  <div class="scene-tag" id="scene-tag">1/6</div>
+</div>
+
+<div id="progress">
+  <div class="prog-seg current"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+</div>
+
+<div id="stage">
+  <svg id="canvas" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <!-- 金色漸層 -->
+      <linearGradient id="gradGold" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFE34D"/>
+        <stop offset="100%" stop-color="#FF8A00"/>
+      </linearGradient>
+      <!-- 紅色漸層 -->
+      <linearGradient id="gradRed" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FF6B6B"/>
+        <stop offset="100%" stop-color="#C00A03"/>
+      </linearGradient>
+      <!-- 藍色漸層 -->
+      <linearGradient id="gradBlue" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#4DBCFF"/>
+        <stop offset="100%" stop-color="#0066CC"/>
+      </linearGradient>
+      <!-- 紫色漸層 -->
+      <linearGradient id="gradPurple" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#D690FF"/>
+        <stop offset="100%" stop-color="#7D2AE8"/>
+      </linearGradient>
+      <!-- 青綠 -->
+      <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#5EFF8F"/>
+        <stop offset="100%" stop-color="#00A849"/>
+      </linearGradient>
+      <!-- 陰影 / 發光 -->
+      <filter id="neonGold" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#FFD700"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonRed" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#FF3B30"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonCyan" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#00F5FF"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonPurple" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur"/>
+        <feFlood flood-color="#B967FF"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonGreen" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#39FF14"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+      <!-- 六角形遮罩 -->
+      <clipPath id="hexClip">
+        <polygon points="50,0 93,25 93,75 50,100 7,75 7,25"/>
+      </clipPath>
+    </defs>
+    <g id="scene-root"></g>
+  </svg>
+  <div id="stage-label"></div>
+  <div id="narration"></div>
+  <div id="combo-display">
+    <div class="combo-x">COMBO</div>
+    <div class="combo-n">0</div>
+    <div class="combo-label">×</div>
+  </div>
+  <div id="score-display">⭐ <span id="score-num">0</span> / 4</div>
+</div>
+
+<div id="control-bar">
+  <div id="progress-info">⚔️ 第 <span id="s-n">1</span> / 6 關</div>
+  <div id="main-actions">
+    <button class="btn btn-next" id="btn-next">▶ 發動技能</button>
+  </div>
+  <div id="side-controls">
+    <button class="btn btn-small" id="btn-prev" title="上一關">◀</button>
+    <button class="btn btn-small" id="btn-restart" title="重新開始">🔁</button>
+    <button class="btn btn-small" id="btn-mute" title="靜音">🔊</button>
+  </div>
+</div>
+
+<script>
+const state = { sceneIdx:0, stepIdx:-1, audioOn:true };
+
+// ==== 音效 ====
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+}
+function beep(f,d=0.15,t="sine",g=0.2){
+  if(!state.audioOn||!audioCtx) return;
+  const o=audioCtx.createOscillator(), gn=audioCtx.createGain();
+  o.type=t; o.frequency.value=f;
+  gn.gain.setValueAtTime(g, audioCtx.currentTime);
+  gn.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+d);
+  o.connect(gn); gn.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime+d);
+}
+const SFX = {
+  click(){ beep(800,0.05,"square",0.1); },
+  reveal(){ beep(523,0.12,"sine",0.15); setTimeout(()=>beep(659,0.12,"sine",0.15),80); },
+  pop(){ beep(1047,0.08,"triangle",0.18); },
+  combo(n){
+    const base = 660 + n*110;
+    beep(base,0.1,"square",0.15);
+    setTimeout(()=>beep(base*1.25,0.12,"square",0.15),60);
+  },
+  ultimate(){
+    [440,554,659,880,1175].forEach((f,i)=>setTimeout(()=>beep(f,0.2,"sawtooth",0.18),i*80));
+  },
+  success(){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,0.18,"sine",0.2),i*100)); },
+  gentle(){ beep(440,0.15,"sine",0.12); setTimeout(()=>beep(330,0.2,"sine",0.12),150); },
+  win(){
+    const seq = [523,659,784,1047,1319];
+    seq.forEach((f,i)=>setTimeout(()=>beep(f,0.22,"sawtooth",0.2),i*120));
+  }
+};
+
+// ==== 幾何 ====
+function triFromSSS(a,b,c){
+  if(a+b<=c||b+c<=a||a+c<=b) return null;
+  const x=(c*c+a*a-b*b)/(2*a);
+  const y=Math.sqrt(Math.max(c*c-x*x,0));
+  return [{x,y:-y,label:"A"},{x:0,y:0,label:"B"},{x:a,y:0,label:"C"}];
+}
+function tform(pts,cx,cy,scale=20){
+  const mx=pts.reduce((s,p)=>s+p.x,0)/3, my=pts.reduce((s,p)=>s+p.y,0)/3;
+  return pts.map(p=>({x:cx+(p.x-mx)*scale, y:cy+(p.y-my)*scale, label:p.label}));
+}
+function lerp(a,b,t){ return a+(b-a)*t; }
+function lerpPts(p1,p2,t){
+  return p1.map((p,i)=>({x:lerp(p.x,p2[i].x,t), y:lerp(p.y,p2[i].y,t), label:p.label}));
+}
+
+// ==== SVG 工具 ====
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs={},parent=null){
+  const e=document.createElementNS(NS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  if(parent) parent.appendChild(e);
+  return e;
+}
+function clearScene(){
+  const r=document.getElementById("scene-root");
+  r.innerHTML="";
+  return r;
+}
+function triPath(pts){
+  return `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y} Z`;
+}
+
+// 霓虹三角形 (水晶/寶石風格)
+function drawTri(parent, pts, opts={}){
+  const {fill="url(#gradPurple)", stroke="#B967FF", sw=5, id="",
+         glow="neonPurple", labels=false, showLen=null} = opts;
+  const g = el("g", id?{id, filter:`url(#${glow})`}:{filter:`url(#${glow})`}, parent);
+  // 外發光層
+  el("path", {d:triPath(pts), fill:"none", stroke, "stroke-width":sw+3,
+    opacity:.4, "stroke-linejoin":"round"}, g);
+  // 主體
+  el("path", {d:triPath(pts), fill, stroke, "stroke-width":sw,
+    "stroke-linejoin":"round", "stroke-linecap":"round"}, g);
+  // 內部高光 (水晶感)
+  const cx = pts.reduce((s,p)=>s+p.x,0)/3;
+  const cy = pts.reduce((s,p)=>s+p.y,0)/3;
+  el("path", {
+    d:`M${pts[0].x},${pts[0].y} L${(pts[0].x+cx)/2},${(pts[0].y+cy)/2}`,
+    stroke:"#fff", "stroke-width":2, opacity:.5, fill:"none"
+  }, g);
+  if(labels){
+    pts.forEach(p=>{
+      const dx=p.label==="A"?0:(p.label==="B"?-22:22);
+      const dy=p.label==="A"?-20:26;
+      const t = el("text",{x:p.x+dx,y:p.y+dy,"font-size":24,"font-weight":900,
+        fill:"#fff","text-anchor":"middle",
+        "stroke":"#000","stroke-width":3,"paint-order":"stroke"},g);
+      t.textContent = p.label;
+    });
+  }
+  if(showLen){
+    const m=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+    const mAB=m(pts[0],pts[1]), mBC=m(pts[1],pts[2]), mCA=m(pts[2],pts[0]);
+    const lbl = (x,y,text,color="#FFD700") => {
+      const t = el("text",{x,y,"font-size":26,"font-weight":900,
+        fill:color,"text-anchor":"middle",
+        "stroke":"#000","stroke-width":4,"paint-order":"stroke"},g);
+      t.textContent = text;
+    };
+    lbl(mAB.x-24, mAB.y+8, showLen.AB);
+    lbl(mBC.x, mBC.y+34, showLen.BC);
+    lbl(mCA.x+22, mCA.y+8, showLen.CA);
+  }
+  return g;
+}
+
+// 英雄頭像卡 (六角形框 + 光暈)
+function heroCard(parent, cx, cy, label, role="召喚師", color="#B967FF", icon="⚔️"){
+  const g = el("g", {}, parent);
+  const r = 55;
+  // 外圈光暈
+  el("circle", {cx, cy, r:r+8, fill:"none", stroke:color, "stroke-width":3,
+    opacity:.5, filter:`url(#neon${color==="#FFD700"?"Gold":color==="#B967FF"?"Purple":color==="#00F5FF"?"Cyan":color==="#FF3B30"?"Red":"Green"})`}, g);
+  // 主圓圈 (深色底)
+  el("circle", {cx, cy, r, fill:"#1A0F3E", stroke:color, "stroke-width":4}, g);
+  // 圖示
+  el("text", {x:cx, y:cy+18, "font-size":50, "text-anchor":"middle"}, g).textContent = icon;
+  // 標籤
+  el("rect", {x:cx-60, y:cy+r+6, width:120, height:28, rx:6, fill:"#0A0E27",
+    stroke:color, "stroke-width":2}, g);
+  el("text", {x:cx, y:cy+r+26, "font-size":16, "font-weight":900, fill:color,
+    "text-anchor":"middle"}, g).textContent = label;
+  return g;
+}
+
+// 關卡標題橫幅
+function stageBanner(parent, title, subtitle=""){
+  const g = el("g", {}, parent);
+  // 主標題
+  const t1 = el("text", {x:800, y:100, "text-anchor":"middle", "font-size":52,
+    "font-weight":900, fill:"url(#gradGold)",
+    "stroke":"#000","stroke-width":6,"paint-order":"stroke",
+    filter:"url(#neonGold)"}, g);
+  t1.textContent = title;
+  if(subtitle){
+    const t2 = el("text", {x:800, y:150, "text-anchor":"middle", "font-size":24,
+      "font-weight":700, fill:"#00F5FF",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, g);
+    t2.textContent = subtitle;
+  }
+  return g;
+}
+
+// ==== UI helpers ====
+function setNarration(text){
+  const n = document.getElementById("narration");
+  if(text){ n.textContent = text; n.classList.add("visible"); }
+  else n.classList.remove("visible");
+}
+function setStageLabel(text){
+  const t = document.getElementById("stage-label");
+  if(text){ t.textContent = text; t.classList.add("visible"); }
+  else t.classList.remove("visible");
+}
+function setTeacherTip(text){
+  document.getElementById("tip-content").innerHTML = text;
+}
+
+// Combo 顯示
+let comboCount = 0;
+function showCombo(n){
+  comboCount = n;
+  const d = document.getElementById("combo-display");
+  if(n === 0){ d.classList.remove("visible"); return; }
+  d.querySelector(".combo-n").textContent = n;
+  d.classList.add("visible");
+  SFX.combo(n);
+  // 自動消失
+  clearTimeout(showCombo._t);
+  if(n >= 3) return; // Perfect 狀態保留
+  showCombo._t = setTimeout(()=>d.classList.remove("visible"), 2500);
+}
+function hideCombo(){
+  document.getElementById("combo-display").classList.remove("visible");
+}
+
+// 分數
+function setScore(n, total){
+  const d = document.getElementById("score-display");
+  if(total){
+    d.classList.add("visible");
+    document.getElementById("score-num").textContent = n;
+    d.innerHTML = `⭐ <span id="score-num">${n}</span> / ${total}`;
+  } else d.classList.remove("visible");
+}
+
+// 大字閃現
+function flashBig(text, color="#39FF14", size=120){
+  const f = document.createElement("div");
+  f.className = "flash";
+  const s = document.createElement("div");
+  s.className = "flash-text";
+  s.textContent = text;
+  s.style.color = color;
+  s.style.fontSize = size+"px";
+  f.appendChild(s);
+  document.getElementById("stage").appendChild(f);
+  setTimeout(()=>f.remove(), 800);
+}
+function flashCorrect(){ SFX.success(); flashBig("VICTORY!", "#39FF14", 100); confetti(25); }
+function flashRetry(){ SFX.gentle(); flashBig("再戰一次", "#FF8A00", 80); }
+
+function confetti(n=20){
+  const colors = ["#FFD700","#00F5FF","#B967FF","#39FF14","#FF3B30","#FF8A00"];
+  for(let i=0;i<n;i++){
+    const d = document.createElement("div");
+    d.className = "confetti";
+    d.style.left = Math.random()*100+"vw";
+    d.style.background = colors[i%colors.length];
+    d.style.color = colors[i%colors.length];
+    d.style.animationDelay = (Math.random()*0.8)+"s";
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),3500);
+  }
+}
+
+// 火花粒子 (點擊位置)
+function sparkBurst(cx, cy, color="#FFD700"){
+  for(let i=0;i<12;i++){
+    const s = document.createElement("div");
+    s.className = "spark";
+    s.style.background = color;
+    s.style.boxShadow = `0 0 10px ${color}`;
+    s.style.left = cx+"px"; s.style.top = cy+"px";
+    const ang = (i/12)*Math.PI*2;
+    const dist = 60 + Math.random()*40;
+    s.animate([
+      {transform:"translate(0,0) scale(1)", opacity:1},
+      {transform:`translate(${Math.cos(ang)*dist}px,${Math.sin(ang)*dist}px) scale(0)`, opacity:0}
+    ], {duration:600, easing:"ease-out"});
+    document.getElementById("stage").appendChild(s);
+    setTimeout(()=>s.remove(),600);
+  }
+}
+
+// SAS: 兩邊 + 夾角 → 三頂點
+function triFromSAS(sideLeft, angleDeg, sideRight){
+  const g = angleDeg * Math.PI/180;
+  const a = Math.sqrt(sideLeft*sideLeft + sideRight*sideRight - 2*sideLeft*sideRight*Math.cos(g));
+  return triFromSSS(a, sideRight, sideLeft);
+}
+// ASA: 兩角 + 夾邊 → 三頂點
+function triFromASA(angleBDeg, sideBC, angleCDeg){
+  const B = angleBDeg * Math.PI/180;
+  const C = angleCDeg * Math.PI/180;
+  const A = Math.PI - B - C;
+  const a = sideBC;
+  const b = a * Math.sin(B) / Math.sin(A);
+  const c = a * Math.sin(C) / Math.sin(A);
+  return triFromSSS(a, b, c);
+}
+// 角度弧
+function drawAngleArc(parent, vertex, p1, p2, radius, color, sw){
+  radius = radius || 28; color = color || "#F39C12"; sw = sw || 5;
+  const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+  let da = a2 - a1;
+  while(da > Math.PI) da -= 2*Math.PI;
+  while(da < -Math.PI) da += 2*Math.PI;
+  const sweep = da > 0 ? 1 : 0;
+  const start = {x:vertex.x+Math.cos(a1)*radius, y:vertex.y+Math.sin(a1)*radius};
+  const end = {x:vertex.x+Math.cos(a2)*radius, y:vertex.y+Math.sin(a2)*radius};
+  return el("path", {
+    d:`M${start.x},${start.y} A${radius},${radius} 0 0,${sweep} ${end.x},${end.y}`,
+    stroke:color, "stroke-width":sw, fill:"none", "stroke-linecap":"round"
+  }, parent);
+}
+// 粗邊線
+function drawEdge(parent, p1, p2, color, sw, id){
+  color = color || "#FFD700"; sw = sw || 10;
+  const attrs = {x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y,
+    stroke:color, "stroke-width":sw, "stroke-linecap":"round"};
+  if(id) attrs.id = id;
+  return el("line", attrs, parent);
+}
+
+// 動畫三角形
+let animId = 0;
+function animateTri(elemId, from, to, frames, onDone){
+  cancelAnimationFrame(animId);
+  let f = 0;
+  const tick = () => {
+    f++;
+    const t = f/frames;
+    const cur = lerpPts(from, to, t);
+    const paths = document.querySelectorAll(`#${elemId} path`);
+    paths.forEach(p => p.setAttribute("d", triPath(cur)));
+    if(f < frames) animId = requestAnimationFrame(tick);
+    else if(onDone) onDone();
+  };
+  tick();
+}
+
+// ============================================================
+// 關卡設計 · 第二節：SAS + ASA
+// ============================================================
+const scenes = [
+
+// ============ 第1關 · SSS 快速複習 (昨日回顧) ============
+{
+  name:"SSS 快速複習",
+  stageLabel:"第 1 關 · 昨日回顧",
+  init(){
+    const root = clearScene();
+    stageBanner(root, "SSS 複習", "DAY 1 RECAP");
+    heroCard(root, 180, 460, "哆啦A夢", "導師", "#00F5FF", "🔵");
+    const pts = triFromSSS(5, 7, 8);
+    const tpts = tform(pts, 900, 480, 40);
+    drawTri(root, tpts, {fill:"url(#gradRed)", stroke:"#FF3B30", sw:7,
+      glow:"neonRed", id:"recap-tri", showLen:{AB:8, BC:5, CA:7}});
+  },
+  steps:[
+    {
+      tip:"說：『<b>昨天我們學了 SSS：三邊相同就全等。</b>還記得嗎？今天要學兩個新招式——SAS 和 ASA！』",
+      narrate:"昨日回顧：三邊 5、7、8 → 全等",
+      run(){}
+    },
+    {
+      tip:"說：『三邊一樣 → 一定全等 ≅。<b>這是 SSS 絕技</b>。』",
+      narrate:"🔴 SSS = 三邊對應相等",
+      run(){
+        const root = document.getElementById("scene-root");
+        el("text", {x:400, y:250, "text-anchor":"middle", "font-size":64,
+          "font-weight":900, fill:"url(#gradRed)",
+          "stroke":"#000","stroke-width":5,"paint-order":"stroke",
+          filter:"url(#neonRed)"}, root).textContent = "SSS ✓";
+        SFX.reveal();
+      }
+    },
+  ],
+  afterSteps:{
+    tip:"<b>暖身完成</b>。接下來 SAS 和 ASA 登場！",
+    narrate:"今天的任務：SAS + ASA"
+  }
+},
+
+// ============ 第2關 · SAS 新技能 · 胖虎訂單 ============
+{
+  name:"SAS 新技能",
+  stageLabel:"第 2 關 · 新技能 · SAS",
+  init(){
+    const root = clearScene();
+    stageBanner(root, "SAS 新技能", "TWO SIDES + ANGLE");
+    // 胖虎
+    heroCard(root, 180, 560, "胖虎", "客人", "#FF3B30", "😤");
+    // 訂單
+    el("rect", {x:80, y:200, width:300, height:120, rx:12,
+      fill:"#0A0E27", stroke:"#FF3B30", "stroke-width":3,
+      filter:"url(#neonRed)"}, root);
+    el("text", {x:230, y:240, "text-anchor":"middle", "font-size":22,
+      "font-weight":900, fill:"#FF3B30"}, root).textContent = "📋 訂單";
+    el("text", {x:230, y:275, "text-anchor":"middle", "font-size":20,
+      "font-weight":700, fill:"#fff"}, root).textContent = "兩邊：6、8";
+    el("text", {x:230, y:305, "text-anchor":"middle", "font-size":18,
+      "font-weight":600, fill:"#FF8A00"}, root).textContent = "（沒說夾角）";
+  },
+  steps:[
+    {
+      tip:"說：『胖虎要訂做三角形，只告訴你<b>兩邊 6 跟 8</b>，沒說夾角。做得出一模一樣的嗎？』",
+      narrate:"胖虎只給兩邊 · 能做全等嗎？",
+      run(){}
+    },
+    {
+      tip:"說：『我試試看——試三種不同夾角：30°、90°、150°。<b>結果⋯</b>』",
+      narrate:"試試不同夾角 → 形狀會一樣嗎？",
+      run(){
+        const root = document.getElementById("scene-root");
+        // 三種 SAS with 不同夾角
+        const pts30  = tform(triFromSAS(6, 30, 8),  600, 490, 18);
+        const pts90  = tform(triFromSAS(6, 90, 8),  900, 490, 18);
+        const pts150 = tform(triFromSAS(6, 150, 8), 1200, 490, 18);
+        drawTri(root, pts30,  {fill:"url(#gradBlue)", stroke:"#4DBCFF", sw:5, glow:"neonCyan"});
+        drawTri(root, pts90,  {fill:"url(#gradBlue)", stroke:"#4DBCFF", sw:5, glow:"neonCyan"});
+        drawTri(root, pts150, {fill:"url(#gradBlue)", stroke:"#4DBCFF", sw:5, glow:"neonCyan"});
+        // 標角度
+        el("text", {x:600, y:620, "text-anchor":"middle", "font-size":20,
+          "font-weight":800, fill:"#FF8A00"}, root).textContent = "夾角 30°";
+        el("text", {x:900, y:620, "text-anchor":"middle", "font-size":20,
+          "font-weight":800, fill:"#FF8A00"}, root).textContent = "夾角 90°";
+        el("text", {x:1200, y:620, "text-anchor":"middle", "font-size":20,
+          "font-weight":800, fill:"#FF8A00"}, root).textContent = "夾角 150°";
+        SFX.gentle();
+      }
+    },
+    {
+      tip:"說：『<b>每次形狀都不一樣！</b>所以兩邊不夠。胖虎會生氣：你在耍我嗎！』",
+      narrate:"😡 三個形狀都不一樣！",
+      run(){
+        flashBig("FAIL!", "#FF3B30", 110);
+        SFX.gentle();
+      }
+    },
+    {
+      tip:"說：『少了什麼？<b>夾角！</b>如果胖虎說「兩邊 6、8，夾角 60°」，就能做出一模一樣的！』",
+      narrate:"▶ 加上夾角 60° → 鎖死！",
+      run(){
+        const root = clearScene();
+        stageBanner(root, "SAS 成立！", "LOCKED");
+        heroCard(root, 180, 460, "哆啦A夢", "導師", "#00F5FF", "🔵");
+        // 三個一樣的 SAS 三角形 (all 6-60-8)
+        for(let i=0;i<3;i++){
+          const pts = tform(triFromSAS(6, 60, 8), 600 + i*300, 480, 20);
+          // 主體
+          const g = drawTri(root, pts, {fill:"url(#gradBlue)", stroke:"#00F5FF", sw:5, glow:"neonCyan"});
+          // 兩邊藍色
+          drawEdge(root, pts[0], pts[1], "#00F5FF", 8);
+          drawEdge(root, pts[0], pts[2], "#00F5FF", 8);
+          // 夾角橘色弧
+          drawAngleArc(root, pts[0], pts[1], pts[2], 32, "#FF8A00", 6);
+        }
+        el("text", {x:800, y:720, "text-anchor":"middle", "font-size":24,
+          "font-weight":900, fill:"#00F5FF"}, root).textContent = "三個完全一樣！";
+        SFX.ultimate();
+      }
+    },
+    {
+      tip:"說：『<b>SAS 絕技解鎖！</b>兩邊藍色、夾角橘色，三個全都配對 → 全等。』",
+      narrate:"⚡ SAS 絕技解鎖！",
+      run(){
+        const root = document.getElementById("scene-root");
+        // 技能卡
+        el("rect", {x:500, y:150, width:600, height:120, rx:16,
+          fill:"#0A0E27", stroke:"#00F5FF", "stroke-width":5,
+          filter:"url(#neonCyan)"}, root);
+        el("text", {x:800, y:200, "text-anchor":"middle", "font-size":26,
+          "font-weight":900, fill:"#00F5FF"}, root).textContent = "⚡ SKILL UNLOCKED";
+        el("text", {x:800, y:250, "text-anchor":"middle", "font-size":48,
+          "font-weight":900, fill:"url(#gradBlue)",
+          "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root)
+          .textContent = "SAS = 兩邊+夾角";
+        flashBig("ULTIMATE!", "#00F5FF", 120);
+        confetti(30);
+        SFX.ultimate();
+      }
+    }
+  ],
+  afterSteps:{
+    tip:"<b>第 2 關通關</b>：SAS = 兩邊相同 + 中間夾角相同 → 全等。下一關 ASA！",
+    narrate:"SAS 絕技 · MASTER"
+  }
+},
+
+// ============ 第3關 · ASA 絕技 · 靜香量河寬 ============
+{
+  name:"ASA 新技能",
+  stageLabel:"第 3 關 · 絕技 · ASA",
+  init(){
+    const root = clearScene();
+    stageBanner(root, "ASA 絕技 · 測量之術", "MEASURING TRICK");
+    heroCard(root, 180, 560, "靜香", "測量師", "#39FF14", "📏");
+    // 河流視覺 (藍色波浪)
+    el("rect", {x:500, y:520, width:700, height:80, fill:"#1B4F72", opacity:.5}, root);
+    for(let i=0; i<7; i++){
+      el("path", {
+        d:`M${500+i*100},560 Q${550+i*100},540 ${600+i*100},560`,
+        stroke:"#4DBCFF", "stroke-width":3, fill:"none", opacity:.7
+      }, root);
+    }
+    el("text", {x:850, y:580, "text-anchor":"middle", "font-size":22,
+      "font-weight":800, fill:"#4DBCFF"}, root).textContent = "🌊 河流";
+  },
+  steps:[
+    {
+      tip:"說：『靜香要量河寬，但<b>不能過河</b>！她只量得到自己這邊——兩個角和中間那條邊。夠嗎？』",
+      narrate:"靜香要量河寬 · 不能過河",
+      run(){}
+    },
+    {
+      tip:"說：『她量了：岸邊 AB 長 5 公尺，角 A = 60°、角 B = 45°。<b>這樣能畫出一模一樣的三角形嗎？</b>』",
+      narrate:"📏 量得到：邊 5、角 60°、角 45°",
+      run(){
+        const root = document.getElementById("scene-root");
+        // 在河岸畫角度記號
+        el("text", {x:700, y:490, "text-anchor":"middle", "font-size":24,
+          "font-weight":900, fill:"#39FF14"}, root).textContent = "量得到：";
+        el("text", {x:700, y:525, "text-anchor":"middle", "font-size":20,
+          "font-weight":800, fill:"#fff"}, root).textContent = "AB = 5 公尺、∠A = 60°、∠B = 45°";
+        SFX.reveal();
+      }
+    },
+    {
+      tip:"說：『<b>試三次看看</b>——只要 AB=5、兩角一樣，畫出來的三角形永遠一模一樣！』",
+      narrate:"畫 3 次 → 結果⋯",
+      run(){
+        const root = clearScene();
+        stageBanner(root, "ASA 成立！", "LOCKED");
+        heroCard(root, 180, 460, "靜香", "測量師", "#39FF14", "📏");
+        // 三個一樣的 ASA 三角形
+        for(let i=0;i<3;i++){
+          const pts = tform(triFromASA(45, 5, 60), 600 + i*300, 480, 40);
+          drawTri(root, pts, {fill:"url(#gradGreen)", stroke:"#39FF14", sw:5, glow:"neonGreen"});
+          // 夾邊綠色
+          drawEdge(root, pts[1], pts[2], "#39FF14", 8);
+          // 兩角金色弧
+          drawAngleArc(root, pts[1], pts[0], pts[2], 26, "#FFD700", 5);
+          drawAngleArc(root, pts[2], pts[0], pts[1], 26, "#FFD700", 5);
+        }
+        el("text", {x:800, y:720, "text-anchor":"middle", "font-size":24,
+          "font-weight":900, fill:"#39FF14"}, root).textContent = "三個一模一樣！";
+        SFX.ultimate();
+      }
+    },
+    {
+      tip:"說：『<b>ASA 絕技解鎖！</b>兩角金色、夾邊綠色 → 一定全等。測量師靠這招算河寬！』",
+      narrate:"⚡ ASA 絕技解鎖！",
+      run(){
+        const root = document.getElementById("scene-root");
+        el("rect", {x:500, y:150, width:600, height:120, rx:16,
+          fill:"#0A0E27", stroke:"#39FF14", "stroke-width":5,
+          filter:"url(#neonGreen)"}, root);
+        el("text", {x:800, y:200, "text-anchor":"middle", "font-size":26,
+          "font-weight":900, fill:"#39FF14"}, root).textContent = "⚡ SKILL UNLOCKED";
+        el("text", {x:800, y:250, "text-anchor":"middle", "font-size":48,
+          "font-weight":900, fill:"url(#gradGreen)",
+          "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root)
+          .textContent = "ASA = 兩角+夾邊";
+        flashBig("ULTIMATE!", "#39FF14", 120);
+        confetti(30);
+        SFX.ultimate();
+      }
+    }
+  ],
+  afterSteps:{
+    tip:"<b>第 3 關通關</b>：ASA = 兩角+夾邊 → 全等。測量師、工程師每天用這招！",
+    narrate:"ASA 絕技 · MASTER"
+  }
+},
+
+// ============ 第4關 · 三招辨識 ============
+{
+  name:"三招辨識",
+  stageLabel:"第 4 關 · 三招大對決",
+  init(){
+    const root = clearScene();
+    stageBanner(root, "三招大對決", "MASTER TRIO");
+  },
+  steps:[
+    {
+      tip:"說：『你們學了三招。<b>怎麼認出哪招？看顏色！</b>』",
+      narrate:"看顏色 · 秒認三招",
+      run(){
+        const root = document.getElementById("scene-root");
+        // 三個三角形並排, 用顏色區辨
+        const pts = triFromSSS(5, 7, 8);
+        // SSS 紅
+        const p1 = tform(pts, 400, 520, 28);
+        drawTri(root, p1, {fill:"url(#gradRed)", stroke:"#FF3B30", sw:6, glow:"neonRed"});
+        // SAS 藍邊+橘角
+        const p2 = tform(triFromSAS(6, 60, 8), 800, 520, 22);
+        drawTri(root, p2, {fill:"#0A0E27", stroke:"#666", sw:3});
+        drawEdge(root, p2[0], p2[1], "#00F5FF", 8);
+        drawEdge(root, p2[0], p2[2], "#00F5FF", 8);
+        drawAngleArc(root, p2[0], p2[1], p2[2], 26, "#FF8A00", 6);
+        // ASA 金角+綠邊
+        const p3 = tform(triFromASA(45, 6, 60), 1200, 520, 32);
+        drawTri(root, p3, {fill:"#0A0E27", stroke:"#666", sw:3});
+        drawEdge(root, p3[1], p3[2], "#39FF14", 8);
+        drawAngleArc(root, p3[1], p3[0], p3[2], 24, "#FFD700", 5);
+        drawAngleArc(root, p3[2], p3[0], p3[1], 24, "#FFD700", 5);
+        // 標籤
+        el("text", {x:400, y:670, "text-anchor":"middle", "font-size":32,
+          "font-weight":900, fill:"#FF3B30",
+          "stroke":"#000","stroke-width":4,"paint-order":"stroke",
+          filter:"url(#neonRed)"}, root).textContent = "SSS";
+        el("text", {x:800, y:670, "text-anchor":"middle", "font-size":32,
+          "font-weight":900, fill:"#00F5FF",
+          "stroke":"#000","stroke-width":4,"paint-order":"stroke",
+          filter:"url(#neonCyan)"}, root).textContent = "SAS";
+        el("text", {x:1200, y:670, "text-anchor":"middle", "font-size":32,
+          "font-weight":900, fill:"#39FF14",
+          "stroke":"#000","stroke-width":4,"paint-order":"stroke",
+          filter:"url(#neonGreen)"}, root).textContent = "ASA";
+        SFX.reveal();
+      }
+    },
+    {
+      tip:"說：『口訣：<b>全紅就是 SSS，藍橘就是 SAS，綠金就是 ASA</b>。』",
+      narrate:"🔴 全紅=SSS  🔵🟠=SAS  🟢🟡=ASA",
+      run(){
+        const root = document.getElementById("scene-root");
+        el("rect", {x:200, y:200, width:1200, height:120, rx:16,
+          fill:"#0A0E27", stroke:"#FFD700", "stroke-width":4,
+          filter:"url(#neonGold)"}, root);
+        el("text", {x:800, y:250, "text-anchor":"middle", "font-size":26,
+          "font-weight":900, fill:"#FFD700"}, root).textContent = "🎯 認招口訣";
+        el("text", {x:800, y:300, "text-anchor":"middle", "font-size":28,
+          "font-weight":800, fill:"#fff"}, root).textContent = "看顏色秒認 · 全等三招";
+        SFX.pop();
+      }
+    },
+    {
+      tip:"說：『<b>只要三招裡的任何一個符合，就全等！</b>三招都是好朋友，一起用。』",
+      narrate:"三招任一符合 → 全等 ≅",
+      run(){
+        const root = document.getElementById("scene-root");
+        el("text", {x:800, y:140, "text-anchor":"middle", "font-size":44,
+          "font-weight":900, fill:"url(#gradPurple)",
+          "stroke":"#000","stroke-width":5,"paint-order":"stroke",
+          filter:"url(#neonPurple)"}, root).textContent = "SSS / SAS / ASA → ≅";
+        SFX.ultimate();
+      }
+    },
+  ],
+  afterSteps:{
+    tip:"<b>第 4 關通關</b>：會辨識三招。準備最終 BOSS 混合測驗！",
+    narrate:"三招辨識 · MASTER"
+  }
+},
+
+// ============ 第5關 · BOSS 混合測驗 ============
+{
+  name:"BOSS 混合戰",
+  stageLabel:"第 5 關 · 最終 BOSS",
+  _quizzes:[
+    // 每題: type (SSS/SAS/ASA), 用哪招判斷全等
+    {type:"SSS", desc:"兩個三角形都三邊 5、7、8", correct:"SSS", why:"三邊對應相等 → SSS ✅"},
+    {type:"SAS", desc:"兩邊 6、8 + 夾角 60°", correct:"SAS", why:"兩邊+夾角 → SAS ✅"},
+    {type:"ASA", desc:"兩角 45°、60° + 夾邊 5", correct:"ASA", why:"兩角+夾邊 → ASA ✅"},
+    {type:"SAS", desc:"兩邊 4、7 + 夾角 90°", correct:"SAS", why:"兩邊+夾角 → SAS ✅"},
+  ],
+  _q:0, _score:0, _streak:0,
+  init(){ this._q=0; this._score=0; this._streak=0; this._render(); },
+  _render(){
+    const root = clearScene();
+    hideCombo();
+    if(this._q >= this._quizzes.length){
+      stageBanner(root, "BOSS 戰結算", "BATTLE RESULT");
+      el("rect", {x:500, y:260, width:600, height:300, rx:20,
+        fill:"#0A0E27", stroke:"#FFD700", "stroke-width":5,
+        filter:"url(#neonGold)"}, root);
+      el("text", {x:800, y:340, "text-anchor":"middle", "font-size":36,
+        "font-weight":900, fill:"#FFD700"}, root).textContent = "⭐ 得分";
+      el("text", {x:800, y:430, "text-anchor":"middle", "font-size":90,
+        "font-weight":900, fill:"url(#gradGold)",
+        "stroke":"#000","stroke-width":5,"paint-order":"stroke"}, root).textContent = `${this._score} / 4`;
+      const rank = this._score===4 ? "S" : this._score===3 ? "A" : this._score===2 ? "B" : "C";
+      const rc = rank==="S"?"#FFD700":rank==="A"?"#B967FF":rank==="B"?"#00F5FF":"#888";
+      el("text", {x:800, y:510, "text-anchor":"middle", "font-size":32,
+        "font-weight":900, fill:rc,
+        "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = `全等三招評價：${rank} 級`;
+      setScore(0, 0);
+      SFX.win();
+      confetti(50);
+      setNarration(this._score===4 ? "🏆 全勝！三招大師！" : "🎉 戰鬥結束！");
+      return;
+    }
+    stageBanner(root, `BOSS · 第 ${this._q+1}/4 回合`, "用哪一招？");
+    const cur = this._quizzes[this._q];
+    // 畫對應的三角形 + 顏色標示
+    if(cur.type === "SSS"){
+      const pts = tform(triFromSSS(5,7,8), 800, 500, 40);
+      drawTri(root, pts, {fill:"url(#gradRed)", stroke:"#FF3B30", sw:7,
+        glow:"neonRed", showLen:{AB:8, BC:5, CA:7}});
+    } else if(cur.type === "SAS"){
+      const pts = tform(triFromSAS(cur.desc.includes("6、8")?6:4, cur.desc.includes("60")?60:90, cur.desc.includes("6、8")?8:7), 800, 500, 35);
+      drawTri(root, pts, {fill:"#0A0E27", stroke:"#888", sw:3});
+      drawEdge(root, pts[0], pts[1], "#00F5FF", 9);
+      drawEdge(root, pts[0], pts[2], "#00F5FF", 9);
+      drawAngleArc(root, pts[0], pts[1], pts[2], 32, "#FF8A00", 7);
+    } else if(cur.type === "ASA"){
+      const pts = tform(triFromASA(45, 5, 60), 800, 500, 55);
+      drawTri(root, pts, {fill:"#0A0E27", stroke:"#888", sw:3});
+      drawEdge(root, pts[1], pts[2], "#39FF14", 9);
+      drawAngleArc(root, pts[1], pts[0], pts[2], 28, "#FFD700", 6);
+      drawAngleArc(root, pts[2], pts[0], pts[1], 28, "#FFD700", 6);
+    }
+    el("text", {x:800, y:150, "text-anchor":"middle", "font-size":28,
+      "font-weight":900, fill:"#9B4DFF",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = cur.desc;
+    el("text", {x:800, y:200, "text-anchor":"middle", "font-size":24,
+      "font-weight":700, fill:"#fff"}, root).textContent = "這兩個三角形全等，要用哪一招？";
+    setScore(this._score, 4);
+  },
+  steps:[
+    {
+      tip:"說：『BOSS 戰！每題選：SSS、SAS、ASA，還是不全等？<b>學生舉手喊答</b>，老師按按鈕。』",
+      narrate:"⚔️ BOSS 戰開始！",
+      run(){}
+    }
+  ],
+  afterSteps:{ tip:"戰鬥中", narrate:"" },
+  onFinalStep(){
+    const actions = document.getElementById("main-actions");
+    actions.innerHTML = "";
+    ["SSS","SAS","ASA"].forEach(label => {
+      const b = document.createElement("button");
+      b.className = "btn btn-answer";
+      if(label==="SSS") b.classList.add("btn-warn");
+      else if(label==="SAS") b.style.background = "linear-gradient(135deg,#00F5FF,#0088CC)";
+      else b.classList.add("btn-ok");
+      b.textContent = label;
+      b.style.minWidth = "120px";
+      b.style.fontSize = "28px";
+      b.style.color = label==="SAS" ? "#0A0E27" : undefined;
+      b.onclick = () => this.answer(label);
+      actions.appendChild(b);
+    });
+  },
+  answer(choice){
+    SFX.click();
+    const cur = this._quizzes[this._q];
+    if(choice === cur.correct){
+      flashCorrect(); setNarration(cur.why);
+      this._score++; this._streak++;
+    } else {
+      flashRetry(); setNarration("💛 不對～答案是 " + cur.correct);
+      this._streak = 0; hideCombo();
+    }
+    setTimeout(()=>{
+      this._q++; this._render();
+      if(this._q >= this._quizzes.length){
+        const actions = document.getElementById("main-actions");
+        actions.innerHTML = "";
+        const nx = document.createElement("button");
+        nx.className = "btn btn-scene-next";
+        nx.textContent = "🏆 進入勝利畫面";
+        nx.onclick = nextScene;
+        actions.appendChild(nx);
+      } else {
+        scenes[4].onFinalStep();
+      }
+    }, 1800);
+  }
+},
+
+// ============ 第6關 · 勝利畫面 ============
+{
+  name:"勝利畫面",
+  stageLabel:"🏆 VICTORY",
+  init(){
+    const root = clearScene();
+    setScore(0, 0); hideCombo();
+    // 獎盃
+    el("circle", {cx:800, cy:400, r:200, fill:"url(#gradGold)", opacity:.15,
+      filter:"url(#neonGold)"}, root);
+    el("rect", {x:700, y:490, width:200, height:50, rx:6,
+      fill:"url(#gradGold)", stroke:"#FFD700", "stroke-width":4,
+      filter:"url(#neonGold)"}, root);
+    el("circle", {cx:800, cy:400, r:100, fill:"url(#gradGold)",
+      stroke:"#FFD700", "stroke-width":6, filter:"url(#neonGold)"}, root);
+    el("text", {x:800, y:430, "text-anchor":"middle", "font-size":90}, root).textContent = "🏆";
+    // 標題
+    el("text", {x:800, y:160, "text-anchor":"middle", "font-size":70,
+      "font-weight":900, fill:"url(#gradGold)",
+      "stroke":"#000","stroke-width":7,"paint-order":"stroke",
+      filter:"url(#neonGold)"}, root).textContent = "VICTORY!";
+    el("text", {x:800, y:220, "text-anchor":"middle", "font-size":30,
+      "font-weight":700, fill:"#B967FF",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
+      .textContent = "全等戰場 · 三招大師";
+    // 三招徽章
+    const skills = [
+      {icon:"🔴", name:"SSS 絕技", color:"#FF3B30"},
+      {icon:"🔵🟠", name:"SAS 新技", color:"#00F5FF"},
+      {icon:"🟢🟡", name:"ASA 新技", color:"#39FF14"},
+    ];
+    skills.forEach((sk, i) => {
+      const x = 400 + i*400;
+      el("circle", {cx:x, cy:660, r:55, fill:"#0A0E27",
+        stroke:sk.color, "stroke-width":4, filter:`url(#neon${sk.color==="#FF3B30"?"Red":sk.color==="#00F5FF"?"Cyan":"Green"})`}, root);
+      el("text", {x, y:680, "font-size":42, "text-anchor":"middle"}, root).textContent = sk.icon;
+      el("text", {x, y:755, "font-size":22, "font-weight":900, fill:sk.color,
+        "text-anchor":"middle",
+        "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = sk.name;
+    });
+    SFX.win();
+    confetti(60);
+    setTimeout(()=>confetti(40), 900);
+    setTimeout(()=>confetti(40), 1800);
+  },
+  steps:[
+    {
+      tip:"說：『<b>恭喜通關第二節全等戰場！</b>你學會三個大招：SSS、SAS、ASA。<b>數學課本還有 AAS 和 RHS 兩招，老師回來教！</b>』",
+      narrate:"🏆 三招大師！",
+      run(){}
+    }
+  ],
+  afterSteps:{
+    tip:"收尾：『辛苦了！請學生分享一個印象最深的關卡。』老師會在週一回來繼續教 AAS 和 RHS！",
+    narrate:"老師回來教 AAS + RHS"
+  }
+}
+];
+
+// ==== 控制 ====
+function renderScene(){
+  const scene = scenes[state.sceneIdx];
+  state.stepIdx = -1;
+  hideCombo();
+  setScore(0, 0);
+  scene.init && scene.init();
+  setNarration("");
+  setStageLabel(scene.stageLabel || "");
+  setTeacherTip(`<b>🎬 第 ${state.sceneIdx+1} 關：${scene.name}</b><br>按「▶ 發動技能」開始`);
+  document.getElementById("s-n").textContent = state.sceneIdx + 1;
+  document.getElementById("scene-tag").textContent = `${state.sceneIdx+1}/6`;
+  document.querySelectorAll(".prog-seg").forEach((s,i)=>{
+    s.classList.remove("done","current");
+    if(i < state.sceneIdx) s.classList.add("done");
+    else if(i === state.sceneIdx) s.classList.add("current");
+  });
+  const actions = document.getElementById("main-actions");
+  actions.innerHTML = "";
+  const b = document.createElement("button");
+  b.className = "btn btn-next";
+  b.textContent = "▶ 發動技能";
+  b.onclick = advanceStep;
+  actions.appendChild(b);
+}
+
+function advanceStep(){
+  SFX.click(); ensureAudio();
+  const scene = scenes[state.sceneIdx];
+  state.stepIdx++;
+  if(state.stepIdx < scene.steps.length){
+    const step = scene.steps[state.stepIdx];
+    setTeacherTip(`<b>🎬 ${state.sceneIdx+1}.${state.stepIdx+1}</b> ${step.tip}`);
+    setNarration(step.narrate);
+    step.run && step.run.call(scene);
+    if(scene.onFinalStep && state.stepIdx === scene.steps.length - 1){
+      setTimeout(()=>scene.onFinalStep(), 600);
+    }
+  } else {
+    if(scene.afterSteps){
+      setTeacherTip(`<b>✅ 本關通關</b> ${scene.afterSteps.tip}`);
+      if(scene.afterSteps.narrate) setNarration(scene.afterSteps.narrate);
+    }
+    const actions = document.getElementById("main-actions");
+    actions.innerHTML = "";
+    if(state.sceneIdx < scenes.length - 1){
+      const nx = document.createElement("button");
+      nx.className = "btn btn-scene-next";
+      nx.textContent = "▶ 進入下一關";
+      nx.onclick = nextScene;
+      actions.appendChild(nx);
+    } else {
+      const rst = document.createElement("button");
+      rst.className = "btn btn-scene-next";
+      rst.textContent = "🔁 再戰一次";
+      rst.onclick = () => { state.sceneIdx=0; renderScene(); };
+      actions.appendChild(rst);
+    }
+  }
+}
+function nextScene(){ SFX.click(); if(state.sceneIdx<scenes.length-1){state.sceneIdx++; renderScene();} }
+function prevScene(){ SFX.click(); if(state.sceneIdx>0){state.sceneIdx--; renderScene();} }
+
+document.addEventListener("click", ensureAudio, {once:true});
+document.addEventListener("touchstart", ensureAudio, {once:true});
+document.getElementById("btn-prev").onclick = prevScene;
+document.getElementById("btn-restart").onclick = () => { SFX.click(); state.sceneIdx=0; renderScene(); };
+document.getElementById("btn-mute").onclick = (e) => {
+  state.audioOn = !state.audioOn;
+  e.currentTarget.textContent = state.audioOn ? "🔊" : "🔇";
+  if(state.audioOn) SFX.click();
+};
+document.addEventListener("keydown", e => {
+  if(e.key==="ArrowRight" || e.key===" "){ e.preventDefault(); advanceStep(); }
+  if(e.key==="ArrowLeft") prevScene();
+});
+
+renderScene();
+</script>
+</body>
+</html>
