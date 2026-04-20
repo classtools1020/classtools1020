@@ -138,7 +138,9 @@ const KEY='ag-ch';
 function db(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return{}}}
 function dbSet(d){localStorage.setItem(KEY,JSON.stringify(d))}
 function gp(){const d=db();return d[S.name]||{avatar:S.avatar,power:0,levels:{}};}
-function sp(p){const d=db();d[S.name]=p;dbSet(d);}
+const CLOUD='https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
+function syncCloud(p){if(!S.name)return;try{fetch(CLOUD,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'save_progress',name:S.name,tool:'angleArena',data:JSON.stringify(p)})});const d=db();d._roster=Array.from(new Set([...(d._roster||[]),S.name]));dbSet(d);fetch(CLOUD,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'save_progress',name:'_ROSTER',tool:'angleArena',data:JSON.stringify(d._roster)})});}catch(e){}}
+function sp(p){const d=db();d[S.name]=p;dbSet(d);syncCloud(p);}
 function unlocked(i){if(i===0)return true;const p=gp();return(p.levels[LEVELS[i-1].id]||0)>0;}
 function title(pw){let t=TITLES[0];TITLES.forEach(x=>{if(pw>=x.p)t=x});return t;}
 
