@@ -145,7 +145,10 @@ function db(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){re
 function dbSet(d){localStorage.setItem(KEY,JSON.stringify(d))}
 function gp(){const d=db();return d[S.name]||{avatar:S.avatar,power:0,levels:{}};}
 const CLOUD='https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
-function syncCloud(p){if(!S.name)return;try{fetch(CLOUD,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'save_progress',name:S.name,tool:'angleGuard',data:JSON.stringify(p)})});const d=db();d._roster=Array.from(new Set([...(d._roster||[]),S.name]));dbSet(d);fetch(CLOUD,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'save_progress',name:'_ROSTER',tool:'angleGuard',data:JSON.stringify(d._roster)})});}catch(e){}}
+function pushCloud(name,data){fetch(CLOUD,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'save_progress',name,tool:'angleGuard',data:JSON.stringify(data)})});}
+function syncCloud(p){if(!S.name)return;try{pushCloud(S.name,p);const d=db();d._roster=Array.from(new Set([...(d._roster||[]),S.name]));dbSet(d);pushCloud('_ROSTER',d._roster);}catch(e){}}
+// Auto-sync legacy local data on page load (for students who played before cloud sync existed)
+setTimeout(()=>{try{const d=db();const names=Object.keys(d).filter(n=>n&&!n.startsWith('_'));if(!names.length)return;names.forEach(n=>pushCloud(n,d[n]));const r=Array.from(new Set([...(d._roster||[]),...names]));d._roster=r;dbSet(d);pushCloud('_ROSTER',r);}catch(e){}},1500);
 function sp(p){const d=db();d[S.name]=p;dbSet(d);syncCloud(p);}
 function unlocked(i){if(i===0)return true;const p=gp();return(p.levels[LEVELS[i-1].id]||0)>0;}
 function title(pw){let t=TITLES[0];TITLES.forEach(x=>{if(pw>=x.p)t=x});return t;}
