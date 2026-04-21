@@ -3,28 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>9B 代課工作區（待更新）</title>
+<title>Day 4 代課工作區 — 9B 地點</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#fafafa;color:#1a1a1a;padding:40px 16px;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center}
-.wrap{max-width:520px}
-h1{font-size:1.8em;font-weight:900;margin-bottom:8px}
-.meta{color:#666;font-size:.95em;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #111}
-.msg{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:24px;margin-bottom:20px;line-height:1.7}
-.msg b{color:#111}
-a{color:#111;font-weight:700;text-decoration:underline}
+body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.55;padding:24px 16px;min-height:100vh}
+.wrap{max-width:880px;margin:0 auto}
+
+header{border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:22px}
+h1{font-size:1.7em;font-weight:900;letter-spacing:-.5px}
+.meta{color:#666;font-size:.92em;margin-top:4px}
+
+.cta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.cta a{display:block;padding:18px 14px;border:2px solid #111;border-radius:12px;background:#fff;text-decoration:none;color:#111;text-align:center;transition:all .15s;font-weight:700}
+.cta a:hover{background:#111;color:#fff;transform:translateY(-2px)}
+.cta .icon{font-size:1.6em;display:block;margin-bottom:4px}
+.cta .sub{font-size:.78em;color:#888;font-weight:400;margin-top:2px}
+.cta a:hover .sub{color:#ddd}
+@media(max-width:600px){.cta{grid-template-columns:1fr}}
+
+section{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:18px 22px;margin-bottom:16px}
+h2{font-size:1.08em;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+h2::before{content:'';width:4px;height:16px;background:#111;border-radius:2px}
+
+table{width:100%;border-collapse:collapse;font-size:.93em}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid #f0f0f0;vertical-align:top}
+th{background:#fafafa;font-weight:700;font-size:.82em;color:#666;text-transform:uppercase;letter-spacing:.5px}
+td:first-child{font-weight:700;color:#111;white-space:nowrap;width:72px}
+td:nth-child(2){font-weight:700;white-space:nowrap;width:58px;color:#666}
+tr:last-child td{border-bottom:none}
+.phase{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.76em;font-weight:700}
+.p-warm{background:#e3f2fd;color:#1565c0}
+.p-core{background:#fff3e0;color:#e65100}
+.p-self{background:#e8f5e9;color:#2e7d32}
+.p-exam{background:#fce4ec;color:#c2185b}
+
+.note{font-size:.86em;color:#666;line-height:1.7}
+.back{display:inline-block;margin-bottom:10px;color:#666;text-decoration:none;font-size:.88em}
+.back:hover{color:#111}
+
+footer{text-align:center;color:#999;font-size:.82em;margin-top:28px;padding-top:16px;border-top:1px solid #eee}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>9B · 4/23（四）</h1>
-  <div class="meta">進度待更新</div>
-  <div class="msg">
-    9B 進度與 9A 不同，<br>
-    Stacey 會在代課日前完成內容。<br><br>
-    如有急事請先參考 <a href="day6-sub.html">9A 工作區</a>。
+
+<a href="sub.html" class="back">← 回代課首頁</a>
+
+<header>
+  <h1>Day 4 · Places</h1>
+  <div class="meta">4/23（四）｜9B 英文</div>
+</header>
+
+<div class="cta">
+  <a href="https://docs.google.com/presentation/d/1mxdAHjc8Jswlo8GcZhAmGz9m4k1Z114oY50SM95hmIc/edit" target="_blank">
+    <span class="icon">▶</span>開啟簡報
+    <div class="sub">23 張 · 會考衝刺王</div>
+  </a>
+  <a href="https://classtools1020.github.io/classtools1020/teacher-dashboard.html" target="_blank">
+    <span class="icon">◎</span>教師後台
+    <div class="sub">密碼 stacey2026</div>
+  </a>
+  <a href="https://classtools1020.github.io/classtools1020/eng9.html" target="_blank">
+    <span class="icon">◇</span>學生自學
+    <div class="sub">投影 QR 給學生掃</div>
+  </a>
+</div>
+
+<section>
+  <h2>45 分鐘節拍</h2>
+  <table>
+    <tr><th>分鐘</th><th>投影片</th><th>階段</th><th>重點</th></tr>
+    <tr><td>0–5</td><td>P1–3</td><td><span class="phase p-warm">暖身</span></td><td>暖身</td></tr>
+    <tr><td>5–18</td><td>P4–11</td><td><span class="phase p-core">單字</span></td><td>8 個地點單字</td></tr>
+    <tr><td>18–26</td><td>P12–15</td><td><span class="phase p-core">文法</span></td><td>at / in / to</td></tr>
+    <tr><td>26–36</td><td>—</td><td><span class="phase p-self">自學</span></td><td>投影 QR code 給學生掃</td></tr>
+    <tr><td>36–43</td><td>P16–22</td><td><span class="phase p-exam">會考</span></td><td>會考模擬題目</td></tr>
+    <tr><td>43–45</td><td>P23</td><td><span class="phase p-warm">收尾</span></td><td>收尾</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>學生自學 QR code（自學時段投影）</h2>
+  <div style="text-align:center;padding:16px 0">
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=https%3A%2F%2Fclasstools1020.github.io%2Fclasstools1020%2Feng9.html&margin=10" alt="學生自學 QR code" style="border:1px solid #e0e0e0;border-radius:8px;max-width:100%;height:auto">
+    <div style="margin-top:10px;font-size:.88em;color:#666">classtools1020.github.io/classtools1020/eng9.html</div>
   </div>
-  <a href="sub.html">← 回代課首頁</a>
+</section>
+
+<section>
+  <h2>回家作業</h2>
+  <p class="note">PaGamO Day 4 + 聽力戰令 Day 4</p>
+</section>
+
+<footer>Stacey · 9B Day 4</footer>
+
 </div>
 </body>
 </html>
