@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>禮拜四 4/23 · 8A 數學 · SSS 全等</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    background: linear-gradient(135deg, #E8F1F8 0%, #C7DFEE 100%);
+    min-height: 100vh;
+    padding: 15px;
+    color: #0D3A5C;
+    line-height: 1.6;
+  }
+  .container { max-width: 750px; margin: 0 auto; }
+  .back-btn {
+    display: inline-block;
+    background: #1B5E8F;
+    color: #FFF;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    min-height: 48px;
+    line-height: 1.5;
+  }
+  .back-btn:hover { background: #0D3A5C; }
+  .header {
+    background: #1B5E8F;
+    color: #FFF;
+    padding: 25px 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(27,94,143,0.3);
+  }
+  h1 { font-size: 1.9rem; margin-bottom: 5px; letter-spacing: 1px; }
+  .date-label { font-size: 1.05rem; color: #B5D9EC; margin-top: 5px; }
+  .core-concept {
+    background: #FFF;
+    border: 3px solid #B5D9EC;
+    border-radius: 15px;
+    padding: 18px;
+    margin-bottom: 20px;
+    font-size: 1.15rem;
+    text-align: center;
+  }
+  .core-concept strong { color: #1B5E8F; font-size: 1.3rem; }
+
+  .step-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #1B5E8F;
+    margin: 25px 10px 12px;
+    padding-left: 12px;
+    border-left: 5px solid #1B5E8F;
+  }
+
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 25px;
+  }
+  .step-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #FFF;
+    border: 3px solid #1B5E8F;
+    border-radius: 15px;
+    padding: 20px;
+    text-decoration: none;
+    color: #0D3A5C;
+    box-shadow: 0 4px 10px rgba(27,94,143,0.18);
+    transition: all 0.2s;
+    min-height: 48px;
+  }
+  .step-btn:hover, .step-btn:active {
+    background: #B5D9EC;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(27,94,143,0.3);
+  }
+  .step-btn.no-link {
+    cursor: default;
+    background: #F6FAFD;
+  }
+  .step-btn.no-link:hover {
+    transform: none;
+    background: #F6FAFD;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    background: #1B5E8F;
+    color: #FFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+  }
+  .step-body { flex: 1; min-width: 0; }
+  .step-body .title-text {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #1B5E8F;
+    margin-bottom: 4px;
+  }
+  .step-body .desc {
+    font-size: 0.95rem;
+    color: #4A6A85;
+  }
+  .step-arrow {
+    font-size: 1.8rem;
+    color: #1B5E8F;
+    flex-shrink: 0;
+  }
+  .step-btn.no-link .step-arrow { display: none; }
+
+  .homework {
+    background: #FFF3D4;
+    border: 3px solid #E5A93A;
+    border-radius: 15px;
+    padding: 20px;
+    margin: 25px 0;
+    text-align: center;
+  }
+  .homework .hw-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #8B6414;
+    margin-bottom: 8px;
+  }
+  .homework .hw-content {
+    font-size: 1.1rem;
+    color: #6B4C00;
+    line-height: 1.7;
+  }
+
+  .color-rule {
+    background: #FFF;
+    border: 2px dashed #1B5E8F;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 1rem;
+    color: #4A6A85;
+  }
+  .color-rule .chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    margin: 4px;
+    font-weight: bold;
+    color: #FFF;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 30px;
+    color: #1B5E8F;
+    font-size: 0.95rem;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 1.5rem; }
+    .step-body .title-text { font-size: 1.05rem; }
+    .step-body .desc { font-size: 0.88rem; }
+    .step-num { width: 44px; height: 44px; font-size: 1.3rem; }
+    .homework .hw-title { font-size: 1.15rem; }
+    .homework .hw-content { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a href="index.html" class="back-btn">← 回代課老師主頁</a>
+
+  <div class="header">
+    <h1>🔺 8A 數學 · SSS 全等</h1>
+    <div class="date-label">📅 禮拜四 · 4/23</div>
+  </div>
+
+  <div class="core-concept">
+    🎯 今天教：<strong>三邊相同 = 全等 ≅</strong>
+  </div>
+
+  <div class="step-title">📝 上課 4 步驟</div>
+
+  <div class="flow-steps">
+
+    <a href="https://docs.google.com/presentation/d/1bpvzRd0NQ463OSCKuW6gS4RG1Mo9wTGByljjisq0Yzo/edit" target="_blank" class="step-btn">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="title-text">📊 播放 PPT</div>
+        <div class="desc">SSS Triangle Magic Quest · 12 張投影片<br>（全班一起看 · 點擊開啟 Google 簡報）</div>
+      </div>
+      <div class="step-arrow">▶</div>
+    </a>
+
+    <a href="https://classtools1020.github.io/classtools1020/congruence-sss-lesson1.html" target="_blank" class="step-btn">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="title-text">🎮 動畫 · 第 1-4 關</div>
+        <div class="desc">按「▶ 發動技能」帶學生一關一關走<br>疊合 → 對應邊 → SSS → 100 小兵群戰</div>
+      </div>
+      <div class="step-arrow">▶</div>
+    </a>
+
+    <div class="step-btn no-link">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="title-text">📖 課本 P128 ~ P132</div>
+        <div class="desc">照順序講：三角形全等定義 → 對應邊角 → SSS<br>例題 1（老師帶著做）→ 隨堂（學生自己寫）</div>
+      </div>
+    </div>
+
+    <a href="https://classtools1020.github.io/classtools1020/congruence-sss-lesson1.html" target="_blank" class="step-btn">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="title-text">⚔️ 動畫 · 第 5 關 BOSS</div>
+        <div class="desc">6 題混合測驗 · 點學生答 · 老師按按鈕<br>結束後進第 6 關勝利畫面收尾</div>
+      </div>
+      <div class="step-arrow">▶</div>
+    </a>
+
+  </div>
+
+  <div class="homework">
+    <div class="hw-title">📚 回家作業</div>
+    <div class="hw-content">
+      課本 P146 ~ P149<br>
+      <span style="font-size:0.95rem;color:#8B6414;">· 老師依今天進度勾選 ·</span>
+    </div>
+  </div>
+
+  <div class="color-rule">
+    🎨 色碼小提醒<br>
+    <span class="chip" style="background:#D84040;">SSS = 全紅</span>
+    <span class="chip" style="background:#888;color:#FFF;">= 三邊鎖死</span>
+  </div>
+
+  <div class="footer">
+    芎林國中 · 8A 資源班
+  </div>
+
+</div>
+</body>
+</html>
