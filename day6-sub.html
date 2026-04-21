@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 6 代課工作區 — 食物飲料</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.55;padding:24px 16px;min-height:100vh}
+.wrap{max-width:880px;margin:0 auto}
+
+/* Header */
+header{border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:22px}
+h1{font-size:1.7em;font-weight:900;letter-spacing:-.5px}
+.meta{color:#666;font-size:.92em;margin-top:4px}
+
+/* Primary buttons row */
+.cta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.cta a{display:block;padding:18px 14px;border:2px solid #111;border-radius:12px;background:#fff;text-decoration:none;color:#111;text-align:center;transition:all .15s;font-weight:700}
+.cta a:hover{background:#111;color:#fff;transform:translateY(-2px)}
+.cta .icon{font-size:1.6em;display:block;margin-bottom:4px}
+.cta .sub{font-size:.78em;color:#888;font-weight:400;margin-top:2px}
+.cta a:hover .sub{color:#ddd}
+@media(max-width:600px){.cta{grid-template-columns:1fr}}
+
+/* Section */
+section{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:18px 22px;margin-bottom:16px}
+h2{font-size:1.08em;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+h2::before{content:'';width:4px;height:16px;background:#111;border-radius:2px}
+
+/* Flow table */
+table{width:100%;border-collapse:collapse;font-size:.93em}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid #f0f0f0;vertical-align:top}
+th{background:#fafafa;font-weight:700;font-size:.82em;color:#666;text-transform:uppercase;letter-spacing:.5px}
+td:first-child{font-weight:700;color:#111;white-space:nowrap;width:72px}
+td:nth-child(2){font-weight:700;white-space:nowrap;width:58px;color:#666}
+tr:last-child td{border-bottom:none}
+.phase{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.76em;font-weight:700}
+.p-warm{background:#e3f2fd;color:#1565c0}
+.p-core{background:#fff3e0;color:#e65100}
+.p-self{background:#e8f5e9;color:#2e7d32}
+.p-exam{background:#fce4ec;color:#c2185b}
+
+/* Students */
+.stu{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+.stu-card{padding:10px 12px;background:#fafafa;border-left:3px solid #111;border-radius:4px;font-size:.88em}
+.stu-card b{display:block;margin-bottom:2px}
+@media(max-width:600px){.stu{grid-template-columns:1fr}}
+
+/* Quick links */
+.ql{display:flex;gap:8px;flex-wrap:wrap}
+.ql a{padding:6px 12px;background:#f0f0f0;border-radius:20px;text-decoration:none;color:#111;font-size:.88em;font-weight:600}
+.ql a:hover{background:#111;color:#fff}
+
+/* Muted notes */
+.note{font-size:.86em;color:#666;line-height:1.7}
+.note b{color:#111}
+ul.lean{margin-left:18px;font-size:.9em}
+ul.lean li{margin:2px 0}
+
+/* Footer */
+footer{text-align:center;color:#999;font-size:.82em;margin-top:28px;padding-top:16px;border-top:1px solid #eee}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Day 6 · Food &amp; Drinks</h1>
+  <div class="meta">4/23（四）｜九年級資源班英語｜2–3 人</div>
+</header>
+
+<!-- 3 個主要連結：一鍵打開 -->
+<div class="cta">
+  <a href="https://docs.google.com/presentation/d/1XAWM8HurdMHLKrgxvL1t1Z0dDqe04eY3dZMyVO2nFVE/edit" target="_blank">
+    <span class="icon">▶</span>開啟簡報
+    <div class="sub">33 張 · 會考衝刺王</div>
+  </a>
+  <a href="https://classtools1020.github.io/classtools1020/teacher-dashboard.html" target="_blank">
+    <span class="icon">◎</span>教師後台
+    <div class="sub">密碼 stacey2026</div>
+  </a>
+  <a href="https://classtools1020.github.io/classtools1020/eng9.html" target="_blank">
+    <span class="icon">◇</span>學生自學
+    <div class="sub">投影 QR 給學生掃</div>
+  </a>
+</div>
+
+<!-- 節拍表 -->
+<section>
+  <h2>45 分鐘節拍</h2>
+  <table>
+    <tr><th>分鐘</th><th>投影片</th><th>階段</th><th>重點</th></tr>
+    <tr><td>0–5</td><td>P1–3</td><td><span class="phase p-warm">暖身</span></td><td>中文聊鬼滅 / Labubu / 50 嵐，不逼說英文</td></tr>
+    <tr><td>5–20</td><td>P4–13</td><td><span class="phase p-core">單字</span></td><td>10 字 · 每字 1.5 分 · 小聲跟唸 · 不點名</td></tr>
+    <tr><td>20–28</td><td>P14–17</td><td><span class="phase p-core">文法</span></td><td>可數 vs 不可數（會考必考）· 搭配手勢</td></tr>
+    <tr><td>28–38</td><td>—</td><td><span class="phase p-self">自學</span></td><td>學生自選：聽力戰令 / Step 1 / Wordwall</td></tr>
+    <tr><td>38–43</td><td>P22–31</td><td><span class="phase p-exam">會考</span></td><td>10 題舉牌 A/B/C · 題目→答案分頁揭曉</td></tr>
+    <tr><td>43–45</td><td>P32–33</td><td><span class="phase p-warm">收尾</span></td><td>神預告「這個會考每年考」· 下課</td></tr>
+  </table>
+</section>
+
+<!-- 學生 -->
+<section>
+  <h2>學生（2–3 人）</h2>
+  <div class="stu">
+    <div class="stu-card"><b>Wendy 🐱</b>程度最好 · 可挑戰題</div>
+    <div class="stu-card"><b>Lynn 🐶</b>恨英文 · 中文提示多給</div>
+    <div class="stu-card"><b>Yoyo 🐼</b>怕被叫 · 舉牌不口說</div>
+  </div>
+</section>
+
+<!-- 給學生掃的 QR 網址（供主任當堂投影用） -->
+<section>
+  <h2>上課要用到的網址</h2>
+  <div class="ql">
+    <a href="https://classtools1020.github.io/classtools1020/eng9.html" target="_blank">主選單</a>
+    <a href="https://classtools1020.github.io/classtools1020/vocab-practice.html" target="_blank">Step 1 單字</a>
+    <a href="https://classtools1020.github.io/classtools1020/listening-battle-pass.html" target="_blank">聽力戰令</a>
+    <a href="https://classtools1020.github.io/classtools1020/vocab-adventure.html" target="_blank">錯題大魔王</a>
+    <a href="https://classtools1020.github.io/classtools1020/teacher-dashboard.html" target="_blank">教師後台</a>
+  </div>
+</section>
+
+<!-- 回家作業 -->
+<section>
+  <h2>回家作業（雲端自動同步）</h2>
+  <ul class="lean">
+    <li><b>最低</b>：聽力戰令 Day 6 × 1 次</li>
+    <li><b>標準</b>：Step 1 Day 6 完整練習</li>
+    <li><b>挑戰</b>（給 Wendy）：Step 1 + Step 4 錯題大魔王 + 可數/不可數 5 句</li>
+  </ul>
+</section>
+
+<!-- 備案 -->
+<section>
+  <h2>備案</h2>
+  <p class="note">
+    <b>網路斷線</b>：改用紙本學習單（講桌抽屜）。<br>
+    <b>學生不配合</b>：跳到「自學時段」提前開始，壓力較低。<br>
+    <b>簡報打不開</b>：直接用 Step 1 vocab-practice Day 6 上課。
+  </p>
+</section>
+
+<footer>
+  Stacey · 若急事請 LINE<br>
+  classtools1020.github.io/classtools1020/day6-sub.html
+</footer>
+
+</div>
+</body>
+</html>
