@@ -3,43 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>代課工作區 — 4/23（四）</title>
+<title>代課工作區</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#fafafa;color:#1a1a1a;padding:24px 16px;min-height:100vh;display:flex;align-items:center;justify-content:center}
-.wrap{max-width:640px;width:100%}
+body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#fafafa;color:#1a1a1a;padding:28px 16px;min-height:100vh}
+.wrap{max-width:720px;margin:0 auto}
 header{text-align:center;border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:28px}
-h1{font-size:1.8em;font-weight:900;letter-spacing:-.5px}
-.meta{color:#666;font-size:.95em;margin-top:4px}
-.pick{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.pick a{display:block;padding:40px 20px;border:2px solid #111;border-radius:14px;background:#fff;text-decoration:none;color:#111;text-align:center;transition:all .15s}
-.pick a:hover{background:#111;color:#fff;transform:translateY(-3px);box-shadow:0 6px 16px rgba(0,0,0,.12)}
-.pick .cls{font-size:2.4em;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
-.pick .sub{font-size:.95em;color:#888;font-weight:600}
+h1{font-size:1.9em;font-weight:900;letter-spacing:-.5px}
+.meta{color:#666;font-size:.92em;margin-top:4px}
+
+.day-block{margin-bottom:26px}
+.day-title{font-size:1.05em;font-weight:800;color:#111;padding:4px 0 10px;border-bottom:1px dashed #ccc;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.day-title::before{content:'';width:4px;height:16px;background:#111;border-radius:2px}
+
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pick a{display:block;padding:22px 16px;border:2px solid #111;border-radius:12px;background:#fff;text-decoration:none;color:#111;text-align:center;transition:all .15s}
+.pick a:hover{background:#111;color:#fff;transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.1)}
+.pick .cls{font-size:1.8em;font-weight:900;letter-spacing:-1px}
+.pick .sub{font-size:.85em;color:#888;font-weight:600;margin-top:4px}
 .pick a:hover .sub{color:#ddd}
-.pending{opacity:.55;cursor:default}
-.pending:hover{background:#fff;color:#111;transform:none;box-shadow:none}
-.pending:hover .sub{color:#888}
 @media(max-width:500px){.pick{grid-template-columns:1fr}}
-footer{text-align:center;color:#999;font-size:.82em;margin-top:24px}
+
+footer{text-align:center;color:#999;font-size:.82em;margin-top:28px;padding-top:14px;border-top:1px solid #eee}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>代課工作區</h1>
-    <div class="meta">4/23（四）· 請選班級</div>
+    <div class="meta">請選班級</div>
   </header>
-  <div class="pick">
-    <a href="day6-sub-9b.html">
-      <div class="cls">9B</div>
-      <div class="sub">第二節 · Day 4 · Places</div>
-    </a>
-    <a href="day6-sub.html">
-      <div class="cls">9A</div>
-      <div class="sub">第三節 · Day 6 · Food &amp; Drinks</div>
-    </a>
+
+  <!-- 4/23（四） -->
+  <div class="day-block">
+    <div class="day-title">4/23（四）</div>
+    <div class="pick">
+      <a href="day6-sub-9b.html">
+        <div class="cls">9B</div>
+        <div class="sub">第二節 · Day 4 · Places</div>
+      </a>
+      <a href="day6-sub.html">
+        <div class="cls">9A</div>
+        <div class="sub">第三節 · Day 6 · Food &amp; Drinks</div>
+      </a>
+    </div>
   </div>
+
+  <!-- 4/24（五） -->
+  <div class="day-block">
+    <div class="day-title">4/24（五）</div>
+    <div class="pick">
+      <a href="day5-sub-9b-0424.html">
+        <div class="cls">9B</div>
+        <div class="sub">Day 5 · Feelings</div>
+      </a>
+    </div>
+  </div>
+
   <footer>Stacey · classtools1020</footer>
 </div>
 </body>
