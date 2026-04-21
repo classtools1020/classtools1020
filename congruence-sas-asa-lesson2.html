@@ -531,6 +531,43 @@ function flashBig(text, color="#39FF14", size=120){
 function flashCorrect(){ SFX.success(); flashBig("VICTORY!", "#39FF14", 100); confetti(25); }
 function flashRetry(){ SFX.gentle(); flashBig("再戰一次", "#FF8A00", 80); }
 
+// 可以 / 不可以 投票按鈕（問句步驟專用：老師讓學生先投票，再按鈕揭答）
+function addYesNoButtons(yesLabel, noLabel, onChoose){
+  const actions = document.getElementById("main-actions");
+  actions.innerHTML = "";
+  const mkBtn = (label, gradA, gradB, choice) => {
+    const b = document.createElement("button");
+    b.className = "btn btn-answer";
+    b.style.background = `linear-gradient(135deg, ${gradA}, ${gradB})`;
+    b.style.color = "#000";
+    b.style.fontWeight = "900";
+    b.style.fontSize = "24px";
+    b.style.minWidth = "160px";
+    b.textContent = label;
+    b.onclick = () => {
+      SFX.click();
+      onChoose && onChoose(choice);
+      setTimeout(() => {
+        const a = document.getElementById("main-actions");
+        a.innerHTML = "";
+        const nx = document.createElement("button");
+        nx.className = "btn btn-next";
+        nx.textContent = "▶ 揭曉答案";
+        nx.onclick = () => {
+          advanceStep();
+          // 若下一步沒另外換按鈕，恢復「發動技能」避免文字卡住
+          const aa = document.getElementById("main-actions");
+          if(aa.firstElementChild === nx) nx.textContent = "▶ 發動技能";
+        };
+        a.appendChild(nx);
+      }, 1200);
+    };
+    return b;
+  };
+  actions.appendChild(mkBtn(`✓ ${yesLabel}`, "#39FF14", "#00A82D", "yes"));
+  actions.appendChild(mkBtn(`✗ ${noLabel}`, "#FF3B30", "#A02020", "no"));
+}
+
 function confetti(n=20){
   const colors = ["#FFD700","#00F5FF","#B967FF","#39FF14","#FF3B30","#FF8A00"];
   for(let i=0;i<n;i++){
@@ -698,7 +735,17 @@ const scenes = [
     {
       tip:"說：『胖虎要訂做三角形，只告訴你<b>兩邊 6 跟 8</b>，沒說夾角。做得出一模一樣的嗎？』",
       narrate:"胖虎只給兩邊 · 能做全等嗎？",
-      run(){}
+      run(){
+        addYesNoButtons("可以", "不可以", (choice) => {
+          if(choice === "no"){
+            flashCorrect();
+            setNarration("🎯 答對了！兩邊不夠 · 還少了夾角！");
+          } else {
+            flashRetry();
+            setNarration("❓ 真的嗎？試試看就知道⋯");
+          }
+        });
+      }
     },
     {
       tip:"說：『我試試看——試三種不同夾角：30°、90°、150°。<b>結果⋯</b>』",
@@ -810,12 +857,63 @@ const scenes = [
       narrate:"📏 量得到：邊 5、角 60°、角 45°",
       run(){
         const root = document.getElementById("scene-root");
-        // 在河岸畫角度記號
-        el("text", {x:700, y:490, "text-anchor":"middle", "font-size":24,
-          "font-weight":900, fill:"#39FF14"}, root).textContent = "量得到：";
-        el("text", {x:700, y:525, "text-anchor":"middle", "font-size":20,
-          "font-weight":800, fill:"#fff"}, root).textContent = "AB = 5 公尺、∠A = 60°、∠B = 45°";
+        // 近岸地面
+        el("rect", {x:350, y:620, width:1000, height:100,
+          fill:"#3E2723", opacity:0.35}, root);
+        // 三個關鍵點（A、B 在近岸，C 在對岸）
+        const A = {x:500, y:640}, B = {x:900, y:640}, C = {x:646, y:387};
+        // 射線 AC、BC（虛線，靜香的視線）
+        [[A,C],[B,C]].forEach(([p,q]) => {
+          el("line", {x1:p.x, y1:p.y, x2:q.x, y2:q.y,
+            stroke:"#39FF14", "stroke-width":3, "stroke-dasharray":"12 6",
+            opacity:0.7}, root);
+        });
+        // AB 夾邊（綠粗實線）
+        drawEdge(root, A, B, "#39FF14", 11);
+        // AB 長度標牌
+        el("rect", {x:645, y:660, width:110, height:36, rx:8,
+          fill:"#0A0E27", stroke:"#39FF14", "stroke-width":2,
+          filter:"url(#neonGreen)"}, root);
+        el("text", {x:700, y:685, "text-anchor":"middle", "font-size":22,
+          "font-weight":900, fill:"#39FF14"}, root).textContent = "AB = 5 公尺";
+        // ∠A 弧 + 標
+        drawAngleArc(root, A, B, C, 60, "#FFD700", 6);
+        el("text", {x:A.x+55, y:A.y-55, "font-size":24,
+          "font-weight":900, fill:"#FFD700",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "∠A=60°";
+        // ∠B 弧 + 標
+        drawAngleArc(root, B, A, C, 60, "#FFD700", 6);
+        el("text", {x:B.x-120, y:B.y-55, "font-size":24,
+          "font-weight":900, fill:"#FFD700",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "∠B=45°";
+        // A、B 點標籤
+        [{p:A, lbl:"A", dx:-22}, {p:B, lbl:"B", dx:14}].forEach(({p,lbl,dx}) => {
+          el("circle", {cx:p.x, cy:p.y, r:9, fill:"#fff",
+            stroke:"#39FF14", "stroke-width":3}, root);
+          el("text", {x:p.x+dx, y:p.y+10, "font-size":30,
+            "font-weight":900, fill:"#fff",
+            "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = lbl;
+        });
+        // 對岸 "?" 目標點
+        el("circle", {cx:C.x, cy:C.y, r:30, fill:"#0A0E27",
+          stroke:"#FF8A00", "stroke-width":4, "stroke-dasharray":"6 4",
+          filter:"url(#neonGold)"}, root);
+        el("text", {x:C.x, y:C.y+11, "text-anchor":"middle", "font-size":34,
+          "font-weight":900, fill:"#FF8A00"}, root).textContent = "?";
+        el("text", {x:C.x, y:C.y-45, "text-anchor":"middle", "font-size":18,
+          "font-weight":700, fill:"#FF8A00",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "對岸目標";
         SFX.reveal();
+        // 可以/不可以 投票
+        addYesNoButtons("可以", "不可以", (choice) => {
+          if(choice === "yes"){
+            flashCorrect();
+            setNarration("🎯 答對了！兩角 + 夾邊 → 形狀鎖死！");
+          } else {
+            flashRetry();
+            setNarration("🤔 再想想：兩角把第三點 C 鎖死了嗎？");
+          }
+        });
       }
     },
     {

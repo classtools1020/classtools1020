@@ -805,10 +805,59 @@ const scenes = [
         flashBig("MAX LEVEL!", "#FFD700", 120);
         confetti(30);
       }
+    },
+    {
+      tip:"說：『<b>進階題！</b>有時候兩個三角形會<b>共用一邊</b>（像蝴蝶翅膀）。只要另外兩邊相等，就是 SSS 全等！』",
+      narrate:"🦋 共用邊 · SSS 應用（課本 P131 例題 1）",
+      run(){
+        const root = clearScene();
+        stageBanner(root, "共用邊 SSS", "SHARED EDGE");
+        // 四個點：A、B、C、D
+        const A = {x: 550, y: 480};
+        const C = {x: 950, y: 480};
+        const B = {x: 750, y: 280};  // 上三角
+        const D = {x: 750, y: 680};  // 下三角
+        // 兩個三角形（淡紅底）
+        drawTri(root, [A, B, C], {fill:"rgba(255,59,48,0.25)", stroke:"#FF3B30", sw:6, glow:"neonRed"});
+        drawTri(root, [A, D, C], {fill:"rgba(255,59,48,0.25)", stroke:"#FF3B30", sw:6, glow:"neonRed"});
+        // 共用邊 AC 金色突出
+        drawEdge(root, A, C, "#FFD700", 12);
+        el("rect", {x:670, y:493, width:160, height:30, rx:6,
+          fill:"#0A0E27", stroke:"#FFD700", "stroke-width":2,
+          filter:"url(#neonGold)"}, root);
+        el("text", {x:750, y:514, "text-anchor":"middle", "font-size":20,
+          "font-weight":900, fill:"#FFD700"}, root).textContent = "共用邊 AC";
+        // 點標籤
+        [{p:A, lbl:"A", dx:-28, dy:8}, {p:B, lbl:"B", dx:0, dy:-18},
+         {p:C, lbl:"C", dx:22, dy:8}, {p:D, lbl:"D", dx:0, dy:30}].forEach(({p, lbl, dx, dy}) => {
+          el("circle", {cx:p.x, cy:p.y, r:8, fill:"#fff",
+            stroke:"#FF3B30", "stroke-width":3}, root);
+          el("text", {x:p.x+dx, y:p.y+dy, "text-anchor":"middle",
+            "font-size":30, "font-weight":900, fill:"#fff",
+            "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = lbl;
+        });
+        // 邊長標示（AB=AD=3, BC=DC=8）
+        const midLbl = (p1, p2, txt, offX, offY) => {
+          const mx = (p1.x+p2.x)/2 + offX, my = (p1.y+p2.y)/2 + offY;
+          el("text", {x:mx, y:my, "text-anchor":"middle", "font-size":24,
+            "font-weight":900, fill:"#FF8A00",
+            "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = txt;
+        };
+        midLbl(A, B, "3", -22, 0);
+        midLbl(B, C, "8", 22, 0);
+        midLbl(A, D, "3", -22, 5);
+        midLbl(D, C, "8", 22, 5);
+        // 結論
+        el("text", {x:800, y:810, "text-anchor":"middle", "font-size":32,
+          "font-weight":900, fill:"url(#gradRed)",
+          "stroke":"#000","stroke-width":5,"paint-order":"stroke",
+          filter:"url(#neonRed)"}, root).textContent = "△ABC ≅ △ADC（SSS）";
+        SFX.ultimate();
+      }
     }
   ],
   afterSteps:{
-    tip:"<b>第 3 關通關</b>：SSS = 三邊相同 → 絕對全等。這是數學定理！",
+    tip:"<b>第 3 關通關</b>：SSS = 三邊相同 → 絕對全等。共用邊也算喔！",
     narrate:"SSS 絕技 · MASTER"
   }
 },
