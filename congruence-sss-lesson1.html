@@ -808,24 +808,24 @@ const scenes = [
     },
     {
       tip:"說：『<b>進階題！</b>有時候兩個三角形會<b>共用一邊</b>（像蝴蝶翅膀）。只要另外兩邊相等，就是 SSS 全等！』",
-      narrate:"🦋 共用邊 · SSS 應用（課本 P131 例題 1）",
+      narrate:"🦋 共用邊應用",
       run(){
         const root = clearScene();
         stageBanner(root, "共用邊 SSS", "SHARED EDGE");
-        // 四個點：A、B、C、D
-        const A = {x: 550, y: 480};
-        const C = {x: 950, y: 480};
-        const B = {x: 750, y: 280};  // 上三角
-        const D = {x: 750, y: 680};  // 下三角
+        // 四個點：A、B、C、D（整體下移讓出上方標題空間）
+        const A = {x: 550, y: 560};
+        const C = {x: 950, y: 560};
+        const B = {x: 750, y: 380};  // 上三角
+        const D = {x: 750, y: 740};  // 下三角
         // 兩個三角形（淡紅底）
         drawTri(root, [A, B, C], {fill:"rgba(255,59,48,0.25)", stroke:"#FF3B30", sw:6, glow:"neonRed"});
         drawTri(root, [A, D, C], {fill:"rgba(255,59,48,0.25)", stroke:"#FF3B30", sw:6, glow:"neonRed"});
         // 共用邊 AC 金色突出
         drawEdge(root, A, C, "#FFD700", 12);
-        el("rect", {x:670, y:493, width:160, height:30, rx:6,
+        el("rect", {x:670, y:573, width:160, height:30, rx:6,
           fill:"#0A0E27", stroke:"#FFD700", "stroke-width":2,
           filter:"url(#neonGold)"}, root);
-        el("text", {x:750, y:514, "text-anchor":"middle", "font-size":20,
+        el("text", {x:750, y:594, "text-anchor":"middle", "font-size":20,
           "font-weight":900, fill:"#FFD700"}, root).textContent = "共用邊 AC";
         // 點標籤
         [{p:A, lbl:"A", dx:-28, dy:8}, {p:B, lbl:"B", dx:0, dy:-18},
