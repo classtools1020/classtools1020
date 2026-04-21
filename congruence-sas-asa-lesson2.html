@@ -305,7 +305,7 @@ body{display:flex;flex-direction:column;
     <div class="combo-n">0</div>
     <div class="combo-label">×</div>
   </div>
-  <div id="score-display">⭐ <span id="score-num">0</span> / 4</div>
+  <div id="score-display">⭐ <span id="score-num">0</span> / 6</div>
 </div>
 
 <div id="control-bar">
@@ -635,10 +635,19 @@ const scenes = [
     const root = clearScene();
     stageBanner(root, "SSS 複習", "DAY 1 RECAP");
     heroCard(root, 180, 460, "哆啦A夢", "導師", "#00F5FF", "🔵");
-    const pts = triFromSSS(5, 7, 8);
-    const tpts = tform(pts, 900, 480, 40);
-    drawTri(root, tpts, {fill:"url(#gradRed)", stroke:"#FF3B30", sw:7,
-      glow:"neonRed", id:"recap-tri", showLen:{AB:8, BC:5, CA:7}});
+    // 左三角
+    const pts1 = tform(triFromSSS(5, 7, 8), 560, 500, 32);
+    drawTri(root, pts1, {fill:"url(#gradRed)", stroke:"#FF3B30", sw:6,
+      glow:"neonRed", id:"recap-tri-1", showLen:{AB:8, BC:5, CA:7}});
+    // ≅ 符號（紫色）
+    el("text", {x:860, y:540, "text-anchor":"middle", "font-size":100,
+      "font-weight":900, fill:"#9B4DFF",
+      "stroke":"#000","stroke-width":6,"paint-order":"stroke",
+      filter:"url(#neonPurple)"}, root).textContent = "≅";
+    // 右三角（與左邊完全一樣）
+    const pts2 = tform(triFromSSS(5, 7, 8), 1160, 500, 32);
+    drawTri(root, pts2, {fill:"url(#gradRed)", stroke:"#FF3B30", sw:6,
+      glow:"neonRed", id:"recap-tri-2", showLen:{AB:8, BC:5, CA:7}});
   },
   steps:[
     {
@@ -943,11 +952,13 @@ const scenes = [
   name:"BOSS 混合戰",
   stageLabel:"第 5 關 · 最終 BOSS",
   _quizzes:[
-    // 每題: type (SSS/SAS/ASA), 用哪招判斷全等
-    {type:"SSS", desc:"兩個三角形都三邊 5、7、8", correct:"SSS", why:"三邊對應相等 → SSS ✅"},
-    {type:"SAS", desc:"兩邊 6、8 + 夾角 60°", correct:"SAS", why:"兩邊+夾角 → SAS ✅"},
-    {type:"ASA", desc:"兩角 45°、60° + 夾邊 5", correct:"ASA", why:"兩角+夾邊 → ASA ✅"},
-    {type:"SAS", desc:"兩邊 4、7 + 夾角 90°", correct:"SAS", why:"兩邊+夾角 → SAS ✅"},
+    // 每題: type + params（SSS:[a,b,c] / SAS:[左邊,夾角,右邊] / ASA:[角B,夾邊,角C]）
+    {type:"SSS", params:[5,7,8],  desc:"兩個三角形都三邊 5、7、8",    correct:"SSS", why:"三邊對應相等 → SSS ✅"},
+    {type:"SAS", params:[6,60,8], desc:"兩邊 6、8 + 夾角 60°",       correct:"SAS", why:"兩邊+夾角 → SAS ✅"},
+    {type:"ASA", params:[45,5,60],desc:"兩角 45°、60° + 夾邊 5",     correct:"ASA", why:"兩角+夾邊 → ASA ✅"},
+    {type:"SAS", params:[4,90,7], desc:"兩邊 4、7 + 夾角 90°",       correct:"SAS", why:"兩邊+夾角 → SAS ✅"},
+    {type:"ASA", params:[45,6,90],desc:"兩角 45°、90° + 夾邊 6",     correct:"ASA", why:"兩角+夾邊 → ASA ✅"},
+    {type:"SSS", params:[6,6,9],  desc:"兩個三角形都三邊 6、6、9 (等腰)", correct:"SSS", why:"三邊對應相等 → SSS ✅"},
   ],
   _q:0, _score:0, _streak:0,
   init(){ this._q=0; this._score=0; this._streak=0; this._render(); },
@@ -963,8 +974,9 @@ const scenes = [
         "font-weight":900, fill:"#FFD700"}, root).textContent = "⭐ 得分";
       el("text", {x:800, y:430, "text-anchor":"middle", "font-size":90,
         "font-weight":900, fill:"url(#gradGold)",
-        "stroke":"#000","stroke-width":5,"paint-order":"stroke"}, root).textContent = `${this._score} / 4`;
-      const rank = this._score===4 ? "S" : this._score===3 ? "A" : this._score===2 ? "B" : "C";
+        "stroke":"#000","stroke-width":5,"paint-order":"stroke"}, root).textContent = `${this._score} / ${this._quizzes.length}`;
+      const total = this._quizzes.length;
+      const rank = this._score===total ? "S" : this._score>=total-1 ? "A" : this._score>=Math.ceil(total/2) ? "B" : "C";
       const rc = rank==="S"?"#FFD700":rank==="A"?"#B967FF":rank==="B"?"#00F5FF":"#888";
       el("text", {x:800, y:510, "text-anchor":"middle", "font-size":32,
         "font-weight":900, fill:rc,
@@ -972,39 +984,106 @@ const scenes = [
       setScore(0, 0);
       SFX.win();
       confetti(50);
-      setNarration(this._score===4 ? "🏆 全勝！三招大師！" : "🎉 戰鬥結束！");
+      setNarration(this._score===this._quizzes.length ? "🏆 全勝！三招大師！" : "🎉 戰鬥結束！");
       return;
     }
-    stageBanner(root, `BOSS · 第 ${this._q+1}/4 回合`, "用哪一招？");
     const cur = this._quizzes[this._q];
-    // 畫對應的三角形 + 顏色標示
-    if(cur.type === "SSS"){
-      const pts = tform(triFromSSS(5,7,8), 800, 500, 40);
-      drawTri(root, pts, {fill:"url(#gradRed)", stroke:"#FF3B30", sw:7,
-        glow:"neonRed", showLen:{AB:8, BC:5, CA:7}});
-    } else if(cur.type === "SAS"){
-      const pts = tform(triFromSAS(cur.desc.includes("6、8")?6:4, cur.desc.includes("60")?60:90, cur.desc.includes("6、8")?8:7), 800, 500, 35);
-      drawTri(root, pts, {fill:"#0A0E27", stroke:"#888", sw:3});
-      drawEdge(root, pts[0], pts[1], "#00F5FF", 9);
-      drawEdge(root, pts[0], pts[2], "#00F5FF", 9);
-      drawAngleArc(root, pts[0], pts[1], pts[2], 32, "#FF8A00", 7);
-    } else if(cur.type === "ASA"){
-      const pts = tform(triFromASA(45, 5, 60), 800, 500, 55);
-      drawTri(root, pts, {fill:"#0A0E27", stroke:"#888", sw:3});
-      drawEdge(root, pts[1], pts[2], "#39FF14", 9);
-      drawAngleArc(root, pts[1], pts[0], pts[2], 28, "#FFD700", 6);
-      drawAngleArc(root, pts[2], pts[0], pts[1], 28, "#FFD700", 6);
+    const total = this._quizzes.length;
+
+    // ===== ① 頂部標題（精簡）=====
+    el("text", {x:800, y:60, "text-anchor":"middle", "font-size":36,
+      "font-weight":900, fill:"url(#gradGold)",
+      "stroke":"#000","stroke-width":5,"paint-order":"stroke",
+      filter:"url(#neonGold)"}, root).textContent =
+        `⚔️ BOSS · 第 ${this._q+1} / ${total} 回合`;
+
+    // ===== ② 進度燈（6 顆）=====
+    const dotSp = 52;
+    const dotX0 = 800 - (total-1)*dotSp/2;
+    for(let i=0; i<total; i++){
+      const done = i < this._q;
+      const nowQ = i === this._q;
+      const cx = dotX0 + i*dotSp;
+      const cy = 110;
+      el("circle", {cx, cy, r: nowQ?16:12,
+        fill: done?"#39FF14": nowQ?"#FFD700":"#1A1A2E",
+        stroke: nowQ?"#FFD700": done?"#39FF14":"#555",
+        "stroke-width":3,
+        filter: nowQ?"url(#neonGold)": done?"url(#neonGreen)":""}, root);
+      el("text", {x:cx, y:cy+5, "text-anchor":"middle", "font-size":14,
+        "font-weight":900, fill: (done||nowQ)?"#000":"#888"},
+        root).textContent = i+1;
     }
-    el("text", {x:800, y:150, "text-anchor":"middle", "font-size":28,
+
+    // ===== ③ 題目卡片（顏色鐵律：SSS 紅 / SAS 青 / ASA 綠）=====
+    const typeC = cur.type==="SSS" ? {c:"#FF3B30", g:"neonRed", label:"SSS"}
+                : cur.type==="SAS" ? {c:"#00F5FF", g:"neonCyan", label:"SAS"}
+                :                    {c:"#39FF14", g:"neonGreen", label:"ASA"};
+
+    // 卡片外框
+    el("rect", {x:220, y:150, width:1160, height:170, rx:20,
+      fill:"#0A0E27", stroke:typeC.c, "stroke-width":4,
+      filter:`url(#${typeC.g})`, opacity:0.98}, root);
+
+    // 卡片內小標「📋 題目」
+    el("rect", {x:250, y:170, width:150, height:38, rx:10,
+      fill:typeC.c}, root);
+    el("text", {x:325, y:197, "text-anchor":"middle", "font-size":22,
+      "font-weight":900, fill:"#000"}, root).textContent = "📋 題目";
+
+    // 題目主文
+    el("text", {x:800, y:260, "text-anchor":"middle", "font-size":34,
+      "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"},
+      root).textContent = cur.desc;
+
+    // 卡片底引導
+    el("text", {x:800, y:302, "text-anchor":"middle", "font-size":18,
+      "font-weight":700, fill:"#B967FF"},
+      root).textContent = "— 這兩個三角形全等 —";
+
+    // ===== ④ 三角形區（左三 + ≅ + 右三）=====
+    const drawQuizTri = (cx, cy) => {
+      if(cur.type === "SSS"){
+        const [a,b,c] = cur.params;
+        const pts = tform(triFromSSS(a,b,c), cx, cy, 28);
+        drawTri(root, pts, {fill:"url(#gradRed)", stroke:"#FF3B30", sw:6,
+          glow:"neonRed", showLen:{AB:c, BC:a, CA:b}});
+      } else if(cur.type === "SAS"){
+        const [sl, ang, sr] = cur.params;
+        const pts = tform(triFromSAS(sl, ang, sr), cx, cy, 24);
+        drawTri(root, pts, {fill:"#0A0E27", stroke:"#888", sw:3});
+        drawEdge(root, pts[0], pts[1], "#00F5FF", 9);
+        drawEdge(root, pts[0], pts[2], "#00F5FF", 9);
+        drawAngleArc(root, pts[0], pts[1], pts[2], 28, "#FF8A00", 7);
+      } else if(cur.type === "ASA"){
+        const [angB, side, angC] = cur.params;
+        const pts = tform(triFromASA(angB, side, angC), cx, cy, 40);
+        drawTri(root, pts, {fill:"#0A0E27", stroke:"#888", sw:3});
+        drawEdge(root, pts[1], pts[2], "#39FF14", 9);
+        drawAngleArc(root, pts[1], pts[0], pts[2], 26, "#FFD700", 6);
+        drawAngleArc(root, pts[2], pts[0], pts[1], 26, "#FFD700", 6);
+      }
+    };
+    drawQuizTri(500, 560);
+    // ≅ 符號（紫色 · 全等符號）
+    el("text", {x:800, y:580, "text-anchor":"middle", "font-size":96,
       "font-weight":900, fill:"#9B4DFF",
-      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = cur.desc;
-    el("text", {x:800, y:200, "text-anchor":"middle", "font-size":24,
-      "font-weight":700, fill:"#fff"}, root).textContent = "這兩個三角形全等，要用哪一招？";
-    setScore(this._score, 4);
+      "stroke":"#000","stroke-width":5,"paint-order":"stroke",
+      filter:"url(#neonPurple)"}, root).textContent = "≅";
+    drawQuizTri(1100, 560);
+
+    // ===== ⑤ 底部引導 =====
+    el("text", {x:800, y:750, "text-anchor":"middle", "font-size":28,
+      "font-weight":800, fill:"#FFD700",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"},
+      root).textContent = "👇 選一招：SSS / SAS / ASA";
+
+    setScore(this._score, total);
   },
   steps:[
     {
-      tip:"說：『BOSS 戰！每題選：SSS、SAS、ASA，還是不全等？<b>學生舉手喊答</b>，老師按按鈕。』",
+      tip:"說：『<b>BOSS 戰！</b>』",
       narrate:"⚔️ BOSS 戰開始！",
       run(){}
     }
