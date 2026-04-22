@@ -531,7 +531,7 @@ function flashBig(text, color="#39FF14", size=120){
 function flashCorrect(){ SFX.success(); flashBig("VICTORY!", "#39FF14", 100); confetti(25); }
 function flashRetry(){ SFX.gentle(); flashBig("再戰一次", "#FF8A00", 80); }
 
-// 可以 / 不可以 投票按鈕（問句步驟專用：老師讓學生先投票，再按鈕揭答）
+// 可以 / 不可以 投票按鈕（學生按完 → 秀反饋動畫 → 自動前進下一步，不卡中間按鈕）
 function addYesNoButtons(yesLabel, noLabel, onChoose){
   const actions = document.getElementById("main-actions");
   actions.innerHTML = "";
@@ -546,21 +546,22 @@ function addYesNoButtons(yesLabel, noLabel, onChoose){
     b.textContent = label;
     b.onclick = () => {
       SFX.click();
+      // 立刻把兩顆按鈕清掉避免重複點
+      document.getElementById("main-actions").innerHTML = "";
       onChoose && onChoose(choice);
+      // 反饋動畫跑 1.6 秒後自動推進下一步
       setTimeout(() => {
+        // 先恢復主按鈕為「發動技能」
         const a = document.getElementById("main-actions");
         a.innerHTML = "";
-        const nx = document.createElement("button");
-        nx.className = "btn btn-next";
-        nx.textContent = "▶ 揭曉答案";
-        nx.onclick = () => {
-          advanceStep();
-          // 若下一步沒另外換按鈕，恢復「發動技能」避免文字卡住
-          const aa = document.getElementById("main-actions");
-          if(aa.firstElementChild === nx) nx.textContent = "▶ 發動技能";
-        };
-        a.appendChild(nx);
-      }, 1200);
+        const bb = document.createElement("button");
+        bb.className = "btn btn-next";
+        bb.textContent = "▶ 發動技能";
+        bb.onclick = advanceStep;
+        a.appendChild(bb);
+        // 自動前進到下一步（下一步的 run 若要另外放按鈕會覆蓋）
+        advanceStep();
+      }, 1600);
     };
     return b;
   };
