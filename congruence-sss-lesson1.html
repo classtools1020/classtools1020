@@ -305,7 +305,7 @@ body{display:flex;flex-direction:column;
     <div class="combo-n">0</div>
     <div class="combo-label">×</div>
   </div>
-  <div id="score-display">⭐ <span id="score-num">0</span> / 4</div>
+  <div id="score-display">⭐ <span id="score-num">0</span> / 6</div>
 </div>
 
 <div id="control-bar">
@@ -929,10 +929,12 @@ const scenes = [
   name:"BOSS 戰",
   stageLabel:"第 5 關 · 最終挑戰",
   _quizzes:[
-    {a:5,b:7,c:8, a2:5,b2:7,c2:8, correct:true, why:"✅ 三邊都一樣！全等"},
+    {a:5,b:7,c:8, a2:5,b2:7,c2:8, correct:true,  why:"✅ 三邊都一樣！全等"},
     {a:6,b:6,c:6, a2:6,b2:6,c2:9, correct:false, why:"❌ 第三邊不同！不全等"},
-    {a:4,b:5,c:6, a2:4,b2:5,c2:6, correct:true, why:"✅ 三邊完全對應"},
-    {a:3,b:4,c:5, a2:5,b2:4,c2:3, correct:true, why:"✅ 順序不同沒關係"},
+    {a:4,b:5,c:6, a2:4,b2:5,c2:6, correct:true,  why:"✅ 三邊完全對應"},
+    {a:3,b:4,c:5, a2:5,b2:4,c2:3, correct:true,  why:"✅ 順序不同沒關係"},
+    {a:7,b:7,c:7, a2:7,b2:7,c2:7, correct:true,  why:"✅ 正三角 · 三邊相同"},
+    {a:5,b:5,c:8, a2:5,b2:5,c2:6, correct:false, why:"❌ 第三邊不同！不全等"},
   ],
   _q:0, _score:0, _streak:0,
   init(){ this._q=0; this._score=0; this._streak=0; this._render(); },
@@ -949,8 +951,9 @@ const scenes = [
         "font-weight":900, fill:"#FFD700"}, root).textContent = "⭐ 得分";
       el("text", {x:800, y:450, "text-anchor":"middle", "font-size":90,
         "font-weight":900, fill:"url(#gradGold)",
-        "stroke":"#000","stroke-width":5,"paint-order":"stroke"}, root).textContent = `${this._score} / 4`;
-      const rank = this._score===4 ? "S" : this._score===3 ? "A" : this._score===2 ? "B" : "C";
+        "stroke":"#000","stroke-width":5,"paint-order":"stroke"}, root).textContent = `${this._score} / ${this._quizzes.length}`;
+      const total = this._quizzes.length;
+      const rank = this._score===total ? "S" : this._score>=total-1 ? "A" : this._score>=Math.ceil(total/2) ? "B" : "C";
       const rankColor = rank==="S" ? "#FFD700" : rank==="A" ? "#B967FF" : rank==="B" ? "#00F5FF" : "#888";
       el("text", {x:800, y:530, "text-anchor":"middle", "font-size":32,
         "font-weight":900, fill:rankColor,
@@ -958,10 +961,10 @@ const scenes = [
       setScore(0, 0);
       SFX.win();
       confetti(50);
-      setNarration(this._score===4 ? "🏆 全勝！SSS 大師！" : "🎉 戰鬥結束！");
+      setNarration(this._score===this._quizzes.length ? "🏆 全勝！SSS 大師！" : "🎉 戰鬥結束！");
       return;
     }
-    stageBanner(root, `BOSS 戰 · 第 ${this._q+1}/4 回合`, "判斷全等？");
+    stageBanner(root, `BOSS 戰 · 第 ${this._q+1}/${this._quizzes.length} 回合`, "判斷全等？");
     const cur = this._quizzes[this._q];
     const p1 = tform(triFromSSS(cur.a,cur.b,cur.c), 450, 520, 35);
     const p2 = tform(triFromSSS(cur.a2,cur.b2,cur.c2), 1150, 520, 35);
@@ -974,7 +977,7 @@ const scenes = [
       "font-weight":900, fill:"url(#gradGold)",
       "stroke":"#000","stroke-width":5,"paint-order":"stroke",
       filter:"url(#neonGold)"}, root).textContent = "VS";
-    setScore(this._score, 4);
+    setScore(this._score, this._quizzes.length);
     if(this._streak >= 2){
       showCombo(this._streak);
     }

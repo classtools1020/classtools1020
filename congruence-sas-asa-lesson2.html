@@ -781,11 +781,19 @@ const scenes = [
       }
     },
     {
-      tip:"說：『<b>每次形狀都不一樣！</b>所以兩邊不夠。胖虎會生氣：你在耍我嗎！』",
-      narrate:"😡 三個形狀都不一樣！",
+      tip:"說：『三個都不一樣！<b>胖虎氣炸：你在耍我嗎！</b>所以只給兩邊不夠，還少了<b>夾角</b>！』",
+      narrate:"💡 兩邊不夠 · 還差夾角！",
       run(){
-        flashBig("FAIL!", "#FF3B30", 110);
-        SFX.gentle();
+        const root = document.getElementById("scene-root");
+        // 顯示「秘密武器」提示條（不 FAIL，平順過渡到 SAS 解法）
+        el("rect", {x:500, y:340, width:600, height:74, rx:16,
+          fill:"#0A0E27", stroke:"#FF8A00", "stroke-width":4,
+          filter:"url(#neonGold)"}, root);
+        el("text", {x:800, y:390, "text-anchor":"middle", "font-size":30,
+          "font-weight":900, fill:"#FF8A00",
+          "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root)
+          .textContent = "🔑 秘密武器：加上「夾角」！";
+        SFX.reveal();
       }
     },
     {
