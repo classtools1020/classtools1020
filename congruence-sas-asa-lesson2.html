@@ -748,7 +748,7 @@ const scenes = [
       }
     },
     {
-      tip:"說：『我試試看——試三種不同夾角：30°、90°、150°。<b>結果⋯</b>』",
+      tip:"說：『我試試看——試三種不同夾角：30°、90°、150°。<b>形狀會一樣嗎？</b>』",
       narrate:"試試不同夾角 → 形狀會一樣嗎？",
       run(){
         const root = document.getElementById("scene-root");
@@ -767,6 +767,16 @@ const scenes = [
         el("text", {x:1200, y:620, "text-anchor":"middle", "font-size":20,
           "font-weight":800, fill:"#FF8A00"}, root).textContent = "夾角 150°";
         SFX.gentle();
+        // 形狀一樣/不一樣 投票
+        addYesNoButtons("一樣", "不一樣", (choice) => {
+          if(choice === "no"){
+            flashCorrect();
+            setNarration("🎯 答對了！三個形狀都不一樣！");
+          } else {
+            flashRetry();
+            setNarration("🤔 再看看：三個夾角不同 → 形狀就不同！");
+          }
+        });
       }
     },
     {
