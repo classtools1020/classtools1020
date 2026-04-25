@@ -625,169 +625,276 @@ function animateTri(elemId, from, to, frames, onDone){
 // ============================================================
 // 關卡設計 · 第二節：SAS + ASA
 // ============================================================
+// ============================================================
+// 第三節 v2 · 加入「為啥學」+ 生活連結 + 互動
+// ============================================================
+
+// 互動 HUD: 在 stage 中加入 HTML 控制元素
+function addStageOverlay(html){
+  let overlay = document.getElementById("stage-overlay");
+  if(!overlay){
+    overlay = document.createElement("div");
+    overlay.id = "stage-overlay";
+    overlay.style.cssText = "position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:22;background:rgba(10,14,39,.92);border:3px solid #FFD700;border-radius:14px;padding:16px 22px;box-shadow:var(--glow-gold);max-width:90%;";
+    document.getElementById("stage").appendChild(overlay);
+  }
+  overlay.innerHTML = html;
+  return overlay;
+}
+function clearStageOverlay(){
+  const o = document.getElementById("stage-overlay");
+  if(o) o.remove();
+}
+
 const scenes = [
 
-// ============ 第1關 · 三招回顧 ============
+// ============ 第1關 · 為啥學三角形？ ============
 {
-  name:"三招回顧",
-  stageLabel:"第 1 關 · 前情提要",
+  name:"為啥學？",
+  stageLabel:"第 1 關 · 為啥要學",
   init(){
     const root = clearScene();
-    stageBanner(root, "三招回顧", "PREVIOUSLY");
-    heroCard(root, 180, 460, "哆啦A夢", "導師", "#00F5FF", "🔵");
-  },
-  steps:[
-    {
-      tip:"說：『<b>還記得我們學過三招嗎？</b>SSS、SAS、ASA。今天要解鎖最後兩招——AAS 和 RHS！』",
-      narrate:"五招天王 · 最終戰開始！",
-      run(){}
-    },
-    {
-      tip:"說：『SSS = 三邊都一樣 → 全紅！』",
-      narrate:"🔴 SSS = 三邊相同",
-      run(){
-        const root = document.getElementById("scene-root");
-        const p = tform(triFromSSS(5,7,8), 500, 480, 22);
-        drawTri(root, p, {fill:"url(#gradRed)", stroke:"#FF3B30", sw:5, glow:"neonRed"});
-        el("text", {x:500, y:640, "text-anchor":"middle", "font-size":28,
-          "font-weight":900, fill:"#FF3B30",
-          "stroke":"#000","stroke-width":4,"paint-order":"stroke",
-          filter:"url(#neonRed)"}, root).textContent = "SSS";
-        SFX.pop();
-      }
-    },
-    {
-      tip:"說：『SAS = 兩邊藍 + 夾角橘！』",
-      narrate:"🔵🟠 SAS = 兩邊+夾角",
-      run(){
-        const root = document.getElementById("scene-root");
-        const p = tform(triFromSAS(6,60,8), 900, 480, 22);
-        drawTri(root, p, {fill:"#0A0E27", stroke:"#888", sw:3});
-        drawEdge(root, p[0], p[1], "#00F5FF", 8);
-        drawEdge(root, p[0], p[2], "#00F5FF", 8);
-        drawAngleArc(root, p[0], p[1], p[2], 28, "#FF8A00", 6);
-        el("text", {x:900, y:640, "text-anchor":"middle", "font-size":28,
-          "font-weight":900, fill:"#00F5FF",
-          "stroke":"#000","stroke-width":4,"paint-order":"stroke",
-          filter:"url(#neonCyan)"}, root).textContent = "SAS";
-        SFX.pop();
-      }
-    },
-    {
-      tip:"說：『ASA = 兩角金 + 夾邊綠！這三招是基礎，今天再學兩招！』",
-      narrate:"🟡🟢 ASA = 兩角+夾邊",
-      run(){
-        const root = document.getElementById("scene-root");
-        const p = tform(triFromASA(45,6,60), 1300, 480, 30);
-        drawTri(root, p, {fill:"#0A0E27", stroke:"#888", sw:3});
-        drawEdge(root, p[1], p[2], "#39FF14", 8);
-        drawAngleArc(root, p[1], p[0], p[2], 24, "#FFD700", 5);
-        drawAngleArc(root, p[2], p[0], p[1], 24, "#FFD700", 5);
-        el("text", {x:1300, y:640, "text-anchor":"middle", "font-size":28,
-          "font-weight":900, fill:"#39FF14",
-          "stroke":"#000","stroke-width":4,"paint-order":"stroke",
-          filter:"url(#neonGreen)"}, root).textContent = "ASA";
-        SFX.pop();
-        setTimeout(()=>{ SFX.success(); confetti(15); }, 300);
-      }
-    },
-  ],
-  afterSteps:{
-    tip:"<b>暖身完成</b>。準備解鎖第 4 招 AAS！",
-    narrate:"準備解鎖：AAS"
-  }
-},
+    clearStageOverlay();
+    stageBanner(root, "為什麼要學三角形？", "WHY?");
+    el("text", {x:800, y:170, "text-anchor":"middle", "font-size":28,
+      "font-weight":700, fill:"#fff",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
+      .textContent = "點下面 4 個東西，看裡面藏的三角形！";
 
-// ============ 第2關 · AAS 新技能 ============
-{
-  name:"AAS 新技能",
-  stageLabel:"第 2 關 · 新技能 · AAS",
-  init(){
-    const root = clearScene();
-    stageBanner(root, "AAS 新技能", "TWO ANGLES + OPPOSITE SIDE");
-    heroCard(root, 180, 560, "大雄", "客人", "#FFD700", "🏠");
-    el("rect", {x:80, y:200, width:340, height:140, rx:12,
-      fill:"#0A0E27", stroke:"#FFD700", "stroke-width":3,
-      filter:"url(#neonGold)"}, root);
-    el("text", {x:250, y:240, "text-anchor":"middle", "font-size":22,
-      "font-weight":900, fill:"#FFD700"}, root).textContent = "📐 建築師量法";
-    el("text", {x:250, y:275, "text-anchor":"middle", "font-size":18,
-      "font-weight":700, fill:"#fff"}, root).textContent = "兩個角 + 一條對邊";
-    el("text", {x:250, y:305, "text-anchor":"middle", "font-size":16,
-      "font-weight":600, fill:"#B967FF"}, root).textContent = "邊不是夾邊喔！";
+    // 4 個生活物件 (大按鈕風格)
+    this._items = [
+      {emoji:"🏠", label:"屋頂", x:300, key:"roof"},
+      {emoji:"🌉", label:"大橋", x:700, key:"bridge"},
+      {emoji:"🗼", label:"鐵塔", x:1100, key:"tower"},
+      {emoji:"🛝", label:"滑梯", x:1500-300, key:"slide"},
+    ];
+    // 修正第 4 個 x 應為 1500
+    this._items[3].x = 1300;
+    this._discovered = new Set();
+
+    this._items.forEach(it => {
+      const g = el("g", {id:`item-${it.key}`, style:"cursor:pointer"}, root);
+      // 圓形外框
+      el("circle", {cx:it.x, cy:480, r:90, fill:"#0A0E27",
+        stroke:"#FFD700", "stroke-width":4, filter:"url(#neonGold)"}, g);
+      el("text", {x:it.x, y:510, "font-size":100, "text-anchor":"middle"}, g)
+        .textContent = it.emoji;
+      el("text", {x:it.x, y:610, "font-size":24, "font-weight":900,
+        fill:"#FFD700","text-anchor":"middle",
+        "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, g)
+        .textContent = it.label;
+      // 點擊揭示三角形
+      g.addEventListener("click", () => this.reveal(it));
+    });
+  },
+  reveal(it){
+    if(this._discovered.has(it.key)) return;
+    this._discovered.add(it.key);
+    SFX.pop();
+    sparkBurst(it.x, 480, "#FFD700");
+    // 在物件上疊一個發光三角形
+    const root = document.getElementById("scene-root");
+    let pts;
+    if(it.key === "roof") pts = [{x:it.x, y:430}, {x:it.x-60, y:540}, {x:it.x+60, y:540}];
+    else if(it.key === "bridge") pts = [{x:it.x, y:430}, {x:it.x-70, y:530}, {x:it.x+70, y:530}];
+    else if(it.key === "tower") pts = [{x:it.x, y:420}, {x:it.x-65, y:545}, {x:it.x+65, y:545}];
+    else pts = [{x:it.x-65, y:430}, {x:it.x-65, y:540}, {x:it.x+65, y:540}];
+    pts.forEach(p => p.label="");
+    el("path", {d:triPath(pts), fill:"rgba(255,59,48,.4)", stroke:"#FF3B30",
+      "stroke-width":5, filter:"url(#neonRed)"}, root);
+    if(this._discovered.size === 4){
+      setTimeout(()=>{
+        flashBig("ALL FOUND!", "#39FF14", 90);
+        SFX.success();
+        confetti(20);
+        setNarration("✨ 都找到了！三角形到處都有！");
+      }, 400);
+    }
   },
   steps:[
     {
-      tip:"說：『大雄家要蓋房子。<b>建築師量了兩個角，但只量到對面那條邊</b>（不是夾在中間的）。這樣夠嗎？』",
-      narrate:"建築師量：兩角 + 對邊（非夾邊）",
+      tip:"說：『大家看——屋頂、大橋、鐵塔、滑梯，<b>都藏著三角形！</b>用滑鼠點點看，找出藏在裡面的三角形。』讓學生輪流點。",
+      narrate:"點 4 個物件 · 找出三角形！",
       run(){}
     },
     {
-      tip:"說：『先看 ASA——綠夾邊。<b>但 AAS 的邊在對面</b>，是紫色！』",
-      narrate:"⚠️ 邊在對面 → 不是 ASA！",
+      tip:"說：『為什麼這些東西都是三角形？<b>因為三角形最穩定，不會變形！</b>這就是工程師、建築師最愛三角形的原因。』",
+      narrate:"💡 三角形 = 最穩定 = 不會垮",
       run(){
         const root = document.getElementById("scene-root");
-        // ASA 對比 (左) - 綠夾邊
-        const pASA = tform(triFromASA(50, 6, 70), 600, 530, 28);
-        drawTri(root, pASA, {fill:"#0A0E27", stroke:"#888", sw:3});
-        drawEdge(root, pASA[1], pASA[2], "#39FF14", 8);
-        drawAngleArc(root, pASA[1], pASA[0], pASA[2], 22, "#FFD700", 5);
-        drawAngleArc(root, pASA[2], pASA[0], pASA[1], 22, "#FFD700", 5);
-        el("text", {x:600, y:680, "text-anchor":"middle", "font-size":24,
-          "font-weight":900, fill:"#39FF14",
-          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "ASA · 綠夾邊";
-        // AAS (右) - 紫對邊
-        const pAAS = tform(triFromASA(50, 6, 70), 1100, 530, 28);
-        drawTri(root, pAAS, {fill:"#0A0E27", stroke:"#888", sw:3});
-        // AAS 的邊：兩角是 B 和 C, 對邊是 A 對面 = BC, 對 = AB 或 AC
-        // 這裡標 AB 為紫對邊 (∠C 的對邊)
-        drawEdge(root, pAAS[0], pAAS[1], "#B967FF", 8);
-        drawAngleArc(root, pAAS[1], pAAS[0], pAAS[2], 22, "#FFD700", 5);
-        drawAngleArc(root, pAAS[2], pAAS[0], pAAS[1], 22, "#FFD700", 5);
-        el("text", {x:1100, y:680, "text-anchor":"middle", "font-size":24,
-          "font-weight":900, fill:"#B967FF",
-          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "AAS · 紫對邊";
+        el("rect", {x:300, y:200, width:1000, height:120, rx:16,
+          fill:"#0A0E27", stroke:"#39FF14", "stroke-width":4,
+          filter:"url(#neonGreen)"}, root);
+        el("text", {x:800, y:240, "text-anchor":"middle", "font-size":24,
+          "font-weight":900, fill:"#39FF14"}, root).textContent = "💡 三角形 = 最穩定的形狀";
+        el("text", {x:800, y:285, "text-anchor":"middle", "font-size":20,
+          "font-weight":700, fill:"#fff"}, root).textContent = "工程師、建築師、設計師、地圖師都用它";
         SFX.reveal();
       }
     },
     {
-      tip:"說：『<b>AAS 也行！為什麼？</b>因為三角形內角和=180°，知道兩角就能算第三角，<b>變回 ASA！』</b>",
-      narrate:"💡 內角和 180° → 第三角自動算出 → 變 ASA",
+      tip:"說：『學會三角形定理 → <b>你就可以蓋房子、量山高、設計遊樂器材、做手機架</b>！這是工程師的秘密武器。』",
+      narrate:"⚡ 學會三角形 → 你也能當工程師！",
       run(){
         const root = document.getElementById("scene-root");
-        // 公式卡
-        el("rect", {x:300, y:200, width:1000, height:120, rx:16,
+        // 4 個用途
+        const uses = [
+          {x:250, icon:"🏗️", text:"蓋房子"},
+          {x:600, icon:"🗻", text:"量山高"},
+          {x:950, icon:"🎢", text:"設計遊樂器材"},
+          {x:1300, icon:"📱", text:"做手機架"},
+        ];
+        uses.forEach(u => {
+          el("circle", {cx:u.x, cy:710, r:40, fill:"#0A0E27",
+            stroke:"#FFD700", "stroke-width":3, filter:"url(#neonGold)"}, root);
+          el("text", {x:u.x, y:725, "font-size":36, "text-anchor":"middle"}, root).textContent = u.icon;
+          el("text", {x:u.x, y:780, "font-size":18, "font-weight":900,
+            fill:"#FFD700", "text-anchor":"middle",
+            "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = u.text;
+        });
+        SFX.success();
+      }
+    },
+  ],
+  afterSteps:{
+    tip:"<b>暖身完成</b>。為什麼學三角形？因為它最穩定、應用最廣！下一關進入 AAS。",
+    narrate:"準備學新招：AAS"
+  }
+},
+
+// ============ 第2關 · AAS · 大雄家蓋房子 (互動拖滑桿) ============
+{
+  name:"AAS · 大雄家",
+  stageLabel:"第 2 關 · AAS · 蓋房子",
+  // 互動參數
+  _angleA: 50, _angleB: 70, _sideAB: 6,
+  init(){
+    const root = clearScene();
+    clearStageOverlay();
+    stageBanner(root, "AAS · 大雄家的牆角", "BUILD A HOUSE");
+    this._angleA = 50; this._angleB = 70; this._sideAB = 6;
+    this._redraw();
+    this._addControls();
+  },
+  _redraw(){
+    // 清掉之前的三角形 (保留 banner)
+    const old = document.getElementById("aas-tri");
+    if(old) old.remove();
+    const oldL = document.getElementById("aas-labels");
+    if(oldL) oldL.remove();
+    const root = document.getElementById("scene-root");
+    const g = el("g", {id:"aas-tri"}, root);
+    const gL = el("g", {id:"aas-labels"}, root);
+    // 用 ASA 算（角A、夾邊AB、角B），但只標兩角和對邊（紫）
+    const pts = triFromASA(this._angleB, this._sideAB, this._angleA);
+    if(!pts) return;
+    const tpts = tform(pts, 800, 460, 50);
+    // 房子 SVG (簡單)
+    el("rect", {x:tpts[1].x-20, y:tpts[1].y-20, width:280, height:60,
+      fill:"#FADBD8", stroke:"#7B241C", "stroke-width":3, opacity:.4}, g);
+    // 三角屋頂 (紫對邊 + 兩個金色角弧)
+    drawTri(g, tpts, {fill:"rgba(255,255,255,.05)", stroke:"#666", sw:3});
+    // 紫色對邊 (∠A 的對邊 = BC)
+    drawEdge(g, tpts[1], tpts[2], "#B967FF", 9);
+    // 兩個金色角弧 (B 和 C)
+    drawAngleArc(g, tpts[1], tpts[0], tpts[2], 28, "#FFD700", 6);
+    drawAngleArc(g, tpts[2], tpts[0], tpts[1], 28, "#FFD700", 6);
+    // 標籤
+    el("text", {x:(tpts[1].x+tpts[2].x)/2, y:(tpts[1].y+tpts[2].y)/2 + 32,
+      "font-size":22, "font-weight":900, fill:"#B967FF",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke","text-anchor":"middle"}, gL)
+      .textContent = `對邊 ${this._sideAB} 公尺`;
+    el("text", {x:tpts[1].x-40, y:tpts[1].y, "font-size":22,
+      "font-weight":900, fill:"#FFD700",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, gL)
+      .textContent = `${this._angleB}°`;
+    el("text", {x:tpts[2].x+10, y:tpts[2].y, "font-size":22,
+      "font-weight":900, fill:"#FFD700",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, gL)
+      .textContent = `${this._angleA}°`;
+  },
+  _addControls(){
+    const html = `
+      <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center;color:#fff;font-weight:800;font-size:16px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="color:#FFD700">∠A</span>
+          <input type="range" id="sl-aA" min="20" max="80" value="50" style="width:120px">
+          <span id="v-aA" style="color:#FFD700;width:30px">50°</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="color:#FFD700">∠B</span>
+          <input type="range" id="sl-aB" min="20" max="80" value="70" style="width:120px">
+          <span id="v-aB" style="color:#FFD700;width:30px">70°</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="color:#B967FF">對邊</span>
+          <input type="range" id="sl-side" min="3" max="10" value="6" style="width:120px">
+          <span id="v-side" style="color:#B967FF;width:30px">6m</span>
+        </div>
+      </div>
+    `;
+    addStageOverlay(html);
+    const setup = (id, valId, suffix, prop) => {
+      const inp = document.getElementById(id);
+      const out = document.getElementById(valId);
+      if(!inp) return;
+      inp.oninput = () => {
+        out.textContent = inp.value + suffix;
+        this[prop] = +inp.value;
+        // 確保兩角和 < 180 (留 10° 給第三角)
+        if(this._angleA + this._angleB > 170){
+          if(prop === "_angleA") this._angleA = 170 - this._angleB;
+          else this._angleB = 170 - this._angleA;
+          inp.value = this[prop];
+          out.textContent = this[prop] + suffix;
+        }
+        this._redraw();
+        SFX.click();
+      };
+    };
+    setup("sl-aA", "v-aA", "°", "_angleA");
+    setup("sl-aB", "v-aB", "°", "_angleB");
+    setup("sl-side", "v-side", "m", "_sideAB");
+  },
+  steps:[
+    {
+      tip:"說：『大雄家要蓋新房子！建築師量了：<b>角 A = 50°、角 B = 70°、對面的牆 6 公尺</b>。<b>注意——這條牆不是夾在兩角中間！』</b>",
+      narrate:"建築師量：兩角 + 對邊（不是夾邊）",
+      run(){}
+    },
+    {
+      tip:"說：『<b>拖下方的滑桿改變角度，看三角形變化</b>。學生會發現：兩角+對邊一鎖定，三角形就鎖死！』",
+      narrate:"🎮 拖滑桿玩玩看！",
+      run(){
+        // 強調滑桿區
+        const ov = document.getElementById("stage-overlay");
+        if(ov){
+          ov.style.transform = "translateX(-50%) scale(1.05)";
+          ov.style.borderColor = "#39FF14";
+          ov.style.boxShadow = "0 0 30px rgba(57,255,20,.7)";
+        }
+        SFX.reveal();
+      }
+    },
+    {
+      tip:"說：『為什麼<b>對邊也行</b>？因為三角形<b>內角和 = 180°</b>！知兩個角，<b>第三個角自動算出</b>，就跟 ASA 一樣了！』",
+      narrate:"💡 內角和 180° → 第三角自動算",
+      run(){
+        const root = document.getElementById("scene-root");
+        el("rect", {x:300, y:130, width:1000, height:90, rx:14,
           fill:"#0A0E27", stroke:"#B967FF", "stroke-width":4,
           filter:"url(#neonPurple)"}, root);
-        el("text", {x:800, y:250, "text-anchor":"middle", "font-size":26,
-          "font-weight":900, fill:"#B967FF"}, root).textContent = "💡 內角和 = 180°";
-        el("text", {x:800, y:295, "text-anchor":"middle", "font-size":24,
-          "font-weight":800, fill:"#fff"}, root).textContent = "知兩角 → 第三角自動算 → AAS = ASA 變裝版！";
+        el("text", {x:800, y:185, "text-anchor":"middle", "font-size":24,
+          "font-weight":900, fill:"#fff",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
+          .textContent = "AAS = ASA 變裝版（對邊也行！）";
         SFX.pop();
       }
     },
     {
-      tip:"說：『<b>AAS 絕技解鎖！</b>兩角金、對邊紫色（不是夾邊）→ 一定全等！』",
-      narrate:"⚡ AAS 絕技解鎖！",
+      tip:"說：『<b>AAS 絕技解鎖！</b>兩角金 + 對邊紫 → 一定全等。建築師、工程師每天都在用！』",
+      narrate:"⚡ AAS 絕技 · 解鎖！",
       run(){
-        const root = clearScene();
-        // 三個一樣的 AAS 三角形
-        for(let i=0;i<3;i++){
-          const p = tform(triFromASA(50, 6, 70), 500 + i*300, 480, 22);
-          drawTri(root, p, {fill:"url(#gradPurple)", stroke:"#B967FF", sw:5, glow:"neonPurple"});
-          drawEdge(root, p[0], p[1], "#B967FF", 8);
-          drawAngleArc(root, p[1], p[0], p[2], 22, "#FFD700", 5);
-          drawAngleArc(root, p[2], p[0], p[1], 22, "#FFD700", 5);
-        }
-        el("rect", {x:400, y:120, width:800, height:100, rx:16,
-          fill:"#0A0E27", stroke:"#B967FF", "stroke-width":5,
-          filter:"url(#neonPurple)"}, root);
-        el("text", {x:800, y:160, "text-anchor":"middle", "font-size":24,
-          "font-weight":900, fill:"#B967FF"}, root).textContent = "⚡ SKILL UNLOCKED";
-        el("text", {x:800, y:200, "text-anchor":"middle", "font-size":40,
-          "font-weight":900, fill:"url(#gradPurple)",
-          "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root)
-          .textContent = "AAS = 兩角 + 對邊";
         flashBig("ULTIMATE!", "#B967FF", 110);
         confetti(30);
         SFX.ultimate();
@@ -795,206 +902,283 @@ const scenes = [
     }
   ],
   afterSteps:{
-    tip:"<b>第 2 關通關</b>：AAS = 兩角 + 對邊（非夾邊）。下一關小心 AAA 陷阱！",
-    narrate:"AAS 絕技 · MASTER"
+    tip:"<b>第 2 關通關</b>：AAS = 兩角 + 對邊（不是夾邊也行）。下一關小心 AAA 陷阱！",
+    narrate:"AAS 解鎖 · MASTER"
   }
 },
 
-// ============ 第3關 · AAA 迷思破除 ============
+// ============ 第3關 · AAA 陷阱 (互動縮放) ============
 {
   name:"AAA 陷阱",
   stageLabel:"第 3 關 · 警告 · AAA 陷阱",
+  _scale: 1.0,
   init(){
     const root = clearScene();
-    stageBanner(root, "AAA 陷阱警告！", "TRAP! NOT CONGRUENT");
+    clearStageOverlay();
+    stageBanner(root, "AAA 陷阱警告！", "TRAP! NOT WORK");
+    this._scale = 1.0;
+    this._redraw();
+    this._addControls();
+  },
+  _redraw(){
+    const old = document.getElementById("aaa-tri");
+    if(old) old.remove();
+    const root = document.getElementById("scene-root");
+    const g = el("g", {id:"aaa-tri"}, root);
+    // 固定參考三角形 (左)
+    const refPts = tform(triFromASA(50, 5, 70), 400, 460, 30);
+    drawTri(g, refPts, {fill:"#0A0E27", stroke:"#FFD700", sw:4, glow:"neonGold"});
+    drawAngleArc(g, refPts[0], refPts[1], refPts[2], 18, "#FFD700", 4);
+    drawAngleArc(g, refPts[1], refPts[0], refPts[2], 18, "#FFD700", 4);
+    drawAngleArc(g, refPts[2], refPts[0], refPts[1], 18, "#FFD700", 4);
+    el("text", {x:400, y:680, "text-anchor":"middle", "font-size":22,
+      "font-weight":900, fill:"#FFD700",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, g).textContent = "原版";
+    // 縮放版 (右) - 同樣三角度但大小變
+    const scaledPts = tform(triFromASA(50, 5, 70), 1100, 460, 30 * this._scale);
+    drawTri(g, scaledPts, {fill:"#0A0E27", stroke:"#FFD700", sw:4, glow:"neonGold"});
+    drawAngleArc(g, scaledPts[0], scaledPts[1], scaledPts[2], 18 * this._scale, "#FFD700", 4);
+    drawAngleArc(g, scaledPts[1], scaledPts[0], scaledPts[2], 18 * this._scale, "#FFD700", 4);
+    drawAngleArc(g, scaledPts[2], scaledPts[0], scaledPts[1], 18 * this._scale, "#FFD700", 4);
+    el("text", {x:1100, y:680, "text-anchor":"middle", "font-size":22,
+      "font-weight":900, fill:"#FFD700",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, g)
+      .textContent = `縮放 ${(this._scale*100).toFixed(0)}%`;
+    // 角度標籤 (兩個都標 50°、70°、60°)
+    [refPts, scaledPts].forEach(pts => {
+      el("text", {x:pts[0].x, y:pts[0].y-10, "font-size":16,
+        "font-weight":900, fill:"#FFD700","text-anchor":"middle"}, g).textContent = "60°";
+      el("text", {x:pts[1].x-15, y:pts[1].y+12, "font-size":16,
+        "font-weight":900, fill:"#FFD700","text-anchor":"middle"}, g).textContent = "70°";
+      el("text", {x:pts[2].x+15, y:pts[2].y+12, "font-size":16,
+        "font-weight":900, fill:"#FFD700","text-anchor":"middle"}, g).textContent = "50°";
+    });
+  },
+  _addControls(){
+    const html = `
+      <div style="display:flex;gap:18px;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px">
+        <span>📠 影印機 · 縮放</span>
+        <input type="range" id="sl-scale" min="50" max="180" value="100" style="width:200px">
+        <span id="v-scale" style="color:#FFD700;width:50px">100%</span>
+      </div>
+      <div style="text-align:center;color:#FF8A00;font-weight:700;font-size:14px;margin-top:8px">三角度都不變！但大小變了！</div>
+    `;
+    addStageOverlay(html);
+    const inp = document.getElementById("sl-scale");
+    const out = document.getElementById("v-scale");
+    if(inp){
+      inp.oninput = () => {
+        this._scale = inp.value / 100;
+        out.textContent = inp.value + "%";
+        this._redraw();
+        SFX.click();
+      };
+    }
   },
   steps:[
     {
-      tip:"說：『<b>陷阱題！</b>如果三個角都一樣，是全等嗎？想 10 秒。』",
+      tip:"說：『<b>陷阱來了！</b>如果<b>三個角度都一樣</b>，是不是就一定全等？想 10 秒再按下一步。』",
       narrate:"⚠️ 三角度都一樣 → 全等？",
       run(){}
     },
     {
-      tip:"說：『看影印機——把三角形放大 2 倍，<b>三個角都沒變</b>！但形狀大小差很多。』",
-      narrate:"📠 影印機放大 → 角不變但變大",
+      tip:"說：『<b>拖下方滑桿縮放</b>。看到了嗎——三個角度都沒變，但大小完全不同！這就是影印機放大、縮小的原理。』",
+      narrate:"🎮 拖滑桿縮放看看！",
       run(){
-        const root = document.getElementById("scene-root");
-        // 三個三角度相同但大小不同的三角形
-        const pSmall = tform(triFromASA(50, 4, 70), 400, 500, 18);
-        const pMid   = tform(triFromASA(50, 4, 70), 800, 500, 30);
-        const pBig   = tform(triFromASA(50, 4, 70), 1250, 500, 45);
-        [pSmall, pMid, pBig].forEach(p => {
-          drawTri(root, p, {fill:"#0A0E27", stroke:"#FFD700", sw:4, glow:"neonGold"});
-          drawAngleArc(root, p[0], p[1], p[2], 18, "#FFD700", 4);
-          drawAngleArc(root, p[1], p[0], p[2], 18, "#FFD700", 4);
-          drawAngleArc(root, p[2], p[0], p[1], 18, "#FFD700", 4);
-        });
-        el("text", {x:400, y:680, "text-anchor":"middle", "font-size":18,
-          "font-weight":700, fill:"#fff"}, root).textContent = "小";
-        el("text", {x:800, y:680, "text-anchor":"middle", "font-size":18,
-          "font-weight":700, fill:"#fff"}, root).textContent = "中";
-        el("text", {x:1250, y:680, "text-anchor":"middle", "font-size":18,
-          "font-weight":700, fill:"#fff"}, root).textContent = "大";
-        el("text", {x:800, y:140, "text-anchor":"middle", "font-size":24,
-          "font-weight":800, fill:"#FF8A00"}, root).textContent = "三個角度都一樣，但大小不同！";
-        SFX.gentle();
+        const ov = document.getElementById("stage-overlay");
+        if(ov){
+          ov.style.borderColor = "#39FF14";
+          ov.style.boxShadow = "0 0 30px rgba(57,255,20,.7)";
+        }
+        SFX.reveal();
       }
     },
     {
-      tip:"說：『<b>結論：AAA 不能判斷全等！</b>記住：要全等，至少要有「一條邊」對應相等。』",
-      narrate:"❌ AAA ≠ 全等！要有邊才行",
+      tip:"說：『<b>結論：AAA 不是全等！</b>要全等，<b>至少要有一條邊對應相等</b>。這就是為什麼 SSS、SAS、ASA、AAS 都有「邊」，AAA 沒有。』",
+      narrate:"❌ AAA 陷阱 · 至少要 1 條邊！",
       run(){
         const root = document.getElementById("scene-root");
-        el("rect", {x:300, y:200, width:1000, height:130, rx:16,
-          fill:"#0A0E27", stroke:"#FF3B30", "stroke-width":5,
+        el("rect", {x:300, y:130, width:1000, height:100, rx:14,
+          fill:"#0A0E27", stroke:"#FF3B30", "stroke-width":4,
           filter:"url(#neonRed)"}, root);
-        el("text", {x:800, y:250, "text-anchor":"middle", "font-size":30,
-          "font-weight":900, fill:"#FF3B30"}, root).textContent = "❌ AAA 不是全等性質！";
-        el("text", {x:800, y:300, "text-anchor":"middle", "font-size":22,
-          "font-weight":700, fill:"#fff"}, root).textContent = "要全等 → 至少要 1 條邊對應相等";
+        el("text", {x:800, y:175, "text-anchor":"middle", "font-size":28,
+          "font-weight":900, fill:"#FF3B30"}, root).textContent = "❌ AAA ≠ 全等！";
+        el("text", {x:800, y:215, "text-anchor":"middle", "font-size":20,
+          "font-weight":700, fill:"#fff"}, root).textContent = "全等定理一定要包含「邊」";
         flashBig("TRAP!", "#FF3B30", 100);
         SFX.gentle();
       }
     },
   ],
   afterSteps:{
-    tip:"<b>陷阱破解</b>：AAA 不是全等。下一關 RHS 直角絕技！",
-    narrate:"AAA 是陷阱！下一關 RHS"
+    tip:"<b>第 3 關通關</b>：AAA 是陷阱，要邊才能全等。下一關 RHS 直角絕技！",
+    narrate:"AAA 陷阱破解 · MASTER"
   }
 },
 
-// ============ 第4關 · RHS 終極絕技 ============
+// ============ 第4關 · RHS · 公園滑梯 ============
 {
-  name:"RHS 終極絕技",
-  stageLabel:"第 4 關 · 直角專用 · RHS",
+  name:"RHS · 公園滑梯",
+  stageLabel:"第 4 關 · RHS · 滑梯",
   init(){
     const root = clearScene();
-    stageBanner(root, "RHS 終極絕技", "RIGHT TRIANGLE ONLY");
-    heroCard(root, 180, 560, "卡比", "工程師", "#FF8A00", "🛝");
-    // 滑梯主題
-    el("text", {x:250, y:200, "text-anchor":"middle", "font-size":28,
-      "font-weight":900, fill:"#FF8A00"}, root).textContent = "🛝 兩座一樣的滑梯";
-    el("text", {x:250, y:240, "text-anchor":"middle", "font-size":18,
-      "font-weight":600, fill:"#fff"}, root).textContent = "直角 + 斜邊 + 一股";
+    clearStageOverlay();
+    stageBanner(root, "RHS · 公園的滑梯", "PARK SLIDE");
+    // 兩個滑梯
+    this._drawSlide(root, 450, 600, 220, 280, false, "slide-1");
+    this._drawSlide(root, 1100, 600, 220, 280, false, "slide-2");
+    el("text", {x:450, y:730, "text-anchor":"middle", "font-size":24,
+      "font-weight":900, fill:"#FFD700",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "🛝 滑梯 1";
+    el("text", {x:1100, y:730, "text-anchor":"middle", "font-size":24,
+      "font-weight":900, fill:"#FFD700",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "🛝 滑梯 2";
+    this._revealed = false;
+  },
+  _drawSlide(parent, baseX, baseY, width, height, highlight, id){
+    const g = el("g", id?{id, style:"cursor:pointer"}:{style:"cursor:pointer"}, parent);
+    // 滑梯三點：頂(高處)、底左(柱腳)、底右(滑下來的地方)
+    const top = {x:baseX, y:baseY-height};
+    const bl  = {x:baseX, y:baseY};
+    const br  = {x:baseX+width, y:baseY};
+    // 滑面 (斜邊) - 紫色
+    el("line", {id:`${id}-hyp`, x1:top.x, y1:top.y, x2:br.x, y2:br.y,
+      stroke: highlight ? "#B967FF" : "#888", "stroke-width":highlight?9:5,
+      "stroke-linecap":"round"}, g);
+    // 柱子 (一股) - 青色
+    el("line", {id:`${id}-leg`, x1:top.x, y1:top.y, x2:bl.x, y2:bl.y,
+      stroke: highlight ? "#00F5FF" : "#888", "stroke-width":highlight?9:5,
+      "stroke-linecap":"round"}, g);
+    // 地面 (另一股，不畫主要強調)
+    el("line", {x1:bl.x, y1:bl.y, x2:br.x, y2:br.y,
+      stroke:"#666", "stroke-width":4, "stroke-linecap":"round"}, g);
+    // 直角符號 (在 bl)
+    if(highlight){
+      el("path", {d:`M${bl.x+12},${bl.y} L${bl.x+12},${bl.y-12} L${bl.x},${bl.y-12}`,
+        fill:"none", stroke:"#FF3B30", "stroke-width":4}, g);
+    }
+    // 點擊揭示
+    g.addEventListener("click", () => {
+      if(this._revealed) return;
+      this._revealed = true;
+      this.revealParts();
+    });
+    return g;
+  },
+  revealParts(){
+    SFX.reveal();
+    sparkBurst(800, 500, "#B967FF");
+    // 重畫兩個滑梯，這次高亮
+    const root = clearScene();
+    clearStageOverlay();
+    stageBanner(root, "RHS 三件套揭曉！", "3 PARTS");
+    this._drawSlide(root, 450, 600, 220, 280, true, "slide-1h");
+    this._drawSlide(root, 1100, 600, 220, 280, true, "slide-2h");
+    // 標示
+    el("text", {x:450, y:730, "text-anchor":"middle", "font-size":24,
+      "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "🛝 滑梯 1";
+    el("text", {x:1100, y:730, "text-anchor":"middle", "font-size":24,
+      "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "🛝 滑梯 2";
+    // 三件套說明
+    const html = `
+      <div style="display:flex;gap:18px;justify-content:center;color:#fff;font-weight:900;font-size:18px">
+        <div style="background:#FF3B30;padding:8px 18px;border-radius:10px;color:#fff">🟥 直角</div>
+        <div style="background:#B967FF;padding:8px 18px;border-radius:10px;color:#fff">🟣 斜邊</div>
+        <div style="background:#00F5FF;padding:8px 18px;border-radius:10px;color:#0A0E27">🔷 一股</div>
+      </div>
+    `;
+    addStageOverlay(html);
   },
   steps:[
     {
-      tip:"說：『公園有兩座滑梯，看起來一樣。<b>滑梯是直角三角形——直角+斜邊+底部。</b>』",
-      narrate:"🛝 直角三角形 = 滑梯形狀",
-      run(){
-        const root = document.getElementById("scene-root");
-        // 直角三角形 (3-4-5)
-        const A = triFromSSS(3, 5, 4);  // 直角在 B
-        const p = tform(A, 800, 500, 50);
-        drawTri(root, p, {fill:"url(#gradBlue)", stroke:"#4DBCFF", sw:5, glow:"neonCyan"});
-        // 直角符號 (在 B 點 - 即下方)
-        // 找直角頂點：邊 a=BC=3, b=CA=5, c=AB=4, 直角在 a²+c²=b² 的對應頂點 = B
-        // 用簡單作法：在 B 點畫小方框
-        const B = p[1]; // 角 B 是直角
-        // 標直角符號
-        const sz = 16;
-        // 計算 B 出發指向 A 和 C 的單位向量
-        const vA = {x:p[0].x-B.x, y:p[0].y-B.y};
-        const vC = {x:p[2].x-B.x, y:p[2].y-B.y};
-        const lenA = Math.sqrt(vA.x*vA.x+vA.y*vA.y);
-        const lenC = Math.sqrt(vC.x*vC.x+vC.y*vC.y);
-        const uA = {x:vA.x/lenA*sz, y:vA.y/lenA*sz};
-        const uC = {x:vC.x/lenC*sz, y:vC.y/lenC*sz};
-        el("path", {d:`M${B.x+uA.x},${B.y+uA.y} L${B.x+uA.x+uC.x},${B.y+uA.y+uC.y} L${B.x+uC.x},${B.y+uC.y}`,
-          fill:"none", stroke:"#FF3B30", "stroke-width":4}, root);
-        SFX.reveal();
-      }
+      tip:"說：『公園裡有兩座滑梯。要怎麼判斷它們是<b>同款</b>？』『點滑梯！』讓學生輪流點點看。",
+      narrate:"👆 點滑梯 · 揭開祕密",
+      run(){}
     },
     {
-      tip:"說：『<b>RHS 三件套：</b>R = 直角（紅色方框）、H = 斜邊（紫色長邊）、S = 一股（青色短邊）。』",
+      tip:"說：『<b>滑梯就是直角三角形！</b>R = 直角（柱子和地面）、H = 斜邊（滑面）、S = 一股（柱子高）。』",
       narrate:"🟥 直角 + 🟣 斜邊 + 🔷 一股",
       run(){
-        const root = document.getElementById("scene-root");
-        // 標斜邊紫色 (CA - 最長 5)
-        const p = tform(triFromSSS(3, 5, 4), 800, 500, 50);
-        drawEdge(root, p[2], p[0], "#B967FF", 9, "rhs-hyp");
-        drawEdge(root, p[1], p[0], "#00F5FF", 8, "rhs-leg");
-        // 標籤
-        el("text", {x:p[2].x+(p[0].x-p[2].x)/2 + 30, y:p[2].y+(p[0].y-p[2].y)/2,
-          "font-size":20, "font-weight":900, fill:"#B967FF"}, root).textContent = "斜邊";
-        el("text", {x:p[1].x+(p[0].x-p[1].x)/2 - 30, y:p[1].y+(p[0].y-p[1].y)/2,
-          "font-size":20, "font-weight":900, fill:"#00F5FF"}, root).textContent = "一股";
-        SFX.pop();
+        if(!this._revealed) this.revealParts();
       }
     },
     {
-      tip:"說：『<b>RHS 解鎖！</b>兩個直角三角形，斜邊一樣 + 一股一樣 → 一定全等！這是 5 大全等的最後一招！』",
-      narrate:"⚡ RHS 絕技解鎖！",
+      tip:"說：『<b>RHS 解鎖！</b>兩個直角三角形，斜邊一樣 + 一股一樣 → 一定全等。生活中：滑梯、樓梯、屋頂、衣架都是 RHS！』",
+      narrate:"⚡ RHS 絕技 · 解鎖！",
       run(){
-        const root = clearScene();
-        // 三個一樣的 RHS 三角形 (3-4-5)
-        for(let i=0;i<3;i++){
-          const p = tform(triFromSSS(3, 5, 4), 500 + i*300, 480, 30);
-          drawTri(root, p, {fill:"url(#gradBlue)", stroke:"#4DBCFF", sw:4, glow:"neonCyan"});
-          drawEdge(root, p[2], p[0], "#B967FF", 7);  // 斜邊紫
-          drawEdge(root, p[1], p[0], "#00F5FF", 7);  // 一股青
-          // 直角符號
-          const B = p[1];
-          const sz = 12;
-          const vA = {x:p[0].x-B.x, y:p[0].y-B.y};
-          const vC = {x:p[2].x-B.x, y:p[2].y-B.y};
-          const lenA = Math.sqrt(vA.x*vA.x+vA.y*vA.y);
-          const lenC = Math.sqrt(vC.x*vC.x+vC.y*vC.y);
-          const uA = {x:vA.x/lenA*sz, y:vA.y/lenA*sz};
-          const uC = {x:vC.x/lenC*sz, y:vC.y/lenC*sz};
-          el("path", {d:`M${B.x+uA.x},${B.y+uA.y} L${B.x+uA.x+uC.x},${B.y+uA.y+uC.y} L${B.x+uC.x},${B.y+uC.y}`,
-            fill:"none", stroke:"#FF3B30", "stroke-width":3}, root);
-        }
-        el("rect", {x:400, y:140, width:800, height:100, rx:16,
-          fill:"#0A0E27", stroke:"#FF3B30", "stroke-width":5,
+        const root = document.getElementById("scene-root");
+        el("rect", {x:300, y:130, width:1000, height:90, rx:14,
+          fill:"#0A0E27", stroke:"#FF3B30", "stroke-width":4,
           filter:"url(#neonRed)"}, root);
-        el("text", {x:800, y:180, "text-anchor":"middle", "font-size":24,
-          "font-weight":900, fill:"#FF3B30"}, root).textContent = "⚡ FINAL SKILL UNLOCKED";
-        el("text", {x:800, y:218, "text-anchor":"middle", "font-size":36,
+        el("text", {x:800, y:185, "text-anchor":"middle", "font-size":24,
           "font-weight":900, fill:"#fff",
-          "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root)
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
           .textContent = "RHS = 直角 + 斜邊 + 一股";
-        flashBig("MAX LEVEL!", "#FFD700", 120);
-        confetti(40);
+        flashBig("MAX!", "#FFD700", 120);
+        confetti(35);
         SFX.ultimate();
+      }
+    },
+    {
+      tip:"說：『<b>滑梯、樓梯、屋頂、衣架——這些都是 RHS！</b>下次經過公園可以指給朋友看。』",
+      narrate:"🌟 生活到處有 RHS！",
+      run(){
+        const root = document.getElementById("scene-root");
+        const items = [
+          {x:200, icon:"🛝", text:"滑梯"},
+          {x:550, icon:"🪜", text:"樓梯"},
+          {x:900, icon:"🏠", text:"屋頂"},
+          {x:1250, icon:"👕", text:"衣架"},
+        ];
+        items.forEach(it => {
+          el("circle", {cx:it.x, cy:300, r:38, fill:"#0A0E27",
+            stroke:"#FFD700", "stroke-width":3, filter:"url(#neonGold)"}, root);
+          el("text", {x:it.x, y:315, "font-size":34, "text-anchor":"middle"}, root).textContent = it.icon;
+          el("text", {x:it.x, y:370, "font-size":18, "font-weight":900,
+            fill:"#FFD700","text-anchor":"middle",
+            "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = it.text;
+        });
+        SFX.success();
       }
     }
   ],
   afterSteps:{
-    tip:"<b>第 4 關通關</b>：RHS 是直角三角形專用！五招集齊！",
-    narrate:"5 招天王 · ALL UNLOCKED"
+    tip:"<b>第 4 關通關</b>：RHS 是直角專用。下一關 BOSS 戰！",
+    narrate:"5 招集齊 · BOSS 戰 GO!"
   }
 },
 
-// ============ 第5關 · 五招大亂鬥 BOSS 戰 ============
+// ============ 第5關 · 五招大亂鬥 BOSS ============
 {
   name:"五招大亂鬥",
   stageLabel:"第 5 關 · 最終 BOSS · 5 題",
   _quizzes:[
-    {type:"SSS", desc:"兩個三角形：三邊都是 5、7、8", correct:"SSS", why:"三邊對應 → SSS ✅"},
-    {type:"SAS", desc:"兩邊 6、8 + 夾角 60°", correct:"SAS", why:"兩邊+夾角 → SAS ✅"},
-    {type:"ASA", desc:"兩角 50°、70° + 夾邊 6", correct:"ASA", why:"兩角+夾邊 → ASA ✅"},
-    {type:"AAS", desc:"兩角 50°、70° + 對邊 6（不是夾邊）", correct:"AAS", why:"兩角+對邊 → AAS ✅"},
-    {type:"RHS", desc:"直角三角形：斜邊 5 + 一股 4", correct:"RHS", why:"直角+斜邊+一股 → RHS ✅"},
+    {type:"SSS", real:"🗼 鐵塔三角支撐", desc:"三邊都 5、7、8", correct:"SSS", why:"三邊對應 → SSS ✅"},
+    {type:"SAS", real:"📐 你的三角板", desc:"兩邊 6、8 + 夾角 60°", correct:"SAS", why:"兩邊+夾角 → SAS ✅"},
+    {type:"ASA", real:"🗺️ 量河寬", desc:"兩角 50°、70° + 夾邊 6", correct:"ASA", why:"兩角+夾邊 → ASA ✅"},
+    {type:"AAS", real:"🏠 蓋房子", desc:"兩角 50°、70° + 對邊 6（不是夾邊）", correct:"AAS", why:"兩角+對邊 → AAS ✅"},
+    {type:"RHS", real:"🛝 公園滑梯", desc:"直角三角形：斜邊 5 + 一股 4", correct:"RHS", why:"直角+斜邊+一股 → RHS ✅"},
   ],
   _q:0, _score:0, _streak:0,
-  init(){ this._q=0; this._score=0; this._streak=0; this._render(); },
+  init(){ this._q=0; this._score=0; this._streak=0; clearStageOverlay(); this._render(); },
   _render(){
     const root = clearScene();
     hideCombo();
     if(this._q >= this._quizzes.length){
       stageBanner(root, "BOSS 結算", "FINAL RESULT");
-      el("rect", {x:480, y:240, width:640, height:320, rx:20,
+      el("rect", {x:480, y:230, width:640, height:340, rx:20,
         fill:"#0A0E27", stroke:"#FFD700", "stroke-width":5,
         filter:"url(#neonGold)"}, root);
-      el("text", {x:800, y:330, "text-anchor":"middle", "font-size":36,
+      el("text", {x:800, y:320, "text-anchor":"middle", "font-size":36,
         "font-weight":900, fill:"#FFD700"}, root).textContent = "⭐ 五招天王得分";
-      el("text", {x:800, y:430, "text-anchor":"middle", "font-size":100,
+      el("text", {x:800, y:430, "text-anchor":"middle", "font-size":110,
         "font-weight":900, fill:"url(#gradGold)",
         "stroke":"#000","stroke-width":5,"paint-order":"stroke"}, root).textContent = `${this._score} / 5`;
       const rank = this._score===5 ? "S+" : this._score===4 ? "S" : this._score===3 ? "A" : this._score===2 ? "B" : "C";
       const rc = rank==="S+"?"#FFD700":rank==="S"?"#B967FF":rank==="A"?"#00F5FF":rank==="B"?"#39FF14":"#888";
-      el("text", {x:800, y:520, "text-anchor":"middle", "font-size":36,
+      el("text", {x:800, y:530, "text-anchor":"middle", "font-size":36,
         "font-weight":900, fill:rc,
         "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = `評價：${rank} 級`;
       setScore(0, 0);
@@ -1024,7 +1208,7 @@ const scenes = [
     } else if(cur.type === "AAS"){
       const p = tform(triFromASA(50, 6, 70), 800, 500, 50);
       drawTri(root, p, {fill:"#0A0E27", stroke:"#888", sw:3});
-      drawEdge(root, p[0], p[1], "#B967FF", 9);  // 紫對邊
+      drawEdge(root, p[0], p[1], "#B967FF", 9);
       drawAngleArc(root, p[1], p[0], p[2], 26, "#FFD700", 6);
       drawAngleArc(root, p[2], p[0], p[1], 26, "#FFD700", 6);
     } else if(cur.type === "RHS"){
@@ -1032,7 +1216,6 @@ const scenes = [
       drawTri(root, p, {fill:"url(#gradBlue)", stroke:"#4DBCFF", sw:4});
       drawEdge(root, p[2], p[0], "#B967FF", 9);
       drawEdge(root, p[1], p[0], "#00F5FF", 9);
-      // 直角符號
       const B = p[1], sz = 14;
       const vA = {x:p[0].x-B.x, y:p[0].y-B.y};
       const vC = {x:p[2].x-B.x, y:p[2].y-B.y};
@@ -1043,16 +1226,18 @@ const scenes = [
       el("path", {d:`M${B.x+uA.x},${B.y+uA.y} L${B.x+uA.x+uC.x},${B.y+uA.y+uC.y} L${B.x+uC.x},${B.y+uC.y}`,
         fill:"none", stroke:"#FF3B30", "stroke-width":4}, root);
     }
-    el("text", {x:800, y:140, "text-anchor":"middle", "font-size":24,
-      "font-weight":900, fill:"#9B4DFF",
-      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = cur.desc;
-    el("text", {x:800, y:200, "text-anchor":"middle", "font-size":22,
-      "font-weight":700, fill:"#fff"}, root).textContent = "兩個三角形全等，要用哪一招？";
+    el("text", {x:800, y:130, "text-anchor":"middle", "font-size":24,
+      "font-weight":900, fill:"#FFD700",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = cur.real;
+    el("text", {x:800, y:170, "text-anchor":"middle", "font-size":22,
+      "font-weight":700, fill:"#fff"}, root).textContent = cur.desc;
+    el("text", {x:800, y:210, "text-anchor":"middle", "font-size":20,
+      "font-weight":600, fill:"#B967FF"}, root).textContent = "全等嗎？要用哪一招？";
     setScore(this._score, 5);
   },
   steps:[
     {
-      tip:"說：『<b>最終 BOSS 戰！5 題</b>。每題選 SSS、SAS、ASA、AAS、RHS。學生舉手喊答，老師按按鈕。』",
+      tip:"說：『<b>最終 BOSS 戰！5 題真實情境</b>。學生舉手喊：SSS / SAS / ASA / AAS / RHS。』",
       narrate:"⚔️ 五招大亂鬥開始！",
       run(){}
     }
@@ -1073,8 +1258,8 @@ const scenes = [
       b.className = "btn btn-answer";
       b.textContent = label;
       b.style.background = colors[label];
-      b.style.minWidth = "110px";
-      b.style.fontSize = "24px";
+      b.style.minWidth = "100px";
+      b.style.fontSize = "22px";
       b.style.color = (label==="RHS" || label==="SAS") ? "#0A0E27" : "#fff";
       b.style.borderColor = "rgba(255,255,255,.3)";
       b.onclick = () => this.answer(label);
@@ -1109,63 +1294,71 @@ const scenes = [
   }
 },
 
-// ============ 第6關 · 五星天王勝利 ============
+// ============ 第6關 · 五星天王 + 現實對應 ============
 {
   name:"五星天王",
-  stageLabel:"🏆 ULTIMATE VICTORY",
+  stageLabel:"🏆 ULTIMATE",
   init(){
     const root = clearScene();
+    clearStageOverlay();
     setScore(0, 0); hideCombo();
-    // 大獎盃
-    el("circle", {cx:800, cy:380, r:230, fill:"url(#gradGold)", opacity:.18,
-      filter:"url(#neonGold)"}, root);
-    el("rect", {x:680, y:480, width:240, height:60, rx:8,
-      fill:"url(#gradGold)", stroke:"#FFD700", "stroke-width":4,
-      filter:"url(#neonGold)"}, root);
-    el("circle", {cx:800, cy:380, r:120, fill:"url(#gradGold)",
-      stroke:"#FFD700", "stroke-width":7, filter:"url(#neonGold)"}, root);
-    el("text", {x:800, y:415, "text-anchor":"middle", "font-size":110}, root).textContent = "🏆";
     // 標題
-    el("text", {x:800, y:140, "text-anchor":"middle", "font-size":76,
+    el("text", {x:800, y:100, "text-anchor":"middle", "font-size":60,
       "font-weight":900, fill:"url(#gradGold)",
       "stroke":"#000","stroke-width":7,"paint-order":"stroke",
-      filter:"url(#neonGold)"}, root).textContent = "ULTIMATE VICTORY!";
-    el("text", {x:800, y:200, "text-anchor":"middle", "font-size":32,
+      filter:"url(#neonGold)"}, root).textContent = "🏆 五星天王！";
+    el("text", {x:800, y:155, "text-anchor":"middle", "font-size":24,
       "font-weight":700, fill:"#B967FF",
       "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
-      .textContent = "全等戰場 · 五星天王";
-    // 五招徽章
+      .textContent = "全等三角形 · 完整精通";
+    // 五招現實對照
     const skills = [
-      {icon:"🔴",   name:"SSS", color:"#FF3B30", glow:"neonRed"},
-      {icon:"🔵🟠", name:"SAS", color:"#00F5FF", glow:"neonCyan"},
-      {icon:"🟢🟡", name:"ASA", color:"#39FF14", glow:"neonGreen"},
-      {icon:"🟣🟡", name:"AAS", color:"#B967FF", glow:"neonPurple"},
-      {icon:"🟥🟣", name:"RHS", color:"#FFD700", glow:"neonGold"},
+      {x:200,  icon:"🗼", color:"#FF3B30", name:"SSS", real:"鐵塔",   glow:"neonRed"},
+      {x:520,  icon:"📐", color:"#00F5FF", name:"SAS", real:"三角板", glow:"neonCyan"},
+      {x:840,  icon:"🗺️", color:"#39FF14", name:"ASA", real:"地圖測量", glow:"neonGreen"},
+      {x:1160, icon:"🏠", color:"#B967FF", name:"AAS", real:"蓋房子", glow:"neonPurple"},
+      {x:1480-280, icon:"🛝", color:"#FFD700", name:"RHS", real:"公園滑梯", glow:"neonGold"},
     ];
-    skills.forEach((sk, i) => {
-      const x = 200 + i*300;
-      el("circle", {cx:x, cy:680, r:55, fill:"#0A0E27",
+    skills[4].x = 1400;
+    skills.forEach(sk => {
+      // 圓框
+      el("circle", {cx:sk.x, cy:380, r:65, fill:"#0A0E27",
         stroke:sk.color, "stroke-width":5, filter:`url(#${sk.glow})`}, root);
-      el("text", {x, y:690, "font-size":34, "text-anchor":"middle"}, root).textContent = sk.icon;
-      el("text", {x, y:780, "font-size":24, "font-weight":900, fill:sk.color,
-        "text-anchor":"middle",
+      // 圖示
+      el("text", {x:sk.x, y:400, "font-size":50, "text-anchor":"middle"}, root).textContent = sk.icon;
+      // 招式名
+      el("text", {x:sk.x, y:480, "font-size":28, "font-weight":900,
+        fill:sk.color, "text-anchor":"middle",
         "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = sk.name;
+      // 現實對應
+      el("text", {x:sk.x, y:520, "font-size":18, "font-weight":700,
+        fill:"#fff", "text-anchor":"middle",
+        "stroke":"#000","stroke-width":2,"paint-order":"stroke"}, root).textContent = sk.real;
     });
+    // 結語
+    el("rect", {x:200, y:580, width:1200, height:140, rx:18,
+      fill:"#0A0E27", stroke:"#FFD700", "stroke-width":4,
+      filter:"url(#neonGold)"}, root);
+    el("text", {x:800, y:620, "text-anchor":"middle", "font-size":24,
+      "font-weight":900, fill:"#FFD700"}, root).textContent = "💪 你學會的不只是定理！";
+    el("text", {x:800, y:660, "text-anchor":"middle", "font-size":20,
+      "font-weight":700, fill:"#fff"}, root).textContent = "你學會了工程師、建築師、設計師的祕密武器";
+    el("text", {x:800, y:695, "text-anchor":"middle", "font-size":18,
+      "font-weight":600, fill:"#B967FF"}, root).textContent = "下次看到鐵塔、滑梯、橋——你會懂它為什麼這樣蓋";
     SFX.win();
     confetti(80);
     setTimeout(()=>confetti(50), 800);
     setTimeout(()=>confetti(50), 1600);
-    setTimeout(()=>confetti(50), 2400);
   },
   steps:[
     {
-      tip:"說：『<b>恭喜全等三角形完整精通！</b>5 招天王集齊：SSS、SAS、ASA、AAS、RHS。記住——AAA 是陷阱，<b>至少要有一條邊！</b>』",
-      narrate:"🏆 五星天王！全等大師認證",
+      tip:"說：『<b>恭喜！五招天王！</b>SSS、SAS、ASA、AAS、RHS 全部精通。<b>你現在知道為什麼鐵塔是三角的、滑梯是直角的、地圖怎麼量。</b>』",
+      narrate:"🏆 你是工程師認證！",
       run(){}
     }
   ],
   afterSteps:{
-    tip:"收尾：『辛苦了！第三章 3-3 完整結束。下次是綜合應用題（如例題 7 正方形+畢氏）。』",
+    tip:"<b>收尾</b>：『下次經過公園、走樓梯、看到大樓時——你會用新眼光看世界。』",
     narrate:"3-3 全等三角形 · 完整精通！"
   }
 }
