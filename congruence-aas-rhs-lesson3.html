@@ -801,26 +801,45 @@ const scenes = [
     // 兩個金色角弧（∠B 在左下、∠C 在右下）
     drawAngleArc(g, tpts[1], tpts[0], tpts[2], 32, "#FFD700", 6);
     drawAngleArc(g, tpts[2], tpts[0], tpts[1], 32, "#FFD700", 6);
+    // ===== 頂點 A B C 大字標示 =====
+    // A 在頂點（上方）- 白色圓圈底
+    el("circle", {cx:tpts[0].x, cy:tpts[0].y-30, r:18, fill:"#0A0E27",
+      stroke:"#fff", "stroke-width":3}, g);
+    el("text", {x:tpts[0].x, y:tpts[0].y-23, "font-size":24,
+      "font-weight":900, fill:"#fff","text-anchor":"middle"}, g).textContent = "A";
+    // B 在左下 - 金色圓圈底（因為 ∠B 是用到的角）
+    el("circle", {cx:tpts[1].x-30, cy:tpts[1].y+30, r:18, fill:"#0A0E27",
+      stroke:"#FFD700", "stroke-width":3}, g);
+    el("text", {x:tpts[1].x-30, y:tpts[1].y+37, "font-size":24,
+      "font-weight":900, fill:"#FFD700","text-anchor":"middle"}, g).textContent = "B";
+    // C 在右下 - 金色圓圈底
+    el("circle", {cx:tpts[2].x+30, cy:tpts[2].y+30, r:18, fill:"#0A0E27",
+      stroke:"#FFD700", "stroke-width":3}, g);
+    el("text", {x:tpts[2].x+30, y:tpts[2].y+37, "font-size":24,
+      "font-weight":900, fill:"#FFD700","text-anchor":"middle"}, g).textContent = "C";
     // 對邊長度標籤（在 AC 中點，往右上偏移）
     const midAC = {x:(tpts[2].x+tpts[0].x)/2, y:(tpts[2].y+tpts[0].y)/2};
-    el("text", {x: midAC.x + 30, y: midAC.y - 5, "font-size":22, "font-weight":900,
+    el("text", {x: midAC.x + 32, y: midAC.y - 5, "font-size":20, "font-weight":900,
       fill:"#B967FF","stroke":"#000","stroke-width":4,"paint-order":"stroke","text-anchor":"start"}, gL)
-      .textContent = `對邊 ${this._sideAC} 公尺`;
+      .textContent = `AC = ${this._sideAC} 公尺`;
+    el("text", {x: midAC.x + 32, y: midAC.y + 18, "font-size":14, "font-weight":700,
+      fill:"#B967FF","text-anchor":"start"}, gL)
+      .textContent = "← 紫色對邊";
     // ∠B 標籤
-    el("text", {x:tpts[1].x-50, y:tpts[1].y+8, "font-size":22,
+    el("text", {x:tpts[1].x-12, y:tpts[1].y+8, "font-size":22,
       "font-weight":900, fill:"#FFD700",
-      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, gL)
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke","text-anchor":"end"}, gL)
       .textContent = `${this._angleB}°`;
     // ∠C 標籤
-    el("text", {x:tpts[2].x+15, y:tpts[2].y+8, "font-size":22,
+    el("text", {x:tpts[2].x+12, y:tpts[2].y+8, "font-size":22,
       "font-weight":900, fill:"#FFD700",
-      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, gL)
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke","text-anchor":"start"}, gL)
       .textContent = `${this._angleC}°`;
     // 「夾邊 BC」灰色標示，提醒這不是 AAS 用到的邊
     const midBC = {x:(tpts[1].x+tpts[2].x)/2, y:(tpts[1].y+tpts[2].y)/2};
-    el("text", {x: midBC.x, y: midBC.y + 38, "font-size":15, "font-weight":700,
+    el("text", {x: midBC.x, y: midBC.y + 60, "font-size":14, "font-weight":700,
       fill:"#888","text-anchor":"middle"}, gL)
-      .textContent = "（夾邊 BC，不是用這條）";
+      .textContent = "（BC 是夾邊，AAS 不用這條）";
   },
   _addControls(){
     const html = `
