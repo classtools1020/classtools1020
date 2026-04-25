@@ -767,17 +767,18 @@ const scenes = [
   name:"AAS · 大雄家",
   stageLabel:"第 2 關 · AAS · 蓋房子",
   // 互動參數
-  _angleA: 50, _angleB: 70, _sideAB: 6,
+  // ∠B（左下）、∠C（右下）、AC（右斜邊，∠B 的對邊 = AAS）
+  _angleB: 70, _angleC: 50, _sideAC: 6,
   init(){
     const root = clearScene();
     clearStageOverlay();
     stageBanner(root, "AAS · 大雄家的牆角", "BUILD A HOUSE");
-    this._angleA = 50; this._angleB = 70; this._sideAB = 6;
+    this._angleB = 70; this._angleC = 50; this._sideAC = 6;
     this._redraw();
     this._addControls();
   },
   _redraw(){
-    // 清掉之前的三角形 (保留 banner)
+    // 清掉之前的三角形
     const old = document.getElementById("aas-tri");
     if(old) old.remove();
     const oldL = document.getElementById("aas-labels");
@@ -785,51 +786,59 @@ const scenes = [
     const root = document.getElementById("scene-root");
     const g = el("g", {id:"aas-tri"}, root);
     const gL = el("g", {id:"aas-labels"}, root);
-    // 用 ASA 算（角A、夾邊AB、角B），但只標兩角和對邊（紫）
-    const pts = triFromASA(this._angleB, this._sideAB, this._angleA);
+    // 用戶指定 ∠B、∠C、AC（右斜邊 = ∠B 的對邊）
+    // 由正弦定理算出 BC：BC/sin(A) = AC/sin(B) → BC = AC × sin(A) / sin(B)
+    const angleA = 180 - this._angleB - this._angleC;
+    if(angleA <= 0) return;
+    const BC = this._sideAC * Math.sin(angleA * Math.PI/180) / Math.sin(this._angleB * Math.PI/180);
+    const pts = triFromASA(this._angleB, BC, this._angleC);
     if(!pts) return;
-    const tpts = tform(pts, 800, 460, 50);
-    // 房子 SVG (簡單)
-    el("rect", {x:tpts[1].x-20, y:tpts[1].y-20, width:280, height:60,
-      fill:"#FADBD8", stroke:"#7B241C", "stroke-width":3, opacity:.4}, g);
-    // 三角屋頂 (紫對邊 + 兩個金色角弧)
+    const tpts = tform(pts, 800, 460, 38);
+    // 三角形主體（灰色描邊）
     drawTri(g, tpts, {fill:"rgba(255,255,255,.05)", stroke:"#666", sw:3});
-    // 紫色對邊 (∠A 的對邊 = BC)
-    drawEdge(g, tpts[1], tpts[2], "#B967FF", 9);
-    // 兩個金色角弧 (B 和 C)
-    drawAngleArc(g, tpts[1], tpts[0], tpts[2], 28, "#FFD700", 6);
-    drawAngleArc(g, tpts[2], tpts[0], tpts[1], 28, "#FFD700", 6);
-    // 標籤
-    el("text", {x:(tpts[1].x+tpts[2].x)/2, y:(tpts[1].y+tpts[2].y)/2 + 32,
-      "font-size":22, "font-weight":900, fill:"#B967FF",
-      "stroke":"#000","stroke-width":4,"paint-order":"stroke","text-anchor":"middle"}, gL)
-      .textContent = `對邊 ${this._sideAB} 公尺`;
-    el("text", {x:tpts[1].x-40, y:tpts[1].y, "font-size":22,
+    // 紫色對邊 = AC（右斜邊，連接頂點 A 和右下 C）→ 這條邊「不夾」在兩個金色角中間
+    drawEdge(g, tpts[2], tpts[0], "#B967FF", 9);
+    // 兩個金色角弧（∠B 在左下、∠C 在右下）
+    drawAngleArc(g, tpts[1], tpts[0], tpts[2], 32, "#FFD700", 6);
+    drawAngleArc(g, tpts[2], tpts[0], tpts[1], 32, "#FFD700", 6);
+    // 對邊長度標籤（在 AC 中點，往右上偏移）
+    const midAC = {x:(tpts[2].x+tpts[0].x)/2, y:(tpts[2].y+tpts[0].y)/2};
+    el("text", {x: midAC.x + 30, y: midAC.y - 5, "font-size":22, "font-weight":900,
+      fill:"#B967FF","stroke":"#000","stroke-width":4,"paint-order":"stroke","text-anchor":"start"}, gL)
+      .textContent = `對邊 ${this._sideAC} 公尺`;
+    // ∠B 標籤
+    el("text", {x:tpts[1].x-50, y:tpts[1].y+8, "font-size":22,
       "font-weight":900, fill:"#FFD700",
       "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, gL)
       .textContent = `${this._angleB}°`;
-    el("text", {x:tpts[2].x+10, y:tpts[2].y, "font-size":22,
+    // ∠C 標籤
+    el("text", {x:tpts[2].x+15, y:tpts[2].y+8, "font-size":22,
       "font-weight":900, fill:"#FFD700",
       "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, gL)
-      .textContent = `${this._angleA}°`;
+      .textContent = `${this._angleC}°`;
+    // 「夾邊 BC」灰色標示，提醒這不是 AAS 用到的邊
+    const midBC = {x:(tpts[1].x+tpts[2].x)/2, y:(tpts[1].y+tpts[2].y)/2};
+    el("text", {x: midBC.x, y: midBC.y + 38, "font-size":15, "font-weight":700,
+      fill:"#888","text-anchor":"middle"}, gL)
+      .textContent = "（夾邊 BC，不是用這條）";
   },
   _addControls(){
     const html = `
       <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:center;color:#fff;font-weight:800;font-size:16px">
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="color:#FFD700">∠A</span>
-          <input type="range" id="sl-aA" min="20" max="80" value="50" style="width:120px">
-          <span id="v-aA" style="color:#FFD700;width:30px">50°</span>
+          <span style="color:#FFD700">∠B 左角</span>
+          <input type="range" id="sl-aB" min="25" max="75" value="70" style="width:110px">
+          <span id="v-aB" style="color:#FFD700;width:34px">70°</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="color:#FFD700">∠B</span>
-          <input type="range" id="sl-aB" min="20" max="80" value="70" style="width:120px">
-          <span id="v-aB" style="color:#FFD700;width:30px">70°</span>
+          <span style="color:#FFD700">∠C 右角</span>
+          <input type="range" id="sl-aC" min="25" max="75" value="50" style="width:110px">
+          <span id="v-aC" style="color:#FFD700;width:34px">50°</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          <span style="color:#B967FF">對邊</span>
-          <input type="range" id="sl-side" min="3" max="10" value="6" style="width:120px">
-          <span id="v-side" style="color:#B967FF;width:30px">6m</span>
+          <span style="color:#B967FF">對邊 AC</span>
+          <input type="range" id="sl-side" min="3" max="10" value="6" style="width:110px">
+          <span id="v-side" style="color:#B967FF;width:34px">6m</span>
         </div>
       </div>
     `;
@@ -839,22 +848,21 @@ const scenes = [
       const out = document.getElementById(valId);
       if(!inp) return;
       inp.oninput = () => {
-        out.textContent = inp.value + suffix;
         this[prop] = +inp.value;
-        // 確保兩角和 < 180 (留 10° 給第三角)
-        if(this._angleA + this._angleB > 170){
-          if(prop === "_angleA") this._angleA = 170 - this._angleB;
-          else this._angleB = 170 - this._angleA;
+        // 確保兩角和 ≤ 165 (留 ≥ 15° 給第三角，避免太扁)
+        if(this._angleB + this._angleC > 165){
+          if(prop === "_angleB") this._angleB = 165 - this._angleC;
+          else if(prop === "_angleC") this._angleC = 165 - this._angleB;
           inp.value = this[prop];
-          out.textContent = this[prop] + suffix;
         }
+        out.textContent = this[prop] + suffix;
         this._redraw();
         SFX.click();
       };
     };
-    setup("sl-aA", "v-aA", "°", "_angleA");
     setup("sl-aB", "v-aB", "°", "_angleB");
-    setup("sl-side", "v-side", "m", "_sideAB");
+    setup("sl-aC", "v-aC", "°", "_angleC");
+    setup("sl-side", "v-side", "m", "_sideAC");
   },
   steps:[
     {
