@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Day 7 ⚓ 海賊王金錢戰役（NotebookLM 加強版）</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/theme/black.css" id="theme">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+
+html,body{background:#000;margin:0;padding:0;overflow:hidden}
+.reveal{font-family:'Noto Sans TC',sans-serif}
+
+/* 圖片頁：滿版顯示 NotebookLM 圖片 */
+.reveal section.pdf-page{padding:0;height:100%}
+.reveal section.pdf-page img{max-width:95%;max-height:95vh;border-radius:15px;box-shadow:0 12px 40px rgba(255,255,255,0.15);margin:0 auto;display:block}
+
+/* 浮動發音按鈕 */
+.reveal .speak-float{position:absolute;top:20px;right:20px;background:linear-gradient(135deg,#ff6b35,#ff2d95);color:#fff;border:none;border-radius:50%;width:70px;height:70px;font-size:1.6em;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,53,0.6);z-index:50;border:3px solid rgba(255,255,255,0.4);transition:all .25s}
+.reveal .speak-float:hover{transform:scale(1.15) rotate(-8deg)}
+
+/* 浮動標籤（左上角顯示這頁是哪個單字） */
+.reveal .page-tag{position:absolute;top:20px;left:20px;background:linear-gradient(135deg,#0288d1,#01579b);color:#fff;padding:10px 22px;border-radius:30px;font-weight:900;z-index:50;box-shadow:0 6px 20px rgba(2,136,209,0.5);font-size:0.85em}
+
+/* 提示老師 */
+.mouse-hint{position:fixed;bottom:15px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#fff;padding:10px 24px;border-radius:25px;font-size:0.9em;font-family:'Noto Sans TC',sans-serif;z-index:100;opacity:0.85;pointer-events:none;border:2px solid rgba(255,255,255,0.2)}
+
+/* 全螢幕翻頁區（給滑鼠點擊用） */
+.reveal section{cursor:pointer}
+
+/* 隱藏控制 */
+.reveal .controls{display:none !important}
+.reveal .progress{display:none !important}
+
+/* 開場特效 */
+.intro-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0288d1,#7b1fa2);display:flex;align-items:center;justify-content:center;z-index:9999;color:#fff;font-family:'Noto Sans TC',sans-serif;cursor:pointer;animation:fadeOut 0.6s 2s forwards}
+.intro-overlay h1{font-size:4em;animation:pop 1s ease-out;margin:0;text-shadow:0 4px 20px rgba(0,0,0,0.5)}
+.intro-overlay p{font-size:1.3em;margin-top:20px;opacity:0.9}
+@keyframes pop{from{transform:scale(0.5);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fadeOut{to{opacity:0;visibility:hidden}}
+</style>
+</head>
+<body>
+
+<div class="intro-overlay">
+  <div style="text-align:center">
+    <h1>⚓ Day 7 海賊王金錢戰役</h1>
+    <p>數字＆金錢單字 | NotebookLM 加強版</p>
+    <p style="font-size:0.9em;margin-top:30px;opacity:0.7">🖱️ 滾輪/點擊空白處 = 下一張</p>
+  </div>
+</div>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- 15 頁 NotebookLM 圖片自動展開 -->
+<section class="pdf-page" data-transition="fade-in">
+  <span class="page-tag">⚓ 開場</span>
+  <button class="speak-float" onclick="speak('One Piece Money Battle, Day 7')">🔊</button>
+  <img class="fragment fade-up" src="day7-images/page-001.png" alt="page 1">
+</section>
+
+<section class="pdf-page" data-transition="zoom">
+  <span class="page-tag">📚 學習目標</span>
+  <button class="speak-float" onclick="speak('Today we learn about money')">🔊</button>
+  <img class="fragment fade-up" src="day7-images/page-002.png" alt="page 2">
+</section>
+
+<section class="pdf-page" data-transition="slide">
+  <span class="page-tag">🔢 number 數字</span>
+  <button class="speak-float" onclick="speak('number')">🔊</button>
+  <img class="fragment fade-right" src="day7-images/page-003.png" alt="page 3">
+</section>
+
+<section class="pdf-page" data-transition="slide">
+  <span class="page-tag">💵 dollar 元</span>
+  <button class="speak-float" onclick="speak('dollar')">🔊</button>
+  <img class="fragment fade-up" src="day7-images/page-004.png" alt="page 4">
+</section>
+
+<section class="pdf-page" data-transition="slide">
+  <span class="page-tag">💯 hundred 百</span>
+  <button class="speak-float" onclick="speak('hundred')">🔊</button>
+  <img class="fragment fade-left" src="day7-images/page-005.png" alt="page 5">
+</section>
+
+<section class="pdf-page" data-transition="slide">
+  <span class="page-tag">⛵ thousand 千（千陽號）</span>
+  <button class="speak-float" onclick="speak('thousand')">🔊</button>
+  <img class="fragment fade-up" src="day7-images/page-006.png" alt="page 6">
+</section>
+
+<section class="pdf-page" data-transition="slide">
+  <span class="page-tag">💸 cheap 便宜</span>
+  <button class="speak-float" onclick="speak('cheap')">🔊</button>
+  <img class="fragment fade-right" src="day7-images/page-007.png" alt="page 7">
+</section>
+
+<section class="pdf-page" data-transition="slide">
+  <span class="page-tag">💎 expensive 貴</span>
+  <button class="speak-float" onclick="speak('expensive')">🔊</button>
+  <img class="fragment fade-up" src="day7-images/page-008.png" alt="page 8">
+</section>
+
+<section class="pdf-page" data-transition="slide">
+  <span class="page-tag">🛒 buy 買</span>
+  <button class="speak-float" onclick="speak('buy')">🔊</button>
+  <img class="fragment fade-left" src="day7-images/page-009.png" alt="page 9">
+</section>
+
+<section class="pdf-page" data-transition="slide">
+  <span class="page-tag">💳 pay 付錢</span>
+  <button class="speak-float" onclick="speak('pay')">🔊</button>
+  <img class="fragment fade-up" src="day7-images/page-010.png" alt="page 10">
+</section>
+
+<section class="pdf-page" data-transition="slide">
+  <span class="page-tag">💰 money 錢</span>
+  <button class="speak-float" onclick="speak('money')">🔊</button>
+  <img class="fragment fade-right" src="day7-images/page-011.png" alt="page 11">
+</section>
+
+<section class="pdf-page" data-transition="slide">
+  <span class="page-tag">🏷️ price 價格</span>
+  <button class="speak-float" onclick="speak('price')">🔊</button>
+  <img class="fragment fade-up" src="day7-images/page-012.png" alt="page 12">
+</section>
+
+<section class="pdf-page" data-transition="zoom">
+  <span class="page-tag">💬 句型 1</span>
+  <button class="speak-float" onclick="speak('How much is it?')">🔊</button>
+  <img class="fragment fade-up" src="day7-images/page-013.png" alt="page 13">
+</section>
+
+<section class="pdf-page" data-transition="zoom">
+  <span class="page-tag">💬 句型 2</span>
+  <button class="speak-float" onclick="speak('It is ten dollars')">🔊</button>
+  <img class="fragment fade-up" src="day7-images/page-014.png" alt="page 14">
+</section>
+
+<section class="pdf-page" data-transition="zoom">
+  <span class="page-tag">🏆 結算</span>
+  <button class="speak-float" onclick="speak('Great job! For the One Piece of 會考!')">🔊</button>
+  <img class="fragment fade-up" src="day7-images/page-015.png" alt="page 15">
+</section>
+
+</div>
+</div>
+
+<div class="mouse-hint">🖱️ 滾輪 / 左鍵點空白 = 下一步 | 🔊 角落按鈕 = 唸英文</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script>
+function speak(text) {
+  if (!('speechSynthesis' in window)) { alert('瀏覽器不支援發音'); return; }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US'; utter.rate = 0.9; utter.pitch = 1; utter.volume = 1;
+  const voices = window.speechSynthesis.getVoices();
+  const enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
+  if (enVoice) utter.voice = enVoice;
+  window.speechSynthesis.speak(utter);
+}
+
+Reveal.initialize({
+  hash: true,
+  controls: false,
+  progress: false,
+  center: true,
+  transition: 'slide',
+  backgroundTransition: 'fade'
+});
+
+let wheelLocked = false;
+window.addEventListener('wheel', (e) => {
+  if (e.target.closest('iframe, button')) return;
+  e.preventDefault();
+  if (wheelLocked) return;
+  wheelLocked = true;
+  if (e.deltaY > 0) Reveal.next(); else if (e.deltaY < 0) Reveal.prev();
+  setTimeout(() => { wheelLocked = false; }, 250);
+}, { passive: false });
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('button, a, iframe, input, textarea, .speak-float, .intro-overlay')) return;
+  const w = window.innerWidth;
+  if (e.clientX < w * 0.15) Reveal.prev(); else Reveal.next();
+});
+</script>
+</body>
+</html>
