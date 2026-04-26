@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎮 八下數學 3-3 第三節 · 五招天王完整課程</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0A0E27;color:#fff;
+  font-family:"Microsoft JhengHei","微軟正黑體",sans-serif}
+body{display:flex;flex-direction:column;min-height:100vh}
+
+/* 頂部導覽 */
+#nav{background:linear-gradient(135deg,#1A0F3E,#2D1B4E);
+  padding:14px 20px;border-bottom:3px solid #FFD700;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);position:sticky;top:0;z-index:100}
+#nav h1{color:#FFD700;font-size:22px;font-weight:900;
+  text-shadow:0 0 10px rgba(255,215,0,.5)}
+#nav-tabs{display:flex;gap:10px}
+.tab{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.3);
+  color:#fff;padding:8px 18px;border-radius:10px;font-weight:800;
+  font-size:16px;cursor:pointer;transition:all .15s;font-family:inherit}
+.tab:hover{transform:translateY(-1px);background:rgba(255,215,0,.2)}
+.tab.active{background:linear-gradient(135deg,#FFD700,#FF8A00);
+  color:#1A0F3E;border-color:#FFD700;box-shadow:0 0 20px rgba(255,215,0,.5)}
+
+/* 主要區塊 */
+section{display:none;flex:1;width:100%}
+section.active{display:flex;flex-direction:column}
+
+/* 簡報區 */
+#section-slides{padding:20px;background:#1A1F3A}
+#section-slides h2{color:#FFD700;font-size:24px;margin-bottom:12px;
+  text-align:center;text-shadow:0 0 10px rgba(255,215,0,.4)}
+#section-slides .hint{text-align:center;color:#B8C5D6;margin-bottom:14px;
+  font-size:16px}
+#pdf-frame{flex:1;width:100%;height:calc(100vh - 220px);
+  background:#fff;border:3px solid #FFD700;border-radius:14px;
+  box-shadow:0 0 40px rgba(255,215,0,.3)}
+#go-animation{display:block;margin:18px auto 0;
+  background:linear-gradient(135deg,#B967FF,#7D2AE8);
+  color:#fff;padding:16px 36px;border-radius:14px;
+  border:3px solid #B967FF;font-size:22px;font-weight:900;
+  cursor:pointer;font-family:inherit;
+  box-shadow:0 0 20px rgba(185,103,255,.6);
+  animation:btnPulse 2s infinite}
+#go-animation:hover{transform:translateY(-2px) scale(1.04);
+  box-shadow:0 0 35px rgba(185,103,255,.9)}
+@keyframes btnPulse{0%,100%{box-shadow:0 0 20px rgba(185,103,255,.4)}
+  50%{box-shadow:0 0 35px rgba(185,103,255,.9)}}
+
+/* 動畫區 */
+#section-animation{padding:0;background:#0A0E27}
+#anim-frame{width:100%;height:calc(100vh - 60px);border:none;display:block}
+#back-to-slides{position:fixed;top:80px;left:20px;z-index:200;
+  background:rgba(255,215,0,.95);color:#1A0F3E;
+  padding:10px 20px;border-radius:10px;font-weight:900;
+  font-size:14px;cursor:pointer;border:2px solid #fff;
+  box-shadow:0 4px 12px rgba(0,0,0,.4);
+  font-family:inherit;display:none}
+#section-animation.active ~ #back-to-slides{display:block}
+
+/* 手機版 */
+@media (max-width:720px){
+  #nav{padding:8px 10px;flex-wrap:wrap;gap:8px}
+  #nav h1{font-size:16px;flex:1 1 100%;text-align:center}
+  .tab{padding:6px 12px;font-size:14px}
+  #section-slides h2{font-size:18px}
+  #pdf-frame{height:calc(100vh - 240px)}
+  #go-animation{font-size:18px;padding:12px 24px}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <h1>🎮 3-3 第三節 · 五招天王</h1>
+  <div id="nav-tabs">
+    <button class="tab active" data-tab="slides">📊 簡報</button>
+    <button class="tab" data-tab="animation">🎬 動畫</button>
+  </div>
+</nav>
+
+<!-- 區塊 1：NotebookLM 簡報 -->
+<section id="section-slides" class="active">
+  <h2>📊 引起動機簡報（先看這個建立概念）</h2>
+  <div class="hint">學生先看完投影片建立基礎概念，老師可以邊放邊講解 → 看完點下面紫色按鈕進入互動動畫</div>
+  <embed id="pdf-frame" src="pdfs/lesson3-aas-rhs.pdf#toolbar=1&navpanes=0" type="application/pdf">
+  <button id="go-animation">▶ 看完了！進入互動動畫</button>
+</section>
+
+<!-- 區塊 2：MOBA 互動動畫 -->
+<section id="section-animation">
+  <iframe id="anim-frame" src="congruence-aas-rhs-lesson3.html"></iframe>
+</section>
+
+<button id="back-to-slides">◀ 回簡報</button>
+
+<script>
+const tabs = document.querySelectorAll(".tab");
+const slidesSec = document.getElementById("section-slides");
+const animSec = document.getElementById("section-animation");
+const backBtn = document.getElementById("back-to-slides");
+
+function showSection(name){
+  tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+  slidesSec.classList.toggle("active", name === "slides");
+  animSec.classList.toggle("active", name === "animation");
+  backBtn.style.display = name === "animation" ? "block" : "none";
+  window.scrollTo(0, 0);
+}
+
+tabs.forEach(t => t.addEventListener("click", () => showSection(t.dataset.tab)));
+document.getElementById("go-animation").addEventListener("click", () => showSection("animation"));
+backBtn.addEventListener("click", () => showSection("slides"));
+</script>
+
+</body>
+</html>
