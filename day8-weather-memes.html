@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Day 8 🫠 天氣迷因戰場</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/theme/sky.css" id="theme">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
+.reveal{font-family:'Noto Sans TC',sans-serif;font-size:30px}
+.reveal h1{color:#0288d1;font-size:1.7em;font-weight:900}
+.reveal h2{color:#0277bd;font-size:1.3em;font-weight:900}
+.reveal h3{color:#01579b}
+.reveal .big-emoji{font-size:5em;text-align:center;margin:0;line-height:1}
+.reveal .word-card{background:linear-gradient(135deg,#e1f5fe,#b3e5fc);padding:25px;border-radius:20px;border-left:8px solid #0288d1;margin:15px 0}
+.reveal .en{font-size:2em;color:#01579b;font-weight:900;display:inline-block;margin-right:15px}
+.reveal .zh{font-size:1.2em;color:#0277bd}
+.reveal .meme{background:linear-gradient(135deg,#fff9c4,#ffeb3b);padding:12px;border-radius:15px;font-size:0.85em;display:inline-block;margin-top:10px}
+.reveal .correct{color:#2e7d32;font-weight:900}
+.reveal .wrong{color:#c62828}
+.reveal .hint{background:#fff3e0;padding:12px;border-radius:10px;border-left:5px solid #ff9800;font-size:0.85em}
+.reveal .question-box{background:linear-gradient(135deg,#fce4ec,#f8bbd0);padding:25px;border-radius:20px}
+.reveal .answer-box{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);padding:25px;border-radius:20px}
+.reveal .option{background:#fff;padding:12px;border-radius:10px;margin:8px 0;font-size:1em;border:2px solid #ddd}
+.reveal .lock{color:#d32f2f;font-weight:900;margin-top:15px;font-size:0.95em}
+.reveal table{font-size:0.78em}
+.reveal table th{background:#0288d1;color:#fff;padding:8px}
+.reveal table td{padding:6px;text-align:center}
+.reveal .badge{background:linear-gradient(135deg,#ffd700,#ffa500);color:#fff;padding:8px 18px;border-radius:30px;font-weight:900;display:inline-block;margin:5px}
+.reveal .ms{position:fixed;bottom:10px;right:20px;font-size:0.5em;color:#999;z-index:99}
+.reveal .photo{max-width:55%;max-height:340px;border-radius:15px;box-shadow:0 8px 24px rgba(0,0,0,0.25);margin:10px auto;display:block}
+.reveal .speak-btn{background:linear-gradient(135deg,#ff6b35,#ff2d95);color:#fff;border:none;border-radius:50%;width:60px;height:60px;font-size:1.5em;cursor:pointer;box-shadow:0 4px 16px rgba(255,107,53,0.5);vertical-align:middle;transition:all .2s}
+.reveal .speak-btn:hover{transform:scale(1.1)}
+.reveal .speak-btn:active{transform:scale(0.9)}
+.reveal iframe{border-radius:15px;box-shadow:0 8px 24px rgba(0,0,0,0.25)}
+.reveal .yt-link{display:inline-block;background:#ff0000;color:#fff;padding:10px 20px;border-radius:30px;text-decoration:none;font-weight:900;margin:8px}
+.reveal .yt-link:hover{background:#cc0000}
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ACT 1 開場 -->
+<section data-transition="zoom" data-background="linear-gradient(135deg,#81d4fa,#fff)">
+  <div class="big-emoji fragment fade-in">🫠</div>
+  <h1 class="fragment fade-up">Day 8 天氣迷因戰場</h1>
+  <h2 class="fragment fade-up">我快融化了！</h2>
+  <p class="fragment fade-up">從表情包學天氣英文 ☀️🌧️❄️</p>
+  <p class="fragment fade-up" style="font-size:0.7em;color:#666">芎林國中 九年級資源班 × Ms. Tseng</p>
+</section>
+
+<section data-transition="fade">
+  <h2>📚 複習 Day 1-7</h2>
+  <ul>
+    <li class="fragment fade-right">Day 1 人物 / Day 2 動作</li>
+    <li class="fragment fade-right">Day 3 時間 / Day 4 地點</li>
+    <li class="fragment fade-right">Day 5 情緒 / Day 6 食物</li>
+    <li class="fragment fade-right">Day 7 數字金錢 💰</li>
+    <li class="fragment fade-up" style="color:#d32f2f;font-weight:900;font-size:1.3em">→ 今天 Day 8 天氣 🌤️</li>
+  </ul>
+</section>
+
+<section data-transition="fade">
+  <h2>🎵 暖身 — 跟著音樂學天氣！</h2>
+  <p class="fragment fade-up">兒童英文超紅歌：「How's the Weather?」</p>
+  <iframe class="fragment fade-up" width="640" height="360" src="https://www.youtube.com/embed/CvHSv1tQjaU" title="How's the Weather Song" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</section>
+
+<section data-transition="fade">
+  <h2>🗺️ 今日學習地圖</h2>
+  <ol>
+    <li class="fragment fade-up">☀️ 召喚 10 個天氣英雄（按 🔊 學發音）</li>
+    <li class="fragment fade-up">💬 學會「How's the weather?」</li>
+    <li class="fragment fade-up">🎯 句型練習戰（4 題）</li>
+    <li class="fragment fade-up">⚔️ 會考模擬戰（6 題）</li>
+    <li class="fragment fade-up">🏆 勝利結算</li>
+  </ol>
+</section>
+
+<!-- ACT 2: 10 單字 (每字 1 卡 + 1 例句) -->
+<section data-transition="slide">
+  <div class="big-emoji fragment fade-in">🌤️</div>
+  <div class="word-card">
+    <span class="en fragment fade-up">weather</span>
+    <button class="speak-btn fragment fade-up" onclick="speak('weather')">🔊</button>
+    <div class="zh fragment fade-up">天氣 /ˈweðər/</div>
+  </div>
+  <img class="photo fragment fade-up" src="https://images.unsplash.com/photo-1561553873-e8491a564fd0?w=800" alt="weather">
+</section>
+
+<section data-transition="fade">
+  <h3>🌤️ weather 例句</h3>
+  <p class="fragment fade-up">📌 The weather is nice. <button class="speak-btn" onclick="speak('The weather is nice.')" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">📌 How's the weather? <button class="speak-btn" onclick="speak(\"How is the weather?\")" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">🆕 2026 新聞：氣象局又預報錯了 😅</p>
+  <div class="meme fragment fade-up">迷因：哆啦A夢的天氣轉換器 🤖</div>
+</section>
+
+<section data-transition="slide">
+  <div class="big-emoji fragment zoom-in">🥵🫠</div>
+  <div class="word-card">
+    <span class="en fragment fade-up">hot</span>
+    <button class="speak-btn fragment fade-up" onclick="speak('hot')">🔊</button>
+    <div class="zh fragment fade-up">熱 /hɑːt/</div>
+  </div>
+  <img class="photo fragment fade-up" src="https://images.unsplash.com/photo-1599056451797-5e225f87fb43?w=800" alt="hot sun">
+</section>
+
+<section data-transition="fade">
+  <h3>🥵 hot 例句</h3>
+  <p class="fragment fade-up">📌 It is hot today. <button class="speak-btn" onclick="speak('It is hot today.')" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">📌 I'm hot! 🫠 <button class="speak-btn" onclick="speak(\"I am hot!\")" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up" style="color:#d32f2f">🆕 2026 新聞：4 月已破 35 度 🌡️</p>
+  <div class="meme fragment fade-up">迷因：melting face（融化表情包）🫠</div>
+</section>
+
+<section data-transition="slide">
+  <div class="big-emoji fragment zoom-in">🥶</div>
+  <div class="word-card">
+    <span class="en fragment fade-up">cold</span>
+    <button class="speak-btn fragment fade-up" onclick="speak('cold')">🔊</button>
+    <div class="zh fragment fade-up">冷 /koʊld/</div>
+  </div>
+  <img class="photo fragment fade-up" src="https://images.unsplash.com/photo-1483664852095-d6cc6870702d?w=800" alt="cold winter">
+</section>
+
+<section data-transition="fade">
+  <h3>🥶 cold 例句</h3>
+  <p class="fragment fade-up">📌 It is cold outside. <button class="speak-btn" onclick="speak('It is cold outside.')" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">📌 I'm so cold! 🥶</p>
+  <p class="fragment fade-up">💡 反義：cold ↔ hot</p>
+  <div class="meme fragment fade-up">迷因：台語「凍未條」 🥶</div>
+</section>
+
+<section data-transition="slide">
+  <div class="big-emoji fragment zoom-in">🤗</div>
+  <div class="word-card">
+    <span class="en fragment fade-up">warm</span>
+    <button class="speak-btn fragment fade-up" onclick="speak('warm')">🔊</button>
+    <div class="zh fragment fade-up">溫暖 /wɔːrm/</div>
+  </div>
+  <img class="photo fragment fade-up" src="https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=800" alt="warm cozy">
+</section>
+
+<section data-transition="fade">
+  <h3>🌸 warm 例句</h3>
+  <p class="fragment fade-up">📌 It is warm and sunny. <button class="speak-btn" onclick="speak('It is warm and sunny.')" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">📌 Spring is warm. = 春天很溫暖。</p>
+  <p class="fragment fade-up">💡 記憶：warm = 暖暖包的暖</p>
+</section>
+
+<section data-transition="slide">
+  <div class="big-emoji fragment zoom-in">😎</div>
+  <div class="word-card">
+    <span class="en fragment fade-up">cool</span>
+    <button class="speak-btn fragment fade-up" onclick="speak('cool')">🔊</button>
+    <div class="zh fragment fade-up">涼爽 / 酷 /kuːl/</div>
+  </div>
+  <img class="photo fragment fade-up" src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800" alt="cool autumn">
+</section>
+
+<section data-transition="fade">
+  <h3>😎 cool 例句</h3>
+  <p class="fragment fade-up">📌 It is cool in the evening. <button class="speak-btn" onclick="speak('It is cool in the evening.')" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">📌 "That's so cool!" = 那超酷的！</p>
+  <p class="fragment fade-up">💡 air conditioner（冷氣）= 變 cool 的機器</p>
+</section>
+
+<section data-transition="slide">
+  <div class="big-emoji fragment zoom-in">🌧️</div>
+  <div class="word-card">
+    <span class="en fragment fade-up">rain</span>
+    <button class="speak-btn fragment fade-up" onclick="speak('rain')">🔊</button>
+    <div class="zh fragment fade-up">下雨 /reɪn/</div>
+  </div>
+  <img class="photo fragment fade-up" src="https://images.unsplash.com/photo-1438449805896-28a666819a20?w=800" alt="rain">
+</section>
+
+<section data-transition="fade">
+  <h3>🌧️ rain 例句</h3>
+  <p class="fragment fade-up">📌 It will rain tomorrow. <button class="speak-btn" onclick="speak('It will rain tomorrow.')" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">📌 It's raining! ☔</p>
+  <p class="fragment fade-up">💡 raining cats and dogs = 下大雨（俚語）</p>
+  <div class="meme fragment fade-up">迷因：鬼滅之刃「水之呼吸」💧</div>
+</section>
+
+<section data-transition="slide">
+  <div class="big-emoji fragment zoom-in">☀️</div>
+  <div class="word-card">
+    <span class="en fragment fade-up">sunny</span>
+    <button class="speak-btn fragment fade-up" onclick="speak('sunny')">🔊</button>
+    <div class="zh fragment fade-up">晴天 /ˈsʌni/</div>
+  </div>
+  <img class="photo fragment fade-up" src="https://images.unsplash.com/photo-1419833173245-f59e1b93f9ee?w=800" alt="sunny day">
+</section>
+
+<section data-transition="fade">
+  <h3>☀️ sunny 例句</h3>
+  <p class="fragment fade-up">📌 It is a sunny day. <button class="speak-btn" onclick="speak('It is a sunny day.')" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">📌 Sunny days = beach time! 🏖️</p>
+  <p class="fragment fade-up">💡 記憶：sun + ny = sunny</p>
+</section>
+
+<section data-transition="slide">
+  <div class="big-emoji fragment zoom-in">☁️</div>
+  <div class="word-card">
+    <span class="en fragment fade-up">cloudy</span>
+    <button class="speak-btn fragment fade-up" onclick="speak('cloudy')">🔊</button>
+    <div class="zh fragment fade-up">多雲 /ˈklaʊdi/</div>
+  </div>
+  <img class="photo fragment fade-up" src="https://images.unsplash.com/photo-1499346030926-9a72daac6c63?w=800" alt="cloudy">
+</section>
+
+<section data-transition="fade">
+  <h3>☁️ cloudy 例句</h3>
+  <p class="fragment fade-up">📌 It is cloudy today. <button class="speak-btn" onclick="speak('It is cloudy today.')" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">💡 記憶：cloud + y = cloudy</p>
+  <p class="fragment fade-up" style="color:#d32f2f">🆕 氣象局梗：多雲 = 可能下雨 ☔</p>
+</section>
+
+<section data-transition="slide">
+  <div class="big-emoji fragment zoom-in">🌪️</div>
+  <div class="word-card">
+    <span class="en fragment fade-up">wind</span>
+    <button class="speak-btn fragment fade-up" onclick="speak('wind')">🔊</button>
+    <div class="zh fragment fade-up">風 /wɪnd/</div>
+  </div>
+  <img class="photo fragment fade-up" src="https://images.unsplash.com/photo-1527482797697-8795b05a13a4?w=800" alt="wind">
+</section>
+
+<section data-transition="fade">
+  <h3>🌪️ wind 例句</h3>
+  <p class="fragment fade-up">📌 The wind is strong. <button class="speak-btn" onclick="speak('The wind is strong.')" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">📌 "Wind so strong, I'm flying like Anya!"</p>
+  <p class="fragment fade-up" style="color:#d32f2f">🆕 強颱來襲：「明天放假！」🎉</p>
+</section>
+
+<section data-transition="slide">
+  <div class="big-emoji fragment zoom-in">❄️</div>
+  <div class="word-card">
+    <span class="en fragment fade-up">snow</span>
+    <button class="speak-btn fragment fade-up" onclick="speak('snow')">🔊</button>
+    <div class="zh fragment fade-up">雪 /snoʊ/</div>
+  </div>
+  <img class="photo fragment fade-up" src="https://images.unsplash.com/photo-1418985991508-e47386d96a71?w=800" alt="snow">
+</section>
+
+<section data-transition="fade">
+  <h3>❄️ snow 例句</h3>
+  <p class="fragment fade-up">📌 It snows in winter. <button class="speak-btn" onclick="speak('It snows in winter.')" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">📌 It's snowing! ❄️</p>
+  <p class="fragment fade-up">💡 台灣稀有：合歡山下雪 = 全民朝聖打卡 📸</p>
+  <div class="meme fragment fade-up">迷因：snowman ⛄ = 雪人</div>
+</section>
+
+<!-- ACT 3 總集合 -->
+<section data-transition="fade">
+  <h2>📊 10 大天氣英雄（點 🔊 聽發音）</h2>
+  <table>
+    <tr><th>英文</th><th>中文</th><th>發音</th><th>表情</th></tr>
+    <tr class="fragment fade-up"><td>weather</td><td>天氣</td><td><button class="speak-btn" onclick="speak('weather')" style="width:32px;height:32px;font-size:0.75em">🔊</button></td><td>🌤️</td></tr>
+    <tr class="fragment fade-up"><td>hot</td><td>熱</td><td><button class="speak-btn" onclick="speak('hot')" style="width:32px;height:32px;font-size:0.75em">🔊</button></td><td>🥵🫠</td></tr>
+    <tr class="fragment fade-up"><td>cold</td><td>冷</td><td><button class="speak-btn" onclick="speak('cold')" style="width:32px;height:32px;font-size:0.75em">🔊</button></td><td>🥶</td></tr>
+    <tr class="fragment fade-up"><td>warm</td><td>溫暖</td><td><button class="speak-btn" onclick="speak('warm')" style="width:32px;height:32px;font-size:0.75em">🔊</button></td><td>🤗</td></tr>
+    <tr class="fragment fade-up"><td>cool</td><td>涼爽</td><td><button class="speak-btn" onclick="speak('cool')" style="width:32px;height:32px;font-size:0.75em">🔊</button></td><td>😎</td></tr>
+    <tr class="fragment fade-up"><td>rain</td><td>下雨</td><td><button class="speak-btn" onclick="speak('rain')" style="width:32px;height:32px;font-size:0.75em">🔊</button></td><td>🌧️</td></tr>
+    <tr class="fragment fade-up"><td>sunny</td><td>晴天</td><td><button class="speak-btn" onclick="speak('sunny')" style="width:32px;height:32px;font-size:0.75em">🔊</button></td><td>☀️</td></tr>
+    <tr class="fragment fade-up"><td>cloudy</td><td>多雲</td><td><button class="speak-btn" onclick="speak('cloudy')" style="width:32px;height:32px;font-size:0.75em">🔊</button></td><td>☁️</td></tr>
+    <tr class="fragment fade-up"><td>wind</td><td>風</td><td><button class="speak-btn" onclick="speak('wind')" style="width:32px;height:32px;font-size:0.75em">🔊</button></td><td>🌪️</td></tr>
+    <tr class="fragment fade-up"><td>snow</td><td>雪</td><td><button class="speak-btn" onclick="speak('snow')" style="width:32px;height:32px;font-size:0.75em">🔊</button></td><td>❄️</td></tr>
+  </table>
+</section>
+
+<section data-transition="fade">
+  <h2>🎯 看 emoji 喊英文！</h2>
+  <p style="font-size:2.5em">
+    <span class="fragment fade-in">🌤️ ?</span>
+    <span class="fragment fade-in">🥵 ?</span>
+    <span class="fragment fade-in">🥶 ?</span>
+    <span class="fragment fade-in">🤗 ?</span>
+    <span class="fragment fade-in">😎 ?</span>
+  </p>
+  <p style="font-size:2.5em">
+    <span class="fragment fade-in">🌧️ ?</span>
+    <span class="fragment fade-in">☀️ ?</span>
+    <span class="fragment fade-in">☁️ ?</span>
+    <span class="fragment fade-in">🌪️ ?</span>
+    <span class="fragment fade-in">❄️ ?</span>
+  </p>
+</section>
+
+<!-- ACT 4 句型 -->
+<section data-transition="zoom">
+  <h2>🔮 句型 1：How's the weather?</h2>
+  <p class="fragment fade-up" style="font-size:1.4em">「天氣怎麼樣？」<button class="speak-btn" onclick="speak(\"How is the weather?\")" style="width:40px;height:40px;font-size:1em">🔊</button></p>
+  <p class="fragment fade-up">結構：How + is + the + weather + ?</p>
+  <p class="fragment fade-up">回答：<strong>It is + 形容詞 + today.</strong></p>
+</section>
+
+<section data-transition="fade">
+  <h3>📚 句型 1 範例</h3>
+  <p class="fragment fade-right"><strong>A:</strong> How's the weather? <button class="speak-btn" onclick="speak(\"How is the weather?\")" style="width:35px;height:35px;font-size:0.9em">🔊</button></p>
+  <p class="fragment fade-left"><strong>B:</strong> It's hot today. ☀️ <button class="speak-btn" onclick="speak(\"It's hot today.\")" style="width:35px;height:35px;font-size:0.9em">🔊</button></p>
+  <p class="fragment fade-left"><strong>B:</strong> It's rainy today. 🌧️ <button class="speak-btn" onclick="speak(\"It's rainy today.\")" style="width:35px;height:35px;font-size:0.9em">🔊</button></p>
+  <p class="fragment fade-left"><strong>B:</strong> It's sunny today. ☀️ <button class="speak-btn" onclick="speak(\"It's sunny today.\")" style="width:35px;height:35px;font-size:0.9em">🔊</button></p>
+</section>
+
+<section data-transition="zoom">
+  <h2>🔮 句型 2：It is ___ today.</h2>
+  <p class="fragment fade-up" style="font-size:1.3em">「今天 ___ 」</p>
+  <p class="fragment fade-up">📌 It is hot today. <button class="speak-btn" onclick="speak('It is hot today.')" style="width:35px;height:35px;font-size:0.9em">🔊</button></p>
+  <p class="fragment fade-up">📌 It is cold today. <button class="speak-btn" onclick="speak('It is cold today.')" style="width:35px;height:35px;font-size:0.9em">🔊</button></p>
+  <p class="fragment fade-up">📌 It is rainy today. <button class="speak-btn" onclick="speak('It is rainy today.')" style="width:35px;height:35px;font-size:0.9em">🔊</button></p>
+</section>
+
+<section data-transition="fade">
+  <h2>⚠️ 文法陷阱</h2>
+  <p class="fragment fade-up"><strong>rain</strong> = 動詞 (It rains.)</p>
+  <p class="fragment fade-up"><strong>rainy</strong> = 形容詞 (It is rainy.)</p>
+  <p class="fragment fade-up"><strong>snow</strong> = 動詞 (It snows.)</p>
+  <p class="fragment fade-up"><strong>snowy</strong> = 形容詞 (It is snowy.)</p>
+  <p class="fragment fade-up" style="color:#d32f2f;font-weight:900">口訣：be 動詞後面用形容詞（加 y）！</p>
+</section>
+
+<!-- ACT 5 句型練習 -->
+<section data-transition="slide" data-background="linear-gradient(135deg,#fce4ec,#f8bbd0)">
+  <h2>🎯 Practice 1 題目</h2>
+  <p class="fragment fade-up">朋友問你天氣：</p>
+  <p class="fragment fade-up" style="font-size:1.3em">A: How's the ___?</p>
+  <div class="option fragment fade-up">(A) weather</div>
+  <div class="option fragment fade-up">(B) wind</div>
+  <div class="option fragment fade-up">(C) hot</div>
+  <p class="lock fragment fade-in">🚫 答案在下一頁！自己先想！</p>
+</section>
+
+<section data-transition="slide">
+  <div class="answer-box">
+    <h2>✅ Practice 1 答案</h2>
+    <p class="fragment fade-up correct" style="font-size:1.4em">正解：(A) weather</p>
+    <p class="fragment fade-up">完整句：How's the weather? <button class="speak-btn" onclick="speak(\"How is the weather?\")" style="width:35px;height:35px;font-size:0.9em">🔊</button></p>
+  </div>
+</section>
+
+<section data-transition="slide" data-background="linear-gradient(135deg,#fce4ec,#f8bbd0)">
+  <h2>🎯 Practice 2 題目</h2>
+  <p class="fragment fade-up">今天 35 度高溫 🥵：</p>
+  <p class="fragment fade-up" style="font-size:1.3em">It is ___ today!</p>
+  <div class="option fragment fade-up">(A) hot</div>
+  <div class="option fragment fade-up">(B) cold</div>
+  <div class="option fragment fade-up">(C) snow</div>
+  <p class="lock fragment fade-in">🚫 答案在下一頁！</p>
+</section>
+
+<section data-transition="slide">
+  <div class="answer-box">
+    <h2>✅ Practice 2 答案</h2>
+    <p class="fragment fade-up correct" style="font-size:1.4em">正解：(A) hot 🥵🫠</p>
+    <p class="fragment fade-up">完整句：It is hot today! <button class="speak-btn" onclick="speak('It is hot today!')" style="width:35px;height:35px;font-size:0.9em">🔊</button></p>
+  </div>
+</section>
+
+<section data-transition="slide" data-background="linear-gradient(135deg,#fce4ec,#f8bbd0)">
+  <h2>🎯 Practice 3 題目</h2>
+  <p class="fragment fade-up">明天會下雨：</p>
+  <p class="fragment fade-up" style="font-size:1.3em">It will ___ tomorrow.</p>
+  <div class="option fragment fade-up">(A) rain</div>
+  <div class="option fragment fade-up">(B) sun</div>
+  <div class="option fragment fade-up">(C) snow</div>
+  <p class="lock fragment fade-in">🚫 答案在下一頁！</p>
+</section>
+
+<section data-transition="slide">
+  <div class="answer-box">
+    <h2>✅ Practice 3 答案</h2>
+    <p class="fragment fade-up correct" style="font-size:1.4em">正解：(A) rain</p>
+    <p class="fragment fade-up">完整句：It will rain tomorrow. <button class="speak-btn" onclick="speak('It will rain tomorrow.')" style="width:35px;height:35px;font-size:0.9em">🔊</button></p>
+    <div class="hint fragment fade-up">💡 will + 原形動詞 = rain（不是 rainy）</div>
+  </div>
+</section>
+
+<section data-transition="slide" data-background="linear-gradient(135deg,#fce4ec,#f8bbd0)">
+  <h2>🎯 Practice 4 題目</h2>
+  <p class="fragment fade-up">合歡山冬天下雪 ❄️：</p>
+  <p class="fragment fade-up" style="font-size:1.3em">It ___ on Mt. Hehuan in winter.</p>
+  <div class="option fragment fade-up">(A) snows</div>
+  <div class="option fragment fade-up">(B) snow</div>
+  <div class="option fragment fade-up">(C) snowy</div>
+  <p class="lock fragment fade-in">🚫 答案在下一頁！</p>
+</section>
+
+<section data-transition="slide">
+  <div class="answer-box">
+    <h2>✅ Practice 4 答案</h2>
+    <p class="fragment fade-up correct" style="font-size:1.4em">正解：(A) snows</p>
+    <p class="fragment fade-up">It snows on Mt. Hehuan in winter.</p>
+    <div class="hint fragment fade-up">💡 It（單數）+ 動詞要加 s</div>
+  </div>
+</section>
+
+<!-- ACT 6 會考模擬 -->
+<section data-transition="zoom" data-background="linear-gradient(135deg,#9c27b0,#3f51b5)">
+  <h1 class="fragment fade-up" style="color:#fff">⚔️ 會考模擬戰</h1>
+  <p class="fragment fade-up" style="font-size:1.3em;color:#fff">6 場聖杯戰鬥 開始！</p>
+</section>
+
+<section data-transition="slide" data-background="linear-gradient(135deg,#fce4ec,#f8bbd0)">
+  <h2>⚔️ Battle 1 題目</h2>
+  <p class="fragment fade-up">氣象主播：「明天 90% 機率下雨」</p>
+  <p class="fragment fade-up" style="font-size:1.2em">It will ___ tomorrow.</p>
+  <div class="option fragment fade-up">(A) rain</div>
+  <div class="option fragment fade-up">(B) snow</div>
+  <div class="option fragment fade-up">(C) sunny</div>
+  <div class="option fragment fade-up">(D) wind</div>
+  <p class="lock fragment fade-in">🚫 答案下一頁！</p>
+</section>
+
+<section data-transition="slide">
+  <div class="answer-box">
+    <h2>✅ Battle 1 答案</h2>
+    <p class="fragment fade-up correct" style="font-size:1.4em">(A) rain</p>
+    <div class="hint fragment fade-up">解析：will + 原形 → rain</div>
+  </div>
+</section>
+
+<section data-transition="slide" data-background="linear-gradient(135deg,#fce4ec,#f8bbd0)">
+  <h2>⚔️ Battle 2 題目</h2>
+  <p class="fragment fade-up">合歡山冬天看到的白色東西是？</p>
+  <p class="fragment fade-up" style="font-size:1.2em">The white thing is ___.</p>
+  <div class="option fragment fade-up">(A) snow</div>
+  <div class="option fragment fade-up">(B) rain</div>
+  <div class="option fragment fade-up">(C) hot</div>
+  <div class="option fragment fade-up">(D) sunny</div>
+  <p class="lock fragment fade-in">🚫 答案下一頁！</p>
+</section>
+
+<section data-transition="slide">
+  <div class="answer-box">
+    <h2>✅ Battle 2 答案</h2>
+    <p class="fragment fade-up correct" style="font-size:1.4em">(A) snow ❄️</p>
+    <div class="hint fragment fade-up">白色 + 冬天 = snow</div>
+  </div>
+</section>
+
+<section data-transition="slide" data-background="linear-gradient(135deg,#fce4ec,#f8bbd0)">
+  <h2>⚔️ Battle 3 題目</h2>
+  <p class="fragment fade-up">颱風天最強的是什麼？🌪️</p>
+  <p class="fragment fade-up" style="font-size:1.2em">Typhoon brings strong ___.</p>
+  <div class="option fragment fade-up">(A) wind</div>
+  <div class="option fragment fade-up">(B) sun</div>
+  <div class="option fragment fade-up">(C) cool</div>
+  <div class="option fragment fade-up">(D) warm</div>
+  <p class="lock fragment fade-in">🚫 答案下一頁！</p>
+</section>
+
+<section data-transition="slide">
+  <div class="answer-box">
+    <h2>✅ Battle 3 答案</h2>
+    <p class="fragment fade-up correct" style="font-size:1.4em">(A) wind 🌪️</p>
+    <div class="hint fragment fade-up">颱風 = strong wind</div>
+  </div>
+</section>
+
+<section data-transition="slide" data-background="linear-gradient(135deg,#fce4ec,#f8bbd0)">
+  <h2>⚔️ Battle 4 題目</h2>
+  <p class="fragment fade-up">「外面好冷喔！」🥶</p>
+  <p class="fragment fade-up" style="font-size:1.2em">It's so ___ outside!</p>
+  <div class="option fragment fade-up">(A) cold</div>
+  <div class="option fragment fade-up">(B) hot</div>
+  <div class="option fragment fade-up">(C) sunny</div>
+  <div class="option fragment fade-up">(D) cloudy</div>
+  <p class="lock fragment fade-in">🚫 答案下一頁！</p>
+</section>
+
+<section data-transition="slide">
+  <div class="answer-box">
+    <h2>✅ Battle 4 答案</h2>
+    <p class="fragment fade-up correct" style="font-size:1.4em">(A) cold 🥶</p>
+    <div class="hint fragment fade-up">It's so cold outside!</div>
+  </div>
+</section>
+
+<section data-transition="slide" data-background="linear-gradient(135deg,#fce4ec,#f8bbd0)">
+  <h2>⚔️ Battle 5 題目</h2>
+  <p class="fragment fade-up">「好天氣，去公園！」</p>
+  <p class="fragment fade-up" style="font-size:1.2em">It's a ___ day.</p>
+  <div class="option fragment fade-up">(A) sunny</div>
+  <div class="option fragment fade-up">(B) rainy</div>
+  <div class="option fragment fade-up">(C) snow</div>
+  <div class="option fragment fade-up">(D) wind</div>
+  <p class="lock fragment fade-in">🚫 答案下一頁！</p>
+</section>
+
+<section data-transition="slide">
+  <div class="answer-box">
+    <h2>✅ Battle 5 答案</h2>
+    <p class="fragment fade-up correct" style="font-size:1.4em">(A) sunny ☀️</p>
+    <div class="hint fragment fade-up">🔗 park 是 Day 4 學過！</div>
+  </div>
+</section>
+
+<section data-transition="slide" data-background="linear-gradient(135deg,#fce4ec,#f8bbd0)">
+  <h2>⚔️ Battle 6 題目</h2>
+  <p class="fragment fade-up">It ___ hot today.</p>
+  <div class="option fragment fade-up">(A) is</div>
+  <div class="option fragment fade-up">(B) am</div>
+  <div class="option fragment fade-up">(C) are</div>
+  <div class="option fragment fade-up">(D) be</div>
+  <p class="lock fragment fade-in">🚫 答案下一頁！</p>
+</section>
+
+<section data-transition="slide">
+  <div class="answer-box">
+    <h2>✅ Battle 6 答案</h2>
+    <p class="fragment fade-up correct" style="font-size:1.4em">(A) is</p>
+    <div class="hint fragment fade-up">It → is（Day 5 be 動詞學過！）</div>
+  </div>
+</section>
+
+<!-- ACT 7 結算 + 加碼影片 -->
+<section data-transition="zoom" data-background="linear-gradient(135deg,#ffd700,#ff9800)">
+  <h1 style="color:#fff" class="fragment fade-up">🏆 今日戰績！</h1>
+  <div class="badge fragment fade-up">🎖️ 10 個天氣英雄</div>
+  <div class="badge fragment fade-up">🎖️ How's the weather?</div>
+  <div class="badge fragment fade-up">🎖️ 4 題練習</div>
+  <div class="badge fragment fade-up">🎖️ 6 場模擬戰</div>
+</section>
+
+<section data-transition="fade">
+  <h2>🎬 加碼：天氣英文 MV</h2>
+  <p class="fragment fade-up">Super Simple Songs - "Sunny Day"</p>
+  <iframe class="fragment fade-up" width="640" height="360" src="https://www.youtube.com/embed/bRGBjZmrWHM" title="Sunny Day Song" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</section>
+
+<section data-transition="fade">
+  <h2>🔮 下集預告</h2>
+  <p class="fragment fade-up" style="font-size:1.4em">Day 9 🚌 交通篇</p>
+  <p class="fragment fade-up">公車 / 火車 / 捷運 / 騎車 / 開車</p>
+  <p class="fragment fade-up" style="margin-top:30px;font-size:1.1em;color:#0277bd">不管 hot 還是 cold，</p>
+  <p class="fragment fade-up" style="font-size:1.1em;color:#0277bd">不管 sunny 還是 rainy，</p>
+  <p class="fragment fade-up" style="font-size:1.3em;color:#d32f2f;font-weight:900">你都來上課了！🌈</p>
+</section>
+
+</div>
+</div>
+
+<div class="ms">⚓ Day 8 by Ms. Tseng</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script>
+// 🔊 英文發音功能（瀏覽器內建 Web Speech API）
+function speak(text) {
+  if (!('speechSynthesis' in window)) {
+    alert('你的瀏覽器不支援發音功能');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = 0.9;
+  utter.pitch = 1;
+  utter.volume = 1;
+  // 嘗試找美式發音
+  const voices = window.speechSynthesis.getVoices();
+  const enVoice = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
+  if (enVoice) utter.voice = enVoice;
+  window.speechSynthesis.speak(utter);
+}
+
+// 預先載入聲音清單
+window.speechSynthesis.onvoiceschanged = () => {
+  console.log('🔊 發音引擎已載入', window.speechSynthesis.getVoices().length, '種聲音');
+};
+
+Reveal.initialize({
+  hash: true,
+  controls: true,
+  progress: true,
+  center: true,
+  transition: 'slide',
+  transitionSpeed: 'default',
+  backgroundTransition: 'fade'
+});
+</script>
+</body>
+</html>
