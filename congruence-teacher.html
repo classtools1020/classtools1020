@@ -175,8 +175,8 @@
 <!-- 學生編輯 modal -->
 <div class="modal-overlay" id="editModal">
   <div class="modal-box">
-    <h3>👥 編輯學生名單</h3>
-    <p>輸入這個班 8A 數學的 5 位學生姓名（用逗號分隔，或一行一個）</p>
+    <h3>👥 編輯學生暱稱清單</h3>
+    <p>學生會自己取暱稱（例如：小光、神龍、ABC...）<br>請學生回報暱稱後，輸入這裡（一行一個或逗號分隔）</p>
     <textarea id="studentsInput" rows="6" style="width:100%;padding:10px;border-radius:8px;border:2px solid #B967FF;background:#0A0E27;color:#fff;font-family:inherit;font-size:1em;outline:none"></textarea>
     <div class="row-btn">
       <button class="tb-btn" onclick="closeStudentEditor()">取消</button>
@@ -213,7 +213,7 @@ function loadStudents(){
     const s = JSON.parse(localStorage.getItem(STUDENTS_KEY) || '[]');
     if(Array.isArray(s) && s.length>0) return s;
   }catch(e){}
-  return ['1 號','2 號','3 號','4 號','5 號']; // 預設 placeholder
+  return ['（待學生回報）','（待學生回報）','（待學生回報）','（待學生回報）','（待學生回報）'];
 }
 function saveStudentsToStorage(){
   localStorage.setItem(STUDENTS_KEY, JSON.stringify(students));
