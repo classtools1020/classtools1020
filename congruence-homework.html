@@ -442,17 +442,22 @@ function drawTriSVG(opts){
     pts.forEach((p,i)=>lbl(p,i,names[i]));
   }
 
-  // 標題
-  if(label){
-    const t = svgEl('text',{
-      x:w/2, y:24, 'text-anchor':'middle',
-      'font-size':16, 'font-weight':900, fill:'#fff',
-      stroke:'#000','stroke-width':3,'paint-order':'stroke'
-    });
-    t.textContent = label;
-    svg.appendChild(t);
-  }
+  // ✅ 標題不在 SVG 內畫（避免擋住頂點），統一由外層 HTML 標題顯示
   return svg;
+}
+
+// 包裝：SVG + 下方 HTML 標籤
+function wrapTri(svg, caption){
+  const wrap = document.createElement('div');
+  wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+  wrap.appendChild(svg);
+  if(caption){
+    const cap = document.createElement('div');
+    cap.style.cssText='font-size:1.05em;font-weight:900;color:#FFD700;letter-spacing:1px;text-shadow:1px 1px 0 #000';
+    cap.innerHTML = caption;
+    wrap.appendChild(cap);
+  }
+  return wrap;
 }
 
 // 簡單形狀（用在熱身關）
@@ -513,12 +518,12 @@ const LEVELS = [
     leftTri:{a:5, b:7, c:8, highlight:'AB'},
     rightTri:{a:5, b:7, c:8},
     options:[
-      {label:"A'B'", correct:true},
-      {label:"B'C'", correct:false},
-      {label:"C'A'", correct:false},
+      {label:"DE", correct:true},
+      {label:"EF", correct:false},
+      {label:"DF", correct:false},
     ],
-    hint:"AB 對應 A'B'（同位置同名字）",
-    msg:"答對！對應邊：AB = A'B'"
+    hint:"△ABC ≅ △DEF：A↔D、B↔E、C↔F，所以 AB ↔ DE",
+    msg:"答對！對應邊：AB = DE"
   },
 
   // L3: SSS 推未知邊
@@ -527,13 +532,13 @@ const LEVELS = [
     title:'第 3 關 · SSS 推邊長',
     sub:'兩三角形 SSS 全等 → 對應邊相等',
     icon:'📏',
-    speak:'兩三角形 SSS 全等。右邊「?」是多少？',
+    speak:'△ABC ≅ △DEF（SSS 全等）。右邊「?」是多少？',
     leftSides:[3, 4, 5],     // [BC, CA, AB]
-    rightHide:0,             // 隱藏右邊第 0 個 (BC)
+    rightHide:0,             // 隱藏右邊第 0 個 (BC) → 對應 EF
     answer:3,
     options:[3, 4, 5, 6],
-    hint:'左邊 BC = 3，全等 → 右邊 B\'C\' 也是 3',
-    msg:'答對！SSS 全等：對應邊相等 → ? = 3'
+    hint:'BC 對應 EF → EF = BC = 3',
+    msg:'答對！對應邊相等 → EF = 3'
   },
 
   // L4: SAS 推未知邊
@@ -542,13 +547,13 @@ const LEVELS = [
     title:'第 4 關 · SAS 推邊長',
     sub:'SAS 全等 → 對應邊相等',
     icon:'📐',
-    speak:'SAS 全等：兩邊 + 夾角。AB = ?',
+    speak:'△ABC ≅ △DEF（SAS 全等）。DE = ?',
     leftSAS:{AB:6, AC:8, angA:60},
     rightSAS:{AB:'?', AC:8, angA:60},
     answer:6,
     options:[4, 6, 8, 10],
-    hint:'SAS 全等 → AB = A\'B\' = 6',
-    msg:'答對！對應邊相等 → AB = 6'
+    hint:'AB 對應 DE → DE = AB = 6',
+    msg:'答對！對應邊相等 → DE = 6'
   },
 
   // L5: ASA 推未知角
@@ -557,13 +562,13 @@ const LEVELS = [
     title:'第 5 關 · ASA 推角度',
     sub:'ASA 全等 → 對應角相等',
     icon:'🎯',
-    speak:'ASA 全等：兩角 + 夾邊。∠B = ?',
+    speak:'△ABC ≅ △DEF（ASA 全等）。∠E = ?',
     leftASA:{angB:50, BC:5, angC:70},
     rightASA:{angB:'?', BC:5, angC:70},
     answer:50,
     options:[30, 50, 60, 70],
-    hint:'ASA 全等 → ∠B = ∠B\' = 50°',
-    msg:'答對！對應角相等 → ∠B = 50°'
+    hint:'∠B 對應 ∠E → ∠E = ∠B = 50°',
+    msg:'答對！對應角相等 → ∠E = 50°'
   },
 
   // L6: 看顏色秒認招
@@ -609,11 +614,11 @@ const LEVELS = [
     speak:'BOSS 戰開始！6 題綜合應用',
     boss:[
       {kind:'rule',  q:'兩個三角形三邊都是 5、7、8。', correct:'SSS', options:['SSS','SAS','ASA']},
-      {kind:'find',  q:'SSS 全等：左邊 3、4、5，右邊 3、4、? · ?=', correct:5, options:[3,4,5,6]},
+      {kind:'find',  q:'△ABC ≅ △DEF · 三邊都 3、4、5。EF = ?', correct:3, options:[3,4,5,6]},
       {kind:'rule',  q:'兩邊 6、8 + 夾角 60°。', correct:'SAS', options:['SSS','SAS','ASA']},
-      {kind:'find',  q:'SAS 全等：左 AB=7，右 A\'B\'=? · ?=', correct:7, options:[5,7,9,11]},
+      {kind:'find',  q:'△ABC ≅ △DEF（SAS 全等）· AB=7。DE = ?', correct:7, options:[5,7,9,11]},
       {kind:'rule',  q:'兩角 45°、60° + 夾邊 5。', correct:'ASA', options:['SSS','SAS','ASA']},
-      {kind:'find',  q:'ASA 全等：左 ∠C=80°，右 ∠C\'=? · ?=', correct:80, options:[60,70,80,90]},
+      {kind:'find',  q:'△ABC ≅ △DEF（ASA 全等）· ∠C = 80°。∠F = ?', correct:80, options:[60,70,80,90]},
     ]
   }
 ];
@@ -875,12 +880,13 @@ function renderShapePick(parent, lv){
 
 // ===== L2: 對應邊找朋友 =====
 function renderSideMatch(parent, lv){
-  // 兩個全等三角形並列
   const row=document.createElement('div'); row.className='svg-wrap';
-  const left = drawTriSVG({a:lv.leftTri.a,b:lv.leftTri.b,c:lv.leftTri.c, type:'NEUTRAL', w:240, h:200, sides:[lv.leftTri.a, lv.leftTri.b, lv.leftTri.c], showVertex:true, vertexNames:['A','B','C'], highlightEdge:lv.leftTri.highlight, label:'△ABC'});
+  const leftSvg = drawTriSVG({a:lv.leftTri.a,b:lv.leftTri.b,c:lv.leftTri.c, type:'NEUTRAL', w:230, h:190, sides:[lv.leftTri.a, lv.leftTri.b, lv.leftTri.c], showVertex:true, vertexNames:['A','B','C'], highlightEdge:lv.leftTri.highlight});
+  const rightSvg = drawTriSVG({a:lv.rightTri.a,b:lv.rightTri.b,c:lv.rightTri.c, type:'NEUTRAL', w:230, h:190, sides:[lv.rightTri.a, lv.rightTri.b, lv.rightTri.c], showVertex:true, vertexNames:['D','E','F']});
   const eq=document.createElement('div'); eq.className='eq-symbol'; eq.textContent='≅';
-  const right = drawTriSVG({a:lv.rightTri.a,b:lv.rightTri.b,c:lv.rightTri.c, type:'NEUTRAL', w:240, h:200, sides:[lv.rightTri.a, lv.rightTri.b, lv.rightTri.c], showVertex:true, vertexNames:["A'","B'","C'"], label:"△A'B'C'"});
-  row.appendChild(left); row.appendChild(eq); row.appendChild(right);
+  row.appendChild(wrapTri(leftSvg, '△ABC'));
+  row.appendChild(eq);
+  row.appendChild(wrapTri(rightSvg, '△DEF'));
   parent.appendChild(row);
 
   // 答案
@@ -902,10 +908,12 @@ function renderFindSideSSS(parent, lv){
   rightSides[lv.rightHide] = '?';
 
   const row=document.createElement('div'); row.className='svg-wrap';
-  const left = drawTriSVG({a:BC,b:CA,c:AB, type:'SSS', w:240, h:200, sides:[BC,CA,AB], showVertex:true, vertexNames:['A','B','C'], label:'△ABC'});
+  const leftSvg = drawTriSVG({a:BC,b:CA,c:AB, type:'SSS', w:230, h:190, sides:[BC,CA,AB], showVertex:true, vertexNames:['A','B','C']});
+  const rightSvg = drawTriSVG({a:BC,b:CA,c:AB, type:'SSS', w:230, h:190, sides:rightSides, showVertex:true, vertexNames:['D','E','F']});
   const eq=document.createElement('div'); eq.className='eq-symbol'; eq.textContent='≅';
-  const right = drawTriSVG({a:BC,b:CA,c:AB, type:'SSS', w:240, h:200, sides:rightSides, showVertex:true, vertexNames:["A'","B'","C'"], label:"△A'B'C'"});
-  row.appendChild(left); row.appendChild(eq); row.appendChild(right);
+  row.appendChild(wrapTri(leftSvg, '△ABC'));
+  row.appendChild(eq);
+  row.appendChild(wrapTri(rightSvg, '△DEF'));
   parent.appendChild(row);
 
   // 答案：4 個數字
@@ -948,10 +956,10 @@ function renderFindSideSAS(parent, lv){
 
   const rc = document.createElement('div'); rc.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
   rc.appendChild(visualRight);
-  rc.appendChild(card("△A'B'C'", [
-    `A'B' = <span class="qmark">${lv.rightSAS.AB}</span>`,
-    `A'C' = <span style="color:#00F5FF">${lv.rightSAS.AC}</span>`,
-    `∠A' = <span style="color:#FF8A00">${lv.rightSAS.angA}°</span>`,
+  rc.appendChild(card('△DEF', [
+    `DE = <span class="qmark">${lv.rightSAS.AB}</span>`,
+    `DF = <span style="color:#00F5FF">${lv.rightSAS.AC}</span>`,
+    `∠D = <span style="color:#FF8A00">${lv.rightSAS.angA}°</span>`,
   ]));
 
   row.appendChild(lc); row.appendChild(eq); row.appendChild(rc);
@@ -992,10 +1000,10 @@ function renderFindAngleASA(parent, lv){
 
   const rc = document.createElement('div'); rc.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
   rc.appendChild(visualRight);
-  rc.appendChild(card("△A'B'C'", [
-    `∠B' = <span class="qmark">${lv.rightASA.angB}°</span>`,
-    `B'C' = <span style="color:#39FF14">${lv.rightASA.BC}</span>`,
-    `∠C' = <span style="color:#FFD700">${lv.rightASA.angC}°</span>`,
+  rc.appendChild(card('△DEF', [
+    `∠E = <span class="qmark">${lv.rightASA.angB}°</span>`,
+    `EF = <span style="color:#39FF14">${lv.rightASA.BC}</span>`,
+    `∠F = <span style="color:#FFD700">${lv.rightASA.angC}°</span>`,
   ]));
 
   row.appendChild(lc); row.appendChild(eq); row.appendChild(rc);
