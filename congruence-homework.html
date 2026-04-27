@@ -605,26 +605,22 @@ const LEVELS = [
     msg:'答對！ASA = 兩角 + 夾邊'
   },
 
-  // L8: BOSS 6 連題
+  // L8: BOSS 4 連題
   {
     type:'boss',
     title:'第 8 關 · BOSS · 大魔王',
-    sub:'6 連題綜合 · 全對才完美通關',
+    sub:'4 連題綜合 · 全對完美通關',
     icon:'👑',
-    speak:'BOSS 戰開始！6 題綜合應用',
+    speak:'BOSS 戰開始！4 題綜合應用',
     boss:[
       {kind:'rule', visual:{type:'SSS', sides:[5,7,8]},
        q:'這兩個三角形是哪一招全等？', correct:'SSS', options:['SSS','SAS','ASA']},
-      {kind:'find', visual:{type:'SSS-find', leftSides:[3,4,5], rightHide:0},
-       q:'EF = ?', correct:3, options:[3,4,5,6]},
       {kind:'rule', visual:{type:'SAS', sideL:6, sideR:8, angle:60},
        q:'這兩個三角形是哪一招全等？', correct:'SAS', options:['SSS','SAS','ASA']},
-      {kind:'find', visual:{type:'SAS-find', AB:7, AC:9, angA:50, missing:'AB'},
-       q:'DE = ?', correct:7, options:[5,7,9,11]},
       {kind:'rule', visual:{type:'ASA', side:5, angB:45, angC:60},
        q:'這兩個三角形是哪一招全等？', correct:'ASA', options:['SSS','SAS','ASA']},
-      {kind:'find', visual:{type:'ASA-find', angB:50, BC:5, angC:80, missing:'C'},
-       q:'∠F = ?', correct:80, options:[60,70,80,90]},
+      {kind:'find', visual:{type:'SSS-find', leftSides:[3,4,5], rightHide:0},
+       q:'EF = ?', correct:3, options:[3,4,5,6]},
     ]
   }
 ];
