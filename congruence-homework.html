@@ -613,12 +613,18 @@ const LEVELS = [
     icon:'👑',
     speak:'BOSS 戰開始！6 題綜合應用',
     boss:[
-      {kind:'rule',  q:'兩個三角形三邊都是 5、7、8。', correct:'SSS', options:['SSS','SAS','ASA']},
-      {kind:'find',  q:'△ABC ≅ △DEF · 三邊都 3、4、5。EF = ?', correct:3, options:[3,4,5,6]},
-      {kind:'rule',  q:'兩邊 6、8 + 夾角 60°。', correct:'SAS', options:['SSS','SAS','ASA']},
-      {kind:'find',  q:'△ABC ≅ △DEF（SAS 全等）· AB=7。DE = ?', correct:7, options:[5,7,9,11]},
-      {kind:'rule',  q:'兩角 45°、60° + 夾邊 5。', correct:'ASA', options:['SSS','SAS','ASA']},
-      {kind:'find',  q:'△ABC ≅ △DEF（ASA 全等）· ∠C = 80°。∠F = ?', correct:80, options:[60,70,80,90]},
+      {kind:'rule', visual:{type:'SSS', sides:[5,7,8]},
+       q:'這兩個三角形是哪一招全等？', correct:'SSS', options:['SSS','SAS','ASA']},
+      {kind:'find', visual:{type:'SSS-find', leftSides:[3,4,5], rightHide:0},
+       q:'EF = ?', correct:3, options:[3,4,5,6]},
+      {kind:'rule', visual:{type:'SAS', sideL:6, sideR:8, angle:60},
+       q:'這兩個三角形是哪一招全等？', correct:'SAS', options:['SSS','SAS','ASA']},
+      {kind:'find', visual:{type:'SAS-find', AB:7, AC:9, angA:50, missing:'AB'},
+       q:'DE = ?', correct:7, options:[5,7,9,11]},
+      {kind:'rule', visual:{type:'ASA', side:5, angB:45, angC:60},
+       q:'這兩個三角形是哪一招全等？', correct:'ASA', options:['SSS','SAS','ASA']},
+      {kind:'find', visual:{type:'ASA-find', angB:50, BC:5, angC:80, missing:'C'},
+       q:'∠F = ?', correct:80, options:[60,70,80,90]},
     ]
   }
 ];
@@ -1051,6 +1057,93 @@ function renderConditionPick(parent, lv){
   parent.appendChild(ans);
 }
 
+// ===== BOSS 題目圖形視覺 =====
+function renderBossVisual(v){
+  const wrap = document.createElement('div');
+  wrap.style.cssText='display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 4px';
+
+  const eqEl = ()=>{ const e=document.createElement('div'); e.className='eq-symbol'; e.style.fontSize='1.8em'; e.textContent='≅'; return e; };
+  const card = (label, lines)=>{
+    const c=document.createElement('div'); c.className='tri-info-card';
+    c.style.fontSize='.9em'; c.style.minWidth='105px'; c.style.padding='8px 10px';
+    c.innerHTML=`<div class="info-label">${label}</div>` +
+      lines.map(l=>`<div class="info-line">${l}</div>`).join('');
+    return c;
+  };
+
+  if(v.type === 'SSS'){
+    const [a,b,c] = v.sides;
+    const left = drawTriSVG({a,b,c, type:'SSS', w:160, h:140, sides:v.sides, hideValues:false});
+    const right = drawTriSVG({a,b,c, type:'SSS', w:160, h:140, sides:v.sides, hideValues:false});
+    wrap.appendChild(left); wrap.appendChild(eqEl()); wrap.appendChild(right);
+  } else if(v.type === 'SAS'){
+    // sideL, sideR, angle
+    const ang = v.angle * Math.PI/180;
+    const a = Math.sqrt(v.sideL*v.sideL + v.sideR*v.sideR - 2*v.sideL*v.sideR*Math.cos(ang));
+    const left = drawTriSVG({a, b:v.sideR, c:v.sideL, type:'SAS', w:160, h:140, hideValues:true});
+    const right = drawTriSVG({a, b:v.sideR, c:v.sideL, type:'SAS', w:160, h:140, hideValues:true});
+    wrap.appendChild(card('△ABC', [
+      `兩邊 <span style="color:#00F5FF">${v.sideL}、${v.sideR}</span>`,
+      `夾角 <span style="color:#FF8A00">${v.angle}°</span>`,
+    ]));
+    wrap.appendChild(eqEl());
+    wrap.appendChild(card('△DEF', [
+      `兩邊 <span style="color:#00F5FF">${v.sideL}、${v.sideR}</span>`,
+      `夾角 <span style="color:#FF8A00">${v.angle}°</span>`,
+    ]));
+  } else if(v.type === 'ASA'){
+    // side, angB, angC
+    const angA = 180 - v.angB - v.angC;
+    const b = v.side * Math.sin(v.angB*Math.PI/180) / Math.sin(angA*Math.PI/180);
+    const c = v.side * Math.sin(v.angC*Math.PI/180) / Math.sin(angA*Math.PI/180);
+    wrap.appendChild(card('△ABC', [
+      `兩角 <span style="color:#FFD700">${v.angB}°、${v.angC}°</span>`,
+      `夾邊 <span style="color:#39FF14">${v.side}</span>`,
+    ]));
+    wrap.appendChild(eqEl());
+    wrap.appendChild(card('△DEF', [
+      `兩角 <span style="color:#FFD700">${v.angB}°、${v.angC}°</span>`,
+      `夾邊 <span style="color:#39FF14">${v.side}</span>`,
+    ]));
+  } else if(v.type === 'SSS-find'){
+    const [BC, CA, AB] = v.leftSides;
+    const rightSides = [...v.leftSides];
+    rightSides[v.rightHide] = '?';
+    const leftSvg = drawTriSVG({a:BC,b:CA,c:AB, type:'SSS', w:160, h:140, sides:v.leftSides, showVertex:true, vertexNames:['A','B','C']});
+    const rightSvg = drawTriSVG({a:BC,b:CA,c:AB, type:'SSS', w:160, h:140, sides:rightSides, showVertex:true, vertexNames:['D','E','F']});
+    wrap.appendChild(wrapTri(leftSvg, '△ABC'));
+    wrap.appendChild(eqEl());
+    wrap.appendChild(wrapTri(rightSvg, '△DEF'));
+  } else if(v.type === 'SAS-find'){
+    wrap.appendChild(card('△ABC', [
+      `AB = <span style="color:#00F5FF">${v.AB}</span>`,
+      `AC = <span style="color:#00F5FF">${v.AC}</span>`,
+      `∠A = <span style="color:#FF8A00">${v.angA}°</span>`,
+    ]));
+    wrap.appendChild(eqEl());
+    wrap.appendChild(card('△DEF', [
+      `DE = <span class="qmark">?</span>`,
+      `DF = <span style="color:#00F5FF">${v.AC}</span>`,
+      `∠D = <span style="color:#FF8A00">${v.angA}°</span>`,
+    ]));
+  } else if(v.type === 'ASA-find'){
+    wrap.appendChild(card('△ABC', [
+      `∠B = <span style="color:#FFD700">${v.angB}°</span>`,
+      `BC = <span style="color:#39FF14">${v.BC}</span>`,
+      `∠C = <span style="color:#FFD700">${v.angC}°</span>`,
+    ]));
+    wrap.appendChild(eqEl());
+    const missing = v.missing || 'C';
+    wrap.appendChild(card('△DEF', [
+      `∠E = <span style="color:#FFD700">${missing==='B'?'<span class=\"qmark\">?</span>':v.angB+'°'}</span>`,
+      `EF = <span style="color:#39FF14">${v.BC}</span>`,
+      `∠F = <span style="color:#FFD700">${missing==='C'?'<span class=\"qmark\">?</span>':v.angC+'°'}</span>`,
+    ]));
+  }
+
+  return wrap;
+}
+
 // ===== L8: BOSS =====
 let bossState = {q:0, score:0};
 function renderBoss(parent, lv){
@@ -1096,9 +1189,14 @@ function renderBossQ(parent, lv){
   hdr.textContent = `第 ${bossState.q+1} / ${lv.boss.length} 題（已答對 ${bossState.score}）`;
   parent.appendChild(hdr);
 
+  // ✨ 圖形視覺（核心改動）
+  if(cur.visual){
+    parent.appendChild(renderBossVisual(cur.visual));
+  }
+
   const q=document.createElement('div');
   q.style.cssText=`background:#1A0F3E;border:3px solid #B967FF;border-radius:14px;
-    padding:18px;margin:14px 0;text-align:center;font-size:1.1em;font-weight:800;color:#fff`;
+    padding:14px;margin:10px 0;text-align:center;font-size:1.15em;font-weight:800;color:#fff`;
   q.textContent = '📋 ' + cur.q;
   parent.appendChild(q);
 
