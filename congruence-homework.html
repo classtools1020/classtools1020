@@ -657,6 +657,25 @@ function pickPrize(){
 // 狀態管理
 // ============================================================
 const STORAGE_KEY = 'congruence-hw-v2';
+const NAME_KEY = 'congruence-hw-name';
+const API = 'https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
+
+// 從 URL ?name=XX 或 localStorage 取得學生姓名
+function getStudentName(){
+  const url = new URLSearchParams(location.search);
+  const fromUrl = url.get('name');
+  if(fromUrl){
+    localStorage.setItem(NAME_KEY, fromUrl);
+    return fromUrl;
+  }
+  return localStorage.getItem(NAME_KEY) || '';
+}
+function setStudentName(name){
+  if(name && name.trim()){
+    localStorage.setItem(NAME_KEY, name.trim());
+  }
+}
+
 let state = loadState();
 function loadState(){
   try{
@@ -665,13 +684,64 @@ function loadState(){
       cur: s.cur || 0,
       done: s.done || new Array(LEVELS.length).fill(false),
       stars: s.stars || 0,
-      collection: s.collection || {}, // {emoji: count}
+      collection: s.collection || {},
     };
   }catch(e){
     return {cur:0, done:new Array(LEVELS.length).fill(false), stars:0, collection:{}};
   }
 }
-function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  syncCloud(); // 雲端同步（fire-and-forget）
+}
+
+function syncCloud(){
+  const name = getStudentName();
+  if(!name) return;
+  const data = {
+    cur: state.cur,
+    done: state.done,
+    stars: state.stars,
+    collection: state.collection,
+    updated: new Date().toISOString()
+  };
+  try{
+    fetch(API, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'save_progress', name, tool:'congruenceHW', data:JSON.stringify(data)})
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+// 第一次進來、沒有姓名 → 顯示輸入 modal
+function showNameModalIfNeeded(){
+  if(getStudentName()) return;
+  const overlay = document.createElement('div');
+  overlay.style.cssText=`position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px`;
+  overlay.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1A0F3E,#3D1A6E);border:3px solid #FFD700;border-radius:18px;padding:24px;max-width:360px;width:100%;text-align:center;box-shadow:0 0 40px #FFD700">
+      <div style="font-size:3em;margin-bottom:8px">👋</div>
+      <h2 style="color:#FFD700;font-size:1.4em;margin-bottom:6px">你叫什麼名字？</h2>
+      <p style="color:#fff;font-size:.95em;margin-bottom:14px">輸入名字，老師才看得到你的進度</p>
+      <input id="name-input" type="text" placeholder="輸入你的名字" maxlength="10" style="width:100%;padding:14px;border-radius:10px;border:2px solid #B967FF;background:#0A0E27;color:#fff;font-size:1.15em;text-align:center;outline:none">
+      <button id="name-confirm" style="margin-top:12px;width:100%;background:linear-gradient(135deg,#FFD700,#FFA500);color:#000;border:none;border-radius:10px;padding:14px;font-size:1.1em;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(255,215,0,.5)">▶ 開始闖關</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const input = overlay.querySelector('#name-input');
+  const btn = overlay.querySelector('#name-confirm');
+  setTimeout(()=>input.focus(), 100);
+  const submit = ()=>{
+    const v = input.value.trim();
+    if(!v){ input.style.borderColor='#FF3B30'; return; }
+    setStudentName(v);
+    overlay.remove();
+    syncCloud(); // 立刻初始同步
+  };
+  btn.onclick = submit;
+  input.onkeypress = e => { if(e.key==='Enter') submit(); };
+}
 
 // ============================================================
 // 音效
@@ -1348,7 +1418,22 @@ document.getElementById('reset-btn').onclick = ()=>{
 document.addEventListener('click', ensureAudio, {once:true});
 document.addEventListener('touchstart', ensureAudio, {once:true});
 
+// 啟動：先顯示姓名輸入 modal（若沒姓名）→ 然後渲染
 renderLevel();
+showNameModalIfNeeded();
+// 顯示姓名標籤在 header 右邊
+(function showNameTag(){
+  const name = getStudentName();
+  if(!name) return;
+  const hdr = document.querySelector('header .h-row');
+  if(hdr && !document.getElementById('name-tag')){
+    const tag = document.createElement('div');
+    tag.id='name-tag';
+    tag.style.cssText='font-size:.85em;color:#B967FF;font-weight:700;width:100%;text-align:center;margin-top:4px';
+    tag.textContent = '👤 ' + name;
+    hdr.parentElement.insertBefore(tag, hdr.nextSibling);
+  }
+})();
 </script>
 
 </body>

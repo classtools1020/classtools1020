@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📊 8A 數學教師後台 · 全等三角形作業</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;
+    background:linear-gradient(135deg,#0A0E27 0%,#1A0F3E 50%,#0A0E27 100%);
+    color:#fff;min-height:100vh;padding:16px;line-height:1.5;
+  }
+  .wrap{max-width:980px;margin:0 auto}
+
+  /* ==== 密碼遮罩 ==== */
+  #pwOverlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .pw-box{
+    background:linear-gradient(135deg,#1A0F3E,#3D1A6E);
+    border:3px solid #FFD700;border-radius:18px;
+    padding:30px 24px;text-align:center;max-width:380px;width:100%;
+    box-shadow:0 0 40px #FFD700;
+  }
+  .pw-box h2{color:#FFD700;font-size:1.5em;margin-bottom:10px}
+  .pw-box p{color:#B967FF;margin-bottom:16px;font-size:.95em}
+  .pw-box input{
+    width:100%;padding:14px;border-radius:10px;
+    border:2px solid #B967FF;background:#0A0E27;color:#fff;
+    font-size:1.1em;text-align:center;outline:none;
+  }
+  .pw-box button{
+    margin-top:12px;width:100%;
+    background:linear-gradient(135deg,#FFD700,#FFA500);
+    color:#000;border:none;border-radius:10px;
+    padding:14px;font-size:1.1em;font-weight:900;cursor:pointer;
+  }
+  .pw-error{color:#FF6B6B;font-size:.9em;margin-top:8px}
+
+  /* ==== 主內容 ==== */
+  #main{display:none}
+  header{
+    background:rgba(10,14,39,.85);
+    border:2px solid #B967FF;border-radius:14px;
+    padding:16px 18px;margin-bottom:14px;
+    box-shadow:0 0 18px rgba(185,103,255,.3);
+  }
+  h1{color:#FFD700;font-size:1.4em;text-align:center;margin-bottom:6px;text-shadow:2px 2px 0 #000}
+  .meta{text-align:center;color:#B967FF;font-size:.92em;font-weight:700}
+
+  .toolbar{
+    display:flex;gap:8px;justify-content:center;align-items:center;
+    margin:14px 0;flex-wrap:wrap;
+  }
+  .tb-btn{
+    background:rgba(255,255,255,.1);color:#fff;
+    border:1px solid rgba(255,255,255,.3);border-radius:10px;
+    padding:10px 16px;font-size:.95em;cursor:pointer;font-weight:700;
+  }
+  .tb-btn.primary{background:linear-gradient(135deg,#FFD700,#FFA500);color:#000;border:none}
+  .tb-btn:active{opacity:.8}
+
+  /* ==== 學生卡 ==== */
+  .students{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .stu-card{
+    background:rgba(10,14,39,.7);
+    border:2px solid rgba(185,103,255,.4);border-radius:14px;
+    padding:14px 16px;
+  }
+  .stu-card.complete{border-color:#FFD700;box-shadow:0 0 18px rgba(255,215,0,.3)}
+  .stu-card.partial{border-color:#39FF14}
+  .stu-card.empty{border-color:#555;opacity:.7}
+  .stu-name{
+    font-size:1.2em;font-weight:900;color:#FFD700;
+    display:flex;align-items:center;gap:8px;margin-bottom:8px;
+  }
+  .stu-status{font-size:.95em;color:#B967FF;font-weight:700;margin-bottom:10px}
+  .stu-stars{font-size:1.4em;color:#FFD700;letter-spacing:3px;margin:8px 0}
+  .stu-progress{
+    display:flex;gap:4px;margin:8px 0;flex-wrap:wrap;
+  }
+  .stu-progress .lvl{
+    width:24px;height:24px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.78em;font-weight:900;
+    background:#1A1A2E;border:2px solid #555;color:#888;
+  }
+  .stu-progress .lvl.done{background:#39FF14;border-color:#39FF14;color:#000}
+  .stu-prizes{
+    margin-top:8px;padding-top:8px;border-top:1px dashed rgba(185,103,255,.3);
+    display:flex;flex-wrap:wrap;gap:4px;
+  }
+  .stu-prizes .pz{
+    background:rgba(255,255,255,.1);border-radius:6px;
+    padding:3px 6px;font-size:.85em;
+  }
+  .stu-time{font-size:.78em;color:#888;margin-top:6px}
+
+  /* ==== 摘要 ==== */
+  .summary{
+    background:rgba(255,215,0,.1);border:2px solid #FFD700;
+    border-radius:14px;padding:14px;margin-bottom:14px;
+  }
+  .summary-row{
+    display:flex;justify-content:space-around;flex-wrap:wrap;gap:10px;
+  }
+  .summary-cell{text-align:center}
+  .summary-num{font-size:1.8em;font-weight:900;color:#FFD700}
+  .summary-label{font-size:.85em;color:#B967FF;margin-top:2px}
+
+  /* ==== Modal ==== */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;
+    display:none;align-items:center;justify-content:center;padding:20px;
+  }
+  .modal-overlay.show{display:flex}
+  .modal-box{
+    background:linear-gradient(135deg,#1A0F3E,#3D1A6E);
+    border:3px solid #FFD700;border-radius:18px;
+    padding:24px;max-width:420px;width:100%;
+    box-shadow:0 0 40px #FFD700;max-height:90vh;overflow-y:auto;
+  }
+  .modal-box h3{color:#FFD700;margin-bottom:10px;font-size:1.2em}
+  .modal-box p{color:#B967FF;font-size:.9em;margin-bottom:14px}
+  .modal-box input{
+    width:100%;padding:12px;border-radius:8px;
+    border:2px solid #B967FF;background:#0A0E27;color:#fff;
+    font-size:1em;margin-bottom:8px;outline:none;
+  }
+  .modal-box .row-btn{display:flex;gap:8px;margin-top:14px}
+  .modal-box .row-btn button{flex:1}
+
+  .loading{text-align:center;padding:40px;color:#B967FF;font-size:1.1em}
+  .empty{text-align:center;padding:30px;color:#888;font-size:1em}
+
+  @media(max-width:480px){
+    h1{font-size:1.2em}
+    .stu-name{font-size:1.05em}
+    .summary-num{font-size:1.4em}
+  }
+</style>
+</head>
+<body>
+
+<!-- 密碼 -->
+<div id="pwOverlay">
+  <div class="pw-box">
+    <h2>🔐 8A 數學教師後台</h2>
+    <p>全等三角形回家作業 · 進度追蹤</p>
+    <input id="pwInput" type="password" placeholder="輸入密碼" autofocus>
+    <button onclick="checkPw()">進入後台</button>
+    <div id="pwError" class="pw-error"></div>
+  </div>
+</div>
+
+<!-- 主內容 -->
+<div id="main" class="wrap">
+  <header>
+    <h1>📊 8A 數學作業後台</h1>
+    <div class="meta">3-3 全等三角形 · 8 關闖關</div>
+  </header>
+
+  <div class="toolbar">
+    <button class="tb-btn" onclick="openStudentEditor()">👥 編輯學生名單</button>
+    <button class="tb-btn primary" onclick="refreshAll()">🔄 重新整理</button>
+  </div>
+
+  <div class="summary" id="summary"></div>
+  <div id="content"><div class="loading">載入中...</div></div>
+  <div style="text-align:center;color:#888;font-size:.82em;margin-top:14px" id="updatedTime"></div>
+</div>
+
+<!-- 學生編輯 modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal-box">
+    <h3>👥 編輯學生名單</h3>
+    <p>輸入這個班 8A 數學的 5 位學生姓名（用逗號分隔，或一行一個）</p>
+    <textarea id="studentsInput" rows="6" style="width:100%;padding:10px;border-radius:8px;border:2px solid #B967FF;background:#0A0E27;color:#fff;font-family:inherit;font-size:1em;outline:none"></textarea>
+    <div class="row-btn">
+      <button class="tb-btn" onclick="closeStudentEditor()">取消</button>
+      <button class="tb-btn primary" onclick="saveStudents()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const PW = 'stacey2026';
+const API = 'https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
+const TOOL = 'congruenceHW';
+const STUDENTS_KEY = 'congruence-teacher-students';
+const TOTAL_LEVELS = 8;
+
+const PRIZES_MAP = {
+  '⭐':{name:'星星',rarity:'common'},
+  '🍀':{name:'幸運草',rarity:'common'},
+  '🌟':{name:'流星',rarity:'rare'},
+  '💎':{name:'鑽石',rarity:'rare'},
+  '🏆':{name:'金盃',rarity:'epic'},
+  '👑':{name:'皇冠',rarity:'epic'},
+  '🦄':{name:'獨角獸',rarity:'epic'},
+  '🐉':{name:'神龍',rarity:'legendary'},
+  '🌈':{name:'彩虹',rarity:'legendary'},
+};
+
+let students = loadStudents();
+let allData = {};
+
+function loadStudents(){
+  try{
+    const s = JSON.parse(localStorage.getItem(STUDENTS_KEY) || '[]');
+    if(Array.isArray(s) && s.length>0) return s;
+  }catch(e){}
+  return ['1 號','2 號','3 號','4 號','5 號']; // 預設 placeholder
+}
+function saveStudentsToStorage(){
+  localStorage.setItem(STUDENTS_KEY, JSON.stringify(students));
+}
+
+// ==== 密碼 ====
+function checkPw(){
+  const v = document.getElementById('pwInput').value;
+  if(v === PW){
+    document.getElementById('pwOverlay').style.display='none';
+    document.getElementById('main').style.display='block';
+    refreshAll();
+  } else {
+    document.getElementById('pwError').textContent='密碼錯誤';
+    document.getElementById('pwInput').value='';
+  }
+}
+document.getElementById('pwInput').addEventListener('keypress', e=>{
+  if(e.key==='Enter') checkPw();
+});
+
+// ==== 學生編輯 ====
+function openStudentEditor(){
+  document.getElementById('studentsInput').value = students.join('\n');
+  document.getElementById('editModal').classList.add('show');
+}
+function closeStudentEditor(){
+  document.getElementById('editModal').classList.remove('show');
+}
+function saveStudents(){
+  const txt = document.getElementById('studentsInput').value;
+  const list = txt.split(/[,，\n]/).map(s=>s.trim()).filter(s=>s.length>0);
+  if(list.length===0){ alert('請至少輸入一位學生'); return; }
+  students = list;
+  saveStudentsToStorage();
+  closeStudentEditor();
+  refreshAll();
+}
+
+// ==== 載入資料 ====
+async function fetchStudent(name){
+  try{
+    const r = await fetch(`${API}?action=load_progress&name=${encodeURIComponent(name)}&tool=${encodeURIComponent(TOOL)}`);
+    const j = await r.json();
+    if(j.status==='ok' && j.data) return JSON.parse(j.data);
+  }catch(e){}
+  return null;
+}
+
+async function refreshAll(){
+  document.getElementById('content').innerHTML='<div class="loading">⏳ 從雲端載入...</div>';
+  document.getElementById('summary').innerHTML='';
+  allData = {};
+  const tasks = students.map(name =>
+    fetchStudent(name).then(d => { allData[name] = d; })
+  );
+  await Promise.all(tasks);
+  document.getElementById('updatedTime').textContent =
+    '更新時間：' + new Date().toLocaleString('zh-TW');
+  render();
+}
+
+// ==== 渲染 ====
+function render(){
+  // 摘要
+  let totalDone=0, totalStars=0, completeStudents=0;
+  students.forEach(n => {
+    const d = allData[n];
+    if(d){
+      totalStars += (d.stars||0);
+      const doneCount = (d.done||[]).filter(x=>x).length;
+      totalDone += doneCount;
+      if(doneCount===TOTAL_LEVELS) completeStudents++;
+    }
+  });
+  document.getElementById('summary').innerHTML = `
+    <div class="summary-row">
+      <div class="summary-cell">
+        <div class="summary-num">${students.length}</div>
+        <div class="summary-label">總學生</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-num">${completeStudents}</div>
+        <div class="summary-label">全部通關</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-num">${totalStars}</div>
+        <div class="summary-label">總星星</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-num">${Math.round(totalDone/(students.length*TOTAL_LEVELS||1)*100)}%</div>
+        <div class="summary-label">整體完成率</div>
+      </div>
+    </div>
+  `;
+
+  // 學生卡片
+  let h = '<div class="students">';
+  students.forEach(n => h += renderCard(n, allData[n]));
+  h += '</div>';
+  document.getElementById('content').innerHTML = h;
+}
+
+function renderCard(name, d){
+  if(!d){
+    return `
+      <div class="stu-card empty">
+        <div class="stu-name">⚪ ${escape(name)}</div>
+        <div class="stu-status">尚未開始</div>
+        <div style="color:#666;font-size:.9em">學生還沒打開作業，或還沒輸入名字</div>
+      </div>
+    `;
+  }
+  const stars = d.stars || 0;
+  const done = d.done || [];
+  const doneCount = done.filter(x=>x).length;
+  const allDone = doneCount === TOTAL_LEVELS;
+  const cls = allDone ? 'complete' : (doneCount>0 ? 'partial' : 'empty');
+  const icon = allDone ? '🏆' : (doneCount>0 ? '⏳' : '⚪');
+  const statusText = allDone ? '完美通關！' : (doneCount>0 ? `已完成 ${doneCount} / ${TOTAL_LEVELS} 關` : '還沒開始答題');
+
+  // 進度燈
+  let lvls = '';
+  for(let i=0;i<TOTAL_LEVELS;i++){
+    lvls += `<div class="lvl ${done[i]?'done':''}">${done[i]?'✓':(i+1)}</div>`;
+  }
+
+  // 收藏品
+  let prizes = '';
+  if(d.collection && Object.keys(d.collection).length>0){
+    prizes = '<div class="stu-prizes">';
+    Object.entries(d.collection).forEach(([emoji,count])=>{
+      const info = PRIZES_MAP[emoji] || {name:emoji,rarity:'common'};
+      prizes += `<div class="pz">${emoji} ×${count}</div>`;
+    });
+    prizes += '</div>';
+  }
+
+  // 更新時間
+  const time = d.updated ? new Date(d.updated).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+
+  return `
+    <div class="stu-card ${cls}">
+      <div class="stu-name">${icon} ${escape(name)}</div>
+      <div class="stu-status">${statusText}</div>
+      <div class="stu-stars">${'⭐'.repeat(stars)}${stars===0?'（尚無星星）':''}</div>
+      <div class="stu-progress">${lvls}</div>
+      ${prizes}
+      ${time?`<div class="stu-time">📅 最後更新：${time}</div>`:''}
+    </div>
+  `;
+}
+
+function escape(s){ return String(s).replace(/[<>&"']/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;","'":"&#39;"}[c])); }
+
+</script>
+</body>
+</html>
