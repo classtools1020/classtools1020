@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🔺 3-3 全等三角形 · 8 關闖關</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{overflow-x:hidden}
+  body{
+    font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;
+    background:linear-gradient(135deg,#0A0E27 0%,#1A0F3E 50%,#0A0E27 100%);
+    color:#fff;
+    min-height:100vh;
+    line-height:1.55;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+  #app{max-width:780px;margin:0 auto;padding:14px;min-height:100vh;display:flex;flex-direction:column}
+
+  /* ===== Header ===== */
+  header{
+    background:rgba(10,14,39,.85);
+    border:2px solid #B967FF;
+    border-radius:16px;
+    padding:14px 16px;
+    margin-bottom:14px;
+    box-shadow:0 0 20px rgba(185,103,255,.4);
+  }
+  .h-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .h-title{font-size:1.05em;font-weight:900;color:#FFD700;letter-spacing:.5px}
+  .h-stars{font-size:1.05em;font-weight:900;color:#FFD700}
+  .h-stars span{color:#fff}
+  .progress-dots{display:flex;gap:6px;margin-top:10px;justify-content:center;flex-wrap:wrap}
+  .dot{
+    width:30px;height:30px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.85em;font-weight:900;
+    background:#1A1A2E;border:2px solid #555;
+    color:#888;transition:all .25s;
+  }
+  .dot.done{background:#39FF14;border-color:#39FF14;color:#000;box-shadow:0 0 12px #39FF14}
+  .dot.cur{background:#FFD700;border-color:#FFD700;color:#000;box-shadow:0 0 12px #FFD700;transform:scale(1.15)}
+
+  /* ===== Stage ===== */
+  main{
+    flex:1;
+    background:rgba(10,14,39,.7);
+    border:2px solid rgba(185,103,255,.3);
+    border-radius:16px;
+    padding:18px;
+    margin-bottom:14px;
+    min-height:520px;
+  }
+  .level-title{
+    text-align:center;font-size:1.5em;font-weight:900;
+    color:#FFD700;margin-bottom:6px;
+    text-shadow:2px 2px 0 #000,0 0 12px rgba(255,215,0,.6);
+  }
+  .level-sub{text-align:center;color:#B967FF;font-size:.95em;font-weight:700;margin-bottom:14px}
+  .character-row{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:12px}
+  .char-icon{font-size:2.4em}
+  .char-bubble{
+    background:#fff;color:#111;padding:10px 14px;border-radius:14px;
+    font-weight:700;font-size:1.05em;max-width:480px;
+    position:relative;line-height:1.45;
+  }
+  .char-bubble::before{
+    content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);
+    border:8px solid transparent;border-right-color:#fff;
+  }
+
+  /* SVG container */
+  .svg-wrap{display:flex;justify-content:center;margin:14px 0}
+  svg{max-width:100%;height:auto}
+
+  /* Answer buttons */
+  .answers{
+    display:grid;gap:10px;margin-top:14px;
+  }
+  .answers.two{grid-template-columns:1fr 1fr}
+  .answers.three{grid-template-columns:repeat(3,1fr)}
+  .answers.four{grid-template-columns:1fr 1fr}
+  @media(max-width:480px){
+    .answers.three{grid-template-columns:1fr 1fr}
+  }
+  .ans-btn{
+    background:linear-gradient(135deg,#1B5E8F,#0D3A5C);
+    color:#fff;
+    border:3px solid #4DBCFF;
+    border-radius:14px;
+    padding:18px 14px;
+    font-size:1.15em;
+    font-weight:900;
+    cursor:pointer;
+    transition:all .15s;
+    min-height:64px;
+    box-shadow:0 4px 12px rgba(77,188,255,.3);
+  }
+  .ans-btn:active{transform:scale(.96);box-shadow:0 2px 6px rgba(77,188,255,.4)}
+  .ans-btn.ok{background:linear-gradient(135deg,#39FF14,#1B8B0A);border-color:#39FF14;color:#000}
+  .ans-btn.warn{background:linear-gradient(135deg,#FF3B30,#A02020);border-color:#FF6B6B}
+  .ans-btn.gold{background:linear-gradient(135deg,#FFD700,#B8860B);border-color:#FFD700;color:#000}
+  .ans-btn:disabled{opacity:.5;cursor:not-allowed}
+  .ans-btn.right{
+    background:linear-gradient(135deg,#39FF14,#1B8B0A);
+    border-color:#39FF14;color:#000;
+    animation:pulse 0.4s ease;
+  }
+  .ans-btn.wrong{
+    background:linear-gradient(135deg,#FF3B30,#A02020);
+    border-color:#FF3B30;
+    animation:shake 0.4s ease;
+  }
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  /* Feedback box */
+  .feedback{
+    margin-top:14px;padding:14px;border-radius:12px;
+    font-size:1.1em;font-weight:800;text-align:center;
+    line-height:1.55;
+  }
+  .fb-ok{background:rgba(57,255,20,.15);border:2px solid #39FF14;color:#39FF14}
+  .fb-no{background:rgba(255,138,0,.15);border:2px solid #FF8A00;color:#FFB347}
+
+  /* Next button */
+  .next-row{margin-top:14px;text-align:center}
+  .next-btn{
+    background:linear-gradient(135deg,#FFD700,#FFA500);
+    color:#000;border:none;border-radius:14px;
+    padding:18px 36px;font-size:1.2em;font-weight:900;
+    cursor:pointer;transition:all .15s;
+    box-shadow:0 0 20px rgba(255,215,0,.5);
+    min-height:60px;letter-spacing:1px;
+  }
+  .next-btn:active{transform:scale(.95)}
+
+  /* Footer */
+  footer{
+    display:flex;gap:8px;justify-content:center;padding:6px 0;
+  }
+  .foot-btn{
+    background:rgba(255,255,255,.1);
+    color:#fff;border:1px solid rgba(255,255,255,.3);
+    border-radius:10px;
+    padding:10px 18px;font-size:.95em;
+    cursor:pointer;font-weight:700;
+  }
+  .foot-btn:active{background:rgba(255,255,255,.2)}
+
+  /* Hint box */
+  #hint-box{
+    background:rgba(255,215,0,.15);
+    border:2px dashed #FFD700;
+    border-radius:12px;
+    padding:12px 14px;margin-top:12px;
+    color:#FFD700;font-weight:700;font-size:.98em;line-height:1.6;
+    display:none;
+  }
+  #hint-box.show{display:block}
+
+  /* Final celebration */
+  .victory-screen{text-align:center;padding:30px 14px}
+  .crown{font-size:5em;animation:bounce 1.2s infinite ease}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .victory-title{font-size:2em;font-weight:900;color:#FFD700;margin:16px 0;text-shadow:2px 2px 0 #000}
+  .victory-stars{font-size:2.5em;letter-spacing:6px;margin:14px 0}
+
+  /* Confetti */
+  .confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:9999}
+
+  /* Match cards */
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .match-card{
+    background:#1A1A2E;border:3px solid #4DBCFF;border-radius:14px;
+    padding:10px;cursor:pointer;text-align:center;
+    transition:all .15s;
+  }
+  .match-card:active{transform:scale(.97)}
+  .match-card.right{border-color:#39FF14;background:rgba(57,255,20,.15)}
+  .match-card.wrong{border-color:#FF3B30;background:rgba(255,59,48,.15)}
+  .match-card svg{margin:auto}
+
+  @media(max-width:480px){
+    body{font-size:14px}
+    .level-title{font-size:1.25em}
+    .ans-btn{padding:14px 10px;font-size:1em;min-height:56px}
+    .char-icon{font-size:2em}
+    .char-bubble{font-size:.95em;padding:8px 12px}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="h-row">
+      <div class="h-title">🔺 全等三角形 · 闖關</div>
+      <div class="h-stars">⭐ <span id="star-count">0</span> / 8</div>
+    </div>
+    <div class="progress-dots" id="progress-dots"></div>
+  </header>
+
+  <main id="stage"></main>
+
+  <footer>
+    <button class="foot-btn" id="hint-btn">💡 提示</button>
+    <button class="foot-btn" id="reset-btn">🔄 重來</button>
+  </footer>
+
+</div>
+
+<script>
+// ============================================================
+// 工具：SVG 三角形繪圖
+// ============================================================
+const NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag,attrs={}){
+  const e = document.createElementNS(NS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  return e;
+}
+
+// SSS：三邊長算頂點 (a=BC, b=CA, c=AB)
+function triPts(a,b,c){
+  if(a+b<=c||b+c<=a||a+c<=b) return null;
+  const x = (c*c+a*a-b*b)/(2*a);
+  const y = Math.sqrt(Math.max(c*c-x*x,0));
+  return [{x,y:-y},{x:0,y:0},{x:a,y:0}]; // [A, B, C]
+}
+
+// 縮放並置中
+function fitTri(pts, cx, cy, scale){
+  const mx=(pts[0].x+pts[1].x+pts[2].x)/3;
+  const my=(pts[0].y+pts[1].y+pts[2].y)/3;
+  return pts.map(p=>({x:cx+(p.x-mx)*scale, y:cy+(p.y-my)*scale}));
+}
+
+// 畫一個三角形 SVG（含邊長/類型）
+function drawTriSVG(opts){
+  // opts: {a,b,c, type, w, h, showSides, sideColors, angleColor, label}
+  const {a,b,c, type='SSS', w=240, h=200, showSides=true, label=null} = opts;
+  const svg = svgEl('svg', {width:w, height:h, viewBox:`0 0 ${w} ${h}`});
+
+  // background
+  svg.appendChild(svgEl('rect', {x:0,y:0,width:w,height:h, fill:'#0A0E27', rx:10}));
+
+  const raw = triPts(a,b,c);
+  if(!raw) return svg;
+
+  // 自動 scale: 適配寬高
+  const span = Math.max(a,b,c);
+  const scale = Math.min((w-50)/span, (h-50)/span) * 0.85;
+  const pts = fitTri(raw, w/2, h/2+10, scale);
+
+  // 顏色設定
+  const colors = {
+    SSS:{stroke:'#FF3B30', fill:'rgba(255,59,48,0.25)', glow:'#FF3B30'},
+    SAS:{stroke:'#888', fill:'#0A0E27', glow:'#00F5FF'},
+    ASA:{stroke:'#888', fill:'#0A0E27', glow:'#39FF14'},
+    NEUTRAL:{stroke:'#4DBCFF', fill:'rgba(77,188,255,0.2)', glow:'#4DBCFF'}
+  };
+  const c1 = colors[type] || colors.NEUTRAL;
+
+  // 描邊
+  const path = svgEl('path', {
+    d:`M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y} Z`,
+    fill:c1.fill, stroke:c1.stroke, 'stroke-width':4, 'stroke-linejoin':'round'
+  });
+  svg.appendChild(path);
+
+  // SAS：標兩邊和夾角
+  if(type==='SAS'){
+    // AB = c (pts[0]-pts[1]), AC = b (pts[0]-pts[2])
+    const drawEdge = (p1,p2,col)=>{
+      svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:col,'stroke-width':6,'stroke-linecap':'round'}));
+    };
+    drawEdge(pts[0],pts[1],'#00F5FF');
+    drawEdge(pts[0],pts[2],'#00F5FF');
+    // 角弧 at A
+    drawAngleArc(svg, pts[0], pts[1], pts[2], 22, '#FF8A00', 5);
+  }
+  // ASA：標夾邊和兩角
+  if(type==='ASA'){
+    const drawEdge = (p1,p2,col)=>{
+      svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:col,'stroke-width':6,'stroke-linecap':'round'}));
+    };
+    drawEdge(pts[1],pts[2],'#39FF14'); // BC 是夾邊
+    drawAngleArc(svg, pts[1], pts[0], pts[2], 22, '#FFD700', 5);
+    drawAngleArc(svg, pts[2], pts[0], pts[1], 22, '#FFD700', 5);
+  }
+
+  // 邊長標
+  if(showSides){
+    const lblSide = (p1,p2,txt,offset)=>{
+      const mx = (p1.x+p2.x)/2;
+      const my = (p1.y+p2.y)/2;
+      const t = svgEl('text',{
+        x:mx, y:my+offset, 'text-anchor':'middle',
+        'font-size':18, 'font-weight':900, fill:'#FFD700',
+        stroke:'#000', 'stroke-width':3, 'paint-order':'stroke'
+      });
+      t.textContent = txt;
+      svg.appendChild(t);
+    };
+    lblSide(pts[1],pts[2], a, 22);
+    lblSide(pts[0],pts[2], b, -8);
+    lblSide(pts[0],pts[1], c, -8);
+  }
+
+  // 標題
+  if(label){
+    const t = svgEl('text',{
+      x:w/2, y:24, 'text-anchor':'middle',
+      'font-size':18, 'font-weight':900, fill:'#fff',
+      stroke:'#000','stroke-width':3,'paint-order':'stroke'
+    });
+    t.textContent = label;
+    svg.appendChild(t);
+  }
+
+  return svg;
+}
+
+// 角弧
+function drawAngleArc(svg, vertex, p1, p2, radius, color, sw){
+  const a1 = Math.atan2(p1.y-vertex.y, p1.x-vertex.x);
+  const a2 = Math.atan2(p2.y-vertex.y, p2.x-vertex.x);
+  let da = a2-a1;
+  while(da > Math.PI) da -= 2*Math.PI;
+  while(da < -Math.PI) da += 2*Math.PI;
+  const sweep = da > 0 ? 1 : 0;
+  const start = {x:vertex.x+Math.cos(a1)*radius, y:vertex.y+Math.sin(a1)*radius};
+  const end = {x:vertex.x+Math.cos(a2)*radius, y:vertex.y+Math.sin(a2)*radius};
+  svg.appendChild(svgEl('path',{
+    d:`M${start.x},${start.y} A${radius},${radius} 0 0,${sweep} ${end.x},${end.y}`,
+    stroke:color, 'stroke-width':sw, fill:'none', 'stroke-linecap':'round'
+  }));
+}
+
+// ============================================================
+// 確認題：方框形狀（給第 1 關用）
+// ============================================================
+function drawShape(type, w=140, h=120){
+  const svg = svgEl('svg',{width:w,height:h,viewBox:`0 0 ${w} ${h}`});
+  svg.appendChild(svgEl('rect',{x:0,y:0,width:w,height:h, fill:'#0A0E27', rx:10}));
+  const cx=w/2, cy=h/2;
+  if(type==='triangle'){
+    svg.appendChild(svgEl('polygon',{
+      points:`${cx},${cy-40} ${cx-44},${cy+30} ${cx+44},${cy+30}`,
+      fill:'rgba(255,59,48,0.4)', stroke:'#FF3B30','stroke-width':4,'stroke-linejoin':'round'
+    }));
+  } else if(type==='square'){
+    svg.appendChild(svgEl('rect',{x:cx-40,y:cy-35,width:80,height:70,
+      fill:'rgba(77,188,255,0.4)', stroke:'#4DBCFF','stroke-width':4, rx:4}));
+  } else if(type==='circle'){
+    svg.appendChild(svgEl('circle',{cx,cy,r:42,
+      fill:'rgba(57,255,20,0.4)', stroke:'#39FF14','stroke-width':4}));
+  } else if(type==='pentagon'){
+    const pts=[];
+    for(let i=0;i<5;i++){
+      const a = -Math.PI/2 + i*2*Math.PI/5;
+      pts.push(`${cx+Math.cos(a)*40},${cy+Math.sin(a)*40}`);
+    }
+    svg.appendChild(svgEl('polygon',{
+      points:pts.join(' '),
+      fill:'rgba(255,138,0,0.4)', stroke:'#FF8A00','stroke-width':4,'stroke-linejoin':'round'
+    }));
+  }
+  return svg;
+}
+
+// ============================================================
+// 8 關設定
+// ============================================================
+const LEVELS = [
+  // 第 1 關：認三角形（熱身）
+  {
+    title:'第 1 關 · 三角形偵探',
+    sub:'熱身：誰是三角形？',
+    char:'🤖',
+    speak:'哆啦A夢：「點出畫面上是「三角形」的形狀！」',
+    type:'shape-pick',
+    shapes:[
+      {kind:'square',  is:false},
+      {kind:'triangle',is:true},
+      {kind:'circle',  is:false},
+      {kind:'pentagon',is:false},
+    ],
+    hint:'三角形有 3 個尖尖的角喔～',
+    successMsg:'答對了！三角形有 3 邊 3 角，是最穩固的形狀！'
+  },
+
+  // 第 2 關：SSS 三邊判斷
+  {
+    title:'第 2 關 · SSS · 三邊一樣',
+    sub:'三邊都對應相等 = 全等',
+    char:'🐱',
+    speak:'哆啦A夢：「左邊和右邊三角形，三邊一樣嗎？是不是全等？」',
+    type:'tri-pair',
+    left:{a:5,b:7,c:8, type:'SSS'},
+    right:{a:5,b:7,c:8, type:'SSS'},
+    options:[
+      {label:'✅ 全等', correct:true,  cls:'ok'},
+      {label:'❌ 不全等', correct:false, cls:'warn'},
+    ],
+    hint:'三邊都標一樣的數字 → 一定全等（SSS 規則）',
+    successMsg:'答對！三邊都是 5、7、8 → SSS 全等 ≅'
+  },
+
+  // 第 3 關：SSS · 找夥伴
+  {
+    title:'第 3 關 · SSS · 找全等夥伴',
+    sub:'哪一個跟左邊完全一樣？',
+    char:'👶',
+    speak:'蠟筆小新：「玩具店訂單！哪一個三角形跟左邊那個完全一樣？」',
+    type:'tri-match',
+    target:{a:3,b:4,c:5},
+    candidates:[
+      {a:3,b:5,c:6, correct:false},  // 三邊不同
+      {a:3,b:4,c:5, correct:true},   // 完全一樣
+      {a:4,b:4,c:5, correct:false},  // 兩邊一樣
+    ],
+    hint:'看三邊長：左邊是 3、4、5。哪一個也是 3、4、5？',
+    successMsg:'答對！三邊都是 3、4、5 → 一定全等！'
+  },
+
+  // 第 4 關：SAS 兩邊+夾角
+  {
+    title:'第 4 關 · SAS · 兩邊 + 夾角',
+    sub:'兩邊相同 + 夾角相同 = 全等',
+    char:'😤',
+    speak:'胖虎：「兩邊 6、8 + 夾角 60°，左右兩個一樣嗎？」',
+    type:'tri-pair',
+    left:{a:'?',b:6,c:8, type:'SAS', label:'兩邊 6、8 + ∠夾角 60°'},
+    right:{a:'?',b:6,c:8, type:'SAS', label:'兩邊 6、8 + ∠夾角 60°'},
+    sasParams:{left:[6,60,8], right:[6,60,8]},
+    options:[
+      {label:'✅ 全等', correct:true,  cls:'ok'},
+      {label:'❌ 不全等', correct:false, cls:'warn'},
+    ],
+    hint:'兩邊 + 夾角 都一樣 → SAS 鎖死 → 全等',
+    successMsg:'答對！兩邊 + 夾角全相同 → SAS 全等 ≅'
+  },
+
+  // 第 5 關：ASA 兩角+夾邊
+  {
+    title:'第 5 關 · ASA · 兩角 + 夾邊',
+    sub:'兩角相同 + 中間那條邊相同 = 全等',
+    char:'👧',
+    speak:'靜香：「兩個角 60°、45°，中間那條邊 5。左右一樣嗎？」',
+    type:'tri-pair',
+    left:{a:5,b:'?',c:'?', type:'ASA', label:'∠B=45° · BC=5 · ∠C=60°'},
+    right:{a:5,b:'?',c:'?', type:'ASA', label:'∠B=45° · BC=5 · ∠C=60°'},
+    asaParams:{left:[45,5,60], right:[45,5,60]},
+    options:[
+      {label:'✅ 全等', correct:true,  cls:'ok'},
+      {label:'❌ 不全等', correct:false, cls:'warn'},
+    ],
+    hint:'兩角 + 夾邊 都一樣 → ASA 鎖死 → 全等',
+    successMsg:'答對！兩角 + 夾邊都一樣 → ASA 全等 ≅'
+  },
+
+  // 第 6 關：色碼 → 招式名
+  {
+    title:'第 6 關 · 看顏色秒認招',
+    sub:'色碼鐵律：紅=SSS / 藍橘=SAS / 綠金=ASA',
+    char:'🎀',
+    speak:'卡比：「看下面的三角形顏色，這是哪一招？」',
+    type:'color-id',
+    triangles:[
+      {color:'SSS', a:5,b:6,c:7, correct:'SSS'}
+    ],
+    options:[
+      {label:'🔴 SSS',     correct:true,  cls:'warn'},
+      {label:'🔵🟠 SAS',   correct:false, cls:'ok'},
+      {label:'🟢🟡 ASA',   correct:false, cls:'gold'},
+    ],
+    hint:'看三角形外框顏色：紅 = SSS 三邊',
+    successMsg:'答對！紅色三邊 = SSS！'
+  },
+
+  // 第 7 關：條件 → 是哪一招
+  {
+    title:'第 7 關 · 哪一招？',
+    sub:'看條件選對的招式',
+    char:'🐧',
+    speak:'角落生物：「給你 3 個條件，這是哪一招？」',
+    type:'condition-pick',
+    question:'給的條件是「兩個角 + 中間那條邊」',
+    options:[
+      {label:'🔴 SSS（三邊）', correct:false, cls:'warn'},
+      {label:'🔵🟠 SAS（兩邊+夾角）', correct:false, cls:'ok'},
+      {label:'🟢🟡 ASA（兩角+夾邊）', correct:true,  cls:'gold'},
+    ],
+    hint:'兩個角 + 中間那條邊 = 兩角夾一邊 = ASA',
+    successMsg:'答對！兩角 + 夾邊 = ASA'
+  },
+
+  // 第 8 關：BOSS 大魔王
+  {
+    title:'第 8 關 · BOSS · 大魔王',
+    sub:'4 連題綜合應用',
+    char:'👑',
+    speak:'BOSS 戰：「答 4 題，全對通關！」',
+    type:'boss',
+    boss:[
+      {q:'兩個三角形三邊都是 5、7、8。', correct:'SSS', options:['SSS','SAS','ASA']},
+      {q:'兩邊 6、8 + 夾角 60°。', correct:'SAS', options:['SSS','SAS','ASA']},
+      {q:'兩角 45°、60° + 夾邊 5。', correct:'ASA', options:['SSS','SAS','ASA']},
+      {q:'兩個三角形三邊都是 3、4、5。', correct:'SSS', options:['SSS','SAS','ASA']},
+    ],
+    hint:'紅看 SSS · 藍橘看 SAS · 綠金看 ASA'
+  }
+];
+
+// ============================================================
+// 狀態管理
+// ============================================================
+const STORAGE_KEY = 'congruence-homework-progress';
+let state = loadState();
+
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    return {
+      cur: s.cur || 0,
+      done: s.done || new Array(LEVELS.length).fill(false),
+      stars: s.stars || 0,
+    };
+  } catch(e){
+    return {cur:0, done:new Array(LEVELS.length).fill(false), stars:0};
+  }
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// ============================================================
+// 音效（簡單）
+// ============================================================
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx) try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+}
+function beep(freq, dur, type='sine', vol=0.15){
+  if(!audioCtx) return;
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type=type; o.frequency.value=freq;
+  g.gain.value=0; g.gain.linearRampToValueAtTime(vol, audioCtx.currentTime+0.01);
+  g.gain.linearRampToValueAtTime(0, audioCtx.currentTime+dur);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime+dur);
+}
+function sfxClick(){ ensureAudio(); beep(440,0.1,'square',0.1); }
+function sfxRight(){
+  ensureAudio();
+  [659, 784, 988].forEach((f,i)=>setTimeout(()=>beep(f,0.18,'sine',0.18),i*80));
+}
+function sfxWrong(){ ensureAudio(); beep(220,0.25,'sawtooth',0.12); }
+function sfxWin(){
+  ensureAudio();
+  [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,0.22,'sawtooth',0.18),i*100));
+}
+
+// ============================================================
+// 紙花特效
+// ============================================================
+function confetti(n=20){
+  const colors=['#FFD700','#00F5FF','#B967FF','#39FF14','#FF3B30','#FF8A00'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div');
+    c.className='confetti';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.left=(50+Math.random()*40-20)+'%';
+    c.style.top='40%';
+    c.style.borderRadius=Math.random()<0.5?'50%':'2px';
+    document.body.appendChild(c);
+    const dx=(Math.random()-0.5)*400;
+    const dy=200+Math.random()*300;
+    c.animate([
+      {transform:'translate(0,0) rotate(0)',opacity:1},
+      {transform:`translate(${dx}px,${dy}px) rotate(${Math.random()*720}deg)`,opacity:0}
+    ],{duration:1500+Math.random()*800,easing:'ease-out'}).onfinish=()=>c.remove();
+  }
+}
+
+// ============================================================
+// 渲染：頂部進度
+// ============================================================
+function renderHeader(){
+  document.getElementById('star-count').textContent = state.stars;
+  const dots = document.getElementById('progress-dots');
+  dots.innerHTML='';
+  for(let i=0;i<LEVELS.length;i++){
+    const d=document.createElement('div');
+    d.className='dot';
+    if(state.done[i]) d.classList.add('done');
+    if(i===state.cur && !state.done[i]) d.classList.add('cur');
+    d.textContent = state.done[i] ? '✓' : (i+1);
+    dots.appendChild(d);
+  }
+}
+
+// ============================================================
+// 渲染：關卡內容
+// ============================================================
+function renderLevel(){
+  // 全通關？
+  if(state.cur >= LEVELS.length){
+    return renderVictory();
+  }
+
+  const lv = LEVELS[state.cur];
+  const stage = document.getElementById('stage');
+  stage.innerHTML='';
+  document.getElementById('hint-box') && document.getElementById('hint-box').remove();
+
+  // 標題
+  const title = document.createElement('div');
+  title.className='level-title';
+  title.textContent = lv.title;
+  stage.appendChild(title);
+
+  const sub = document.createElement('div');
+  sub.className='level-sub';
+  sub.textContent = lv.sub;
+  stage.appendChild(sub);
+
+  // 角色對話
+  const charRow = document.createElement('div');
+  charRow.className='character-row';
+  charRow.innerHTML = `
+    <div class="char-icon">${lv.char}</div>
+    <div class="char-bubble">${lv.speak}</div>
+  `;
+  stage.appendChild(charRow);
+
+  // 內容區（依 type 分流）
+  const content = document.createElement('div');
+  stage.appendChild(content);
+
+  if(lv.type === 'shape-pick'){
+    renderShapePick(content, lv);
+  } else if(lv.type === 'tri-pair'){
+    renderTriPair(content, lv);
+  } else if(lv.type === 'tri-match'){
+    renderTriMatch(content, lv);
+  } else if(lv.type === 'color-id'){
+    renderColorId(content, lv);
+  } else if(lv.type === 'condition-pick'){
+    renderConditionPick(content, lv);
+  } else if(lv.type === 'boss'){
+    renderBoss(content, lv);
+  }
+
+  // 提示框（隱藏）
+  const hb = document.createElement('div');
+  hb.id='hint-box';
+  hb.textContent = '💡 ' + lv.hint;
+  stage.appendChild(hb);
+
+  renderHeader();
+}
+
+// ===== 第 1 關：點形狀 =====
+function renderShapePick(parent, lv){
+  const wrap = document.createElement('div');
+  wrap.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px';
+  lv.shapes.forEach(s=>{
+    const card = document.createElement('div');
+    card.className='match-card';
+    const svg = drawShape(s.kind);
+    card.appendChild(svg);
+    card.onclick = ()=>{
+      sfxClick();
+      if(s.is){
+        card.classList.add('right');
+        sfxRight();
+        showFeedback(parent, true, lv.successMsg);
+        passLevel();
+      } else {
+        card.classList.add('wrong');
+        sfxWrong();
+        setTimeout(()=>card.classList.remove('wrong'), 500);
+        showFeedback(parent, false, '🤔 不是這個喔～再想想，三角形有 3 個尖尖的角');
+      }
+    };
+    wrap.appendChild(card);
+  });
+  parent.appendChild(wrap);
+}
+
+// ===== 第 2、4、5 關：兩三角形比較 =====
+function renderTriPair(parent, lv){
+  const wrap = document.createElement('div');
+  wrap.style.cssText='display:flex;justify-content:center;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap';
+
+  // 左
+  let leftSvg;
+  if(lv.sasParams){
+    // SAS：用三角函數算出第三邊以畫圖
+    const [s1, ang, s2] = lv.sasParams.left;
+    const a = Math.sqrt(s1*s1 + s2*s2 - 2*s1*s2*Math.cos(ang*Math.PI/180));
+    leftSvg = drawTriSVG({a:a.toFixed(1), b:s2, c:s1, type:'SAS', w:240, h:200, showSides:false, label:lv.left.label});
+  } else if(lv.asaParams){
+    // ASA：用 sin 規則算邊
+    const [angB, side, angC] = lv.asaParams.left;
+    const angA = 180 - angB - angC;
+    const b = side * Math.sin(angB*Math.PI/180) / Math.sin(angA*Math.PI/180);
+    const c = side * Math.sin(angC*Math.PI/180) / Math.sin(angA*Math.PI/180);
+    leftSvg = drawTriSVG({a:side, b:b.toFixed(1), c:c.toFixed(1), type:'ASA', w:240, h:200, showSides:false, label:lv.left.label});
+  } else {
+    leftSvg = drawTriSVG({a:lv.left.a, b:lv.left.b, c:lv.left.c, type:lv.left.type, w:240, h:200, showSides:true, label:lv.left.label});
+  }
+
+  let rightSvg;
+  if(lv.sasParams){
+    const [s1, ang, s2] = lv.sasParams.right;
+    const a = Math.sqrt(s1*s1 + s2*s2 - 2*s1*s2*Math.cos(ang*Math.PI/180));
+    rightSvg = drawTriSVG({a:a.toFixed(1), b:s2, c:s1, type:'SAS', w:240, h:200, showSides:false, label:lv.right.label});
+  } else if(lv.asaParams){
+    const [angB, side, angC] = lv.asaParams.right;
+    const angA = 180 - angB - angC;
+    const b = side * Math.sin(angB*Math.PI/180) / Math.sin(angA*Math.PI/180);
+    const c = side * Math.sin(angC*Math.PI/180) / Math.sin(angA*Math.PI/180);
+    rightSvg = drawTriSVG({a:side, b:b.toFixed(1), c:c.toFixed(1), type:'ASA', w:240, h:200, showSides:false, label:lv.right.label});
+  } else {
+    rightSvg = drawTriSVG({a:lv.right.a, b:lv.right.b, c:lv.right.c, type:lv.right.type, w:240, h:200, showSides:true, label:lv.right.label});
+  }
+
+  const lc = document.createElement('div'); lc.appendChild(leftSvg);
+  const eq = document.createElement('div');
+  eq.style.cssText='font-size:2.5em;font-weight:900;color:#B967FF;text-shadow:0 0 12px #B967FF';
+  eq.textContent='≅?';
+  const rc = document.createElement('div'); rc.appendChild(rightSvg);
+  wrap.appendChild(lc); wrap.appendChild(eq); wrap.appendChild(rc);
+  parent.appendChild(wrap);
+
+  // 答案
+  const ans = document.createElement('div');
+  ans.className='answers two';
+  lv.options.forEach(opt=>{
+    const b = document.createElement('button');
+    b.className='ans-btn '+(opt.cls||'');
+    b.textContent=opt.label;
+    b.onclick = ()=>{
+      sfxClick();
+      if(opt.correct){
+        b.classList.add('right');
+        sfxRight();
+        showFeedback(parent, true, lv.successMsg);
+        ans.querySelectorAll('button').forEach(x=>x.disabled=true);
+        passLevel();
+      } else {
+        b.classList.add('wrong');
+        sfxWrong();
+        setTimeout(()=>{b.classList.remove('wrong');b.disabled=false;}, 500);
+        showFeedback(parent, false, '🤔 再看看：條件對應全相等才是全等。要找哪招？');
+      }
+    };
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ===== 第 3 關：找全等夥伴 =====
+function renderTriMatch(parent, lv){
+  // 上方：目標
+  const targetWrap = document.createElement('div');
+  targetWrap.style.cssText='text-align:center;margin-top:8px;margin-bottom:12px';
+  const targetLabel = document.createElement('div');
+  targetLabel.style.cssText='color:#FFD700;font-weight:900;margin-bottom:6px;font-size:1.1em';
+  targetLabel.textContent='🎯 目標三角形';
+  targetWrap.appendChild(targetLabel);
+  targetWrap.appendChild(drawTriSVG({...lv.target, type:'SSS', w:200, h:170, showSides:true}));
+  parent.appendChild(targetWrap);
+
+  // 下方：候選
+  const grid = document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px';
+  lv.candidates.forEach((c,idx)=>{
+    const card = document.createElement('div');
+    card.className='match-card';
+    card.appendChild(drawTriSVG({...c, type:'NEUTRAL', w:140, h:130, showSides:true}));
+    card.onclick = ()=>{
+      sfxClick();
+      if(c.correct){
+        card.classList.add('right');
+        sfxRight();
+        showFeedback(parent, true, lv.successMsg);
+        grid.querySelectorAll('.match-card').forEach(x=>x.style.pointerEvents='none');
+        passLevel();
+      } else {
+        card.classList.add('wrong');
+        sfxWrong();
+        setTimeout(()=>card.classList.remove('wrong'), 500);
+        showFeedback(parent, false, '🤔 看三邊長對不對得起來～再選一次');
+      }
+    };
+    grid.appendChild(card);
+  });
+  parent.appendChild(grid);
+}
+
+// ===== 第 6 關：色碼 =====
+function renderColorId(parent, lv){
+  const wrap = document.createElement('div');
+  wrap.style.cssText='display:flex;justify-content:center;margin:14px 0';
+  const tri = lv.triangles[0];
+  wrap.appendChild(drawTriSVG({a:tri.a,b:tri.b,c:tri.c,type:tri.color,w:280,h:220,showSides:false}));
+  parent.appendChild(wrap);
+
+  const ans = document.createElement('div');
+  ans.className='answers three';
+  lv.options.forEach(opt=>{
+    const b = document.createElement('button');
+    b.className='ans-btn '+(opt.cls||'');
+    b.textContent=opt.label;
+    b.onclick = ()=>{
+      sfxClick();
+      if(opt.correct){
+        b.classList.add('right');
+        sfxRight();
+        showFeedback(parent, true, lv.successMsg);
+        ans.querySelectorAll('button').forEach(x=>x.disabled=true);
+        passLevel();
+      } else {
+        b.classList.add('wrong');
+        sfxWrong();
+        setTimeout(()=>{b.classList.remove('wrong');b.disabled=false;}, 500);
+        showFeedback(parent, false, '🤔 看三角形顏色：紅 = SSS、藍橘 = SAS、綠金 = ASA');
+      }
+    };
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ===== 第 7 關：條件選擇 =====
+function renderConditionPick(parent, lv){
+  const q = document.createElement('div');
+  q.style.cssText=`
+    background:linear-gradient(135deg,#1A0F3E,#0A0E27);
+    border:3px solid #FFD700;border-radius:14px;
+    padding:18px;margin:14px 0;text-align:center;
+    font-size:1.2em;font-weight:900;color:#FFD700;
+    box-shadow:0 0 18px rgba(255,215,0,.3);
+  `;
+  q.innerHTML = '📋 ' + lv.question;
+  parent.appendChild(q);
+
+  const ans = document.createElement('div');
+  ans.className='answers';
+  ans.style.gridTemplateColumns='1fr';
+  lv.options.forEach(opt=>{
+    const b = document.createElement('button');
+    b.className='ans-btn '+(opt.cls||'');
+    b.textContent=opt.label;
+    b.onclick = ()=>{
+      sfxClick();
+      if(opt.correct){
+        b.classList.add('right');
+        sfxRight();
+        showFeedback(parent, true, lv.successMsg);
+        ans.querySelectorAll('button').forEach(x=>x.disabled=true);
+        passLevel();
+      } else {
+        b.classList.add('wrong');
+        sfxWrong();
+        setTimeout(()=>{b.classList.remove('wrong');b.disabled=false;}, 500);
+        showFeedback(parent, false, '🤔 再想想條件：兩個角 + 中間那條邊 = ？');
+      }
+    };
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ===== 第 8 關：BOSS =====
+let bossState = {q:0, score:0};
+function renderBoss(parent, lv){
+  bossState = {q:0, score:0};
+  renderBossQ(parent, lv);
+}
+function renderBossQ(parent, lv){
+  parent.innerHTML='';
+  if(bossState.q >= lv.boss.length){
+    // 結算
+    const ok = bossState.score === lv.boss.length;
+    const result = document.createElement('div');
+    result.style.cssText=`text-align:center;padding:20px;`;
+    result.innerHTML = `
+      <div style="font-size:3em">${ok ? '🏆' : '💪'}</div>
+      <div style="font-size:1.5em;font-weight:900;color:#FFD700;margin:14px 0">
+        BOSS 戰結束<br>${bossState.score} / ${lv.boss.length} 答對
+      </div>
+      ${ok ? '<div style="color:#39FF14;font-weight:800">完美通關！</div>' :
+             '<div style="color:#FF8A00;font-weight:800">再戰一次更厲害！</div>'}
+    `;
+    parent.appendChild(result);
+    if(ok){
+      showFeedback(parent, true, '🏆 全對！你是全等三角形大師！');
+      passLevel();
+    } else {
+      // 重來
+      const retry = document.createElement('button');
+      retry.className='next-btn';
+      retry.textContent='🔄 再戰一次';
+      retry.style.marginTop='14px';
+      retry.onclick = ()=>{
+        sfxClick();
+        bossState={q:0,score:0};
+        renderBossQ(parent, lv);
+      };
+      parent.appendChild(retry);
+    }
+    return;
+  }
+
+  const cur = lv.boss[bossState.q];
+  const hdr = document.createElement('div');
+  hdr.style.cssText=`text-align:center;color:#FFD700;font-weight:900;font-size:1.15em;margin:8px 0`;
+  hdr.textContent = `第 ${bossState.q+1} / ${lv.boss.length} 題（已答對 ${bossState.score}）`;
+  parent.appendChild(hdr);
+
+  const q = document.createElement('div');
+  q.style.cssText=`
+    background:#1A0F3E;border:3px solid #B967FF;border-radius:14px;
+    padding:18px;margin:14px 0;text-align:center;
+    font-size:1.15em;font-weight:800;color:#fff;
+  `;
+  q.textContent = '📋 ' + cur.q;
+  parent.appendChild(q);
+
+  const ans = document.createElement('div');
+  ans.className='answers three';
+  cur.options.forEach(label=>{
+    const b = document.createElement('button');
+    const colorMap={SSS:'warn',SAS:'',ASA:'gold'};
+    b.className='ans-btn '+(colorMap[label]||'');
+    b.textContent = label;
+    b.onclick = ()=>{
+      sfxClick();
+      if(label === cur.correct){
+        b.classList.add('right');
+        sfxRight();
+        bossState.score++;
+        setTimeout(()=>{
+          bossState.q++;
+          renderBossQ(parent, lv);
+        }, 700);
+      } else {
+        b.classList.add('wrong');
+        sfxWrong();
+        setTimeout(()=>{
+          // 答錯也照樣前進，但不加分
+          bossState.q++;
+          renderBossQ(parent, lv);
+        }, 700);
+      }
+    };
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ============================================================
+// 反饋 + 過關
+// ============================================================
+function showFeedback(parent, ok, msg){
+  let fb = parent.querySelector('.feedback');
+  if(!fb){
+    fb = document.createElement('div');
+    fb.className='feedback';
+    parent.appendChild(fb);
+  }
+  fb.className = 'feedback ' + (ok ? 'fb-ok' : 'fb-no');
+  fb.textContent = msg;
+}
+
+function passLevel(){
+  if(!state.done[state.cur]){
+    state.done[state.cur] = true;
+    state.stars++;
+    saveState();
+  }
+  // 顯示「下一關」按鈕
+  setTimeout(()=>{
+    const stage = document.getElementById('stage');
+    if(stage.querySelector('.next-row')) return;
+    const row = document.createElement('div');
+    row.className='next-row';
+    const btn = document.createElement('button');
+    btn.className='next-btn';
+    if(state.cur < LEVELS.length-1){
+      btn.textContent = '▶ 進入下一關';
+    } else {
+      btn.textContent = '🏆 看結果';
+    }
+    btn.onclick = ()=>{
+      sfxClick();
+      state.cur++;
+      saveState();
+      renderLevel();
+    };
+    row.appendChild(btn);
+    stage.appendChild(row);
+    confetti(15);
+  }, 600);
+  renderHeader();
+}
+
+// ============================================================
+// 全部通關畫面
+// ============================================================
+function renderVictory(){
+  const stage = document.getElementById('stage');
+  stage.innerHTML = `
+    <div class="victory-screen">
+      <div class="crown">👑</div>
+      <div class="victory-title">🎉 全部通關！</div>
+      <div class="victory-stars">${'⭐'.repeat(state.stars)}</div>
+      <div style="color:#fff;font-weight:700;margin:14px 0;font-size:1.1em">
+        你已經是<br>
+        <span style="color:#FFD700;font-size:1.4em">全等三角形大師</span><br>
+        SSS · SAS · ASA 三招都會了！
+      </div>
+      <button class="next-btn" id="restart-btn" style="margin-top:14px">🔄 從頭再戰</button>
+    </div>
+  `;
+  document.getElementById('restart-btn').onclick = ()=>{
+    sfxClick();
+    state = {cur:0, done:new Array(LEVELS.length).fill(false), stars:0};
+    saveState();
+    renderLevel();
+  };
+  sfxWin();
+  confetti(80);
+  setTimeout(()=>confetti(60), 500);
+  setTimeout(()=>confetti(60), 1100);
+  renderHeader();
+}
+
+// ============================================================
+// 按鈕綁定
+// ============================================================
+document.getElementById('hint-btn').onclick = ()=>{
+  sfxClick();
+  const hb = document.getElementById('hint-box');
+  if(hb) hb.classList.toggle('show');
+};
+document.getElementById('reset-btn').onclick = ()=>{
+  if(confirm('確定要重來嗎？已收集的星星會清空喔～')){
+    sfxClick();
+    state = {cur:0, done:new Array(LEVELS.length).fill(false), stars:0};
+    saveState();
+    renderLevel();
+  }
+};
+// 第一次點擊啟動音效
+document.addEventListener('click', ensureAudio, {once:true});
+
+// 啟動
+renderLevel();
+</script>
+
+</body>
+</html>
