@@ -75,6 +75,7 @@ section.active{display:flex;flex-direction:column}
   <h1>🥷 3-4 中垂線 · 角平分線</h1>
   <button class="tab active" data-tab="slides">📊 簡報</button>
   <button class="tab" data-tab="animation">🎬 動畫</button>
+  <button class="tab" data-tab="textbook">📚 課本</button>
 </nav>
 
 <!-- 階段指引條（教學流程） -->
@@ -135,6 +136,14 @@ section.active{display:flex;flex-direction:column}
   <iframe id="anim-frame" src="perpendicular-bisector-angle-bisector-lesson4.html"></iframe>
 </section>
 
+<!-- 課本區 -->
+<section id="section-textbook" style="padding:14px;background:#1A1F3A">
+  <h2 style="color:#FFD700;font-size:20px;margin-bottom:8px;text-align:center">📚 翰林版課本 · 3-4 原版</h2>
+  <p style="text-align:center;color:#B8C5D6;margin-bottom:10px;font-size:14px">12 頁完整教材：例 1-4、性質框、自我評量、重點回顧</p>
+  <embed id="textbook-frame" src="pdfs/textbook-3-4.pdf#toolbar=1&navpanes=0" type="application/pdf"
+    style="flex:1;width:100%;height:calc(100vh - 230px);background:#fff;border:3px solid #FFD700;border-radius:12px;box-shadow:0 0 30px rgba(255,215,0,.25)">
+</section>
+
 <script>
 const tabs = document.querySelectorAll(".tab");
 const stageBtns = document.querySelectorAll(".stage-btn");
@@ -154,10 +163,13 @@ const stageHints = {
   "9": "📊 階段 9（50-55 分）：八字訣總結「等距離 ↔ 在線上」。"
 };
 
+const textbookSec = document.getElementById("section-textbook");
+
 function showTab(name){
   tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === name));
   slidesSec.classList.toggle("active", name === "slides");
   animSec.classList.toggle("active", name === "animation");
+  textbookSec.classList.toggle("active", name === "textbook");
   window.scrollTo(0, 0);
 }
 
