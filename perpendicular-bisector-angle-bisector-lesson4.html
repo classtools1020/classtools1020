@@ -632,6 +632,23 @@ function animateTri(elemId, from, to, frames, onDone){
 // ============================================================
 // 關卡設計 · 第二節：SAS + ASA
 // ============================================================
+// 互動 HUD: 在 stage 中加入 HTML 控制元素
+function addStageOverlay(html){
+  let overlay = document.getElementById("stage-overlay");
+  if(!overlay){
+    overlay = document.createElement("div");
+    overlay.id = "stage-overlay";
+    overlay.style.cssText = "position:absolute;left:50%;bottom:30px;transform:translateX(-50%);z-index:22;background:rgba(10,14,39,.92);border:3px solid #FFD700;border-radius:14px;padding:16px 22px;box-shadow:var(--glow-gold);max-width:90%;";
+    document.getElementById("stage").appendChild(overlay);
+  }
+  overlay.innerHTML = html;
+  return overlay;
+}
+function clearStageOverlay(){
+  const o = document.getElementById("stage-overlay");
+  if(o) o.remove();
+}
+
 // ============================================================
 // 拖拉互動工具（最終強化版：掛在 SVG 整個畫布，hit area 50px）
 // ============================================================
