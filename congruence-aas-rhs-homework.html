@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>⚔️ 全等最終戰 · AAS + RHS 闖關</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+  html,body{overflow-x:hidden}
+  body{
+    font-family:'Microsoft JhengHei','Noto Sans TC',-apple-system,sans-serif;
+    background:radial-gradient(ellipse at top,#1A0F3E 0%,#0A0E27 60%,#000 100%);
+    color:#fff;min-height:100vh;line-height:1.5;
+    user-select:none;-webkit-user-select:none;
+  }
+  #app{max-width:780px;margin:0 auto;padding:12px;min-height:100vh;display:flex;flex-direction:column}
+
+  /* ===== Header ===== */
+  header{
+    background:rgba(10,14,39,.85);
+    border:2px solid #B967FF;border-radius:14px;padding:12px 14px;margin-bottom:12px;
+    box-shadow:0 0 18px rgba(185,103,255,.3);
+  }
+  .h-row{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+  .h-title{font-size:1em;font-weight:900;color:#FFD700}
+  .h-stars{font-size:1em;font-weight:900;color:#FFD700}
+  .h-stars span{color:#fff}
+  .progress-dots{display:flex;gap:5px;margin-top:8px;justify-content:center;flex-wrap:wrap}
+  .dot{
+    width:30px;height:30px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.85em;font-weight:900;
+    background:#1A1A2E;border:2px solid #555;color:#888;transition:all .25s;
+  }
+  .dot.done{background:#39FF14;border-color:#39FF14;color:#000;box-shadow:0 0 12px #39FF14}
+  .dot.cur{background:#FFD700;border-color:#FFD700;color:#000;box-shadow:0 0 14px #FFD700;transform:scale(1.18)}
+
+  /* ===== Stage ===== */
+  main{
+    flex:1;
+    background:rgba(10,14,39,.7);
+    border:2px solid rgba(185,103,255,.3);
+    border-radius:14px;padding:16px;margin-bottom:12px;min-height:480px;
+  }
+  .level-title{
+    text-align:center;font-size:1.4em;font-weight:900;color:#FFD700;
+    text-shadow:2px 2px 0 #000,0 0 12px rgba(255,215,0,.6);margin-bottom:4px;
+  }
+  .level-sub{text-align:center;color:#B967FF;font-size:.92em;font-weight:700;margin-bottom:12px}
+  .speak-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+  .speak-icon{font-size:2.4em;flex-shrink:0;line-height:1}
+  .speak-bubble{
+    flex:1;background:#fff;color:#111;padding:10px 14px;border-radius:14px;
+    font-weight:700;font-size:1.02em;line-height:1.5;position:relative;
+  }
+  .speak-bubble::before{
+    content:'';position:absolute;left:-10px;top:14px;
+    border:8px solid transparent;border-right-color:#fff;
+  }
+
+  /* SVG */
+  .svg-wrap{display:flex;justify-content:center;align-items:center;gap:8px;margin:14px 0;flex-wrap:wrap}
+  .eq-symbol{font-size:2.5em;font-weight:900;color:#B967FF;text-shadow:0 0 14px #B967FF}
+  svg{max-width:100%;height:auto}
+
+  /* Cards (for shape-pick / tri-match) */
+  .card-grid{display:grid;gap:10px;margin-top:10px}
+  .card-grid.g2{grid-template-columns:1fr 1fr}
+  .card-grid.g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:480px){.card-grid.g3{grid-template-columns:1fr 1fr}}
+  .card{
+    background:#1A1A2E;border:3px solid #4DBCFF;border-radius:14px;
+    padding:8px;cursor:pointer;text-align:center;transition:all .15s;
+  }
+  .card:active{transform:scale(.97)}
+  .card.right{border-color:#39FF14;background:rgba(57,255,20,.18);box-shadow:0 0 18px #39FF14}
+  .card.wrong{border-color:#FF3B30;background:rgba(255,59,48,.18);animation:shake .4s}
+
+  /* Answer buttons */
+  .answers{display:grid;gap:10px;margin-top:14px}
+  .answers.two{grid-template-columns:1fr 1fr}
+  .answers.three{grid-template-columns:repeat(3,1fr)}
+  .answers.four{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:520px){
+    .answers.three{grid-template-columns:1fr 1fr}
+    .answers.four{grid-template-columns:1fr 1fr}
+  }
+  .ans-btn{
+    background:linear-gradient(135deg,#1B5E8F,#0D3A5C);
+    color:#fff;border:3px solid #4DBCFF;border-radius:12px;
+    padding:16px 12px;font-size:1.1em;font-weight:900;
+    cursor:pointer;transition:all .15s;min-height:64px;
+    box-shadow:0 4px 12px rgba(77,188,255,.3);
+  }
+  .ans-btn:active{transform:scale(.96)}
+  .ans-btn.ok{background:linear-gradient(135deg,#39FF14,#1B8B0A);border-color:#39FF14;color:#000}
+  .ans-btn.warn{background:linear-gradient(135deg,#FF3B30,#A02020);border-color:#FF6B6B}
+  .ans-btn.gold{background:linear-gradient(135deg,#FFD700,#B8860B);border-color:#FFD700;color:#000}
+  .ans-btn:disabled{opacity:.5;cursor:not-allowed}
+  .ans-btn.right{
+    background:linear-gradient(135deg,#39FF14,#1B8B0A) !important;
+    border-color:#39FF14 !important;color:#000 !important;
+    animation:pulse .4s ease;box-shadow:0 0 24px #39FF14 !important;
+  }
+  .ans-btn.wrong{
+    background:linear-gradient(135deg,#FF3B30,#A02020) !important;
+    border-color:#FF3B30 !important;animation:shake .4s ease;
+  }
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+  /* Feedback */
+  .feedback{
+    margin-top:14px;padding:14px;border-radius:12px;
+    font-size:1.08em;font-weight:800;text-align:center;line-height:1.55;
+  }
+  .fb-ok{background:rgba(57,255,20,.15);border:2px solid #39FF14;color:#39FF14}
+  .fb-no{background:rgba(255,138,0,.15);border:2px solid #FF8A00;color:#FFB347}
+
+  /* Next button */
+  .next-row{margin-top:14px;text-align:center}
+  .next-btn{
+    background:linear-gradient(135deg,#FFD700,#FFA500);
+    color:#000;border:none;border-radius:14px;
+    padding:18px 36px;font-size:1.2em;font-weight:900;
+    cursor:pointer;transition:all .15s;
+    box-shadow:0 0 20px rgba(255,215,0,.5);
+    min-height:60px;letter-spacing:1px;
+  }
+  .next-btn:active{transform:scale(.95)}
+
+  /* Footer */
+  footer{display:flex;gap:8px;justify-content:center;padding:6px 0}
+  .foot-btn{
+    background:rgba(255,255,255,.1);color:#fff;
+    border:1px solid rgba(255,255,255,.3);border-radius:10px;
+    padding:10px 18px;font-size:.95em;cursor:pointer;font-weight:700;
+  }
+  .foot-btn:active{background:rgba(255,255,255,.2)}
+
+  /* Hint */
+  #hint-box{
+    background:rgba(255,215,0,.15);border:2px dashed #FFD700;
+    border-radius:12px;padding:12px;margin-top:12px;
+    color:#FFD700;font-weight:700;font-size:.96em;line-height:1.6;display:none;
+  }
+  #hint-box.show{display:block}
+
+  /* Side highlight in tri */
+  .highlight-edge{stroke:#FFD700 !important;stroke-width:8 !important;filter:drop-shadow(0 0 4px #FFD700)}
+
+  /* ============ 慶祝特效 ============ */
+  /* 撒花 */
+  .confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:9998}
+
+  /* 賽車 */
+  .race-car{
+    position:fixed;font-size:4em;z-index:9999;pointer-events:none;
+    bottom:30%;left:-100px;
+    filter:drop-shadow(0 0 8px #FFD700);
+  }
+
+  /* 傳說對決光圈 */
+  .legend-banner{
+    position:fixed;top:30%;left:50%;
+    transform:translate(-50%,-50%) scale(0);
+    z-index:9999;pointer-events:none;
+    text-align:center;width:90%;max-width:400px;
+  }
+  .legend-banner.show{animation:legendIn 1.8s ease forwards}
+  @keyframes legendIn{
+    0%{transform:translate(-50%,-50%) scale(0) rotate(-180deg);opacity:0}
+    35%{transform:translate(-50%,-50%) scale(1.2) rotate(0);opacity:1}
+    65%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1}
+    100%{transform:translate(-50%,-50%) scale(1.4) rotate(0);opacity:0}
+  }
+  .legend-text{
+    background:linear-gradient(135deg,#FFD700,#FFA500,#FF6B00);
+    color:#000;font-weight:900;font-size:2.2em;padding:18px 28px;
+    border-radius:18px;border:5px solid #FFF;
+    box-shadow:0 0 60px #FFD700,inset 0 0 20px #FFF;
+    text-shadow:2px 2px 0 #FFF;letter-spacing:3px;
+  }
+  .legend-stars{font-size:1.5em;margin-top:10px;color:#FFD700;letter-spacing:8px;text-shadow:0 0 16px #FFD700}
+
+  /* 扭蛋機 */
+  .gacha-overlay{
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(0,0,0,.85);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .3s;
+  }
+  .gacha-overlay.show{opacity:1;pointer-events:auto}
+  .gacha-box{
+    background:linear-gradient(135deg,#1A0F3E,#3D1A6E);
+    border:4px solid #FFD700;border-radius:24px;
+    padding:24px 28px;text-align:center;max-width:90%;width:340px;
+    box-shadow:0 0 50px #FFD700;
+  }
+  .gacha-machine{font-size:5em;margin:0 auto 10px;animation:wiggle 0.5s infinite}
+  @keyframes wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+  .gacha-prize{font-size:6em;margin:14px 0;animation:prizePop .8s ease}
+  @keyframes prizePop{
+    0%{transform:scale(0) rotate(0);opacity:0}
+    60%{transform:scale(1.4) rotate(20deg);opacity:1}
+    100%{transform:scale(1) rotate(0);opacity:1}
+  }
+  .gacha-name{font-size:1.4em;font-weight:900;color:#FFD700;margin-bottom:6px}
+  .gacha-rarity{font-weight:800;font-size:1em;margin-bottom:12px}
+  .rarity-common{color:#fff}
+  .rarity-rare{color:#4DBCFF}
+  .rarity-epic{color:#B967FF}
+  .rarity-legendary{color:#FFD700;text-shadow:0 0 12px #FFD700}
+  .gacha-close{
+    margin-top:14px;background:#FFD700;color:#000;
+    border:none;border-radius:10px;padding:12px 30px;
+    font-weight:900;font-size:1.05em;cursor:pointer;
+  }
+
+  /* Final victory */
+  .victory-screen{text-align:center;padding:24px 14px}
+  .crown-big{font-size:5em;animation:bounce 1.2s infinite ease}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .victory-title{font-size:1.8em;font-weight:900;color:#FFD700;margin:14px 0;text-shadow:2px 2px 0 #000}
+  .victory-stars{font-size:2.2em;letter-spacing:6px;margin:10px 0}
+
+  /* 收藏品櫃 */
+  .collection{
+    background:rgba(255,215,0,.1);border:2px solid #FFD700;
+    border-radius:14px;padding:14px;margin-top:14px;
+  }
+  .col-title{color:#FFD700;font-weight:900;font-size:1.1em;margin-bottom:10px}
+  .col-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .col-item{background:rgba(255,255,255,.1);border-radius:10px;padding:10px;text-align:center}
+  .col-emoji{font-size:2em}
+  .col-count{font-size:.85em;color:#FFD700;font-weight:700}
+
+  /* Triangle pair display */
+  .tri-pair-row{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin:10px 0}
+  .tri-info-card{
+    background:#1A0F3E;border:2px solid #B967FF;border-radius:12px;
+    padding:10px 14px;font-weight:800;color:#fff;font-size:.98em;line-height:1.7;
+    text-align:center;min-width:140px;
+  }
+  .tri-info-card .info-label{color:#FFD700;font-size:.85em;margin-bottom:4px}
+  .tri-info-card .info-line{margin:2px 0}
+  .tri-info-card .qmark{color:#FF8A00;font-size:1.4em;font-weight:900}
+
+  @media(max-width:480px){
+    .level-title{font-size:1.2em}
+    .ans-btn{padding:14px 8px;font-size:1em;min-height:56px}
+    .speak-icon{font-size:2em}
+    .speak-bubble{font-size:.95em}
+    .legend-text{font-size:1.6em;padding:14px 20px}
+    .gacha-machine{font-size:4em}
+    .gacha-prize{font-size:5em}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="h-row">
+      <div class="h-title">⚔️ AAS + RHS 最終戰</div>
+      <div class="h-stars">⭐ <span id="star-count">0</span> / 8</div>
+    </div>
+    <div class="progress-dots" id="progress-dots"></div>
+  </header>
+
+  <main id="stage"></main>
+
+  <footer>
+    <button class="foot-btn" id="hint-btn">💡 提示</button>
+    <button class="foot-btn" id="reset-btn">🔄 重來</button>
+  </footer>
+
+</div>
+
+<!-- 慶祝層 -->
+<div class="legend-banner" id="legend-banner">
+  <div class="legend-text">闖關成功！</div>
+  <div class="legend-stars">⭐⭐⭐</div>
+</div>
+
+<div class="gacha-overlay" id="gacha-overlay">
+  <div class="gacha-box">
+    <div class="gacha-machine" id="gacha-machine">🎰</div>
+    <div id="gacha-content" style="display:none">
+      <div class="gacha-prize" id="gacha-prize">🎁</div>
+      <div class="gacha-name" id="gacha-name">??</div>
+      <div class="gacha-rarity" id="gacha-rarity">??</div>
+    </div>
+    <button class="gacha-close" id="gacha-close" style="display:none">繼續闖關 ▶</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ============================================================
+// SVG 工具
+// ============================================================
+const NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag,attrs={}){
+  const e = document.createElementNS(NS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  return e;
+}
+function triPts(a,b,c){
+  if(a+b<=c||b+c<=a||a+c<=b) return null;
+  const x = (c*c+a*a-b*b)/(2*a);
+  const y = Math.sqrt(Math.max(c*c-x*x,0));
+  return [{x,y:-y},{x:0,y:0},{x:a,y:0}];
+}
+function fitTri(pts, cx, cy, scale){
+  const mx=(pts[0].x+pts[1].x+pts[2].x)/3;
+  const my=(pts[0].y+pts[1].y+pts[2].y)/3;
+  return pts.map(p=>({x:cx+(p.x-mx)*scale, y:cy+(p.y-my)*scale}));
+}
+function drawAngleArc(svg, vertex, p1, p2, radius, color, sw){
+  const a1 = Math.atan2(p1.y-vertex.y, p1.x-vertex.x);
+  const a2 = Math.atan2(p2.y-vertex.y, p2.x-vertex.x);
+  let da = a2-a1;
+  while(da > Math.PI) da -= 2*Math.PI;
+  while(da < -Math.PI) da += 2*Math.PI;
+  const sweep = da > 0 ? 1 : 0;
+  const start = {x:vertex.x+Math.cos(a1)*radius, y:vertex.y+Math.sin(a1)*radius};
+  const end = {x:vertex.x+Math.cos(a2)*radius, y:vertex.y+Math.sin(a2)*radius};
+  svg.appendChild(svgEl('path',{
+    d:`M${start.x},${start.y} A${radius},${radius} 0 0,${sweep} ${end.x},${end.y}`,
+    stroke:color, 'stroke-width':sw, fill:'none', 'stroke-linecap':'round'
+  }));
+}
+
+function drawTriSVG(opts){
+  const {a,b,c, type='NEUTRAL', w=240, h=200, sides=null, label=null, hideValues=false, highlightEdge=null, anglesA=null} = opts;
+  // sides 是要顯示的標籤陣列 [BC, CA, AB]，可以是數字或 '?' 或 null（不顯示）
+  const svg = svgEl('svg',{width:w, height:h, viewBox:`0 0 ${w} ${h}`});
+  svg.appendChild(svgEl('rect',{x:0,y:0,width:w,height:h, fill:'#0A0E27', rx:10}));
+
+  // 用實際邊長畫
+  const aa = parseFloat(a), bb = parseFloat(b), cc = parseFloat(c);
+  const raw = triPts(aa, bb, cc);
+  if(!raw) return svg;
+  const span = Math.max(aa,bb,cc);
+  const scale = Math.min((w-50)/span, (h-50)/span) * 0.8;
+  const pts = fitTri(raw, w/2, h/2+12, scale);
+
+  const colors = {
+    SSS:{stroke:'#FF3B30', fill:'rgba(255,59,48,0.25)'},
+    SAS:{stroke:'#888', fill:'#0A0E27'},
+    ASA:{stroke:'#888', fill:'#0A0E27'},
+    AAS:{stroke:'#888', fill:'#0A0E27'},
+    RHS:{stroke:'#888', fill:'#0A0E27'},
+    NEUTRAL:{stroke:'#4DBCFF', fill:'rgba(77,188,255,0.2)'}
+  };
+  const co = colors[type] || colors.NEUTRAL;
+  const path = svgEl('path',{
+    d:`M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y} Z`,
+    fill:co.fill, stroke:co.stroke, 'stroke-width':4, 'stroke-linejoin':'round'
+  });
+  svg.appendChild(path);
+
+  // SAS 視覺：兩邊藍色 + 夾角橘
+  if(type==='SAS'){
+    const drawEdge = (p1,p2,col,sw=6)=>svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:col,'stroke-width':sw,'stroke-linecap':'round'}));
+    drawEdge(pts[0],pts[1],'#00F5FF');
+    drawEdge(pts[0],pts[2],'#00F5FF');
+    drawAngleArc(svg, pts[0], pts[1], pts[2], 22, '#FF8A00', 5);
+  }
+  // ASA 視覺：夾邊綠 + 兩角金
+  if(type==='ASA'){
+    const drawEdge = (p1,p2,col,sw=6)=>svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:col,'stroke-width':sw,'stroke-linecap':'round'}));
+    drawEdge(pts[1],pts[2],'#39FF14');
+    drawAngleArc(svg, pts[1], pts[0], pts[2], 22, '#FFD700', 5);
+    drawAngleArc(svg, pts[2], pts[0], pts[1], 22, '#FFD700', 5);
+  }
+  // AAS 視覺：兩角金 + 對邊紫（邊在「外面」，不在兩角中間）
+  if(type==='AAS'){
+    const drawEdge = (p1,p2,col,sw=6)=>svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:col,'stroke-width':sw,'stroke-linecap':'round'}));
+    // 兩角在 A 和 B，紫色邊是 BC（B 對 C，A 的對邊 → 不夾在兩角中間）
+    drawAngleArc(svg, pts[0], pts[1], pts[2], 22, '#FFD700', 5); // ∠A
+    drawAngleArc(svg, pts[1], pts[0], pts[2], 22, '#FFD700', 5); // ∠B
+    drawEdge(pts[1],pts[2],'#9B4DFF'); // BC 紫色
+  }
+  // RHS 視覺：紅直角 + 紫斜邊 + 青股
+  if(type==='RHS'){
+    const drawEdge = (p1,p2,col,sw=6)=>svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:col,'stroke-width':sw,'stroke-linecap':'round'}));
+    // 假設直角在 C（pts[2]），斜邊 AB（pts[0]-pts[1]），股 BC（pts[1]-pts[2]）或 CA
+    drawEdge(pts[0],pts[1],'#9B4DFF', 7); // 斜邊 AB 紫
+    drawEdge(pts[1],pts[2],'#00F5FF', 7); // 股 BC 青
+    // 直角符號（小方框）在 C
+    const C=pts[2], B=pts[1], A=pts[0];
+    const v1 = {x:B.x-C.x, y:B.y-C.y};
+    const v2 = {x:A.x-C.x, y:A.y-C.y};
+    const len1 = Math.hypot(v1.x,v1.y), len2 = Math.hypot(v2.x,v2.y);
+    const u1 = {x:v1.x/len1*16, y:v1.y/len1*16};
+    const u2 = {x:v2.x/len2*16, y:v2.y/len2*16};
+    const p1 = {x:C.x+u1.x, y:C.y+u1.y};
+    const p2 = {x:C.x+u1.x+u2.x, y:C.y+u1.y+u2.y};
+    const p3 = {x:C.x+u2.x, y:C.y+u2.y};
+    svg.appendChild(svgEl('polyline',{
+      points:`${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`,
+      stroke:'#FF3B30','stroke-width':3, fill:'none'
+    }));
+  }
+
+  // 高亮指定邊
+  if(highlightEdge){
+    const edgeMap = {AB:[pts[0],pts[1]], BC:[pts[1],pts[2]], CA:[pts[0],pts[2]]};
+    const [p1,p2] = edgeMap[highlightEdge] || [];
+    if(p1) svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,stroke:'#FFD700','stroke-width':9,'stroke-linecap':'round',filter:'drop-shadow(0 0 4px #FFD700)'}));
+  }
+
+  // 邊長標
+  if(sides && !hideValues){
+    const lblSide = (p1,p2,txt,offY)=>{
+      if(txt==null) return;
+      const mx=(p1.x+p2.x)/2, my=(p1.y+p2.y)/2;
+      const isQ = txt==='?';
+      const t = svgEl('text',{
+        x:mx, y:my+offY, 'text-anchor':'middle',
+        'font-size':22, 'font-weight':900,
+        fill: isQ ? '#FF8A00' : '#FFD700',
+        stroke:'#000', 'stroke-width':3, 'paint-order':'stroke'
+      });
+      t.textContent = txt;
+      svg.appendChild(t);
+    };
+    lblSide(pts[1],pts[2], sides[0], 22);   // BC
+    lblSide(pts[0],pts[2], sides[1], -8);   // CA
+    lblSide(pts[0],pts[1], sides[2], -8);   // AB
+  }
+
+  // 角度標 (anglesA = [angA(at vertex A 0), angB(at vertex B 1), angC(at vertex C 2)])
+  if(anglesA){
+    const lblAng = (vIdx,p1Idx,p2Idx,txt)=>{
+      if(txt==null) return;
+      const v=pts[vIdx], p1=pts[p1Idx], p2=pts[p2Idx];
+      const a1=Math.atan2(p1.y-v.y,p1.x-v.x), a2=Math.atan2(p2.y-v.y,p2.x-v.x);
+      const mid = Math.atan2(Math.sin(a1)+Math.sin(a2),Math.cos(a1)+Math.cos(a2));
+      const lx=v.x+Math.cos(mid)*38, ly=v.y+Math.sin(mid)*38;
+      const isQ = txt==='?';
+      const t = svgEl('text',{
+        x:lx, y:ly+5, 'text-anchor':'middle',
+        'font-size':18, 'font-weight':900,
+        fill:isQ?'#FF8A00':'#FFD700',
+        stroke:'#000', 'stroke-width':3, 'paint-order':'stroke'
+      });
+      t.textContent = txt;
+      svg.appendChild(t);
+    };
+    lblAng(0,1,2,anglesA[0]); // A
+    lblAng(1,0,2,anglesA[1]); // B
+    lblAng(2,0,1,anglesA[2]); // C
+  }
+
+  // 頂點標 A B C
+  if(opts.showVertex){
+    const lbl = (p,idx,name)=>{
+      const offsets=[{x:0,y:-12},{x:-12,y:8},{x:12,y:8}];
+      const o=offsets[idx];
+      const t = svgEl('text',{
+        x:p.x+o.x, y:p.y+o.y, 'text-anchor':'middle',
+        'font-size':18, 'font-weight':900, fill:'#fff',
+        stroke:'#000', 'stroke-width':3, 'paint-order':'stroke'
+      });
+      t.textContent = name;
+      svg.appendChild(t);
+    };
+    const names = opts.vertexNames || ['A','B','C'];
+    pts.forEach((p,i)=>lbl(p,i,names[i]));
+  }
+
+  // ✅ 標題不在 SVG 內畫（避免擋住頂點），統一由外層 HTML 標題顯示
+  return svg;
+}
+
+// 包裝：SVG + 下方 HTML 標籤
+function wrapTri(svg, caption){
+  const wrap = document.createElement('div');
+  wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+  wrap.appendChild(svg);
+  if(caption){
+    const cap = document.createElement('div');
+    cap.style.cssText='font-size:1.05em;font-weight:900;color:#FFD700;letter-spacing:1px;text-shadow:1px 1px 0 #000';
+    cap.innerHTML = caption;
+    wrap.appendChild(cap);
+  }
+  return wrap;
+}
+
+// 簡單形狀（用在熱身關）
+function drawShape(type, w=140, h=120){
+  const svg = svgEl('svg',{width:w,height:h,viewBox:`0 0 ${w} ${h}`});
+  svg.appendChild(svgEl('rect',{x:0,y:0,width:w,height:h, fill:'#0A0E27', rx:10}));
+  const cx=w/2, cy=h/2;
+  if(type==='triangle'){
+    svg.appendChild(svgEl('polygon',{points:`${cx},${cy-40} ${cx-44},${cy+30} ${cx+44},${cy+30}`,
+      fill:'rgba(255,59,48,0.4)', stroke:'#FF3B30','stroke-width':4,'stroke-linejoin':'round'}));
+  } else if(type==='square'){
+    svg.appendChild(svgEl('rect',{x:cx-40,y:cy-35,width:80,height:70,
+      fill:'rgba(77,188,255,0.4)', stroke:'#4DBCFF','stroke-width':4, rx:4}));
+  } else if(type==='circle'){
+    svg.appendChild(svgEl('circle',{cx,cy,r:42,
+      fill:'rgba(57,255,20,0.4)', stroke:'#39FF14','stroke-width':4}));
+  } else if(type==='pentagon'){
+    const pts=[];
+    for(let i=0;i<5;i++){
+      const a = -Math.PI/2 + i*2*Math.PI/5;
+      pts.push(`${cx+Math.cos(a)*40},${cy+Math.sin(a)*40}`);
+    }
+    svg.appendChild(svgEl('polygon',{points:pts.join(' '),
+      fill:'rgba(255,138,0,0.4)', stroke:'#FF8A00','stroke-width':4,'stroke-linejoin':'round'}));
+  }
+  return svg;
+}
+
+// ============================================================
+// 8 關設定
+// ============================================================
+const LEVELS = [
+
+  // L1: 三招速複習(熱身)
+  {
+    type:'color-id',
+    title:'第 1 關 · 三招速複習',
+    sub:'前三招：SSS / SAS / ASA',
+    icon:'🎮',
+    speak:'熱身複習：看下面這個三角形，是哪一招全等？',
+    triType:'SAS',
+    triSides:[6, 8, 7],
+    options:[
+      {label:'🔴 SSS', correct:false, cls:'warn'},
+      {label:'🔵🟠 SAS', correct:true, cls:''},
+      {label:'🟢🟡 ASA', correct:false, cls:'gold'},
+    ],
+    hint:'兩條藍邊 + 中間橘色夾角 = SAS',
+    msg:'答對！🔵 兩邊 + 🟠 夾角 = SAS'
+  },
+
+  // L2: AAS 新招登場
+  {
+    type:'color-id',
+    title:'第 2 關 · 新招 AAS 登場',
+    sub:'兩角 + 邊在「外面」',
+    icon:'🌟',
+    speak:'新招！紫色邊在「外面」(不在兩角中間)，這是哪一招？',
+    triType:'AAS',
+    triSides:[5, 5, 5],
+    options:[
+      {label:'🟢🟡 ASA', correct:false, cls:'gold'},
+      {label:'🟡🟣 AAS', correct:true, cls:''},
+      {label:'🔴 SSS', correct:false, cls:'warn'},
+    ],
+    hint:'兩角金色 + 紫色邊在「外面」= AAS',
+    msg:'答對！AAS = 兩角 + 對邊(在外面)'
+  },
+
+  // L3: AAS vs ASA
+  {
+    type:'condition-pick',
+    title:'第 3 關 · AAS vs ASA',
+    sub:'邊在中間？還是外面？',
+    icon:'🧠',
+    speak:'AAS 跟 ASA 差在哪裡？',
+    options:[
+      {label:'ASA：邊在「中間」/ AAS：邊在「外面」', correct:true, cls:''},
+      {label:'AAS：邊在「中間」/ ASA：邊在「外面」', correct:false, cls:'warn'},
+      {label:'兩個一樣，沒差', correct:false, cls:'gold'},
+    ],
+    hint:'口訣：A-S-A 邊在中間，A-A-S 邊在外面',
+    msg:'答對！只有「邊位置」不同，兩招都會全等'
+  },
+
+  // L4: AAS 推未知角
+  {
+    type:'find-angle-aas',
+    title:'第 4 關 · AAS 推角度',
+    sub:'AAS 全等 → 對應角相等',
+    icon:'🎯',
+    speak:'△ABC ≅ △DEF(AAS 全等)。∠E = ?',
+    leftAAS:{angA:70, angB:50, BC:5},
+    rightAAS:{angA:70, angB:'?', BC:5},
+    answer:50,
+    options:[40, 50, 60, 70],
+    hint:'∠B 對應 ∠E → ∠E = ∠B = 50°',
+    msg:'答對！對應角相等 → ∠E = 50°'
+  },
+
+  // L5: AAA 大陷阱
+  {
+    type:'condition-pick',
+    title:'第 5 關 · AAA 大陷阱',
+    sub:'三個角都一樣 = 全等？',
+    icon:'⚠️',
+    speak:'兩個三角形三個角都相同(AAA)，會全等嗎？想想哆啦A夢的「縮小燈」⚡',
+    options:[
+      {label:'✅ 會！三角都一樣 → 全等', correct:false, cls:''},
+      {label:'❌ 不一定！可能大小不同(縮小燈)', correct:true, cls:'warn'},
+    ],
+    hint:'縮小燈一照：角度不變，但大小變小！',
+    msg:'答對！AAA 不能用來判斷全等(可能是縮小版)'
+  },
+
+  // L6: RHS 直角絕招
+  {
+    type:'color-id',
+    title:'第 6 關 · RHS 直角絕招',
+    sub:'直角 + 斜邊 + 一股',
+    icon:'📐',
+    speak:'有紅色「直角符號」+ 紫色斜邊 + 青色股，這招叫什麼？',
+    triType:'RHS',
+    triSides:[3, 4, 5],
+    options:[
+      {label:'🔴 SSS', correct:false, cls:'warn'},
+      {label:'🔵🟠 SAS', correct:false, cls:''},
+      {label:'📐🟣 RHS', correct:true, cls:'gold'},
+    ],
+    hint:'紅直角 + 紫斜邊 + 青股 = RHS',
+    msg:'答對！RHS = 直角三角形專用絕招'
+  },
+
+  // L7: RHS 陷阱(沒直角)
+  {
+    type:'condition-pick',
+    title:'第 7 關 · RHS 陷阱題',
+    sub:'沒有直角符號 → 不能用 RHS',
+    icon:'⚠️',
+    speak:'兩個三角形兩邊一樣長，但「沒有直角符號」，能用 RHS 嗎？',
+    options:[
+      {label:'✅ 可以，兩邊一樣就 RHS', correct:false, cls:''},
+      {label:'❌ 不可以！沒直角就不是 RHS', correct:true, cls:'warn'},
+    ],
+    hint:'RHS 必須有「直角」！沒直角就絕對不能用',
+    msg:'答對！RHS = 直角專屬，沒直角不能用'
+  },
+
+  // L8: BOSS 五招大亂鬥
+  {
+    type:'boss',
+    title:'第 8 關 · BOSS · 五招大亂鬥',
+    sub:'4 連題 · 五招混合判斷',
+    icon:'👑',
+    speak:'大亂鬥開始！4 題判斷是哪一招',
+    boss:[
+      {kind:'rule', visual:{type:'SSS', sides:[5,7,8]},
+       q:'三條紅邊，這是哪一招？', correct:'SSS', options:['SSS','ASA','AAS','RHS']},
+      {kind:'rule', visual:{type:'ASA', side:5, angB:45, angC:60},
+       q:'兩角 + 邊在「中間」(綠)，這是哪一招？', correct:'ASA', options:['SSS','ASA','AAS','RHS']},
+      {kind:'rule', visual:{type:'AAS', angA:70, angB:50, side:5},
+       q:'兩角 + 邊在「外面」(紫)，這是哪一招？', correct:'AAS', options:['SSS','ASA','AAS','RHS']},
+      {kind:'rule', visual:{type:'RHS', sides:[3,4,5]},
+       q:'有紅色直角符號，這是哪一招？', correct:'RHS', options:['SSS','ASA','AAS','RHS']},
+    ]
+  }
+];
+
+// ============================================================
+// 扭蛋獎品池
+// ============================================================
+const PRIZES = [
+  {emoji:'⭐', name:'星星', rarity:'common', w:30},
+  {emoji:'🍀', name:'幸運草', rarity:'common', w:25},
+  {emoji:'🌟', name:'流星', rarity:'rare', w:15},
+  {emoji:'💎', name:'鑽石', rarity:'rare', w:10},
+  {emoji:'🏆', name:'金盃', rarity:'epic', w:8},
+  {emoji:'👑', name:'皇冠', rarity:'epic', w:5},
+  {emoji:'🦄', name:'獨角獸', rarity:'epic', w:4},
+  {emoji:'🐉', name:'神龍', rarity:'legendary', w:2},
+  {emoji:'🌈', name:'彩虹', rarity:'legendary', w:1},
+];
+function pickPrize(){
+  const total = PRIZES.reduce((s,p)=>s+p.w,0);
+  let r = Math.random()*total;
+  for(const p of PRIZES){
+    r -= p.w;
+    if(r<=0) return p;
+  }
+  return PRIZES[0];
+}
+
+// ============================================================
+// 狀態管理
+// ============================================================
+const STORAGE_KEY = 'congruence-aas-rhs-hw';
+const NAME_KEY = 'congruence-aas-rhs-name';
+const API = 'https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
+
+// 從 URL ?name=XX 或 localStorage 取得學生姓名
+function getStudentName(){
+  const url = new URLSearchParams(location.search);
+  const fromUrl = url.get('name');
+  if(fromUrl){
+    localStorage.setItem(NAME_KEY, fromUrl);
+    return fromUrl;
+  }
+  return localStorage.getItem(NAME_KEY) || '';
+}
+function setStudentName(name){
+  if(name && name.trim()){
+    localStorage.setItem(NAME_KEY, name.trim());
+  }
+}
+
+let state = loadState();
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    return {
+      cur: s.cur || 0,
+      done: s.done || new Array(LEVELS.length).fill(false),
+      stars: s.stars || 0,
+      collection: s.collection || {},
+    };
+  }catch(e){
+    return {cur:0, done:new Array(LEVELS.length).fill(false), stars:0, collection:{}};
+  }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  syncCloud(); // 雲端同步（fire-and-forget）
+}
+
+function syncCloud(){
+  const name = getStudentName();
+  if(!name) return;
+  const data = {
+    cur: state.cur,
+    done: state.done,
+    stars: state.stars,
+    collection: state.collection,
+    updated: new Date().toISOString()
+  };
+  try{
+    fetch(API, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'save_progress', name, tool:'congruenceAasRhsHW', data:JSON.stringify(data)})
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+// 第一次進來、沒有姓名 → 顯示輸入 modal
+function showNameModalIfNeeded(){
+  if(getStudentName()) return;
+  const overlay = document.createElement('div');
+  overlay.style.cssText=`position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:20px`;
+  overlay.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1A0F3E,#3D1A6E);border:3px solid #FFD700;border-radius:18px;padding:24px;max-width:360px;width:100%;text-align:center;box-shadow:0 0 40px #FFD700">
+      <div style="font-size:3em;margin-bottom:8px">🌟</div>
+      <h2 style="color:#FFD700;font-size:1.4em;margin-bottom:6px">取一個喜歡的暱稱！</h2>
+      <p style="color:#fff;font-size:.92em;margin-bottom:14px">用任何暱稱都可以～<br>老師會用這個暱稱看你的進度 ✨</p>
+      <input id="name-input" type="text" placeholder="例如：小光、ABC、神龍 ..." maxlength="12" style="width:100%;padding:14px;border-radius:10px;border:2px solid #B967FF;background:#0A0E27;color:#fff;font-size:1.15em;text-align:center;outline:none">
+      <button id="name-confirm" style="margin-top:12px;width:100%;background:linear-gradient(135deg,#FFD700,#FFA500);color:#000;border:none;border-radius:10px;padding:14px;font-size:1.1em;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(255,215,0,.5)">▶ 開始闖關</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const input = overlay.querySelector('#name-input');
+  const btn = overlay.querySelector('#name-confirm');
+  setTimeout(()=>input.focus(), 100);
+  const submit = ()=>{
+    const v = input.value.trim();
+    if(!v){ input.style.borderColor='#FF3B30'; return; }
+    setStudentName(v);
+    overlay.remove();
+    syncCloud(); // 立刻初始同步
+  };
+  btn.onclick = submit;
+  input.onkeypress = e => { if(e.key==='Enter') submit(); };
+}
+
+// ============================================================
+// 音效
+// ============================================================
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx) try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+function beep(freq, dur, type='sine', vol=0.15){
+  if(!audioCtx) return;
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type=type; o.frequency.value=freq;
+  g.gain.value=0; g.gain.linearRampToValueAtTime(vol, audioCtx.currentTime+0.01);
+  g.gain.linearRampToValueAtTime(0, audioCtx.currentTime+dur);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime+dur);
+}
+function sfxClick(){ ensureAudio(); beep(440,0.1,'square',0.1); }
+function sfxRight(){ ensureAudio(); [659,784,988].forEach((f,i)=>setTimeout(()=>beep(f,0.18,'sine',0.18),i*80)); }
+function sfxWrong(){ ensureAudio(); beep(220,0.25,'sawtooth',0.12); }
+function sfxWin(){ ensureAudio(); [523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,0.22,'sawtooth',0.18),i*100)); }
+function sfxGacha(){ ensureAudio(); for(let i=0;i<6;i++) setTimeout(()=>beep(440+i*100,0.08,'square',0.1),i*60); }
+
+// ============================================================
+// 慶祝特效（4 種隨機）
+// ============================================================
+function celebrate(onDone){
+  const types = ['confetti','race','legend','gacha'];
+  const t = types[Math.floor(Math.random()*types.length)];
+  if(t==='confetti') doConfetti(onDone);
+  else if(t==='race') doRace(onDone);
+  else if(t==='legend') doLegend(onDone);
+  else doGacha(onDone);
+}
+
+function doConfetti(onDone, n=40){
+  const colors=['#FFD700','#00F5FF','#B967FF','#39FF14','#FF3B30','#FF8A00','#FF69B4'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div');
+    c.className='confetti';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.left=(50+Math.random()*40-20)+'%';
+    c.style.top='30%';
+    c.style.borderRadius=Math.random()<0.5?'50%':'2px';
+    document.body.appendChild(c);
+    const dx=(Math.random()-0.5)*500;
+    const dy=200+Math.random()*350;
+    c.animate([
+      {transform:'translate(0,0) rotate(0)',opacity:1},
+      {transform:`translate(${dx}px,${dy}px) rotate(${Math.random()*720}deg)`,opacity:0}
+    ],{duration:1600+Math.random()*800,easing:'ease-out'}).onfinish=()=>c.remove();
+  }
+  setTimeout(()=>onDone&&onDone(), 1200);
+}
+
+function doRace(onDone){
+  const cars = ['🏎️','🏁','🚗','🚀'];
+  const car = document.createElement('div');
+  car.className='race-car';
+  car.textContent = cars[Math.floor(Math.random()*cars.length)];
+  document.body.appendChild(car);
+  car.animate([
+    {left:'-100px', transform:'translateY(0) scale(1)'},
+    {left:'50%',   transform:'translateY(-20px) scale(1.3)', offset:0.5},
+    {left:'calc(100% + 100px)', transform:'translateY(0) scale(1)'}
+  ],{duration:1800,easing:'ease-out'}).onfinish=()=>car.remove();
+  // smoke trail
+  let i = 0;
+  const interval = setInterval(()=>{
+    const smoke = document.createElement('div');
+    smoke.style.cssText=`position:fixed;font-size:1.5em;z-index:9997;pointer-events:none;bottom:30%;opacity:0.7;`;
+    smoke.textContent='💨';
+    smoke.style.left = (i*8 + 5) + '%';
+    document.body.appendChild(smoke);
+    smoke.animate([
+      {opacity:0.7, transform:'translateY(0)'},
+      {opacity:0, transform:'translateY(-30px)'}
+    ],{duration:800}).onfinish=()=>smoke.remove();
+    i++;
+    if(i>12) clearInterval(interval);
+  }, 100);
+  doConfetti(null, 20); // 加碼撒花
+  setTimeout(()=>onDone&&onDone(), 1900);
+}
+
+function doLegend(onDone){
+  const banner = document.getElementById('legend-banner');
+  banner.classList.remove('show');
+  void banner.offsetWidth; // reflow
+  banner.classList.add('show');
+  doConfetti(null, 30);
+  setTimeout(()=>{
+    banner.classList.remove('show');
+    onDone&&onDone();
+  }, 1900);
+}
+
+function doGacha(onDone){
+  const overlay = document.getElementById('gacha-overlay');
+  const machine = document.getElementById('gacha-machine');
+  const content = document.getElementById('gacha-content');
+  const closeBtn = document.getElementById('gacha-close');
+  const prizeEl = document.getElementById('gacha-prize');
+  const nameEl = document.getElementById('gacha-name');
+  const rarityEl = document.getElementById('gacha-rarity');
+
+  machine.style.display='block';
+  content.style.display='none';
+  closeBtn.style.display='none';
+  overlay.classList.add('show');
+  sfxGacha();
+
+  // 1.2 秒後揭曉
+  setTimeout(()=>{
+    const prize = pickPrize();
+    state.collection[prize.emoji] = (state.collection[prize.emoji]||0) + 1;
+    saveState();
+    machine.style.display='none';
+    content.style.display='block';
+    prizeEl.textContent = prize.emoji;
+    nameEl.textContent = prize.name;
+    const rarityNames = {common:'普通',rare:'稀有 ⭐',epic:'史詩 ⭐⭐',legendary:'傳說 ⭐⭐⭐'};
+    rarityEl.textContent = rarityNames[prize.rarity];
+    rarityEl.className = 'gacha-rarity rarity-'+prize.rarity;
+    closeBtn.style.display='inline-block';
+    if(prize.rarity==='legendary' || prize.rarity==='epic'){
+      doConfetti(null, 50);
+    }
+    sfxRight();
+  }, 1200);
+
+  closeBtn.onclick = ()=>{
+    sfxClick();
+    overlay.classList.remove('show');
+    onDone&&onDone();
+  };
+}
+
+// ============================================================
+// 渲染：頂部
+// ============================================================
+function renderHeader(){
+  document.getElementById('star-count').textContent = state.stars;
+  const dots = document.getElementById('progress-dots');
+  dots.innerHTML='';
+  for(let i=0;i<LEVELS.length;i++){
+    const d=document.createElement('div');
+    d.className='dot';
+    if(state.done[i]) d.classList.add('done');
+    if(i===state.cur && !state.done[i]) d.classList.add('cur');
+    d.textContent = state.done[i] ? '✓' : (i+1);
+    dots.appendChild(d);
+  }
+}
+
+// ============================================================
+// 渲染：關卡
+// ============================================================
+function renderLevel(){
+  if(state.cur >= LEVELS.length) return renderVictory();
+  const lv = LEVELS[state.cur];
+  const stage = document.getElementById('stage');
+  stage.innerHTML='';
+
+  // 標題 + 副題
+  const title=document.createElement('div'); title.className='level-title'; title.textContent=lv.title; stage.appendChild(title);
+  const sub=document.createElement('div'); sub.className='level-sub'; sub.textContent=lv.sub; stage.appendChild(sub);
+
+  // 對話
+  const speak=document.createElement('div'); speak.className='speak-row';
+  speak.innerHTML=`<div class="speak-icon">${lv.icon}</div><div class="speak-bubble">${lv.speak}</div>`;
+  stage.appendChild(speak);
+
+  const content = document.createElement('div'); stage.appendChild(content);
+
+  if(lv.type==='shape-pick') renderShapePick(content, lv);
+  else if(lv.type==='side-match') renderSideMatch(content, lv);
+  else if(lv.type==='find-side-sss') renderFindSideSSS(content, lv);
+  else if(lv.type==='find-side-sas') renderFindSideSAS(content, lv);
+  else if(lv.type==='find-angle-asa') renderFindAngleASA(content, lv);
+  else if(lv.type==='find-angle-aas') renderFindAngleAAS(content, lv);
+  else if(lv.type==='color-id') renderColorId(content, lv);
+  else if(lv.type==='condition-pick') renderConditionPick(content, lv);
+  else if(lv.type==='boss') renderBoss(content, lv);
+
+  const hb=document.createElement('div'); hb.id='hint-box'; hb.textContent='💡 '+lv.hint; stage.appendChild(hb);
+  renderHeader();
+}
+
+// ===== L1: 認形狀 =====
+function renderShapePick(parent, lv){
+  const wrap=document.createElement('div');
+  wrap.className='card-grid g2';
+  lv.shapes.forEach(s=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.appendChild(drawShape(s.kind));
+    card.onclick=()=>{
+      sfxClick();
+      if(s.is){
+        card.classList.add('right'); sfxRight();
+        showFeedback(parent, true, lv.msg);
+        wrap.querySelectorAll('.card').forEach(c=>c.style.pointerEvents='none');
+        passLevel();
+      } else {
+        card.classList.add('wrong'); sfxWrong();
+        setTimeout(()=>card.classList.remove('wrong'), 500);
+        showFeedback(parent, false, '🤔 不是這個喔，再找找');
+      }
+    };
+    wrap.appendChild(card);
+  });
+  parent.appendChild(wrap);
+}
+
+// ===== L2: 對應邊找朋友 =====
+function renderSideMatch(parent, lv){
+  const row=document.createElement('div'); row.className='svg-wrap';
+  const leftSvg = drawTriSVG({a:lv.leftTri.a,b:lv.leftTri.b,c:lv.leftTri.c, type:'NEUTRAL', w:230, h:190, sides:[lv.leftTri.a, lv.leftTri.b, lv.leftTri.c], showVertex:true, vertexNames:['A','B','C'], highlightEdge:lv.leftTri.highlight});
+  const rightSvg = drawTriSVG({a:lv.rightTri.a,b:lv.rightTri.b,c:lv.rightTri.c, type:'NEUTRAL', w:230, h:190, sides:[lv.rightTri.a, lv.rightTri.b, lv.rightTri.c], showVertex:true, vertexNames:['D','E','F']});
+  const eq=document.createElement('div'); eq.className='eq-symbol'; eq.textContent='≅';
+  row.appendChild(wrapTri(leftSvg, '△ABC'));
+  row.appendChild(eq);
+  row.appendChild(wrapTri(rightSvg, '△DEF'));
+  parent.appendChild(row);
+
+  // 答案
+  const ans=document.createElement('div'); ans.className='answers three';
+  lv.options.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='ans-btn';
+    b.textContent=opt.label;
+    b.onclick=()=>handleAnswer(b, opt.correct, ans, parent, lv);
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ===== L3: SSS 推未知邊 =====
+function renderFindSideSSS(parent, lv){
+  const [BC, CA, AB] = lv.leftSides;
+  const rightSides = [...lv.leftSides];
+  rightSides[lv.rightHide] = '?';
+
+  const row=document.createElement('div'); row.className='svg-wrap';
+  const leftSvg = drawTriSVG({a:BC,b:CA,c:AB, type:'SSS', w:230, h:190, sides:[BC,CA,AB], showVertex:true, vertexNames:['A','B','C']});
+  const rightSvg = drawTriSVG({a:BC,b:CA,c:AB, type:'SSS', w:230, h:190, sides:rightSides, showVertex:true, vertexNames:['D','E','F']});
+  const eq=document.createElement('div'); eq.className='eq-symbol'; eq.textContent='≅';
+  row.appendChild(wrapTri(leftSvg, '△ABC'));
+  row.appendChild(eq);
+  row.appendChild(wrapTri(rightSvg, '△DEF'));
+  parent.appendChild(row);
+
+  // 答案：4 個數字
+  const ans=document.createElement('div'); ans.className='answers four';
+  lv.options.forEach(num=>{
+    const b=document.createElement('button');
+    b.className='ans-btn';
+    b.textContent=num;
+    b.onclick=()=>handleAnswer(b, num===lv.answer, ans, parent, lv);
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ===== L4: SAS 推未知邊 =====
+function renderFindSideSAS(parent, lv){
+  const row=document.createElement('div'); row.className='tri-pair-row';
+
+  // 用文字卡而不是真的三角形（因為要顯示 ?）
+  const card = (label, lines)=>{
+    const c=document.createElement('div'); c.className='tri-info-card';
+    c.innerHTML=`<div class="info-label">${label}</div>` +
+      lines.map(l=>`<div class="info-line">${l}</div>`).join('');
+    return c;
+  };
+
+  // 但也加一個 SAS 視覺
+  const visualLeft = drawTriSVG({a:8,b:8,c:6, type:'SAS', w:200, h:170, hideValues:true});
+  const visualRight = drawTriSVG({a:8,b:8,c:6, type:'SAS', w:200, h:170, hideValues:true});
+
+  const lc = document.createElement('div'); lc.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+  lc.appendChild(visualLeft);
+  lc.appendChild(card('△ABC', [
+    `AB = <span style="color:#00F5FF">${lv.leftSAS.AB}</span>`,
+    `AC = <span style="color:#00F5FF">${lv.leftSAS.AC}</span>`,
+    `∠A = <span style="color:#FF8A00">${lv.leftSAS.angA}°</span>`,
+  ]));
+
+  const eq=document.createElement('div'); eq.className='eq-symbol'; eq.textContent='≅';
+
+  const rc = document.createElement('div'); rc.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+  rc.appendChild(visualRight);
+  rc.appendChild(card('△DEF', [
+    `DE = <span class="qmark">${lv.rightSAS.AB}</span>`,
+    `DF = <span style="color:#00F5FF">${lv.rightSAS.AC}</span>`,
+    `∠D = <span style="color:#FF8A00">${lv.rightSAS.angA}°</span>`,
+  ]));
+
+  row.appendChild(lc); row.appendChild(eq); row.appendChild(rc);
+  parent.appendChild(row);
+
+  const ans=document.createElement('div'); ans.className='answers four';
+  lv.options.forEach(num=>{
+    const b=document.createElement('button');
+    b.className='ans-btn';
+    b.textContent=num;
+    b.onclick=()=>handleAnswer(b, num===lv.answer, ans, parent, lv);
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ===== L5: ASA 推未知角 =====
+function renderFindAngleASA(parent, lv){
+  const row=document.createElement('div'); row.className='tri-pair-row';
+  const card = (label, lines)=>{
+    const c=document.createElement('div'); c.className='tri-info-card';
+    c.innerHTML=`<div class="info-label">${label}</div>` +
+      lines.map(l=>`<div class="info-line">${l}</div>`).join('');
+    return c;
+  };
+  const visualLeft = drawTriSVG({a:5,b:6,c:5, type:'ASA', w:200, h:170, hideValues:true});
+  const visualRight = drawTriSVG({a:5,b:6,c:5, type:'ASA', w:200, h:170, hideValues:true});
+
+  const lc = document.createElement('div'); lc.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+  lc.appendChild(visualLeft);
+  lc.appendChild(card('△ABC', [
+    `∠B = <span style="color:#FFD700">${lv.leftASA.angB}°</span>`,
+    `BC = <span style="color:#39FF14">${lv.leftASA.BC}</span>`,
+    `∠C = <span style="color:#FFD700">${lv.leftASA.angC}°</span>`,
+  ]));
+
+  const eq=document.createElement('div'); eq.className='eq-symbol'; eq.textContent='≅';
+
+  const rc = document.createElement('div'); rc.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+  rc.appendChild(visualRight);
+  rc.appendChild(card('△DEF', [
+    `∠E = <span class="qmark">${lv.rightASA.angB}°</span>`,
+    `EF = <span style="color:#39FF14">${lv.rightASA.BC}</span>`,
+    `∠F = <span style="color:#FFD700">${lv.rightASA.angC}°</span>`,
+  ]));
+
+  row.appendChild(lc); row.appendChild(eq); row.appendChild(rc);
+  parent.appendChild(row);
+
+  const ans=document.createElement('div'); ans.className='answers four';
+  lv.options.forEach(num=>{
+    const b=document.createElement('button');
+    b.className='ans-btn';
+    b.textContent=num+'°';
+    b.onclick=()=>handleAnswer(b, num===lv.answer, ans, parent, lv);
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ===== AAS 推未知角 =====
+function renderFindAngleAAS(parent, lv){
+  const row=document.createElement('div'); row.className='tri-pair-row';
+  const card = (label, lines)=>{
+    const c=document.createElement('div'); c.className='tri-info-card';
+    c.innerHTML=`<div class="info-label">${label}</div>` +
+      lines.map(l=>`<div class="info-line">${l}</div>`).join('');
+    return c;
+  };
+  const visualLeft = drawTriSVG({a:5,b:5,c:5, type:'AAS', w:200, h:170, hideValues:true});
+  const visualRight = drawTriSVG({a:5,b:5,c:5, type:'AAS', w:200, h:170, hideValues:true});
+
+  const lc = document.createElement('div'); lc.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+  lc.appendChild(visualLeft);
+  lc.appendChild(card('△ABC', [
+    `∠A = <span style="color:#FFD700">${lv.leftAAS.angA}°</span>`,
+    `∠B = <span style="color:#FFD700">${lv.leftAAS.angB}°</span>`,
+    `BC = <span style="color:#9B4DFF">${lv.leftAAS.BC}</span>`,
+  ]));
+
+  const eq=document.createElement('div'); eq.className='eq-symbol'; eq.textContent='≅';
+
+  const rc = document.createElement('div'); rc.style.cssText='display:flex;flex-direction:column;align-items:center;gap:6px';
+  rc.appendChild(visualRight);
+  rc.appendChild(card('△DEF', [
+    `∠D = <span style="color:#FFD700">${lv.rightAAS.angA}°</span>`,
+    `∠E = <span class="qmark">${lv.rightAAS.angB}°</span>`,
+    `EF = <span style="color:#9B4DFF">${lv.rightAAS.BC}</span>`,
+  ]));
+
+  row.appendChild(lc); row.appendChild(eq); row.appendChild(rc);
+  parent.appendChild(row);
+
+  const ans=document.createElement('div'); ans.className='answers four';
+  lv.options.forEach(num=>{
+    const b=document.createElement('button');
+    b.className='ans-btn';
+    b.textContent=num+'°';
+    b.onclick=()=>handleAnswer(b, num===lv.answer, ans, parent, lv);
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ===== 看顏色（支援動態選項數）=====
+function renderColorId(parent, lv){
+  const row=document.createElement('div'); row.className='svg-wrap';
+  row.appendChild(drawTriSVG({a:lv.triSides[0],b:lv.triSides[1],c:lv.triSides[2], type:lv.triType, w:280, h:220, hideValues:true}));
+  parent.appendChild(row);
+
+  const n = lv.options.length;
+  const cls = n<=2 ? 'two' : n===3 ? 'three' : 'four';
+  const ans=document.createElement('div'); ans.className='answers '+cls;
+  lv.options.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='ans-btn '+(opt.cls||'');
+    b.textContent=opt.label;
+    b.onclick=()=>handleAnswer(b, opt.correct, ans, parent, lv);
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ===== L7: 條件判斷 =====
+function renderConditionPick(parent, lv){
+  const ans=document.createElement('div'); ans.className='answers';
+  ans.style.gridTemplateColumns='1fr';
+  lv.options.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='ans-btn '+(opt.cls||'');
+    b.textContent=opt.label;
+    b.onclick=()=>handleAnswer(b, opt.correct, ans, parent, lv);
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ===== BOSS 題目圖形視覺 =====
+function renderBossVisual(v){
+  const wrap = document.createElement('div');
+  wrap.style.cssText='display:flex;justify-content:center;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 4px';
+
+  const eqEl = ()=>{ const e=document.createElement('div'); e.className='eq-symbol'; e.style.fontSize='1.8em'; e.textContent='≅'; return e; };
+  const card = (label, lines)=>{
+    const c=document.createElement('div'); c.className='tri-info-card';
+    c.style.fontSize='.9em'; c.style.minWidth='105px'; c.style.padding='8px 10px';
+    c.innerHTML=`<div class="info-label">${label}</div>` +
+      lines.map(l=>`<div class="info-line">${l}</div>`).join('');
+    return c;
+  };
+
+  if(v.type === 'SSS'){
+    const [a,b,c] = v.sides;
+    const left = drawTriSVG({a,b,c, type:'SSS', w:160, h:140, sides:v.sides, hideValues:false});
+    const right = drawTriSVG({a,b,c, type:'SSS', w:160, h:140, sides:v.sides, hideValues:false});
+    wrap.appendChild(left); wrap.appendChild(eqEl()); wrap.appendChild(right);
+  } else if(v.type === 'SAS'){
+    // sideL, sideR, angle
+    const ang = v.angle * Math.PI/180;
+    const a = Math.sqrt(v.sideL*v.sideL + v.sideR*v.sideR - 2*v.sideL*v.sideR*Math.cos(ang));
+    const left = drawTriSVG({a, b:v.sideR, c:v.sideL, type:'SAS', w:160, h:140, hideValues:true});
+    const right = drawTriSVG({a, b:v.sideR, c:v.sideL, type:'SAS', w:160, h:140, hideValues:true});
+    wrap.appendChild(card('△ABC', [
+      `兩邊 <span style="color:#00F5FF">${v.sideL}、${v.sideR}</span>`,
+      `夾角 <span style="color:#FF8A00">${v.angle}°</span>`,
+    ]));
+    wrap.appendChild(eqEl());
+    wrap.appendChild(card('△DEF', [
+      `兩邊 <span style="color:#00F5FF">${v.sideL}、${v.sideR}</span>`,
+      `夾角 <span style="color:#FF8A00">${v.angle}°</span>`,
+    ]));
+  } else if(v.type === 'ASA'){
+    // side, angB, angC
+    wrap.appendChild(card('△ABC', [
+      `兩角 <span style="color:#FFD700">${v.angB}°、${v.angC}°</span>`,
+      `夾邊(綠·中間) <span style="color:#39FF14">${v.side}</span>`,
+    ]));
+    wrap.appendChild(eqEl());
+    const left = drawTriSVG({a:v.side, b:v.side*Math.sin(v.angB*Math.PI/180)/Math.sin((180-v.angB-v.angC)*Math.PI/180), c:v.side*Math.sin(v.angC*Math.PI/180)/Math.sin((180-v.angB-v.angC)*Math.PI/180), type:'ASA', w:140, h:120, hideValues:true});
+    wrap.appendChild(left);
+  } else if(v.type === 'AAS'){
+    // angA, angB, side (side 在外面：BC，是 ∠A 的對邊)
+    wrap.appendChild(card('△ABC', [
+      `兩角 <span style="color:#FFD700">∠A=${v.angA}°、∠B=${v.angB}°</span>`,
+      `對邊(紫·外面) <span style="color:#9B4DFF">BC=${v.side}</span>`,
+    ]));
+    wrap.appendChild(eqEl());
+    // 視覺：AAS 三角形
+    const angC = 180 - v.angA - v.angB;
+    const a = v.side; // BC
+    const b = a * Math.sin(v.angB*Math.PI/180) / Math.sin(angC*Math.PI/180);
+    const c = a * Math.sin(v.angA*Math.PI/180) / Math.sin(angC*Math.PI/180);
+    const aas = drawTriSVG({a, b, c, type:'AAS', w:140, h:120, hideValues:true});
+    wrap.appendChild(aas);
+  } else if(v.type === 'RHS'){
+    // sides:[a,b,c] where c is hypotenuse (3-4-5 by default)
+    const [a,b,c] = v.sides;
+    wrap.appendChild(card('△ABC', [
+      `直角 <span style="color:#FF3B30">∠C=90°</span>`,
+      `斜邊 <span style="color:#9B4DFF">AB=${c}</span>`,
+      `一股 <span style="color:#00F5FF">BC=${a}</span>`,
+    ]));
+    wrap.appendChild(eqEl());
+    const rhs = drawTriSVG({a, b, c, type:'RHS', w:140, h:120, hideValues:true});
+    wrap.appendChild(rhs);
+  } else if(v.type === 'SSS-find'){
+    const [BC, CA, AB] = v.leftSides;
+    const rightSides = [...v.leftSides];
+    rightSides[v.rightHide] = '?';
+    const leftSvg = drawTriSVG({a:BC,b:CA,c:AB, type:'SSS', w:160, h:140, sides:v.leftSides, showVertex:true, vertexNames:['A','B','C']});
+    const rightSvg = drawTriSVG({a:BC,b:CA,c:AB, type:'SSS', w:160, h:140, sides:rightSides, showVertex:true, vertexNames:['D','E','F']});
+    wrap.appendChild(wrapTri(leftSvg, '△ABC'));
+    wrap.appendChild(eqEl());
+    wrap.appendChild(wrapTri(rightSvg, '△DEF'));
+  } else if(v.type === 'SAS-find'){
+    wrap.appendChild(card('△ABC', [
+      `AB = <span style="color:#00F5FF">${v.AB}</span>`,
+      `AC = <span style="color:#00F5FF">${v.AC}</span>`,
+      `∠A = <span style="color:#FF8A00">${v.angA}°</span>`,
+    ]));
+    wrap.appendChild(eqEl());
+    wrap.appendChild(card('△DEF', [
+      `DE = <span class="qmark">?</span>`,
+      `DF = <span style="color:#00F5FF">${v.AC}</span>`,
+      `∠D = <span style="color:#FF8A00">${v.angA}°</span>`,
+    ]));
+  } else if(v.type === 'ASA-find'){
+    wrap.appendChild(card('△ABC', [
+      `∠B = <span style="color:#FFD700">${v.angB}°</span>`,
+      `BC = <span style="color:#39FF14">${v.BC}</span>`,
+      `∠C = <span style="color:#FFD700">${v.angC}°</span>`,
+    ]));
+    wrap.appendChild(eqEl());
+    const missing = v.missing || 'C';
+    wrap.appendChild(card('△DEF', [
+      `∠E = <span style="color:#FFD700">${missing==='B'?'<span class=\"qmark\">?</span>':v.angB+'°'}</span>`,
+      `EF = <span style="color:#39FF14">${v.BC}</span>`,
+      `∠F = <span style="color:#FFD700">${missing==='C'?'<span class=\"qmark\">?</span>':v.angC+'°'}</span>`,
+    ]));
+  }
+
+  return wrap;
+}
+
+// ===== L8: BOSS =====
+let bossState = {q:0, score:0};
+function renderBoss(parent, lv){
+  bossState = {q:0, score:0};
+  renderBossQ(parent, lv);
+}
+function renderBossQ(parent, lv){
+  parent.innerHTML='';
+  if(bossState.q >= lv.boss.length){
+    const ok = bossState.score === lv.boss.length;
+    const result=document.createElement('div');
+    result.style.cssText='text-align:center;padding:18px';
+    result.innerHTML = `
+      <div style="font-size:3em">${ok?'🏆':'💪'}</div>
+      <div style="font-size:1.4em;font-weight:900;color:#FFD700;margin:14px 0">
+        BOSS 戰結束<br>${bossState.score} / ${lv.boss.length}
+      </div>
+      ${ok ? '<div style="color:#39FF14;font-weight:800;font-size:1.1em">完美通關！🎉</div>'
+           : '<div style="color:#FF8A00;font-weight:800;font-size:1.1em">很棒！再戰一次更厲害！</div>'}
+    `;
+    parent.appendChild(result);
+    if(ok){
+      showFeedback(parent, true, '🏆 全對！你是全等三角形大師！');
+      passLevel();
+    } else {
+      const retry=document.createElement('button');
+      retry.className='next-btn';
+      retry.textContent='🔄 再戰一次';
+      retry.style.marginTop='14px';
+      retry.onclick=()=>{
+        sfxClick();
+        bossState={q:0,score:0};
+        renderBossQ(parent, lv);
+      };
+      parent.appendChild(retry);
+    }
+    return;
+  }
+
+  const cur = lv.boss[bossState.q];
+  const hdr=document.createElement('div');
+  hdr.style.cssText='text-align:center;color:#FFD700;font-weight:900;font-size:1.05em;margin:6px 0';
+  hdr.textContent = `第 ${bossState.q+1} / ${lv.boss.length} 題（已答對 ${bossState.score}）`;
+  parent.appendChild(hdr);
+
+  // ✨ 圖形視覺（核心改動）
+  if(cur.visual){
+    parent.appendChild(renderBossVisual(cur.visual));
+  }
+
+  const q=document.createElement('div');
+  q.style.cssText=`background:#1A0F3E;border:3px solid #B967FF;border-radius:14px;
+    padding:14px;margin:10px 0;text-align:center;font-size:1.15em;font-weight:800;color:#fff`;
+  q.textContent = '📋 ' + cur.q;
+  parent.appendChild(q);
+
+  const ans=document.createElement('div');
+  ans.className = cur.options.length<=3 ? 'answers three' : 'answers four';
+  cur.options.forEach(label=>{
+    const b=document.createElement('button');
+    let cls = '';
+    if(cur.kind==='rule'){
+      const m={SSS:'warn',SAS:'',ASA:'gold',AAS:'',RHS:'gold'};
+      cls = m[label]||'';
+    }
+    b.className='ans-btn '+cls;
+    b.textContent = label;
+    b.onclick = ()=>{
+      sfxClick();
+      const correct = (label === cur.correct) || (label === String(cur.correct));
+      if(correct){
+        b.classList.add('right'); sfxRight();
+        bossState.score++;
+      } else {
+        b.classList.add('wrong'); sfxWrong();
+      }
+      ans.querySelectorAll('button').forEach(x=>x.disabled=true);
+      setTimeout(()=>{ bossState.q++; renderBossQ(parent, lv); }, 800);
+    };
+    ans.appendChild(b);
+  });
+  parent.appendChild(ans);
+}
+
+// ============================================================
+// 共用：答題反饋
+// ============================================================
+function handleAnswer(btn, correct, ansBox, parent, lv){
+  sfxClick();
+  if(correct){
+    btn.classList.add('right'); sfxRight();
+    showFeedback(parent, true, lv.msg);
+    ansBox.querySelectorAll('button').forEach(x=>x.disabled=true);
+    passLevel();
+  } else {
+    btn.classList.add('wrong'); sfxWrong();
+    setTimeout(()=>{btn.classList.remove('wrong');btn.disabled=false;}, 500);
+    showFeedback(parent, false, '🤔 再想想，看「' + (lv.hint||'') + '」');
+  }
+}
+
+function showFeedback(parent, ok, msg){
+  let fb = parent.querySelector('.feedback');
+  if(!fb){ fb=document.createElement('div'); fb.className='feedback'; parent.appendChild(fb); }
+  fb.className = 'feedback ' + (ok?'fb-ok':'fb-no');
+  fb.textContent = msg;
+}
+
+// ============================================================
+// 過關
+// ============================================================
+function passLevel(){
+  if(!state.done[state.cur]){
+    state.done[state.cur] = true;
+    state.stars++;
+    saveState();
+  }
+  setTimeout(()=>{
+    // 觸發隨機慶祝特效
+    celebrate(()=>{
+      const stage = document.getElementById('stage');
+      if(stage.querySelector('.next-row')) return;
+      const row=document.createElement('div'); row.className='next-row';
+      const btn=document.createElement('button');
+      btn.className='next-btn';
+      btn.textContent = state.cur < LEVELS.length-1 ? '▶ 進入下一關' : '🏆 看結果';
+      btn.onclick = ()=>{
+        sfxClick();
+        state.cur++;
+        saveState();
+        renderLevel();
+      };
+      row.appendChild(btn);
+      stage.appendChild(row);
+    });
+  }, 700);
+  renderHeader();
+}
+
+// ============================================================
+// 全通關畫面
+// ============================================================
+function renderVictory(){
+  const stage = document.getElementById('stage');
+  // 收藏品櫃
+  const colItems = Object.entries(state.collection)
+    .map(([emoji,count])=>{
+      const p = PRIZES.find(x=>x.emoji===emoji);
+      return `<div class="col-item rarity-${p?.rarity||'common'}"><div class="col-emoji">${emoji}</div><div class="col-count">×${count}</div></div>`;
+    }).join('');
+
+  stage.innerHTML = `
+    <div class="victory-screen">
+      <div class="crown-big">👑</div>
+      <div class="victory-title">🎉 全部通關！</div>
+      <div class="victory-stars">${'⭐'.repeat(state.stars)}</div>
+      <div style="color:#fff;font-weight:700;margin:14px 0;font-size:1.05em">
+        你已經是<br>
+        <span style="color:#FFD700;font-size:1.4em">全等三角形大師</span><br>
+        SSS · SAS · ASA 都會了！
+      </div>
+      ${colItems ? `<div class="collection">
+        <div class="col-title">🎁 你的收藏品</div>
+        <div class="col-grid">${colItems}</div>
+      </div>` : ''}
+      <button class="next-btn" id="restart-btn" style="margin-top:18px">🔄 從頭再戰</button>
+    </div>
+  `;
+  document.getElementById('restart-btn').onclick = ()=>{
+    sfxClick();
+    if(confirm('要從頭再戰嗎？星星會清空但收藏品保留～')){
+      state.cur=0;
+      state.done=new Array(LEVELS.length).fill(false);
+      state.stars=0;
+      saveState();
+      renderLevel();
+    }
+  };
+  sfxWin();
+  doConfetti(null, 100);
+  setTimeout(()=>doConfetti(null, 60), 600);
+  setTimeout(()=>doConfetti(null, 60), 1200);
+  renderHeader();
+}
+
+// ============================================================
+// 初始化
+// ============================================================
+document.getElementById('hint-btn').onclick = ()=>{
+  sfxClick();
+  const hb = document.getElementById('hint-box');
+  if(hb) hb.classList.toggle('show');
+};
+document.getElementById('reset-btn').onclick = ()=>{
+  if(confirm('確定要重來嗎？星星和收藏品都會清空喔～')){
+    sfxClick();
+    state = {cur:0, done:new Array(LEVELS.length).fill(false), stars:0, collection:{}};
+    saveState();
+    renderLevel();
+  }
+};
+document.addEventListener('click', ensureAudio, {once:true});
+document.addEventListener('touchstart', ensureAudio, {once:true});
+
+// 啟動：先顯示姓名輸入 modal（若沒姓名）→ 然後渲染
+renderLevel();
+showNameModalIfNeeded();
+// 顯示姓名標籤在 header 右邊
+(function showNameTag(){
+  const name = getStudentName();
+  if(!name) return;
+  const hdr = document.querySelector('header .h-row');
+  if(hdr && !document.getElementById('name-tag')){
+    const tag = document.createElement('div');
+    tag.id='name-tag';
+    tag.style.cssText='font-size:.85em;color:#B967FF;font-weight:700;width:100%;text-align:center;margin-top:4px';
+    tag.textContent = '👤 ' + name;
+    hdr.parentElement.insertBefore(tag, hdr.nextSibling);
+  }
+})();
+</script>
+
+</body>
+</html>
