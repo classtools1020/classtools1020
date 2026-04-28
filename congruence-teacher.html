@@ -159,9 +159,13 @@
 <div id="main" class="wrap">
   <header>
     <h1>📊 8A 數學作業後台</h1>
-    <div class="meta">3-3 全等三角形 · 8 關闖關</div>
+    <div class="meta">3-3 全等三角形 · 學生闖關進度</div>
   </header>
 
+  <div class="toolbar">
+    <button class="tb-btn primary" id="tab-sss" onclick="switchTool('congruenceHW',this)">📘 SSS / SAS / ASA</button>
+    <button class="tb-btn" id="tab-aas" onclick="switchTool('congruenceAasRhsHW',this)">⚔️ AAS + RHS</button>
+  </div>
   <div class="toolbar">
     <button class="tb-btn" onclick="openStudentEditor()">👥 編輯學生名單</button>
     <button class="tb-btn primary" onclick="refreshAll()">🔄 重新整理</button>
@@ -189,9 +193,18 @@
 'use strict';
 const PW = 'stacey2026';
 const API = 'https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
-const TOOL = 'congruenceHW';
+let TOOL = 'congruenceHW'; // 可切換：congruenceHW / congruenceAasRhsHW
 const STUDENTS_KEY = 'congruence-teacher-students';
 const TOTAL_LEVELS = 8;
+
+function switchTool(name, btn){
+  TOOL = name;
+  document.querySelectorAll('.toolbar button').forEach(b=>{
+    if(b.id==='tab-sss'||b.id==='tab-aas') b.classList.remove('primary');
+  });
+  btn.classList.add('primary');
+  refreshAll();
+}
 
 const PRIZES_MAP = {
   '⭐':{name:'星星',rarity:'common'},
