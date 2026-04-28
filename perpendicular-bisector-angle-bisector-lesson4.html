@@ -201,6 +201,13 @@ body{display:flex;flex-direction:column;
 .spark{position:absolute;width:8px;height:8px;border-radius:50%;
   pointer-events:none;z-index:24}
 
+/* 拖拉點脈動 */
+@keyframes dragPulse{
+  0%,100%{r:24;stroke-width:4}
+  50%{r:30;stroke-width:6}
+}
+#drag-pt{animation:dragPulse 1.4s ease-in-out infinite;cursor:grab}
+
 @media (max-width:720px){
   #teacher-tip{padding:8px 12px;flex-wrap:wrap;min-height:auto}
   #teacher-tip .content{font-size:15px}
@@ -626,12 +633,13 @@ function animateTri(elemId, from, to, frames, onDone){
 // 關卡設計 · 第二節：SAS + ASA
 // ============================================================
 // ============================================================
-// 拖拉互動工具（強化版：相容 mouse + touch + pointer）
+// 拖拉互動工具（最終強化版：掛在 SVG 整個畫布，hit area 50px）
 // ============================================================
 let dragHandlers = [];
-function makeDraggable(elem, onMove){
-  let dragging = false;
+function makeDraggable(handleElem, onMove){
   const svg = document.getElementById("canvas");
+  svg.style.touchAction = "none";  // 觸控裝置不會被當捲動
+  let dragging = false;
 
   function getXY(e){
     let cx, cy;
@@ -639,28 +647,33 @@ function makeDraggable(elem, onMove){
     else if(e.changedTouches && e.changedTouches[0]){ cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY; }
     else { cx = e.clientX; cy = e.clientY; }
     const rect = svg.getBoundingClientRect();
-    const sx = (cx - rect.left) * 1600 / rect.width;
-    const sy = (cy - rect.top) * 900 / rect.height;
-    return {x:sx, y:sy};
+    return {x:(cx - rect.left) * 1600 / rect.width, y:(cy - rect.top) * 900 / rect.height};
   }
 
   const startDrag = e => {
-    dragging = true;
-    elem.style.cursor = "grabbing";
-    e.preventDefault();
-    e.stopPropagation();
-    const p = getXY(e); onMove(p.x, p.y);  // 開始就吃一下位置
+    const p = getXY(e);
+    const hx = +handleElem.getAttribute("cx");
+    const hy = +handleElem.getAttribute("cy");
+    // hit area 60 像素 (寬鬆好點)
+    if(Math.hypot(p.x - hx, p.y - hy) < 60){
+      dragging = true;
+      handleElem.style.cursor = "grabbing";
+      e.preventDefault();
+      onMove(p.x, p.y);
+    }
   };
   const moveDrag = e => {
     if(!dragging) return;
     e.preventDefault();
-    const p = getXY(e); onMove(p.x, p.y);
+    const p = getXY(e);
+    onMove(p.x, p.y);
   };
-  const endDrag = () => { dragging = false; if(elem) elem.style.cursor = "grab"; };
+  const endDrag = () => { dragging = false; if(handleElem) handleElem.style.cursor = "grab"; };
 
-  elem.addEventListener("mousedown", startDrag);
-  elem.addEventListener("touchstart", startDrag, {passive:false});
-  elem.addEventListener("pointerdown", startDrag);
+  // 掛在 SVG 整體 (大區域)
+  svg.addEventListener("mousedown", startDrag);
+  svg.addEventListener("touchstart", startDrag, {passive:false});
+  svg.addEventListener("pointerdown", startDrag);
   document.addEventListener("mousemove", moveDrag);
   document.addEventListener("touchmove", moveDrag, {passive:false});
   document.addEventListener("pointermove", moveDrag);
@@ -669,10 +682,13 @@ function makeDraggable(elem, onMove){
   document.addEventListener("touchcancel", endDrag);
   document.addEventListener("pointerup", endDrag);
 
-  dragHandlers.push({elem, startDrag, moveDrag, endDrag});
+  dragHandlers.push({svg, startDrag, moveDrag, endDrag});
 }
 function clearDragHandlers(){
   dragHandlers.forEach(h => {
+    h.svg.removeEventListener("mousedown", h.startDrag);
+    h.svg.removeEventListener("touchstart", h.startDrag);
+    h.svg.removeEventListener("pointerdown", h.startDrag);
     document.removeEventListener("mousemove", h.moveDrag);
     document.removeEventListener("touchmove", h.moveDrag);
     document.removeEventListener("pointermove", h.moveDrag);
