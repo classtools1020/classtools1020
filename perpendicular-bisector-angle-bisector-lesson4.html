@@ -1092,58 +1092,68 @@ const scenes = [
     clearDragHandlers();
     const root = clearScene();
     stageBanner(root, "例題：求三角形周長", "FIND PERIMETER");
-    // 三角形 ABC：AB=14, AC=13, BC=15（標準 13-14-15 三角形）
-    // 用正確幾何：A 在左，B 在右，C 在上方（A 右側 5 單位、向上 12 單位）
-    // scale 50 像素/單位
-    const scale = 50;
-    const A = {x:400, y:700};
-    const B = {x:A.x + 14*scale, y:A.y};        // AB = 700 px
-    const C = {x:A.x + 5*scale, y:A.y - 12*scale}; // C = (650, 100)，符合 AC=13, BC=15
+    // 三角形 ABC：AB=14, AC=13, BC=15
+    // 課本擺向：A 左下、B 右下、C 上方偏左（AC=13 < BC=15 → C 較靠近 A）
+    const scale = 45;
+    const A = {x:380, y:740};
+    const B = {x:A.x + 14*scale, y:A.y};         // AB = 630 px
+    const C = {x:A.x + 5*scale, y:A.y - 12*scale}; // C 在 (605, 200)
     this._A = A; this._B = B; this._C = C;
-    // 中垂線 L 過 AB 中點 M
-    const M = {x:(A.x+B.x)/2, y:A.y};
-    // 中垂線 (x = M.x) 與 BC 交點 E
-    // BC 線：B(1100,700) → C(650,100)，方程 y = 700 + (100-700)/(650-1100) * (x-1100)
-    const t = (M.x - B.x) / (C.x - B.x);
-    const E = {x:M.x, y: B.y + t*(C.y - B.y)};
-    this._M = M; this._E = E;
-    // 三角形邊
-    el("line", {x1:A.x, y1:A.y, x2:B.x, y2:B.y, stroke:"#fff", "stroke-width":4}, root);
-    el("line", {x1:B.x, y1:B.y, x2:C.x, y2:C.y, stroke:"#fff", "stroke-width":4}, root);
-    el("line", {x1:C.x, y1:C.y, x2:A.x, y2:A.y, stroke:"#fff", "stroke-width":4}, root);
-    // 頂點標籤
-    el("text", {x:A.x-30, y:A.y+10, "font-size":28, "font-weight":900, fill:"#fff"}, root).textContent = "A";
-    el("text", {x:B.x+10, y:B.y+10, "font-size":28, "font-weight":900, fill:"#fff"}, root).textContent = "B";
-    el("text", {x:C.x+10, y:C.y, "font-size":28, "font-weight":900, fill:"#fff"}, root).textContent = "C";
-    // 邊長
-    el("text", {x:(A.x+B.x)/2, y:A.y+38, "text-anchor":"middle",
-      "font-size":24, "font-weight":900, fill:"#fff",
+    // 中點 D 與中垂線 L
+    const D = {x:(A.x+B.x)/2, y:A.y}; // D = (695, 740)
+    // 中垂線過 D 垂直 AB，交 BC 於 E
+    const t = (D.x - B.x) / (C.x - B.x);
+    const E = {x:D.x, y: B.y + t*(C.y - B.y)};
+    this._D = D; this._E = E; this._M = D;
+    // 三角形填淡藍色背景（像課本一樣的水藍底）
+    el("path", {d:`M${A.x},${A.y} L${B.x},${B.y} L${C.x},${C.y} Z`,
+      fill:"rgba(165,205,235,0.18)", stroke:"#fff", "stroke-width":4,
+      "stroke-linejoin":"round"}, root);
+    // 頂點 A、B、C 大圓圈標示（白色背景小圓 + 黑字）
+    [["A",A.x-22,A.y+25],["B",B.x+22,B.y+25],["C",C.x-15,C.y-15]].forEach(([name,x,y])=>{
+      el("circle", {cx:x, cy:y, r:18, fill:"#0A0E27", stroke:"#fff", "stroke-width":3}, root);
+      el("text", {x, y:y+8, "text-anchor":"middle", "font-size":22,
+        "font-weight":900, fill:"#fff"}, root).textContent = name;
+    });
+    // 邊長標示（離邊有空間，避免跟 L、M 撞）
+    // AB = 14 在最底下（D 下方）
+    el("text", {x:A.x-30, y:A.y+25, "font-size":22, "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = "14";
+    // 但 14 跟 D、M 重疊 → 改放兩段：A→D 寫 7 (一半), D→B 寫 7 (一半)? 不
+    // 最簡單做法：14 標在 AB 下方的 left half (M 左邊)
+    el("text", {x:A.x+(D.x-A.x)*0.5, y:A.y+38, "text-anchor":"middle",
+      "font-size":20, "font-weight":700, fill:"#fff",
       "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "AB = 14";
-    el("text", {x:(B.x+C.x)/2 + 30, y:(B.y+C.y)/2,
-      "font-size":24, "font-weight":900, fill:"#fff",
-      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "BC = 15";
-    el("text", {x:(C.x+A.x)/2 - 30, y:(C.y+A.y)/2, "text-anchor":"end",
-      "font-size":24, "font-weight":900, fill:"#fff",
-      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "AC = 13";
-    // 中垂線 L (粉紅) - 拉長從 y=50 到 y=750 確保覆蓋 E 點
-    el("line", {x1:M.x, y1:50, x2:M.x, y2:M.y+50,
-      stroke:"#FF6B9D", "stroke-width":4, "stroke-dasharray":"8,4"}, root);
-    el("text", {x:M.x-20, y:80, "font-size":24, "font-weight":900,
-      fill:"#FF6B9D"}, root).textContent = "L";
-    // M 中點標籤
-    el("text", {x:M.x, y:M.y+30, "text-anchor":"middle", "font-size":20,
-      "font-weight":900, fill:"#FF6B9D",
-      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "M";
-    // 直角符號 (M 點)
-    el("path", {d:`M${M.x-12},${M.y} L${M.x-12},${M.y-12} L${M.x},${M.y-12}`,
+    // BC = 15 (右斜邊外側)
+    el("text", {x:(B.x+C.x)/2 + 35, y:(B.y+C.y)/2 + 10,
+      "font-size":22, "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = "BC = 15";
+    // AC = 13 (左斜邊外側)
+    el("text", {x:(A.x+C.x)/2 - 50, y:(A.y+C.y)/2 + 10, "text-anchor":"end",
+      "font-size":22, "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = "AC = 13";
+    // 中垂線 L（粉紅虛線）從 D 上去到 y=80
+    el("line", {x1:D.x, y1:80, x2:D.x, y2:D.y+30,
+      stroke:"#FF6B9D", "stroke-width":4, "stroke-dasharray":"10,5",
+      filter:"url(#neonPurple)"}, root);
+    // L 標籤（最上方）
+    el("text", {x:D.x-20, y:75, "font-size":26, "font-weight":900, fill:"#FF6B9D",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = "L";
+    // 直角符號（D 點處，稍微偏離才看得到）
+    el("path", {d:`M${D.x-15},${D.y-3} L${D.x-15},${D.y-18} L${D.x},${D.y-18}`,
       fill:"none", stroke:"#FF3B30", "stroke-width":3}, root);
-    // 中點 M
-    el("circle", {cx:M.x, cy:M.y, r:6, fill:"#FF6B9D"}, root);
-    // E 點
-    el("circle", {cx:E.x, cy:E.y, r:10, fill:"#FFD700",
+    // D 中點圓+標籤（往下偏離 AB）
+    el("circle", {cx:D.x, cy:D.y, r:8, fill:"#FF6B9D", stroke:"#fff", "stroke-width":2}, root);
+    el("text", {x:D.x+22, y:D.y+8, "font-size":22, "font-weight":900, fill:"#FF6B9D",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = "D 中點";
+    // E 點（金色大圓 + 標籤）
+    el("circle", {cx:E.x, cy:E.y, r:12, fill:"#FFD700", stroke:"#fff", "stroke-width":3,
       filter:"url(#neonGold)"}, root);
-    el("text", {x:E.x+18, y:E.y+8, "font-size":24, "font-weight":900, fill:"#FFD700",
-      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "E";
+    el("text", {x:E.x+22, y:E.y+8, "font-size":26, "font-weight":900, fill:"#FFD700",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = "E";
+    // 連 AE 細白線（對應課本圖的內部斜線）
+    el("line", {x1:A.x, y1:A.y, x2:E.x, y2:E.y,
+      stroke:"#fff", "stroke-width":1.5, "stroke-dasharray":"4,3", opacity:.6}, root);
   },
   steps:[
     {
