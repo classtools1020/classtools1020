@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>🥷 3-4 中垂線與角平分線 · 忍者神技互動探索</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;
+  font-family:"Microsoft JhengHei","微軟正黑體","Impact",sans-serif;
+  font-size:20px;user-select:none;touch-action:manipulation;color:#fff}
+body{display:flex;flex-direction:column;
+  background:
+    radial-gradient(ellipse at top, rgba(138,43,226,.25) 0%, transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(0,201,255,.15) 0%, transparent 60%),
+    linear-gradient(135deg, #0A0E27 0%, #1A0F3E 40%, #2D1B4E 100%)}
+
+:root{
+  --gold:#FFD700; --gold-dk:#C9A227;
+  --cyan:#00F5FF; --cyan-dk:#00B8D4;
+  --red:#FF3B30; --red-dk:#C00A03;
+  --purple:#B967FF; --purple-dk:#7D2AE8;
+  --green:#39FF14; --green-dk:#00C853;
+  --orange:#FF8A00; --orange-dk:#E67E00;
+  --bg-dark:#0A0E27; --bg-mid:#1A1F3A;
+  --text:#FFFFFF; --text-dim:#B8C5D6;
+  --shadow:0 4px 20px rgba(0,0,0,.5);
+  --glow-gold:0 0 20px rgba(255,215,0,.6),0 0 40px rgba(255,215,0,.3);
+  --glow-cyan:0 0 20px rgba(0,245,255,.6),0 0 40px rgba(0,245,255,.3);
+  --glow-purple:0 0 20px rgba(185,103,255,.6),0 0 40px rgba(185,103,255,.3);
+  --glow-red:0 0 20px rgba(255,59,48,.6),0 0 40px rgba(255,59,48,.3);
+}
+
+/* ==================== 星空背景 ==================== */
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 30% 70%, #fff, transparent),
+    radial-gradient(1px 1px at 50% 40%, #FFD700, transparent),
+    radial-gradient(2px 2px at 70% 25%, #00F5FF, transparent),
+    radial-gradient(1px 1px at 85% 60%, #fff, transparent),
+    radial-gradient(1px 1px at 15% 85%, #B967FF, transparent),
+    radial-gradient(1px 1px at 95% 90%, #fff, transparent),
+    radial-gradient(2px 2px at 40% 10%, #fff, transparent),
+    radial-gradient(1px 1px at 60% 55%, #39FF14, transparent),
+    radial-gradient(1px 1px at 25% 45%, #FFD700, transparent);
+  background-size:200% 200%; animation:starMove 60s linear infinite}
+@keyframes starMove{0%{background-position:0 0}100%{background-position:200% 200%}}
+
+/* ==================== 老師提示列 ==================== */
+#teacher-tip{background:linear-gradient(90deg,rgba(255,215,0,.15),rgba(255,215,0,.05));
+  border-bottom:3px solid var(--gold);padding:12px 20px;min-height:74px;
+  display:flex;align-items:center;gap:12px;position:relative;z-index:3;
+  backdrop-filter:blur(10px)}
+#teacher-tip .badge{background:linear-gradient(135deg,var(--gold),var(--orange));
+  color:#1A0F3E;padding:6px 14px;border-radius:20px;font-weight:900;
+  font-size:15px;white-space:nowrap;box-shadow:var(--glow-gold)}
+#teacher-tip .content{flex:1;font-size:19px;line-height:1.5;color:#fff;
+  font-weight:600;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+#teacher-tip .content b{color:var(--gold);text-shadow:0 0 10px rgba(255,215,0,.5)}
+#teacher-tip .scene-tag{background:linear-gradient(135deg,var(--purple),var(--purple-dk));
+  color:#fff;padding:6px 12px;border-radius:10px;font-size:14px;font-weight:900;
+  white-space:nowrap;box-shadow:var(--glow-purple)}
+
+/* ==================== 進度條 ==================== */
+#progress{height:12px;background:rgba(0,0,0,.5);display:flex;
+  position:relative;z-index:3;border-bottom:2px solid var(--cyan-dk)}
+.prog-seg{flex:1;background:transparent;border-right:2px solid rgba(255,255,255,.1);
+  transition:background .3s;position:relative}
+.prog-seg:last-child{border-right:none}
+.prog-seg.done{background:linear-gradient(90deg,var(--purple),var(--cyan))}
+.prog-seg.current{background:linear-gradient(90deg,var(--gold),var(--orange));
+  animation:progPulse 1.4s infinite}
+@keyframes progPulse{0%,100%{opacity:.8;box-shadow:0 0 10px var(--gold)}
+  50%{opacity:1;box-shadow:0 0 20px var(--gold)}}
+
+/* ==================== 主舞台 ==================== */
+#stage{flex:1;position:relative;overflow:hidden;z-index:2}
+#canvas{width:100%;height:100%;display:block;position:relative;z-index:2}
+
+/* 旁白大字 (學生看的) */
+#narration{position:absolute;top:20px;left:50%;transform:translateX(-50%);
+  max-width:80%;background:linear-gradient(135deg,rgba(10,14,39,.85),rgba(45,27,78,.85));
+  border:3px solid var(--gold);border-radius:20px;padding:16px 32px;
+  font-size:30px;font-weight:900;color:#fff;text-align:center;line-height:1.3;
+  box-shadow:var(--glow-gold);z-index:20;display:none;
+  text-shadow:0 0 10px rgba(255,215,0,.5);
+  backdrop-filter:blur(6px);letter-spacing:1px}
+#narration.visible{display:block;animation:narIn .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes narIn{from{opacity:0;transform:translate(-50%,-20px) scale(.9)}
+  to{opacity:1;transform:translate(-50%,0) scale(1)}}
+
+/* 關卡標籤 */
+#stage-label{position:absolute;top:18px;left:20px;z-index:15;
+  background:linear-gradient(135deg,var(--red),var(--orange));
+  color:#fff;padding:8px 20px;border-radius:6px;font-weight:900;
+  font-size:20px;box-shadow:var(--glow-red);display:none;
+  clip-path:polygon(12% 0, 100% 0, 88% 100%, 0 100%);
+  padding-left:28px; padding-right:28px}
+#stage-label.visible{display:block;animation:stageIn .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes stageIn{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
+
+/* ==================== 控制列 ==================== */
+#control-bar{background:linear-gradient(0deg,rgba(10,14,39,.95),rgba(26,15,62,.9));
+  padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;z-index:15;border-top:3px solid var(--purple);
+  box-shadow:0 -4px 20px rgba(185,103,255,.3)}
+#progress-info{font-size:17px;color:var(--cyan);font-weight:800;min-width:140px;
+  text-shadow:0 0 8px var(--cyan-dk);letter-spacing:.5px}
+#main-actions{display:flex;gap:10px;flex:1;justify-content:center;flex-wrap:wrap}
+#side-controls{display:flex;gap:6px}
+
+/* 按鈕 - 遊戲技能感 */
+.btn{background:linear-gradient(135deg,#2C3E50,#1A252F);
+  border:3px solid var(--cyan-dk);border-radius:12px;
+  padding:12px 22px;font-size:20px;cursor:pointer;min-height:60px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-weight:900;color:#fff;transition:all .2s;
+  font-family:inherit;gap:8px;letter-spacing:.5px;
+  text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.btn:hover{transform:translateY(-2px) scale(1.03);
+  box-shadow:var(--glow-cyan)}
+.btn:active{transform:translateY(0) scale(.98)}
+
+/* 主按鈕 - 金色技能 */
+.btn-next{background:linear-gradient(135deg,#FFD700,#FF8A00);
+  border:3px solid var(--gold);color:#1A0F3E;
+  min-width:220px;font-size:24px;font-weight:900;
+  box-shadow:var(--glow-gold);animation:skillGlow 1.8s infinite;
+  text-shadow:0 1px 2px rgba(255,255,255,.5)}
+.btn-next:hover{background:linear-gradient(135deg,#FFF200,#FF9F1A);
+  transform:translateY(-2px) scale(1.05);
+  box-shadow:0 0 30px rgba(255,215,0,.8),0 0 60px rgba(255,215,0,.4)}
+@keyframes skillGlow{0%,100%{box-shadow:0 0 20px rgba(255,215,0,.5)}
+  50%{box-shadow:0 0 40px rgba(255,215,0,.9),0 0 60px rgba(255,138,0,.4)}}
+
+/* 下一關按鈕 - 紫色終技 */
+.btn-scene-next{background:linear-gradient(135deg,var(--purple),var(--purple-dk));
+  border:3px solid var(--purple);color:#fff;min-width:240px;font-size:22px;
+  box-shadow:var(--glow-purple)}
+.btn-scene-next:hover{background:linear-gradient(135deg,#D690FF,#9B4DEF);
+  transform:translateY(-2px) scale(1.05);
+  box-shadow:0 0 30px rgba(185,103,255,.9)}
+
+/* 答題按鈕 */
+.btn-answer{min-width:220px;font-size:24px;padding:16px 24px}
+.btn-ok{background:linear-gradient(135deg,var(--green),var(--green-dk));
+  border-color:var(--green);color:#0A0E27;
+  box-shadow:0 0 20px rgba(57,255,20,.5)}
+.btn-ok:hover{box-shadow:0 0 30px rgba(57,255,20,.9)}
+.btn-warn{background:linear-gradient(135deg,var(--red),var(--red-dk));
+  border-color:var(--red);color:#fff;
+  box-shadow:0 0 20px rgba(255,59,48,.5)}
+.btn-warn:hover{box-shadow:0 0 30px rgba(255,59,48,.9)}
+
+/* 小按鈕 */
+.btn-small{min-height:48px;padding:8px 14px;font-size:18px;min-width:auto;
+  background:linear-gradient(135deg,#2C3E50,#1A252F);
+  border-color:rgba(255,255,255,.3)}
+
+/* ==================== Combo 顯示 ==================== */
+#combo-display{position:absolute;top:100px;right:30px;z-index:22;
+  display:flex;flex-direction:column;align-items:center;
+  pointer-events:none;transition:all .4s;opacity:0;transform:scale(.5)}
+#combo-display.visible{opacity:1;transform:scale(1)}
+#combo-display .combo-x{font-size:24px;font-weight:900;color:var(--gold);
+  text-shadow:0 0 10px var(--gold),0 0 20px rgba(255,215,0,.5);letter-spacing:2px}
+#combo-display .combo-n{font-size:80px;font-weight:900;color:var(--gold);
+  line-height:1;text-shadow:0 0 20px var(--gold),0 0 40px rgba(255,215,0,.6),
+  0 4px 0 rgba(0,0,0,.3);letter-spacing:-2px}
+#combo-display .combo-label{font-size:18px;font-weight:900;color:var(--cyan);
+  text-shadow:0 0 10px var(--cyan);letter-spacing:3px;margin-top:-4px}
+
+/* ==================== 分數顯示 ==================== */
+#score-display{position:absolute;top:20px;right:20px;z-index:15;
+  background:linear-gradient(135deg,rgba(10,14,39,.9),rgba(26,15,62,.9));
+  border:2px solid var(--gold);border-radius:10px;padding:8px 16px;
+  color:var(--gold);font-weight:900;font-size:18px;
+  box-shadow:var(--glow-gold);display:none;
+  text-shadow:0 0 8px var(--gold)}
+#score-display.visible{display:block}
+
+/* ==================== 彩帶 ==================== */
+.confetti{position:fixed;width:14px;height:18px;z-index:50;
+  animation:fall 3s linear;pointer-events:none;border-radius:2px;
+  box-shadow:0 0 8px currentColor}
+@keyframes fall{0%{transform:translateY(-20vh) rotate(0)}100%{transform:translateY(110vh) rotate(720deg)}}
+
+/* ==================== 閃現文字 ==================== */
+.flash{position:absolute;inset:0;pointer-events:none;z-index:25;
+  display:flex;align-items:center;justify-content:center;
+  animation:flashIn .7s ease}
+.flash-text{font-size:120px;font-weight:900;
+  text-shadow:0 0 20px currentColor,0 0 40px currentColor,
+  0 6px 0 rgba(0,0,0,.3);letter-spacing:-2px}
+@keyframes flashIn{0%{opacity:0;transform:scale(.3) rotate(-10deg)}
+  50%{opacity:1;transform:scale(1.3) rotate(5deg)}
+  100%{opacity:0;transform:scale(1) rotate(0)}}
+
+/* ==================== 粒子光效 ==================== */
+.spark{position:absolute;width:8px;height:8px;border-radius:50%;
+  pointer-events:none;z-index:24}
+
+@media (max-width:720px){
+  #teacher-tip{padding:8px 12px;flex-wrap:wrap;min-height:auto}
+  #teacher-tip .content{font-size:15px}
+  #narration{font-size:22px;padding:12px 20px;max-width:92%}
+  .btn{font-size:17px;padding:8px 14px;min-height:48px}
+  .btn-next,.btn-scene-next{min-width:150px;font-size:18px}
+  #combo-display .combo-n{font-size:50px}
+  #stage-label{font-size:14px;padding:6px 16px}
+}
+</style>
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<div id="teacher-tip">
+  <div class="badge">👩‍🏫 老師</div>
+  <div class="content" id="tip-content">點「▶ 發動技能」開始召喚師訓練！</div>
+  <div class="scene-tag" id="scene-tag">1/6</div>
+</div>
+
+<div id="progress">
+  <div class="prog-seg current"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+</div>
+
+<div id="stage">
+  <svg id="canvas" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <!-- 金色漸層 -->
+      <linearGradient id="gradGold" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFE34D"/>
+        <stop offset="100%" stop-color="#FF8A00"/>
+      </linearGradient>
+      <!-- 紅色漸層 -->
+      <linearGradient id="gradRed" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FF6B6B"/>
+        <stop offset="100%" stop-color="#C00A03"/>
+      </linearGradient>
+      <!-- 藍色漸層 -->
+      <linearGradient id="gradBlue" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#4DBCFF"/>
+        <stop offset="100%" stop-color="#0066CC"/>
+      </linearGradient>
+      <!-- 紫色漸層 -->
+      <linearGradient id="gradPurple" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#D690FF"/>
+        <stop offset="100%" stop-color="#7D2AE8"/>
+      </linearGradient>
+      <!-- 青綠 -->
+      <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#5EFF8F"/>
+        <stop offset="100%" stop-color="#00A849"/>
+      </linearGradient>
+      <!-- 陰影 / 發光 -->
+      <filter id="neonGold" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#FFD700"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonRed" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#FF3B30"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonCyan" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#00F5FF"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonPurple" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur"/>
+        <feFlood flood-color="#B967FF"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonGreen" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#39FF14"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+      <!-- 六角形遮罩 -->
+      <clipPath id="hexClip">
+        <polygon points="50,0 93,25 93,75 50,100 7,75 7,25"/>
+      </clipPath>
+    </defs>
+    <g id="scene-root"></g>
+  </svg>
+  <div id="stage-label"></div>
+  <div id="narration"></div>
+  <div id="combo-display">
+    <div class="combo-x">COMBO</div>
+    <div class="combo-n">0</div>
+    <div class="combo-label">×</div>
+  </div>
+  <div id="score-display">⭐ <span id="score-num">0</span> / 4</div>
+</div>
+
+<div id="control-bar">
+  <div id="progress-info">⚔️ 第 <span id="s-n">1</span> / 6 關</div>
+  <div id="main-actions">
+    <button class="btn btn-next" id="btn-next">▶ 發動技能</button>
+  </div>
+  <div id="side-controls">
+    <button class="btn btn-small" id="btn-prev" title="上一關">◀</button>
+    <button class="btn btn-small" id="btn-restart" title="重新開始">🔁</button>
+    <button class="btn btn-small" id="btn-mute" title="靜音">🔊</button>
+  </div>
+</div>
+
+<script>
+const state = { sceneIdx:0, stepIdx:-1, audioOn:true };
+
+// ==== 音效 ====
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+}
+function beep(f,d=0.15,t="sine",g=0.2){
+  if(!state.audioOn||!audioCtx) return;
+  const o=audioCtx.createOscillator(), gn=audioCtx.createGain();
+  o.type=t; o.frequency.value=f;
+  gn.gain.setValueAtTime(g, audioCtx.currentTime);
+  gn.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+d);
+  o.connect(gn); gn.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime+d);
+}
+const SFX = {
+  click(){ beep(800,0.05,"square",0.1); },
+  reveal(){ beep(523,0.12,"sine",0.15); setTimeout(()=>beep(659,0.12,"sine",0.15),80); },
+  pop(){ beep(1047,0.08,"triangle",0.18); },
+  combo(n){
+    const base = 660 + n*110;
+    beep(base,0.1,"square",0.15);
+    setTimeout(()=>beep(base*1.25,0.12,"square",0.15),60);
+  },
+  ultimate(){
+    [440,554,659,880,1175].forEach((f,i)=>setTimeout(()=>beep(f,0.2,"sawtooth",0.18),i*80));
+  },
+  success(){ [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,0.18,"sine",0.2),i*100)); },
+  gentle(){ beep(440,0.15,"sine",0.12); setTimeout(()=>beep(330,0.2,"sine",0.12),150); },
+  win(){
+    const seq = [523,659,784,1047,1319];
+    seq.forEach((f,i)=>setTimeout(()=>beep(f,0.22,"sawtooth",0.2),i*120));
+  }
+};
+
+// ==== 幾何 ====
+function triFromSSS(a,b,c){
+  if(a+b<=c||b+c<=a||a+c<=b) return null;
+  const x=(c*c+a*a-b*b)/(2*a);
+  const y=Math.sqrt(Math.max(c*c-x*x,0));
+  return [{x,y:-y,label:"A"},{x:0,y:0,label:"B"},{x:a,y:0,label:"C"}];
+}
+function tform(pts,cx,cy,scale=20){
+  const mx=pts.reduce((s,p)=>s+p.x,0)/3, my=pts.reduce((s,p)=>s+p.y,0)/3;
+  return pts.map(p=>({x:cx+(p.x-mx)*scale, y:cy+(p.y-my)*scale, label:p.label}));
+}
+function lerp(a,b,t){ return a+(b-a)*t; }
+function lerpPts(p1,p2,t){
+  return p1.map((p,i)=>({x:lerp(p.x,p2[i].x,t), y:lerp(p.y,p2[i].y,t), label:p.label}));
+}
+
+// ==== SVG 工具 ====
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs={},parent=null){
+  const e=document.createElementNS(NS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  if(parent) parent.appendChild(e);
+  return e;
+}
+function clearScene(){
+  const r=document.getElementById("scene-root");
+  r.innerHTML="";
+  return r;
+}
+function triPath(pts){
+  return `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y} Z`;
+}
+
+// 霓虹三角形 (水晶/寶石風格)
+function drawTri(parent, pts, opts={}){
+  const {fill="url(#gradPurple)", stroke="#B967FF", sw=5, id="",
+         glow="neonPurple", labels=false, showLen=null} = opts;
+  const g = el("g", id?{id, filter:`url(#${glow})`}:{filter:`url(#${glow})`}, parent);
+  // 外發光層
+  el("path", {d:triPath(pts), fill:"none", stroke, "stroke-width":sw+3,
+    opacity:.4, "stroke-linejoin":"round"}, g);
+  // 主體
+  el("path", {d:triPath(pts), fill, stroke, "stroke-width":sw,
+    "stroke-linejoin":"round", "stroke-linecap":"round"}, g);
+  // 內部高光 (水晶感)
+  const cx = pts.reduce((s,p)=>s+p.x,0)/3;
+  const cy = pts.reduce((s,p)=>s+p.y,0)/3;
+  el("path", {
+    d:`M${pts[0].x},${pts[0].y} L${(pts[0].x+cx)/2},${(pts[0].y+cy)/2}`,
+    stroke:"#fff", "stroke-width":2, opacity:.5, fill:"none"
+  }, g);
+  if(labels){
+    pts.forEach(p=>{
+      const dx=p.label==="A"?0:(p.label==="B"?-22:22);
+      const dy=p.label==="A"?-20:26;
+      const t = el("text",{x:p.x+dx,y:p.y+dy,"font-size":24,"font-weight":900,
+        fill:"#fff","text-anchor":"middle",
+        "stroke":"#000","stroke-width":3,"paint-order":"stroke"},g);
+      t.textContent = p.label;
+    });
+  }
+  if(showLen){
+    const m=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+    const mAB=m(pts[0],pts[1]), mBC=m(pts[1],pts[2]), mCA=m(pts[2],pts[0]);
+    const lbl = (x,y,text,color="#FFD700") => {
+      const t = el("text",{x,y,"font-size":26,"font-weight":900,
+        fill:color,"text-anchor":"middle",
+        "stroke":"#000","stroke-width":4,"paint-order":"stroke"},g);
+      t.textContent = text;
+    };
+    lbl(mAB.x-24, mAB.y+8, showLen.AB);
+    lbl(mBC.x, mBC.y+34, showLen.BC);
+    lbl(mCA.x+22, mCA.y+8, showLen.CA);
+  }
+  return g;
+}
+
+// 英雄頭像卡 (六角形框 + 光暈)
+function heroCard(parent, cx, cy, label, role="召喚師", color="#B967FF", icon="⚔️"){
+  const g = el("g", {}, parent);
+  const r = 55;
+  // 外圈光暈
+  el("circle", {cx, cy, r:r+8, fill:"none", stroke:color, "stroke-width":3,
+    opacity:.5, filter:`url(#neon${color==="#FFD700"?"Gold":color==="#B967FF"?"Purple":color==="#00F5FF"?"Cyan":color==="#FF3B30"?"Red":"Green"})`}, g);
+  // 主圓圈 (深色底)
+  el("circle", {cx, cy, r, fill:"#1A0F3E", stroke:color, "stroke-width":4}, g);
+  // 圖示
+  el("text", {x:cx, y:cy+18, "font-size":50, "text-anchor":"middle"}, g).textContent = icon;
+  // 標籤
+  el("rect", {x:cx-60, y:cy+r+6, width:120, height:28, rx:6, fill:"#0A0E27",
+    stroke:color, "stroke-width":2}, g);
+  el("text", {x:cx, y:cy+r+26, "font-size":16, "font-weight":900, fill:color,
+    "text-anchor":"middle"}, g).textContent = label;
+  return g;
+}
+
+// 關卡標題橫幅
+function stageBanner(parent, title, subtitle=""){
+  const g = el("g", {}, parent);
+  // 主標題
+  const t1 = el("text", {x:800, y:100, "text-anchor":"middle", "font-size":52,
+    "font-weight":900, fill:"url(#gradGold)",
+    "stroke":"#000","stroke-width":6,"paint-order":"stroke",
+    filter:"url(#neonGold)"}, g);
+  t1.textContent = title;
+  if(subtitle){
+    const t2 = el("text", {x:800, y:150, "text-anchor":"middle", "font-size":24,
+      "font-weight":700, fill:"#00F5FF",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, g);
+    t2.textContent = subtitle;
+  }
+  return g;
+}
+
+// ==== UI helpers ====
+function setNarration(text){
+  const n = document.getElementById("narration");
+  if(text){ n.textContent = text; n.classList.add("visible"); }
+  else n.classList.remove("visible");
+}
+function setStageLabel(text){
+  const t = document.getElementById("stage-label");
+  if(text){ t.textContent = text; t.classList.add("visible"); }
+  else t.classList.remove("visible");
+}
+function setTeacherTip(text){
+  document.getElementById("tip-content").innerHTML = text;
+}
+
+// Combo 顯示
+let comboCount = 0;
+function showCombo(n){
+  comboCount = n;
+  const d = document.getElementById("combo-display");
+  if(n === 0){ d.classList.remove("visible"); return; }
+  d.querySelector(".combo-n").textContent = n;
+  d.classList.add("visible");
+  SFX.combo(n);
+  // 自動消失
+  clearTimeout(showCombo._t);
+  if(n >= 3) return; // Perfect 狀態保留
+  showCombo._t = setTimeout(()=>d.classList.remove("visible"), 2500);
+}
+function hideCombo(){
+  document.getElementById("combo-display").classList.remove("visible");
+}
+
+// 分數
+function setScore(n, total){
+  const d = document.getElementById("score-display");
+  if(total){
+    d.classList.add("visible");
+    document.getElementById("score-num").textContent = n;
+    d.innerHTML = `⭐ <span id="score-num">${n}</span> / ${total}`;
+  } else d.classList.remove("visible");
+}
+
+// 大字閃現
+function flashBig(text, color="#39FF14", size=120){
+  const f = document.createElement("div");
+  f.className = "flash";
+  const s = document.createElement("div");
+  s.className = "flash-text";
+  s.textContent = text;
+  s.style.color = color;
+  s.style.fontSize = size+"px";
+  f.appendChild(s);
+  document.getElementById("stage").appendChild(f);
+  setTimeout(()=>f.remove(), 800);
+}
+function flashCorrect(){ SFX.success(); flashBig("VICTORY!", "#39FF14", 100); confetti(25); }
+function flashRetry(){ SFX.gentle(); flashBig("再戰一次", "#FF8A00", 80); }
+
+function confetti(n=20){
+  const colors = ["#FFD700","#00F5FF","#B967FF","#39FF14","#FF3B30","#FF8A00"];
+  for(let i=0;i<n;i++){
+    const d = document.createElement("div");
+    d.className = "confetti";
+    d.style.left = Math.random()*100+"vw";
+    d.style.background = colors[i%colors.length];
+    d.style.color = colors[i%colors.length];
+    d.style.animationDelay = (Math.random()*0.8)+"s";
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),3500);
+  }
+}
+
+// 火花粒子 (點擊位置)
+function sparkBurst(cx, cy, color="#FFD700"){
+  for(let i=0;i<12;i++){
+    const s = document.createElement("div");
+    s.className = "spark";
+    s.style.background = color;
+    s.style.boxShadow = `0 0 10px ${color}`;
+    s.style.left = cx+"px"; s.style.top = cy+"px";
+    const ang = (i/12)*Math.PI*2;
+    const dist = 60 + Math.random()*40;
+    s.animate([
+      {transform:"translate(0,0) scale(1)", opacity:1},
+      {transform:`translate(${Math.cos(ang)*dist}px,${Math.sin(ang)*dist}px) scale(0)`, opacity:0}
+    ], {duration:600, easing:"ease-out"});
+    document.getElementById("stage").appendChild(s);
+    setTimeout(()=>s.remove(),600);
+  }
+}
+
+// SAS: 兩邊 + 夾角 → 三頂點
+function triFromSAS(sideLeft, angleDeg, sideRight){
+  const g = angleDeg * Math.PI/180;
+  const a = Math.sqrt(sideLeft*sideLeft + sideRight*sideRight - 2*sideLeft*sideRight*Math.cos(g));
+  return triFromSSS(a, sideRight, sideLeft);
+}
+// ASA: 兩角 + 夾邊 → 三頂點
+function triFromASA(angleBDeg, sideBC, angleCDeg){
+  const B = angleBDeg * Math.PI/180;
+  const C = angleCDeg * Math.PI/180;
+  const A = Math.PI - B - C;
+  const a = sideBC;
+  const b = a * Math.sin(B) / Math.sin(A);
+  const c = a * Math.sin(C) / Math.sin(A);
+  return triFromSSS(a, b, c);
+}
+// 角度弧
+function drawAngleArc(parent, vertex, p1, p2, radius, color, sw){
+  radius = radius || 28; color = color || "#F39C12"; sw = sw || 5;
+  const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+  let da = a2 - a1;
+  while(da > Math.PI) da -= 2*Math.PI;
+  while(da < -Math.PI) da += 2*Math.PI;
+  const sweep = da > 0 ? 1 : 0;
+  const start = {x:vertex.x+Math.cos(a1)*radius, y:vertex.y+Math.sin(a1)*radius};
+  const end = {x:vertex.x+Math.cos(a2)*radius, y:vertex.y+Math.sin(a2)*radius};
+  return el("path", {
+    d:`M${start.x},${start.y} A${radius},${radius} 0 0,${sweep} ${end.x},${end.y}`,
+    stroke:color, "stroke-width":sw, fill:"none", "stroke-linecap":"round"
+  }, parent);
+}
+// 粗邊線
+function drawEdge(parent, p1, p2, color, sw, id){
+  color = color || "#FFD700"; sw = sw || 10;
+  const attrs = {x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y,
+    stroke:color, "stroke-width":sw, "stroke-linecap":"round"};
+  if(id) attrs.id = id;
+  return el("line", attrs, parent);
+}
+
+// 動畫三角形
+let animId = 0;
+function animateTri(elemId, from, to, frames, onDone){
+  cancelAnimationFrame(animId);
+  let f = 0;
+  const tick = () => {
+    f++;
+    const t = f/frames;
+    const cur = lerpPts(from, to, t);
+    const paths = document.querySelectorAll(`#${elemId} path`);
+    paths.forEach(p => p.setAttribute("d", triPath(cur)));
+    if(f < frames) animId = requestAnimationFrame(tick);
+    else if(onDone) onDone();
+  };
+  tick();
+}
+
+// ============================================================
+// 關卡設計 · 第二節：SAS + ASA
+// ============================================================
+// ============================================================
+// 拖拉互動工具
+// ============================================================
+let dragHandlers = [];
+function makeDraggable(elem, onMove){
+  let dragging = false;
+  const svg = document.getElementById("canvas");
+  const onDown = e => {
+    dragging = true;
+    elem.style.cursor = "grabbing";
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const onMoveEvt = e => {
+    if(!dragging) return;
+    const rect = svg.getBoundingClientRect();
+    const cx = (e.clientX || (e.touches && e.touches[0].clientX) || 0) - rect.left;
+    const cy = (e.clientY || (e.touches && e.touches[0].clientY) || 0) - rect.top;
+    // 換算成 SVG 座標 (1600x900 viewBox)
+    const sx = cx * 1600 / rect.width;
+    const sy = cy * 900 / rect.height;
+    onMove(sx, sy);
+  };
+  const onUp = () => { dragging = false; if(elem) elem.style.cursor = "grab"; };
+  elem.addEventListener("pointerdown", onDown);
+  elem.addEventListener("touchstart", onDown, {passive:false});
+  document.addEventListener("pointermove", onMoveEvt);
+  document.addEventListener("touchmove", onMoveEvt, {passive:false});
+  document.addEventListener("pointerup", onUp);
+  document.addEventListener("touchend", onUp);
+  dragHandlers.push({elem, onDown, onMoveEvt, onUp});
+}
+function clearDragHandlers(){
+  dragHandlers.forEach(h => {
+    document.removeEventListener("pointermove", h.onMoveEvt);
+    document.removeEventListener("touchmove", h.onMoveEvt);
+    document.removeEventListener("pointerup", h.onUp);
+    document.removeEventListener("touchend", h.onUp);
+  });
+  dragHandlers = [];
+}
+
+// 距離
+function dist(p1, p2){
+  return Math.sqrt((p2.x-p1.x)**2 + (p2.y-p1.y)**2);
+}
+// 點到線段最短距離 (返回距離 + 垂足)
+function distToSegment(p, a, b){
+  const dx = b.x - a.x, dy = b.y - a.y;
+  const len2 = dx*dx + dy*dy;
+  if(len2 === 0) return {dist: dist(p, a), foot: {x:a.x, y:a.y}};
+  let t = ((p.x - a.x)*dx + (p.y - a.y)*dy) / len2;
+  t = Math.max(0, Math.min(1, t));
+  const foot = {x: a.x + t*dx, y: a.y + t*dy};
+  return {dist: dist(p, foot), foot};
+}
+// 點到射線最短距離
+function distToRay(p, origin, direction){
+  const len = Math.sqrt(direction.x**2 + direction.y**2);
+  const ux = direction.x/len, uy = direction.y/len;
+  const t = (p.x - origin.x)*ux + (p.y - origin.y)*uy;
+  if(t < 0) return {dist: dist(p, origin), foot: {...origin}};
+  const foot = {x: origin.x + t*ux, y: origin.y + t*uy};
+  return {dist: dist(p, foot), foot};
+}
+
+// ============================================================
+// 關卡：3-4 中垂線與角平分線
+// ============================================================
+const scenes = [
+
+// ============ 第1關 · 中垂線探索（拖點互動）============
+{
+  name:"中垂線探索",
+  stageLabel:"第 1 關 · 階段 2 · 動畫探索",
+  init(){
+    clearDragHandlers();
+    const root = clearScene();
+    clearStageOverlay && clearStageOverlay();
+    stageBanner(root, "尋寶任務 · 中垂線", "FIND THE TREASURE");
+    // 兩棵樹 A 和 B (線段端點)
+    this._A = {x:500, y:600};
+    this._B = {x:1100, y:600};
+    this._goldenPoints = []; // 金色軌跡
+    this._step = 0;
+    this._drawBase();
+  },
+  _drawBase(){
+    const root = document.getElementById("scene-root");
+    // 兩棵樹
+    el("circle", {cx:this._A.x, cy:this._A.y, r:10, fill:"#27AE60"}, root);
+    el("text", {x:this._A.x-20, y:this._A.y+8, "font-size":36}, root).textContent = "🌳";
+    el("text", {x:this._A.x-12, y:this._A.y+50, "font-size":28,
+      "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "A";
+    el("circle", {cx:this._B.x, cy:this._B.y, r:10, fill:"#27AE60"}, root);
+    el("text", {x:this._B.x-20, y:this._B.y+8, "font-size":36}, root).textContent = "🌳";
+    el("text", {x:this._B.x-12, y:this._B.y+50, "font-size":28,
+      "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "B";
+    // AB 線段
+    el("line", {x1:this._A.x, y1:this._A.y, x2:this._B.x, y2:this._B.y,
+      stroke:"#888", "stroke-width":3, "stroke-dasharray":"6,4"}, root);
+    // 七悪角色 (左上)
+    heroCard(root, 140, 180, "七悪", "夜櫻家", "#FF6B9D", "🥷");
+  },
+  _addDraggablePoint(){
+    const root = document.getElementById("scene-root");
+    const g = el("g", {id:"drag-group"}, root);
+    // 拖拉點 P
+    const startP = {x:800, y:300};
+    this._P = {...startP};
+    const handle = el("circle", {id:"drag-pt", cx:this._P.x, cy:this._P.y, r:24,
+      fill:"#FFD700", stroke:"#fff", "stroke-width":4,
+      filter:"url(#neonGold)", style:"cursor:grab"}, g);
+    el("text", {id:"drag-label", x:this._P.x, y:this._P.y+8,
+      "font-size":24, "font-weight":900, fill:"#000",
+      "text-anchor":"middle", "pointer-events":"none"}, g).textContent = "P";
+    // 兩條彩色虛線 + 距離標示
+    const lineA = el("line", {id:"line-PA", x1:this._P.x, y1:this._P.y,
+      x2:this._A.x, y2:this._A.y, stroke:"#FF6B9D", "stroke-width":4,
+      "stroke-dasharray":"8,4", "pointer-events":"none"}, g);
+    const lineB = el("line", {id:"line-PB", x1:this._P.x, y1:this._P.y,
+      x2:this._B.x, y2:this._B.y, stroke:"#3498DB", "stroke-width":4,
+      "stroke-dasharray":"8,4", "pointer-events":"none"}, g);
+    // 距離標籤
+    const labelA = el("text", {id:"dist-PA", "font-size":24, "font-weight":900,
+      fill:"#FF6B9D", "stroke":"#000","stroke-width":4,"paint-order":"stroke",
+      "pointer-events":"none"}, g);
+    const labelB = el("text", {id:"dist-PB", "font-size":24, "font-weight":900,
+      fill:"#3498DB", "stroke":"#000","stroke-width":4,"paint-order":"stroke",
+      "pointer-events":"none"}, g);
+    // 顯示「相等」金色提示
+    const status = el("text", {id:"eq-status", x:800, y:120, "text-anchor":"middle",
+      "font-size":36, "font-weight":900, fill:"#FFD700", opacity:0,
+      "stroke":"#000","stroke-width":5,"paint-order":"stroke"}, g);
+    const update = (px, py) => {
+      // 限制在舞台內
+      px = Math.max(50, Math.min(1550, px));
+      py = Math.max(150, Math.min(750, py));
+      this._P = {x:px, y:py};
+      handle.setAttribute("cx", px);
+      handle.setAttribute("cy", py);
+      document.getElementById("drag-label").setAttribute("x", px);
+      document.getElementById("drag-label").setAttribute("y", py+8);
+      lineA.setAttribute("x1", px); lineA.setAttribute("y1", py);
+      lineB.setAttribute("x1", px); lineB.setAttribute("y1", py);
+      const dA = dist(this._P, this._A);
+      const dB = dist(this._P, this._B);
+      // 距離轉「公尺」: 100 像素 = 1 公尺
+      const mA = (dA/60).toFixed(1);
+      const mB = (dB/60).toFixed(1);
+      labelA.setAttribute("x", (px+this._A.x)/2 - 30);
+      labelA.setAttribute("y", (py+this._A.y)/2);
+      labelA.textContent = `PA=${mA}`;
+      labelB.setAttribute("x", (px+this._B.x)/2 + 10);
+      labelB.setAttribute("y", (py+this._B.y)/2);
+      labelB.textContent = `PB=${mB}`;
+      // 等距判定
+      if(Math.abs(dA - dB) < 8){
+        // 等距！留金色軌跡
+        const exists = this._goldenPoints.some(p => dist(p, this._P) < 25);
+        if(!exists){
+          this._goldenPoints.push({...this._P});
+          el("circle", {cx:px, cy:py, r:8, fill:"#FFD700",
+            filter:"url(#neonGold)", "pointer-events":"none"}, root);
+          SFX.pop();
+        }
+        status.textContent = "✨ 等距離！";
+        status.setAttribute("opacity", "1");
+        handle.setAttribute("fill", "#39FF14");
+      } else {
+        status.setAttribute("opacity", "0");
+        handle.setAttribute("fill", "#FFD700");
+      }
+      // 已有 5+ 個金色點 → 自動畫中垂線
+      if(this._goldenPoints.length >= 5 && !this._lineRevealed){
+        this._lineRevealed = true;
+        this._revealMidLine();
+      }
+    };
+    update(this._P.x, this._P.y);
+    makeDraggable(handle, update);
+  },
+  _revealMidLine(){
+    const root = document.getElementById("scene-root");
+    // 中點
+    const M = {x:(this._A.x+this._B.x)/2, y:(this._A.y+this._B.y)/2};
+    // 中垂線（垂直於 AB）
+    el("line", {x1:M.x, y1:M.y-400, x2:M.x, y2:M.y+200,
+      stroke:"#FF6B9D", "stroke-width":6,
+      filter:"url(#neonPurple)",
+      "pointer-events":"none"}, root);
+    el("text", {x:M.x+30, y:M.y-380, "font-size":32, "font-weight":900,
+      fill:"#FF6B9D",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root)
+      .textContent = "中垂線 L";
+    // 中點 M 標示
+    el("circle", {cx:M.x, cy:M.y, r:8, fill:"#FF6B9D"}, root);
+    el("text", {x:M.x, y:M.y+30, "font-size":22, "font-weight":900,
+      fill:"#FF6B9D", "text-anchor":"middle",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
+      .textContent = "中點 M";
+    // 直角符號
+    el("path", {d:`M${M.x-15},${M.y} L${M.x-15},${M.y-15} L${M.x},${M.y-15}`,
+      fill:"none", stroke:"#FF3B30", "stroke-width":3}, root);
+    SFX.ultimate();
+    flashBig("中垂線出現！", "#FF6B9D", 80);
+  },
+  steps:[
+    {
+      tip:"說：『七悪要尋寶！寶藏埋在離 A 樹和 B 樹「一樣遠」的地方。<b>把金色點 P 拖看看</b>，找出哪些位置是「等距離」。』",
+      narrate:"🥷 拖金色點 P · 找等距離位置",
+      run(){ this._addDraggablePoint(); }
+    },
+    {
+      tip:"<b>讓學生拖點</b>，當綠色亮起時表示找到一個等距點。<b>累積 5 個點</b>後系統會自動畫出中垂線。",
+      narrate:"💡 找到 5 個等距點 → 中垂線出現",
+      run(){
+        // 顯示提示，繼續讓學生拖
+        const root = document.getElementById("scene-root");
+        el("text", {x:800, y:80, "text-anchor":"middle",
+          "font-size":22, "font-weight":700, fill:"#39FF14"}, root)
+          .textContent = "👆 拖動 P 點，找出 5 個「PA = PB」的位置";
+        SFX.reveal();
+      }
+    },
+    {
+      tip:"當中垂線顯示後說：『<b>看！所有等距點連起來變成一條粉紅色的線</b>，這條就是「中垂線」！它把 AB 切兩半（中點 M），且垂直 90°！』",
+      narrate:"🎀 粉紅線 = 中垂線 = 等距點軌跡",
+      run(){
+        // 強制顯示中垂線（如果學生還沒拖滿 5 個）
+        if(!this._lineRevealed){
+          this._lineRevealed = true;
+          this._revealMidLine();
+        }
+        const root = document.getElementById("scene-root");
+        el("rect", {x:300, y:30, width:1000, height:80, rx:14,
+          fill:"#0A0E27", stroke:"#FF6B9D", "stroke-width":4}, root);
+        el("text", {x:800, y:80, "text-anchor":"middle",
+          "font-size":24, "font-weight":900, fill:"#FF6B9D",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
+          .textContent = "💡 中垂線 = 切兩半 + 垂直 90° + 等距軌跡";
+      }
+    }
+  ],
+  afterSteps:{
+    tip:"<b>本關通關</b>：學生親眼看到中垂線是「等距軌跡」。下一關證明為什麼。",
+    narrate:"中垂線探索完成 ✓"
+  }
+},
+
+// ============ 第2關 · 中垂線性質 SAS 證明 ============
+{
+  name:"中垂線性質證明",
+  stageLabel:"第 2 關 · 階段 3 · SAS 證明",
+  init(){
+    clearDragHandlers();
+    const root = clearScene();
+    stageBanner(root, "為什麼？SAS 全等推導", "WHY IT WORKS");
+    // 線段 AB + 中點 M + 中垂線 L 上的 P 點
+    const A = {x:500, y:600}, B = {x:1100, y:600};
+    const M = {x:800, y:600};
+    const P = {x:800, y:280};
+    this._A = A; this._B = B; this._M = M; this._P = P;
+    // AB 線段
+    el("line", {x1:A.x, y1:A.y, x2:B.x, y2:B.y, stroke:"#fff", "stroke-width":4}, root);
+    el("text", {x:A.x-25, y:A.y+8, "font-size":28, "font-weight":900, fill:"#fff"}, root).textContent = "A";
+    el("text", {x:B.x+10, y:B.y+8, "font-size":28, "font-weight":900, fill:"#fff"}, root).textContent = "B";
+    // 中點 M
+    el("circle", {cx:M.x, cy:M.y, r:7, fill:"#FF6B9D"}, root);
+    el("text", {x:M.x, y:M.y+32, "font-size":22, "font-weight":900, fill:"#FF6B9D",
+      "text-anchor":"middle", "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "M";
+    // 中垂線 L
+    el("line", {x1:M.x, y1:M.y-400, x2:M.x, y2:M.y+100,
+      stroke:"#FF6B9D", "stroke-width":4, opacity:.5}, root);
+    el("text", {x:M.x+15, y:M.y-380, "font-size":22, "font-weight":900,
+      fill:"#FF6B9D"}, root).textContent = "L";
+    // 直角符號
+    el("path", {d:`M${M.x-15},${M.y} L${M.x-15},${M.y-15} L${M.x},${M.y-15}`,
+      fill:"none", stroke:"#FF3B30", "stroke-width":3}, root);
+    // P 點
+    el("circle", {cx:P.x, cy:P.y, r:10, fill:"#FFD700"}, root);
+    el("text", {x:P.x, y:P.y-15, "font-size":24, "font-weight":900, fill:"#FFD700",
+      "text-anchor":"middle", "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "P";
+    // PA, PB 線段
+    el("line", {id:"PA-line", x1:P.x, y1:P.y, x2:A.x, y2:A.y,
+      stroke:"#FF6B9D", "stroke-width":4}, root);
+    el("line", {id:"PB-line", x1:P.x, y1:P.y, x2:B.x, y2:B.y,
+      stroke:"#3498DB", "stroke-width":4}, root);
+    // PM 線段（公用邊）
+    el("line", {id:"PM-line", x1:P.x, y1:P.y, x2:M.x, y2:M.y,
+      stroke:"#FFD700", "stroke-width":4, "stroke-dasharray":"6,3"}, root);
+  },
+  steps:[
+    {
+      tip:"說：『P 是中垂線上任一點。我們要證明 PA = PB。<b>看下三角形 △PAM 跟 △PBM</b>，它們有什麼一樣？』",
+      narrate:"🔍 比較兩個三角形 △PAM 和 △PBM",
+      run(){}
+    },
+    {
+      tip:"說：『<b>第一個</b>：AM = BM（M 是中點，把 AB 切兩半）。』",
+      narrate:"① AM = BM（中點切兩半）",
+      run(){
+        const root = document.getElementById("scene-root");
+        // AM 高亮
+        el("line", {x1:this._A.x, y1:this._A.y, x2:this._M.x, y2:this._M.y,
+          stroke:"#39FF14", "stroke-width":7}, root);
+        el("line", {x1:this._M.x, y1:this._M.y, x2:this._B.x, y2:this._B.y,
+          stroke:"#39FF14", "stroke-width":7}, root);
+        SFX.pop();
+      }
+    },
+    {
+      tip:"說：『<b>第二個</b>：∠PMA = ∠PMB = 90°（中垂線垂直於 AB）。』",
+      narrate:"② ∠PMA = ∠PMB = 90°（直角）",
+      run(){
+        const root = document.getElementById("scene-root");
+        // 兩個直角符號變紅色
+        el("path", {d:`M${this._M.x-18},${this._M.y} L${this._M.x-18},${this._M.y-18} L${this._M.x},${this._M.y-18}`,
+          fill:"none", stroke:"#FF3B30", "stroke-width":5,
+          filter:"url(#neonRed)"}, root);
+        el("path", {d:`M${this._M.x+18},${this._M.y} L${this._M.x+18},${this._M.y-18} L${this._M.x},${this._M.y-18}`,
+          fill:"none", stroke:"#FF3B30", "stroke-width":5,
+          filter:"url(#neonRed)"}, root);
+        SFX.pop();
+      }
+    },
+    {
+      tip:"說：『<b>第三個</b>：PM = PM（公用邊，自己跟自己）。』",
+      narrate:"③ PM = PM（公用邊）",
+      run(){
+        const pm = document.getElementById("PM-line");
+        if(pm){
+          pm.setAttribute("stroke", "#FFD700");
+          pm.setAttribute("stroke-width", "8");
+          pm.setAttribute("filter", "url(#neonGold)");
+        }
+        SFX.pop();
+      }
+    },
+    {
+      tip:"說：『邊 + 角 + 邊 → <b>SAS 全等</b>！所以 PA = PB。<b>這就是中垂線性質的證明！</b>』",
+      narrate:"🎯 SAS 全等 → PA = PB ✓",
+      run(){
+        const root = document.getElementById("scene-root");
+        el("rect", {x:300, y:80, width:1000, height:120, rx:14,
+          fill:"#0A0E27", stroke:"#FFD700", "stroke-width":4,
+          filter:"url(#neonGold)"}, root);
+        el("text", {x:800, y:130, "text-anchor":"middle",
+          "font-size":28, "font-weight":900, fill:"#FFD700"}, root)
+          .textContent = "🎯 SAS 全等";
+        el("text", {x:800, y:175, "text-anchor":"middle",
+          "font-size":24, "font-weight":800, fill:"#fff",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
+          .textContent = "△PAM ≅ △PBM → PA = PB";
+        flashBig("PA = PB ✓", "#39FF14", 100);
+        SFX.ultimate();
+      }
+    }
+  ],
+  afterSteps:{
+    tip:"<b>本關通關</b>：學生看懂為什麼中垂線上的點到兩端等距。下一關練習應用！",
+    narrate:"中垂線性質證明完成 ✓"
+  }
+},
+
+// ============ 第3關 · 中垂線例題（拖點互動）============
+{
+  name:"中垂線例題",
+  stageLabel:"第 3 關 · 階段 3 · 例題練習",
+  init(){
+    clearDragHandlers();
+    const root = clearScene();
+    stageBanner(root, "例題：求三角形周長", "FIND PERIMETER");
+    // 三角形 ABC
+    const A = {x:400, y:600}, B = {x:1100, y:600};
+    const C = {x:1300, y:280};
+    this._A = A; this._B = B; this._C = C;
+    // 中垂線 L 與 BC 交於 E
+    const M = {x:(A.x+B.x)/2, y:(A.y+B.y)/2};
+    // L 是垂直 AB 的線, 算與 BC 交點
+    // BC 線：(B.x, B.y) 到 (C.x, C.y)
+    // L 線 x = M.x
+    // 在 BC 上 x = M.x 時的 y
+    const t = (M.x - B.x) / (C.x - B.x);
+    const E = {x:M.x, y: B.y + t*(C.y - B.y)};
+    this._M = M; this._E = E;
+    // 三角形邊
+    el("line", {x1:A.x, y1:A.y, x2:B.x, y2:B.y, stroke:"#fff", "stroke-width":4}, root);
+    el("line", {x1:B.x, y1:B.y, x2:C.x, y2:C.y, stroke:"#fff", "stroke-width":4}, root);
+    el("line", {x1:C.x, y1:C.y, x2:A.x, y2:A.y, stroke:"#fff", "stroke-width":4}, root);
+    // 頂點標籤
+    el("text", {x:A.x-30, y:A.y+10, "font-size":28, "font-weight":900, fill:"#fff"}, root).textContent = "A";
+    el("text", {x:B.x+10, y:B.y+10, "font-size":28, "font-weight":900, fill:"#fff"}, root).textContent = "B";
+    el("text", {x:C.x+10, y:C.y, "font-size":28, "font-weight":900, fill:"#fff"}, root).textContent = "C";
+    // 邊長
+    el("text", {x:(A.x+B.x)/2, y:A.y+38, "text-anchor":"middle",
+      "font-size":24, "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "AB = 14";
+    el("text", {x:(B.x+C.x)/2 + 30, y:(B.y+C.y)/2,
+      "font-size":24, "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "BC = 15";
+    el("text", {x:(C.x+A.x)/2 - 30, y:(C.y+A.y)/2, "text-anchor":"end",
+      "font-size":24, "font-weight":900, fill:"#fff",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "AC = 13";
+    // 中垂線 L (粉紅)
+    el("line", {x1:M.x, y1:M.y-400, x2:M.x, y2:M.y+50,
+      stroke:"#FF6B9D", "stroke-width":4, "stroke-dasharray":"8,4"}, root);
+    el("text", {x:M.x-20, y:M.y-380, "font-size":24, "font-weight":900,
+      fill:"#FF6B9D"}, root).textContent = "L";
+    // 中點 M
+    el("circle", {cx:M.x, cy:M.y, r:6, fill:"#FF6B9D"}, root);
+    // E 點
+    el("circle", {cx:E.x, cy:E.y, r:10, fill:"#FFD700",
+      filter:"url(#neonGold)"}, root);
+    el("text", {x:E.x+18, y:E.y+8, "font-size":24, "font-weight":900, fill:"#FFD700",
+      "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "E";
+  },
+  steps:[
+    {
+      tip:"說：『四怨忍者站在中垂線 L 上的 E 點。<b>三角形邊長：AB=14、BC=15、AC=13</b>。<b>求 △ACE 周長</b>。』",
+      narrate:"📋 求 △ACE 周長",
+      run(){
+        const root = document.getElementById("scene-root");
+        el("rect", {x:200, y:50, width:1200, height:80, rx:14,
+          fill:"#0A0E27", stroke:"#FFD700", "stroke-width":3}, root);
+        el("text", {x:800, y:100, "text-anchor":"middle",
+          "font-size":24, "font-weight":900, fill:"#FFD700"}, root)
+          .textContent = "AB=14, BC=15, AC=13   求 △ACE 周長 = ?";
+      }
+    },
+    {
+      tip:"說：『提示！E 在中垂線 L 上 → <b>E 到 A、B 距離相等</b>！所以 EA = EB。』",
+      narrate:"💡 E 在中垂線上 → EA = EB",
+      run(){
+        const root = document.getElementById("scene-root");
+        // EA 跟 EB 高亮
+        el("line", {x1:this._E.x, y1:this._E.y, x2:this._A.x, y2:this._A.y,
+          stroke:"#FF6B9D", "stroke-width":6}, root);
+        el("line", {x1:this._E.x, y1:this._E.y, x2:this._B.x, y2:this._B.y,
+          stroke:"#FF6B9D", "stroke-width":6}, root);
+        el("text", {x:(this._E.x+this._A.x)/2 - 30, y:(this._E.y+this._A.y)/2,
+          "font-size":22, "font-weight":900, fill:"#FF6B9D",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "EA";
+        el("text", {x:(this._E.x+this._B.x)/2 + 10, y:(this._E.y+this._B.y)/2,
+          "font-size":22, "font-weight":900, fill:"#FF6B9D",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "EB";
+        SFX.reveal();
+      }
+    },
+    {
+      tip:"說：『△ACE 周長 = AC + CE + EA。<b>因為 EA = EB</b>，所以也等於 AC + CE + EB。』",
+      narrate:"🧮 周長 = AC + CE + EA = AC + CE + EB",
+      run(){
+        const root = document.getElementById("scene-root");
+        el("text", {x:300, y:780, "font-size":26, "font-weight":900, fill:"#fff",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
+          .textContent = "周長 = AC + CE + EA";
+        el("text", {x:850, y:780, "font-size":26, "font-weight":900, fill:"#39FF14",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
+          .textContent = "= AC + CE + EB";
+        SFX.pop();
+      }
+    },
+    {
+      tip:"說：『<b>關鍵！CE + EB = BC = 15</b>（因為 E 在 BC 線上）！所以周長 = 13 + 15 = 28。<b>答對了！</b>』",
+      narrate:"🎯 周長 = 13 + 15 = 28",
+      run(){
+        const root = clearScene();
+        stageBanner(root, "🎯 答案揭曉", "ANSWER");
+        // 大答案卡
+        el("rect", {x:300, y:200, width:1000, height:400, rx:24,
+          fill:"#0A0E27", stroke:"#39FF14", "stroke-width":6,
+          filter:"url(#neonGreen)"}, root);
+        el("text", {x:800, y:280, "text-anchor":"middle",
+          "font-size":36, "font-weight":900, fill:"#FFD700"}, root)
+          .textContent = "△ACE 周長 = AC + CE + EA";
+        el("text", {x:800, y:340, "text-anchor":"middle",
+          "font-size":30, "font-weight":700, fill:"#fff"}, root)
+          .textContent = "= AC + (CE + EB)";
+        el("text", {x:800, y:400, "text-anchor":"middle",
+          "font-size":30, "font-weight":700, fill:"#fff"}, root)
+          .textContent = "= 13 + 15";
+        el("text", {x:800, y:500, "text-anchor":"middle",
+          "font-size":80, "font-weight":900, fill:"url(#gradGreen)",
+          "stroke":"#000","stroke-width":6,"paint-order":"stroke"}, root)
+          .textContent = "= 28";
+        flashBig("VICTORY!", "#39FF14", 110);
+        SFX.win();
+        confetti(40);
+      }
+    }
+  ],
+  afterSteps:{
+    tip:"<b>例題完成</b>：學生看懂中垂線性質的應用。下一關角平分線！",
+    narrate:"中垂線例題 ✓"
+  }
+},
+
+// ============ 第4關 · 角平分線探索（拖點互動）============
+{
+  name:"角平分線探索",
+  stageLabel:"第 4 關 · 階段 4 · 動畫探索",
+  init(){
+    clearDragHandlers();
+    const root = clearScene();
+    stageBanner(root, "三角公園 · 角平分線", "PARK FOUNTAIN");
+    // 角 BAC：頂點 A 在中下方
+    const A = {x:400, y:700};
+    const B = {x:1500, y:300};  // 上方延伸
+    const C = {x:1500, y:760};  // 右方延伸
+    this._A = A; this._B = B; this._C = C;
+    this._goldenPoints = [];
+    this._angleLineRevealed = false;
+    // 兩條邊（道路）
+    el("line", {x1:A.x, y1:A.y, x2:B.x, y2:B.y, stroke:"#7E5109", "stroke-width":12}, root);
+    el("line", {x1:A.x, y1:A.y, x2:C.x, y2:C.y, stroke:"#7E5109", "stroke-width":12}, root);
+    el("text", {x:A.x-30, y:A.y+10, "font-size":32, "font-weight":900, fill:"#fff"}, root).textContent = "A";
+    el("text", {x:1450, y:280, "font-size":26, "font-weight":900, fill:"#fff"}, root).textContent = "B 路";
+    el("text", {x:1450, y:780, "font-size":26, "font-weight":900, fill:"#fff"}, root).textContent = "C 路";
+    // 哆啦A夢和角落白熊
+    heroCard(root, 140, 180, "哆啦A夢", "迷路", "#3498DB", "🔵");
+    el("text", {x:140, y:380, "font-size":40, "text-anchor":"middle"}, root).textContent = "🐻";
+  },
+  _addDraggablePoint(){
+    const root = document.getElementById("scene-root");
+    const g = el("g", {id:"drag-group"}, root);
+    const startP = {x:1000, y:520};
+    this._P = {...startP};
+    const handle = el("circle", {id:"drag-pt", cx:this._P.x, cy:this._P.y, r:24,
+      fill:"#FFD700", stroke:"#fff", "stroke-width":4,
+      filter:"url(#neonGold)", style:"cursor:grab"}, g);
+    el("text", {id:"drag-label", x:this._P.x, y:this._P.y+8,
+      "font-size":24, "font-weight":900, fill:"#000",
+      "text-anchor":"middle", "pointer-events":"none"}, g).textContent = "💧";
+    // 兩條垂直線到兩條路
+    const lineToB = el("line", {id:"line-PB", stroke:"#FF6B9D",
+      "stroke-width":4, "stroke-dasharray":"6,3", "pointer-events":"none"}, g);
+    const lineToC = el("line", {id:"line-PC", stroke:"#3498DB",
+      "stroke-width":4, "stroke-dasharray":"6,3", "pointer-events":"none"}, g);
+    const labelB = el("text", {id:"dist-PB", "font-size":22, "font-weight":900,
+      fill:"#FF6B9D", "stroke":"#000","stroke-width":4,"paint-order":"stroke",
+      "pointer-events":"none"}, g);
+    const labelC = el("text", {id:"dist-PC", "font-size":22, "font-weight":900,
+      fill:"#3498DB", "stroke":"#000","stroke-width":4,"paint-order":"stroke",
+      "pointer-events":"none"}, g);
+    const status = el("text", {id:"eq-status", x:800, y:120, "text-anchor":"middle",
+      "font-size":36, "font-weight":900, fill:"#FFD700", opacity:0,
+      "stroke":"#000","stroke-width":5,"paint-order":"stroke"}, g);
+    const update = (px, py) => {
+      px = Math.max(this._A.x + 40, Math.min(1400, px));
+      py = Math.max(this._A.y - 360, Math.min(this._A.y - 5, py));
+      this._P = {x:px, y:py};
+      handle.setAttribute("cx", px);
+      handle.setAttribute("cy", py);
+      document.getElementById("drag-label").setAttribute("x", px);
+      document.getElementById("drag-label").setAttribute("y", py+10);
+      // 計算到兩條路的垂直距離
+      const ray1 = {x:this._B.x - this._A.x, y:this._B.y - this._A.y};
+      const ray2 = {x:this._C.x - this._A.x, y:this._C.y - this._A.y};
+      const r1 = distToRay(this._P, this._A, ray1);
+      const r2 = distToRay(this._P, this._A, ray2);
+      lineToB.setAttribute("x1", px); lineToB.setAttribute("y1", py);
+      lineToB.setAttribute("x2", r1.foot.x); lineToB.setAttribute("y2", r1.foot.y);
+      lineToC.setAttribute("x1", px); lineToC.setAttribute("y1", py);
+      lineToC.setAttribute("x2", r2.foot.x); lineToC.setAttribute("y2", r2.foot.y);
+      labelB.setAttribute("x", (px + r1.foot.x)/2 - 30);
+      labelB.setAttribute("y", (py + r1.foot.y)/2);
+      labelB.textContent = `${(r1.dist/60).toFixed(1)}m`;
+      labelC.setAttribute("x", (px + r2.foot.x)/2 + 10);
+      labelC.setAttribute("y", (py + r2.foot.y)/2);
+      labelC.textContent = `${(r2.dist/60).toFixed(1)}m`;
+      // 等距判定
+      if(Math.abs(r1.dist - r2.dist) < 8){
+        const exists = this._goldenPoints.some(p => dist(p, this._P) < 25);
+        if(!exists){
+          this._goldenPoints.push({...this._P});
+          el("circle", {cx:px, cy:py, r:8, fill:"#FFD700",
+            filter:"url(#neonGold)", "pointer-events":"none"}, root);
+          SFX.pop();
+        }
+        status.textContent = "✨ 兩邊等距離！";
+        status.setAttribute("opacity", "1");
+        handle.setAttribute("fill", "#39FF14");
+      } else {
+        status.setAttribute("opacity", "0");
+        handle.setAttribute("fill", "#FFD700");
+      }
+      if(this._goldenPoints.length >= 4 && !this._angleLineRevealed){
+        this._angleLineRevealed = true;
+        this._revealAngleBisector();
+      }
+    };
+    update(this._P.x, this._P.y);
+    makeDraggable(handle, update);
+  },
+  _revealAngleBisector(){
+    const root = document.getElementById("scene-root");
+    // 角平分線方向：A 到 (B+C 方向中央)
+    const bx = this._B.x - this._A.x, by = this._B.y - this._A.y;
+    const cx = this._C.x - this._A.x, cy = this._C.y - this._A.y;
+    const lenB = Math.sqrt(bx*bx + by*by);
+    const lenC = Math.sqrt(cx*cx + cy*cy);
+    const dirX = bx/lenB + cx/lenC;
+    const dirY = by/lenB + cy/lenC;
+    const dirLen = Math.sqrt(dirX*dirX + dirY*dirY);
+    const farX = this._A.x + dirX/dirLen * 1200;
+    const farY = this._A.y + dirY/dirLen * 1200;
+    el("line", {x1:this._A.x, y1:this._A.y, x2:farX, y2:farY,
+      stroke:"#00BCD4", "stroke-width":6, filter:"url(#neonCyan)",
+      "pointer-events":"none"}, root);
+    el("text", {x:farX-100, y:farY-30, "font-size":30, "font-weight":900,
+      fill:"#00BCD4",
+      "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root)
+      .textContent = "角平分線";
+    SFX.ultimate();
+    flashBig("角平分線出現！", "#00BCD4", 80);
+  },
+  steps:[
+    {
+      tip:"說：『哆啦A夢和角落白熊在三角公園迷路。<b>他們想找一個位置（噴水池），到 B 路和 C 路都一樣遠</b>。拖動 💧 試試看！』",
+      narrate:"💧 拖動噴水池 · 找兩邊等距位置",
+      run(){ this._addDraggablePoint(); }
+    },
+    {
+      tip:"<b>讓學生拖點</b>，找到 4 個等距點後，藍綠色「角平分線」會自動出現！",
+      narrate:"💡 找到 4 個等距點 → 角平分線出現",
+      run(){
+        const root = document.getElementById("scene-root");
+        el("text", {x:800, y:80, "text-anchor":"middle",
+          "font-size":22, "font-weight":700, fill:"#39FF14"}, root)
+          .textContent = "👆 拖 💧，找出兩邊等距的位置";
+        SFX.reveal();
+      }
+    },
+    {
+      tip:"當藍綠線出現後說：『<b>所有兩邊等距的點 → 連起來就是角平分線</b>！這條線把 ∠A 切成兩個一樣大的角。』",
+      narrate:"🌊 藍綠線 = 角平分線 = 把角切兩半",
+      run(){
+        if(!this._angleLineRevealed){
+          this._angleLineRevealed = true;
+          this._revealAngleBisector();
+        }
+        const root = document.getElementById("scene-root");
+        el("rect", {x:300, y:30, width:1000, height:80, rx:14,
+          fill:"#0A0E27", stroke:"#00BCD4", "stroke-width":4}, root);
+        el("text", {x:800, y:80, "text-anchor":"middle",
+          "font-size":24, "font-weight":900, fill:"#00BCD4",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root)
+          .textContent = "💎 角平分線 = 兩邊等距軌跡 + 把角切兩半";
+      }
+    }
+  ],
+  afterSteps:{
+    tip:"<b>本關通關</b>：學生看到角平分線是「兩邊等距軌跡」。下一關 AAS 證明！",
+    narrate:"角平分線探索完成 ✓"
+  }
+},
+
+// ============ 第5關 · 角平分線 AAS 證明 + 噴水池應用 ============
+{
+  name:"角平分線應用",
+  stageLabel:"第 5 關 · 階段 5 · AAS + 應用",
+  init(){
+    clearDragHandlers();
+    const root = clearScene();
+    stageBanner(root, "噴水池應用 · AAS 證明", "FOUNTAIN");
+    // 三角公園：A 上、B 左下、C 右下
+    const A = {x:800, y:200}, B = {x:400, y:680}, C = {x:1200, y:680};
+    this._A = A; this._B = B; this._C = C;
+    // 三角形
+    el("path", {d:`M${A.x},${A.y} L${B.x},${B.y} L${C.x},${C.y} Z`,
+      fill:"rgba(255,255,255,.08)", stroke:"#888", "stroke-width":3}, root);
+    el("text", {x:A.x, y:A.y-15, "font-size":28, "font-weight":900,
+      fill:"#fff", "text-anchor":"middle"}, root).textContent = "A";
+    el("text", {x:B.x-20, y:B.y+30, "font-size":28, "font-weight":900, fill:"#fff"}, root).textContent = "B";
+    el("text", {x:C.x+10, y:C.y+30, "font-size":28, "font-weight":900, fill:"#fff"}, root).textContent = "C";
+    // 噴水池 O 在中央
+    const O = {x:(A.x+B.x+C.x)/3, y:(A.y+B.y+C.y)/3};
+    this._O = O;
+    el("circle", {cx:O.x, cy:O.y, r:30, fill:"#3498DB", stroke:"#fff", "stroke-width":3,
+      filter:"url(#neonCyan)"}, root);
+    el("text", {x:O.x, y:O.y+10, "text-anchor":"middle", "font-size":28}, root).textContent = "💧";
+    el("text", {x:O.x, y:O.y-40, "text-anchor":"middle", "font-size":24, "font-weight":900,
+      fill:"#fff", "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "O 噴水池";
+  },
+  steps:[
+    {
+      tip:"說：『噴水池 O 是 ∠A、∠B 兩個<b>角平分線的交點</b>。<b>已知 O 到 AC 路距離 = 5 公尺</b>。問：到 BC 路距離？』",
+      narrate:"📋 O 到 AC = 5m, 求 O 到 BC = ?",
+      run(){
+        const root = document.getElementById("scene-root");
+        // O 到 AC 的垂直距離（畫垂線）
+        const ray = {x:this._C.x-this._A.x, y:this._C.y-this._A.y};
+        const f = distToRay(this._O, this._A, ray);
+        el("line", {x1:this._O.x, y1:this._O.y, x2:f.foot.x, y2:f.foot.y,
+          stroke:"#FF6B9D", "stroke-width":4, "stroke-dasharray":"5,3"}, root);
+        el("text", {x:(this._O.x+f.foot.x)/2 + 30, y:(this._O.y+f.foot.y)/2,
+          "font-size":24, "font-weight":900, fill:"#FF6B9D",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "5m";
+        // 直角符號
+        el("rect", {x:f.foot.x-12, y:f.foot.y-12, width:12, height:12,
+          fill:"none", stroke:"#FF3B30", "stroke-width":2}, root);
+      }
+    },
+    {
+      tip:"說：『<b>關鍵！</b>O 在「∠A 的角平分線」上 → 到 ∠A 兩邊（AB 和 AC）距離相等！所以 <b>O 到 AB = 5 公尺</b>！』",
+      narrate:"💡 O 在 ∠A 平分線 → O 到 AB = 5m",
+      run(){
+        const root = document.getElementById("scene-root");
+        const ray = {x:this._B.x-this._A.x, y:this._B.y-this._A.y};
+        const f = distToRay(this._O, this._A, ray);
+        el("line", {x1:this._O.x, y1:this._O.y, x2:f.foot.x, y2:f.foot.y,
+          stroke:"#FF6B9D", "stroke-width":4, "stroke-dasharray":"5,3"}, root);
+        el("text", {x:(this._O.x+f.foot.x)/2 - 50, y:(this._O.y+f.foot.y)/2,
+          "font-size":24, "font-weight":900, fill:"#FF6B9D",
+          "stroke":"#000","stroke-width":3,"paint-order":"stroke"}, root).textContent = "5m";
+        el("rect", {x:f.foot.x, y:f.foot.y-12, width:12, height:12,
+          fill:"none", stroke:"#FF3B30", "stroke-width":2}, root);
+        SFX.reveal();
+      }
+    },
+    {
+      tip:"說：『<b>再來！</b>O 也在「∠B 的角平分線」上 → 到 ∠B 兩邊（BA 和 BC）距離相等！所以 <b>O 到 BC = O 到 BA = 5 公尺</b>！』",
+      narrate:"💡 O 在 ∠B 平分線 → O 到 BC = 5m",
+      run(){
+        const root = document.getElementById("scene-root");
+        const ray = {x:this._C.x-this._B.x, y:this._C.y-this._B.y};
+        const f = distToRay(this._O, this._B, ray);
+        el("line", {x1:this._O.x, y1:this._O.y, x2:f.foot.x, y2:f.foot.y,
+          stroke:"#00BCD4", "stroke-width":5,
+          filter:"url(#neonCyan)"}, root);
+        el("text", {x:(this._O.x+f.foot.x)/2, y:(this._O.y+f.foot.y)/2 + 30,
+          "font-size":28, "font-weight":900, fill:"#00BCD4",
+          "stroke":"#000","stroke-width":4,"paint-order":"stroke"}, root).textContent = "5m ?";
+        SFX.pop();
+      }
+    },
+    {
+      tip:"說：『<b>答案揭曉！O 到 BC 也是 5 公尺！</b>』",
+      narrate:"🎯 O 到 BC = 5m ✓",
+      run(){
+        const root = clearScene();
+        stageBanner(root, "🎯 答案揭曉", "ANSWER");
+        el("rect", {x:300, y:200, width:1000, height:400, rx:24,
+          fill:"#0A0E27", stroke:"#00BCD4", "stroke-width":6,
+          filter:"url(#neonCyan)"}, root);
+        el("text", {x:800, y:280, "text-anchor":"middle",
+          "font-size":34, "font-weight":900, fill:"#FFD700"}, root)
+          .textContent = "O 在角平分線交點";
+        el("text", {x:800, y:340, "text-anchor":"middle",
+          "font-size":28, "font-weight":700, fill:"#fff"}, root)
+          .textContent = "→ O 到三邊距離全部相等！";
+        el("text", {x:800, y:480, "text-anchor":"middle",
+          "font-size":80, "font-weight":900, fill:"url(#gradGreen)",
+          "stroke":"#000","stroke-width":6,"paint-order":"stroke"}, root)
+          .textContent = "= 5 公尺";
+        flashBig("VICTORY!", "#00BCD4", 110);
+        SFX.win();
+        confetti(40);
+      }
+    }
+  ],
+  afterSteps:{
+    tip:"<b>例題完成</b>：學生看懂角平分線在生活中的應用！",
+    narrate:"角平分線應用 ✓"
+  }
+},
+
+// ============ 第6關 · 兩大神技勝利畫面 ============
+{
+  name:"兩大神技認證",
+  stageLabel:"🏆 階段 6 · 通關認證",
+  init(){
+    clearDragHandlers();
+    const root = clearScene();
+    setScore(0, 0); hideCombo();
+    // 月亮 + 星星
+    el("circle", {cx:1400, cy:120, r:50, fill:"#FFF9C4", stroke:"#F1C40F", "stroke-width":3}, root);
+    for(let i=0;i<10;i++){
+      const sx = 100 + i*150 + Math.random()*60;
+      const sy = 60 + Math.random()*80;
+      el("text", {x:sx, y:sy, "font-size":28, fill:"#F1C40F"}, root).textContent = "✨";
+    }
+    // 標題
+    el("text", {x:800, y:200, "text-anchor":"middle", "font-size":68,
+      "font-weight":900, fill:"url(#gradGold)",
+      "stroke":"#000","stroke-width":7,"paint-order":"stroke",
+      filter:"url(#neonGold)"}, root).textContent = "忍者神技！";
+    el("text", {x:800, y:260, "text-anchor":"middle", "font-size":28,
+      "font-weight":700, fill:"#B967FF"}, root)
+      .textContent = "中垂線 + 角平分線 全通關";
+    // 兩大神技徽章
+    // 中垂線 (粉紅)
+    el("circle", {cx:500, cy:480, r:90, fill:"#0A0E27",
+      stroke:"#FF6B9D", "stroke-width":6, filter:"url(#neonPurple)"}, root);
+    el("text", {x:500, y:480, "text-anchor":"middle", "font-size":28,
+      "font-weight":900, fill:"#FF6B9D"}, root).textContent = "中垂線";
+    el("text", {x:500, y:520, "text-anchor":"middle", "font-size":18,
+      "font-weight":800, fill:"#fff"}, root).textContent = "等距線段兩端";
+    el("text", {x:500, y:600, "text-anchor":"middle", "font-size":50}, root).textContent = "🎀";
+    // 角平分線 (藍綠)
+    el("circle", {cx:1100, cy:480, r:90, fill:"#0A0E27",
+      stroke:"#00BCD4", "stroke-width":6, filter:"url(#neonCyan)"}, root);
+    el("text", {x:1100, y:480, "text-anchor":"middle", "font-size":28,
+      "font-weight":900, fill:"#00BCD4"}, root).textContent = "角平分線";
+    el("text", {x:1100, y:520, "text-anchor":"middle", "font-size":18,
+      "font-weight":800, fill:"#fff"}, root).textContent = "等距角的兩邊";
+    el("text", {x:1100, y:600, "text-anchor":"middle", "font-size":50}, root).textContent = "💎";
+    // 八字訣
+    el("rect", {x:300, y:680, width:1000, height:90, rx:14,
+      fill:"#0A0E27", stroke:"#FFD700", "stroke-width":4,
+      filter:"url(#neonGold)"}, root);
+    el("text", {x:800, y:735, "text-anchor":"middle", "font-size":36,
+      "font-weight":900, fill:"#FFD700"}, root)
+      .textContent = "🌟 等距離 ↔ 在線上 🌟";
+    SFX.win();
+    confetti(60);
+    setTimeout(()=>confetti(40), 800);
+    setTimeout(()=>confetti(40), 1600);
+  },
+  steps:[
+    {
+      tip:"說：『<b>恭喜通關 3-4！</b>學會兩大神技：中垂線（離線段兩端等距）和角平分線（離角的兩邊等距）。記住八字訣：<b>等距離 ↔ 在線上</b>！』",
+      narrate:"🏆 兩大神技認證！",
+      run(){}
+    }
+  ],
+  afterSteps:{
+    tip:"<b>下節課</b>：3-5 三角形的外心與內心（中垂線跟角平分線的應用）！",
+    narrate:"3-4 完整精通！下節 3-5 預告"
+  }
+}
+];
+
+// ==== 控制 ====
+function renderScene(){
+  const scene = scenes[state.sceneIdx];
+  state.stepIdx = -1;
+  hideCombo();
+  setScore(0, 0);
+  scene.init && scene.init();
+  setNarration("");
+  setStageLabel(scene.stageLabel || "");
+  setTeacherTip(`<b>🎬 第 ${state.sceneIdx+1} 關：${scene.name}</b><br>按「▶ 發動技能」開始`);
+  document.getElementById("s-n").textContent = state.sceneIdx + 1;
+  document.getElementById("scene-tag").textContent = `${state.sceneIdx+1}/6`;
+  document.querySelectorAll(".prog-seg").forEach((s,i)=>{
+    s.classList.remove("done","current");
+    if(i < state.sceneIdx) s.classList.add("done");
+    else if(i === state.sceneIdx) s.classList.add("current");
+  });
+  const actions = document.getElementById("main-actions");
+  actions.innerHTML = "";
+  const b = document.createElement("button");
+  b.className = "btn btn-next";
+  b.textContent = "▶ 發動技能";
+  b.onclick = advanceStep;
+  actions.appendChild(b);
+}
+
+function advanceStep(){
+  SFX.click(); ensureAudio();
+  const scene = scenes[state.sceneIdx];
+  state.stepIdx++;
+  if(state.stepIdx < scene.steps.length){
+    const step = scene.steps[state.stepIdx];
+    setTeacherTip(`<b>🎬 ${state.sceneIdx+1}.${state.stepIdx+1}</b> ${step.tip}`);
+    setNarration(step.narrate);
+    step.run && step.run.call(scene);
+    if(scene.onFinalStep && state.stepIdx === scene.steps.length - 1){
+      setTimeout(()=>scene.onFinalStep(), 600);
+    }
+  } else {
+    if(scene.afterSteps){
+      setTeacherTip(`<b>✅ 本關通關</b> ${scene.afterSteps.tip}`);
+      if(scene.afterSteps.narrate) setNarration(scene.afterSteps.narrate);
+    }
+    const actions = document.getElementById("main-actions");
+    actions.innerHTML = "";
+    if(state.sceneIdx < scenes.length - 1){
+      const nx = document.createElement("button");
+      nx.className = "btn btn-scene-next";
+      nx.textContent = "▶ 進入下一關";
+      nx.onclick = nextScene;
+      actions.appendChild(nx);
+    } else {
+      const rst = document.createElement("button");
+      rst.className = "btn btn-scene-next";
+      rst.textContent = "🔁 再戰一次";
+      rst.onclick = () => { state.sceneIdx=0; renderScene(); };
+      actions.appendChild(rst);
+    }
+  }
+}
+function nextScene(){ SFX.click(); if(state.sceneIdx<scenes.length-1){state.sceneIdx++; renderScene();} }
+function prevScene(){ SFX.click(); if(state.sceneIdx>0){state.sceneIdx--; renderScene();} }
+
+document.addEventListener("click", ensureAudio, {once:true});
+document.addEventListener("touchstart", ensureAudio, {once:true});
+document.getElementById("btn-prev").onclick = prevScene;
+document.getElementById("btn-restart").onclick = () => { SFX.click(); state.sceneIdx=0; renderScene(); };
+document.getElementById("btn-mute").onclick = (e) => {
+  state.audioOn = !state.audioOn;
+  e.currentTarget.textContent = state.audioOn ? "🔊" : "🔇";
+  if(state.audioOn) SFX.click();
+};
+document.addEventListener("keydown", e => {
+  if(e.key==="ArrowRight" || e.key===" "){ e.preventDefault(); advanceStep(); }
+  if(e.key==="ArrowLeft") prevScene();
+});
+
+renderScene();
+</script>
+</body>
+</html>
