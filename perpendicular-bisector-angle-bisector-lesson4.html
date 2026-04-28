@@ -626,43 +626,60 @@ function animateTri(elemId, from, to, frames, onDone){
 // 關卡設計 · 第二節：SAS + ASA
 // ============================================================
 // ============================================================
-// 拖拉互動工具
+// 拖拉互動工具（強化版：相容 mouse + touch + pointer）
 // ============================================================
 let dragHandlers = [];
 function makeDraggable(elem, onMove){
   let dragging = false;
   const svg = document.getElementById("canvas");
-  const onDown = e => {
+
+  function getXY(e){
+    let cx, cy;
+    if(e.touches && e.touches[0]){ cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
+    else if(e.changedTouches && e.changedTouches[0]){ cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY; }
+    else { cx = e.clientX; cy = e.clientY; }
+    const rect = svg.getBoundingClientRect();
+    const sx = (cx - rect.left) * 1600 / rect.width;
+    const sy = (cy - rect.top) * 900 / rect.height;
+    return {x:sx, y:sy};
+  }
+
+  const startDrag = e => {
     dragging = true;
     elem.style.cursor = "grabbing";
     e.preventDefault();
     e.stopPropagation();
+    const p = getXY(e); onMove(p.x, p.y);  // 開始就吃一下位置
   };
-  const onMoveEvt = e => {
+  const moveDrag = e => {
     if(!dragging) return;
-    const rect = svg.getBoundingClientRect();
-    const cx = (e.clientX || (e.touches && e.touches[0].clientX) || 0) - rect.left;
-    const cy = (e.clientY || (e.touches && e.touches[0].clientY) || 0) - rect.top;
-    // 換算成 SVG 座標 (1600x900 viewBox)
-    const sx = cx * 1600 / rect.width;
-    const sy = cy * 900 / rect.height;
-    onMove(sx, sy);
+    e.preventDefault();
+    const p = getXY(e); onMove(p.x, p.y);
   };
-  const onUp = () => { dragging = false; if(elem) elem.style.cursor = "grab"; };
-  elem.addEventListener("pointerdown", onDown);
-  elem.addEventListener("touchstart", onDown, {passive:false});
-  document.addEventListener("pointermove", onMoveEvt);
-  document.addEventListener("touchmove", onMoveEvt, {passive:false});
-  document.addEventListener("pointerup", onUp);
-  document.addEventListener("touchend", onUp);
-  dragHandlers.push({elem, onDown, onMoveEvt, onUp});
+  const endDrag = () => { dragging = false; if(elem) elem.style.cursor = "grab"; };
+
+  elem.addEventListener("mousedown", startDrag);
+  elem.addEventListener("touchstart", startDrag, {passive:false});
+  elem.addEventListener("pointerdown", startDrag);
+  document.addEventListener("mousemove", moveDrag);
+  document.addEventListener("touchmove", moveDrag, {passive:false});
+  document.addEventListener("pointermove", moveDrag);
+  document.addEventListener("mouseup", endDrag);
+  document.addEventListener("touchend", endDrag);
+  document.addEventListener("touchcancel", endDrag);
+  document.addEventListener("pointerup", endDrag);
+
+  dragHandlers.push({elem, startDrag, moveDrag, endDrag});
 }
 function clearDragHandlers(){
   dragHandlers.forEach(h => {
-    document.removeEventListener("pointermove", h.onMoveEvt);
-    document.removeEventListener("touchmove", h.onMoveEvt);
-    document.removeEventListener("pointerup", h.onUp);
-    document.removeEventListener("touchend", h.onUp);
+    document.removeEventListener("mousemove", h.moveDrag);
+    document.removeEventListener("touchmove", h.moveDrag);
+    document.removeEventListener("pointermove", h.moveDrag);
+    document.removeEventListener("mouseup", h.endDrag);
+    document.removeEventListener("touchend", h.endDrag);
+    document.removeEventListener("touchcancel", h.endDrag);
+    document.removeEventListener("pointerup", h.endDrag);
   });
   dragHandlers = [];
 }
@@ -705,12 +722,13 @@ const scenes = [
     const root = clearScene();
     clearStageOverlay && clearStageOverlay();
     stageBanner(root, "尋寶任務 · 中垂線", "FIND THE TREASURE");
-    // 兩棵樹 A 和 B (線段端點)
     this._A = {x:500, y:600};
     this._B = {x:1100, y:600};
-    this._goldenPoints = []; // 金色軌跡
-    this._step = 0;
+    this._goldenPoints = [];
+    this._lineRevealed = false;
     this._drawBase();
+    // 立刻加上拖拉點（不用等按鈕）
+    this._addDraggablePoint();
   },
   _drawBase(){
     const root = document.getElementById("scene-root");
@@ -836,9 +854,12 @@ const scenes = [
   },
   steps:[
     {
-      tip:"說：『七悪要尋寶！寶藏埋在離 A 樹和 B 樹「一樣遠」的地方。<b>把金色點 P 拖看看</b>，找出哪些位置是「等距離」。』",
+      tip:"說：『七悪要尋寶！寶藏埋在離 A 樹和 B 樹「一樣遠」的地方。<b>金色點 P 已經在畫面上，學生可以用滑鼠或手指拖看看</b>，找出哪些位置是「等距離」。』",
       narrate:"🥷 拖金色點 P · 找等距離位置",
-      run(){ this._addDraggablePoint(); }
+      run(){
+        // 確保拖拉點存在 (如果不知何故被清掉了)
+        if(!document.getElementById("drag-pt")){ this._addDraggablePoint(); }
+      }
     },
     {
       tip:"<b>讓學生拖點</b>，當綠色亮起時表示找到一個等距點。<b>累積 5 個點</b>後系統會自動畫出中垂線。",
@@ -1149,6 +1170,8 @@ const scenes = [
     // 哆啦A夢和角落白熊
     heroCard(root, 140, 180, "哆啦A夢", "迷路", "#3498DB", "🔵");
     el("text", {x:140, y:380, "font-size":40, "text-anchor":"middle"}, root).textContent = "🐻";
+    // 立刻加上拖拉點
+    this._addDraggablePoint();
   },
   _addDraggablePoint(){
     const root = document.getElementById("scene-root");
@@ -1246,9 +1269,11 @@ const scenes = [
   },
   steps:[
     {
-      tip:"說：『哆啦A夢和角落白熊在三角公園迷路。<b>他們想找一個位置（噴水池），到 B 路和 C 路都一樣遠</b>。拖動 💧 試試看！』",
+      tip:"說：『哆啦A夢和角落白熊在三角公園迷路。<b>他們想找一個位置（噴水池），到 B 路和 C 路都一樣遠</b>。畫面上的 💧 已經可以拖了！』",
       narrate:"💧 拖動噴水池 · 找兩邊等距位置",
-      run(){ this._addDraggablePoint(); }
+      run(){
+        if(!document.getElementById("drag-pt")){ this._addDraggablePoint(); }
+      }
     },
     {
       tip:"<b>讓學生拖點</b>，找到 4 個等距點後，藍綠色「角平分線」會自動出現！",
