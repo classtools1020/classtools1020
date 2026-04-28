@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🥷 3-4 中垂線與角平分線 · 忍者神技完整課程</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0A0E27;color:#fff;
+  font-family:"Microsoft JhengHei","微軟正黑體",sans-serif}
+body{display:flex;flex-direction:column;min-height:100vh}
+
+/* 頂部導覽 */
+#nav{background:linear-gradient(135deg,#1A0F3E,#2D1B4E);
+  padding:12px 18px;border-bottom:3px solid #FFD700;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);position:sticky;top:0;z-index:100}
+#nav h1{color:#FFD700;font-size:18px;font-weight:900;
+  text-shadow:0 0 10px rgba(255,215,0,.5);flex:1;min-width:200px}
+.tab{background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.3);
+  color:#fff;padding:6px 14px;border-radius:10px;font-weight:800;
+  font-size:14px;cursor:pointer;transition:all .15s;font-family:inherit}
+.tab:hover{transform:translateY(-1px);background:rgba(255,215,0,.2)}
+.tab.active{background:linear-gradient(135deg,#FFD700,#FF8A00);
+  color:#1A0F3E;border-color:#FFD700;box-shadow:0 0 15px rgba(255,215,0,.5)}
+
+/* 階段指引條 */
+#stage-bar{background:rgba(0,0,0,.5);padding:10px 18px;display:flex;gap:6px;
+  overflow-x:auto;border-bottom:1px solid rgba(255,255,255,.1)}
+.stage-btn{background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.2);
+  color:#B8C5D6;padding:6px 12px;border-radius:8px;font-weight:700;
+  font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit;
+  display:flex;flex-direction:column;align-items:center;min-width:130px;gap:2px}
+.stage-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.stage-btn.active{background:linear-gradient(135deg,#B967FF,#7D2AE8);
+  border-color:#B967FF;color:#fff;
+  box-shadow:0 0 15px rgba(185,103,255,.5)}
+.stage-btn .num{font-size:11px;opacity:.8}
+.stage-btn .icon{font-size:14px}
+
+/* 主要區塊 */
+section{display:none;flex:1;width:100%}
+section.active{display:flex;flex-direction:column}
+
+/* 簡報區 */
+#section-slides{padding:14px;background:#1A1F3A}
+#section-slides h2{color:#FFD700;font-size:20px;margin-bottom:8px;text-align:center}
+#section-slides .hint{text-align:center;color:#B8C5D6;margin-bottom:10px;font-size:14px}
+#pdf-frame{flex:1;width:100%;height:calc(100vh - 230px);
+  background:#fff;border:3px solid #FFD700;border-radius:12px;
+  box-shadow:0 0 30px rgba(255,215,0,.25)}
+
+/* 動畫區 */
+#section-animation{padding:0;background:#0A0E27}
+#anim-frame{width:100%;height:calc(100vh - 110px);border:none;display:block}
+
+/* 提示卡 */
+#flow-hint{background:linear-gradient(90deg,rgba(255,215,0,.2),rgba(255,138,0,.1));
+  border-bottom:2px solid #FFD700;padding:8px 18px;font-size:14px;
+  color:#fff;display:flex;align-items:center;gap:10px}
+#flow-hint .label{background:#FFD700;color:#1A0F3E;
+  padding:3px 10px;border-radius:12px;font-weight:900;font-size:12px;white-space:nowrap}
+
+@media (max-width:720px){
+  #nav h1{font-size:14px}
+  .tab{padding:4px 10px;font-size:13px}
+  .stage-btn{font-size:11px;min-width:90px;padding:4px 8px}
+  #pdf-frame{height:calc(100vh - 280px)}
+}
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <h1>🥷 3-4 中垂線 · 角平分線</h1>
+  <button class="tab active" data-tab="slides">📊 簡報</button>
+  <button class="tab" data-tab="animation">🎬 動畫</button>
+</nav>
+
+<!-- 階段指引條（教學流程） -->
+<div id="stage-bar">
+  <button class="stage-btn active" data-stage="1" data-tab="slides" data-time="0-3">
+    <span class="num">階段 1</span>
+    <span class="icon">📊 引入</span>
+  </button>
+  <button class="stage-btn" data-stage="2" data-tab="animation" data-anim-scene="1" data-time="3-10">
+    <span class="num">階段 2</span>
+    <span class="icon">🎬 中垂線探索</span>
+  </button>
+  <button class="stage-btn" data-stage="3" data-tab="slides" data-time="10-15">
+    <span class="num">階段 3</span>
+    <span class="icon">📊 中垂線歸納</span>
+  </button>
+  <button class="stage-btn" data-stage="4" data-tab="animation" data-anim-scene="2" data-time="15-22">
+    <span class="num">階段 4</span>
+    <span class="icon">🎬 SAS 證明 + 例題</span>
+  </button>
+  <button class="stage-btn" data-stage="5" data-tab="slides" data-time="22-25">
+    <span class="num">階段 5</span>
+    <span class="icon">📊 答案揭曉</span>
+  </button>
+  <button class="stage-btn" data-stage="6" data-tab="animation" data-anim-scene="4" data-time="25-37">
+    <span class="num">階段 6</span>
+    <span class="icon">🎬 角平分線探索</span>
+  </button>
+  <button class="stage-btn" data-stage="7" data-tab="slides" data-time="37-43">
+    <span class="num">階段 7</span>
+    <span class="icon">📊 角平分線歸納</span>
+  </button>
+  <button class="stage-btn" data-stage="8" data-tab="animation" data-anim-scene="5" data-time="43-50">
+    <span class="num">階段 8</span>
+    <span class="icon">🎬 噴水池應用</span>
+  </button>
+  <button class="stage-btn" data-stage="9" data-tab="slides" data-time="50-55">
+    <span class="num">階段 9</span>
+    <span class="icon">📊 收尾口訣</span>
+  </button>
+</div>
+
+<!-- 老師提示條 -->
+<div id="flow-hint">
+  <span class="label">👩‍🏫 老師</span>
+  <span id="hint-text">點上面階段 1 開始上課（投影片引入），跟著階段順序推進。</span>
+</div>
+
+<!-- 簡報區 -->
+<section id="section-slides" class="active">
+  <h2 id="slide-title">📊 NotebookLM 30 張簡報</h2>
+  <p class="hint" id="slide-hint">老師翻投影片建立概念 → 切到動畫做互動</p>
+  <embed id="pdf-frame" src="pdfs/lesson4-perpendicular-bisector.pdf#toolbar=1&navpanes=0" type="application/pdf">
+</section>
+
+<!-- 動畫區 -->
+<section id="section-animation">
+  <iframe id="anim-frame" src="perpendicular-bisector-angle-bisector-lesson4.html"></iframe>
+</section>
+
+<script>
+const tabs = document.querySelectorAll(".tab");
+const stageBtns = document.querySelectorAll(".stage-btn");
+const slidesSec = document.getElementById("section-slides");
+const animSec = document.getElementById("section-animation");
+const hintText = document.getElementById("hint-text");
+
+const stageHints = {
+  "1": "📊 階段 1（0-3 分）：說『今天忍者大作戰！夜櫻家要尋寶+哆啦A夢迷路』。翻投影片 1-3 張。",
+  "2": "🎬 階段 2（3-10 分）：學生拖金色點 P，找等距位置。累積 5 個點 → 中垂線自動出現！",
+  "3": "📊 階段 3（10-15 分）：回投影片，歸納中垂線定義（粉紅色重點框）。",
+  "4": "🎬 階段 4（15-22 分）：看 SAS 證明動畫 + 求 △ACE 周長例題（拖 E 互動）。",
+  "5": "📊 階段 5（22-25 分）：投影片揭曉答案 = 28（與題目分頁）。",
+  "6": "🎬 階段 6（25-37 分）：學生拖噴水池 💧，找兩邊等距 → 角平分線出現！",
+  "7": "📊 階段 7（37-43 分）：歸納角平分線定義（藍綠色重點框）+ AAS 證明說明。",
+  "8": "🎬 階段 8（43-50 分）：噴水池應用題互動，O 到 BC 距離 = ?",
+  "9": "📊 階段 9（50-55 分）：八字訣總結「等距離 ↔ 在線上」。"
+};
+
+function showTab(name){
+  tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+  slidesSec.classList.toggle("active", name === "slides");
+  animSec.classList.toggle("active", name === "animation");
+  window.scrollTo(0, 0);
+}
+
+function setStage(stageNum){
+  stageBtns.forEach(b => b.classList.toggle("active", b.dataset.stage === stageNum));
+  hintText.textContent = stageHints[stageNum] || "";
+}
+
+stageBtns.forEach(b => {
+  b.addEventListener("click", () => {
+    const stage = b.dataset.stage;
+    const tab = b.dataset.tab;
+    showTab(tab);
+    setStage(stage);
+    // 動畫場景跳轉（透過 iframe 的 hash 或重載）
+    if(tab === "animation" && b.dataset.animScene){
+      const sceneIdx = parseInt(b.dataset.animScene) - 1;
+      const iframe = document.getElementById("anim-frame");
+      // 讓動畫頁的 iframe 重載到指定場景（簡單做法：reload + jump）
+      iframe.contentWindow.postMessage({type:"goto-scene", scene:sceneIdx}, "*");
+    }
+  });
+});
+
+tabs.forEach(t => t.addEventListener("click", () => showTab(t.dataset.tab)));
+
+// 設定初始階段
+setStage("1");
+</script>
+
+</body>
+</html>
