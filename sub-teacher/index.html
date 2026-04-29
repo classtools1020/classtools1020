@@ -3,30 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, nofollow, noarchive">
-<title>頁面已下架</title>
+<meta name="robots" content="noindex, nofollow">
+<title>代課工作區</title>
 <style>
-  body {
-    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
-    background: #F5F5F5;
-    color: #555;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    text-align: center;
-  }
-  .box { max-width: 400px; }
-  h1 { font-size: 1.4rem; margin-bottom: 10px; color: #333; }
-  p { font-size: 1rem; line-height: 1.6; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#fafafa;color:#1a1a1a;padding:28px 16px;min-height:100vh}
+.wrap{max-width:720px;margin:0 auto}
+header{text-align:center;border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:28px}
+h1{font-size:1.9em;font-weight:900;letter-spacing:-.5px}
+.meta{color:#666;font-size:.92em;margin-top:4px}
+
+.day-block{margin-bottom:26px}
+.day-title{font-size:1.05em;font-weight:800;padding:4px 0 10px;border-bottom:1px dashed #ccc;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.day-title::before{content:'';width:4px;height:16px;background:#111;border-radius:2px}
+
+.pick a{display:block;padding:22px 18px;border:2px solid #111;border-radius:12px;background:#fff;text-decoration:none;color:#111;text-align:left;transition:all .15s;margin-bottom:10px}
+.pick a:hover{background:#111;color:#fff;transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.15)}
+.pick .topic{font-size:1.3em;font-weight:900;letter-spacing:-.5px}
+.pick .sub{font-size:.92em;color:#888;font-weight:600;margin-top:4px}
+.pick a:hover .sub{color:#ddd}
+
+footer{text-align:center;color:#999;font-size:.82em;margin-top:28px;padding-top:14px;border-top:1px solid #eee}
 </style>
 </head>
 <body>
-<div class="box">
-  <h1>此頁面已下架</h1>
-  <p>課程教材僅供當日授課使用，已於課後移除。</p>
+<div class="wrap">
+  <header>
+    <h1>代課工作區</h1>
+    <div class="meta">Stacey · 芎林國中</div>
+  </header>
+
+  <div class="day-block">
+    <div class="day-title">5/4（一）</div>
+    <div class="pick">
+      <a href="may4.html">
+        <div class="topic">5/4 代課</div>
+        <div class="sub">第 3 節 8A 數學 · 第 7 節 特教班社會</div>
+      </a>
+    </div>
+  </div>
+
+  <footer>classtools1020</footer>
 </div>
 </body>
 </html>
