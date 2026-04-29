@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4/29 · 8A 數學 · 中垂線 + 角平分線</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    background: linear-gradient(135deg, #FCE4EC 0%, #E1BEE7 100%);
+    min-height: 100vh;
+    padding: 15px;
+    color: #4A148C;
+    line-height: 1.6;
+  }
+  .container { max-width: 760px; margin: 0 auto; }
+  .header {
+    background: #6A1B9A;
+    color: #FFF;
+    padding: 25px 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(106,27,154,0.3);
+  }
+  h1 { font-size: 1.9rem; margin-bottom: 5px; letter-spacing: 1px; }
+  .date-label { font-size: 1.05rem; color: #E1BEE7; margin-top: 5px; }
+  .core-concept {
+    background: #FFF;
+    border: 3px solid #CE93D8;
+    border-radius: 15px;
+    padding: 18px;
+    margin-bottom: 20px;
+    font-size: 1.15rem;
+    text-align: center;
+  }
+  .core-concept strong { color: #6A1B9A; font-size: 1.3rem; }
+
+  .step-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #6A1B9A;
+    margin: 25px 10px 12px;
+    padding-left: 12px;
+    border-left: 5px solid #6A1B9A;
+  }
+
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .step-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #FFF;
+    border: 3px solid #6A1B9A;
+    border-radius: 15px;
+    padding: 18px;
+    text-decoration: none;
+    color: #4A148C;
+    box-shadow: 0 4px 10px rgba(106,27,154,0.18);
+    transition: all 0.2s;
+    min-height: 48px;
+  }
+  .step-btn:hover, .step-btn:active {
+    background: #E1BEE7;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(106,27,154,0.3);
+  }
+  .step-btn.no-link {
+    cursor: default;
+    background: #F8F0FA;
+  }
+  .step-btn.no-link:hover {
+    transform: none;
+    background: #F8F0FA;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    background: #6A1B9A;
+    color: #FFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+  }
+  .step-body { flex: 1; min-width: 0; }
+  .step-body .title-text {
+    font-size: 1.18rem;
+    font-weight: bold;
+    color: #6A1B9A;
+    margin-bottom: 4px;
+  }
+  .step-body .desc {
+    font-size: 0.92rem;
+    color: #6B4C7C;
+  }
+  .step-arrow {
+    font-size: 1.6rem;
+    color: #6A1B9A;
+    flex-shrink: 0;
+  }
+  .step-btn.no-link .step-arrow { display: none; }
+
+  .quick-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 15px 0;
+  }
+  .quick-btn {
+    display: block;
+    background: #FFF;
+    border: 2px dashed #CE93D8;
+    border-radius: 12px;
+    padding: 14px 12px;
+    text-decoration: none;
+    color: #6A1B9A;
+    font-weight: 700;
+    text-align: center;
+    font-size: 0.95rem;
+    transition: all 0.15s;
+  }
+  .quick-btn:hover, .quick-btn:active {
+    background: #F3E5F5;
+    border-style: solid;
+  }
+  .quick-btn .qb-icon { font-size: 1.6rem; display: block; margin-bottom: 4px; }
+
+  .color-rule {
+    background: #FFF;
+    border: 2px dashed #6A1B9A;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 1rem;
+    color: #4A148C;
+  }
+  .color-rule .chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 8px;
+    margin: 4px 3px;
+    font-weight: bold;
+    color: #FFF;
+  }
+
+  .note-box {
+    background: #FFF8E1;
+    border: 2px solid #FFB300;
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin: 15px 0;
+    font-size: 0.95rem;
+    color: #6B4400;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 30px;
+    color: #6A1B9A;
+    font-size: 0.95rem;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 1.5rem; }
+    .step-body .title-text { font-size: 1.05rem; }
+    .step-body .desc { font-size: 0.88rem; }
+    .step-num { width: 44px; height: 44px; font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>📐 8A 數學 · 中垂線 + 角平分線</h1>
+    <div class="date-label">📅 4/29（三）· 八下 3-4</div>
+  </div>
+
+  <div class="core-concept">
+    🎯 今天教：<strong>「等距離 ↔ 在線上」</strong>
+  </div>
+
+  <div class="step-title">📝 上課照順序點下去就好</div>
+
+  <div class="flow-steps">
+
+    <a href="https://classtools1020.github.io/classtools1020/pdfs/lesson4-perpendicular-bisector.pdf" target="_blank" class="step-btn">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="title-text">📊 開場 PPT（簡報 1-3）</div>
+        <div class="desc">忍者尋寶 + 迷路引入 · 約 3 分鐘</div>
+      </div>
+      <div class="step-arrow">▶</div>
+    </a>
+
+    <a href="https://classtools1020.github.io/classtools1020/perpendicular-bisector-angle-bisector-lesson4.html" target="_blank" class="step-btn">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="title-text">🎬 動畫第 1-2 關</div>
+        <div class="desc">學生拖金色 P 點探索中垂線 · SAS 證明 · 約 15 分鐘</div>
+      </div>
+      <div class="step-arrow">▶</div>
+    </a>
+
+    <div class="step-btn no-link">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="title-text">📚 課本 P150 ~ P151</div>
+        <div class="desc">例 1 範例（最清楚）· 學生跟著做 · 約 5-10 分鐘</div>
+      </div>
+    </div>
+
+    <a href="https://classtools1020.github.io/classtools1020/perpendicular-bisector-angle-bisector-lesson4.html" target="_blank" class="step-btn">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="title-text">🎬 動畫第 3-5 關</div>
+        <div class="desc">例題周長 · 噴水池找角平分線 · BOSS 應用題 · 約 20 分鐘</div>
+      </div>
+      <div class="step-arrow">▶</div>
+    </a>
+
+    <a href="https://classtools1020.github.io/classtools1020/pdfs/lesson4-perpendicular-bisector.pdf" target="_blank" class="step-btn">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="title-text">📊 收尾 PPT（簡報 14）</div>
+        <div class="desc">八字訣「等距離 ↔ 在線上」· 約 3 分鐘</div>
+      </div>
+      <div class="step-arrow">▶</div>
+    </a>
+
+  </div>
+
+  <div class="note-box">
+    💡 <b>小提示：</b>動畫每關按金色「▶ 發動技能」推進。
+    如果簡報某張怪怪的，<b>直接切到課本</b>看（最可靠）。
+  </div>
+
+  <div class="step-title">🎁 備用工具</div>
+
+  <div class="quick-row">
+    <a href="https://classtools1020.github.io/classtools1020/perpendicular-bisector-lesson4-full.html" target="_blank" class="quick-btn">
+      <span class="qb-icon">🥷</span>三合一指揮台<br><small>（簡報+動畫+課本）</small>
+    </a>
+    <a href="https://classtools1020.github.io/classtools1020/pdfs/textbook-3-4.pdf" target="_blank" class="quick-btn">
+      <span class="qb-icon">📚</span>課本 PDF<br><small>（12 頁完整）</small>
+    </a>
+  </div>
+
+  <div class="color-rule">
+    🎨 色碼鐵律<br>
+    <span class="chip" style="background:#FF6B9D;">中垂線 粉紅</span>
+    <span class="chip" style="background:#00BCD4;">角平分線 藍綠</span>
+    <span class="chip" style="background:#B967FF;">等距 紫</span>
+    <span class="chip" style="background:#FF3B30;">直角 紅</span>
+  </div>
+
+  <div class="footer">
+    芎林國中 · 8A 數學
+  </div>
+
+</div>
+</body>
+</html>
