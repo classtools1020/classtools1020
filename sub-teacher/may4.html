@@ -6,41 +6,22 @@
 <title>5/4 代課工作區</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6;padding:24px 16px;min-height:100vh}
-.wrap{max-width:880px;margin:0 auto}
+body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#fafafa;color:#1a1a1a;line-height:1.6;padding:32px 16px;min-height:100vh}
+.wrap{max-width:720px;margin:0 auto}
 
-header{border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:28px}
+header{border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:32px}
 h1{font-size:1.7em;font-weight:900;letter-spacing:-.5px}
 .meta{color:#666;font-size:.92em;margin-top:4px}
 
-.period{margin-bottom:32px}
-.period-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:1px dashed #ccc;padding-bottom:8px;margin-bottom:16px}
-.period-num{font-size:.78em;font-weight:800;letter-spacing:1.5px;color:#888;text-transform:uppercase}
-.period-title{font-size:1.4em;font-weight:900;color:#111;letter-spacing:-.3px}
-.period-time{font-size:.85em;color:#666;font-weight:600}
+.subjects{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:560px){.subjects{grid-template-columns:1fr}}
 
-.cta{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:18px}
-.cta a{display:flex;align-items:center;gap:14px;padding:18px 20px;border:2px solid #111;border-radius:12px;background:#fff;text-decoration:none;color:#111;transition:all .15s}
-.cta a:hover{background:#111;color:#fff;transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.12)}
-.cta .icon{font-size:1.6em;flex-shrink:0}
-.cta .label{font-weight:800;font-size:1.05em}
-.cta .sub{font-size:.82em;color:#888;font-weight:400}
-.cta a:hover .sub{color:#ddd}
-
-.flow{background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:18px 22px}
-.flow h3{font-size:.78em;font-weight:800;letter-spacing:1.5px;color:#888;text-transform:uppercase;margin-bottom:12px}
-ol.steps{padding-left:0;list-style:none;counter-reset:s}
-ol.steps>li{counter-increment:s;padding:10px 0 10px 44px;border-bottom:1px dashed #f0f0f0;position:relative;font-size:1.05em}
-ol.steps>li:last-child{border-bottom:none}
-ol.steps>li::before{content:counter(s);position:absolute;left:0;top:8px;width:30px;height:30px;background:#111;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9em}
-ol.steps>li b{color:#111;font-weight:800}
-ol.steps>li .note{display:block;font-size:.85em;color:#666;margin-top:2px;font-weight:400}
-ol.steps>li .min{font-size:.78em;color:#888;font-weight:600;margin-left:6px}
-
-.todo{padding:14px 18px;border:2px dashed #ccc;border-radius:12px;background:#fafafa;color:#888;font-size:.95em;text-align:center}
-
-.kids{margin-top:14px;padding:12px 16px;background:#FFF8E7;border-left:4px solid #D4A574;border-radius:6px;font-size:.92em;color:#5D4037}
-.kids b{color:#8B4513}
+.subjects a{display:block;padding:36px 24px;border:2px solid #111;border-radius:16px;background:#fff;text-decoration:none;color:#111;text-align:center;transition:all .2s}
+.subjects a:hover{background:#111;color:#fff;transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.15)}
+.subjects .icon{font-size:2.6em;display:block;margin-bottom:10px;line-height:1}
+.subjects .name{font-size:1.4em;font-weight:900;letter-spacing:-.3px;margin-bottom:4px}
+.subjects .period{font-size:.85em;color:#888;font-weight:600;letter-spacing:.5px}
+.subjects a:hover .period{color:#bbb}
 
 footer{text-align:center;color:#999;font-size:.82em;margin-top:36px;padding-top:16px;border-top:1px solid #eee}
 </style>
@@ -53,69 +34,20 @@ footer{text-align:center;color:#999;font-size:.82em;margin-top:36px;padding-top:
   <div class="meta">Stacey 出差 · 芎林國中</div>
 </header>
 
-<!-- ========== 第 3 節 · 8A 數學 ========== -->
-<section class="period">
-  <div class="period-head">
-    <div>
-      <div class="period-num">第 3 節</div>
-      <div class="period-title">8A 數學 · 中垂線、角平分線</div>
-    </div>
-  </div>
+<div class="subjects">
+  <a href="may4-math.html">
+    <span class="icon">📐</span>
+    <div class="name">8A 數學</div>
+    <div class="period">第 3 節</div>
+  </a>
+  <a href="may4-shehui.html">
+    <span class="icon">🍜</span>
+    <div class="name">特教班社會</div>
+    <div class="period">第 7 節</div>
+  </a>
+</div>
 
-  <div class="cta">
-    <a href="https://docs.google.com/presentation/d/1B1SFONQEvx2DJNy6tAbQppvLDtHVdydXGBP38jyWJPE/edit" target="_blank" rel="noopener">
-      <span class="icon">▶</span>
-      <div>
-        <div class="label">開啟簡報</div>
-        <div class="sub">Google Slides · 3-4 中垂線、角平分線</div>
-      </div>
-    </a>
-  </div>
-
-  <div class="flow">
-    <h3>流程</h3>
-    <ol class="steps">
-      <li>
-        <b>簡報</b>
-      </li>
-    </ol>
-  </div>
-</section>
-
-<!-- ========== 第 7 節 · 特教班社會 ========== -->
-<section class="period">
-  <div class="period-head">
-    <div>
-      <div class="period-num">第 7 節</div>
-      <div class="period-title">特教班社會課 · 牛肉麵</div>
-    </div>
-  </div>
-
-  <div class="cta">
-    <a href="https://docs.google.com/presentation/d/1_mPJYVZmvcVwZUUZJNTbIrvdF_rdpR1CrrXdruEkHaA/edit" target="_blank" rel="noopener">
-      <span class="icon">▶</span>
-      <div>
-        <div class="label">開啟簡報</div>
-        <div class="sub">Google Slides · 30 張 · 翻頁照順序就好</div>
-      </div>
-    </a>
-  </div>
-
-  <div class="flow">
-    <h3>流程</h3>
-    <ol class="steps">
-      <li>
-        <b>簡報</b>
-      </li>
-      <li>
-        <b>做牛肉麵</b>
-      </li>
-    </ol>
-  </div>
-
-  </section>
-
-<footer>Stacey · 5/4 代課工作區 · classtools1020</footer>
+<footer>Stacey · classtools1020</footer>
 
 </div>
 </body>
