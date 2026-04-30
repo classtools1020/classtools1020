@@ -375,79 +375,202 @@ body.shake-big{animation:shakeBig .5s ease-out}
 }
 .goomba.stomped.fadeout{opacity:0}
 
-/* ========== BOSS 戰 ========== */
+/* ========== BOSS 戰 - 戲劇版 ========== */
+/* 開場警告 - 全屏紅黑閃爍 */
+.boss-warning{
+  position:fixed;inset:0;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:24px;
+  z-index:280;animation:warningFlash .35s ease-in-out 4;
+}
+.boss-warning.show{display:flex}
+@keyframes warningFlash{
+  0%,100%{background:rgba(0,0,0,.92)}
+  50%{background:rgba(255,0,0,.78)}
+}
+.warning-icon{
+  font-size:120px;
+  animation:warningBounce .4s ease-in-out infinite alternate;
+  filter:drop-shadow(0 0 20px #FF1744);
+}
+@keyframes warningBounce{
+  0%{transform:scale(.9) rotate(-8deg)}
+  100%{transform:scale(1.15) rotate(8deg)}
+}
+.warning-text{
+  font-family:'Press Start 2P',monospace;font-size:54px;color:#FFEB3B;
+  text-shadow:4px 4px 0 #FF1744,8px 8px 0 #000;
+  letter-spacing:4px;text-align:center;
+  animation:warningShake .15s ease-in-out infinite;
+}
+@keyframes warningShake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-4px)}
+  75%{transform:translateX(4px)}
+}
+.warning-sub{
+  font-size:26px;color:#fff;font-weight:900;text-shadow:3px 3px 0 #000;
+  letter-spacing:2px;
+}
+
+/* BOSS 舞台 */
 .boss-stage{
-  /* BOSS 也站在地面上，不擋訊息卡 */
-  position:fixed;left:50%;bottom:8px;transform:translateX(-50%);
-  display:none;flex-direction:column;align-items:center;z-index:90;
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+  display:none;flex-direction:column;align-items:center;z-index:160;gap:14px;
 }
-.boss-stage.show{display:flex;animation:bossEmerge 1s cubic-bezier(.34,1.56,.64,1)}
-@keyframes bossEmerge{
-  0%{transform:translateX(-50%) translateY(150px) scale(.2);opacity:0}
-  60%{transform:translateX(-50%) translateY(-20px) scale(1.2)}
-  100%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}
+.boss-stage.show{display:flex}
+
+/* HP 條 - 大且醒目，放在 BOSS 上方 */
+.boss-hp{
+  display:flex;gap:6px;align-items:center;
+  background:rgba(0,0,0,.85);padding:8px 18px;
+  border:4px solid var(--mario-red);border-radius:10px;
+  box-shadow:0 0 16px rgba(255,23,68,.6),5px 5px 0 #000;
 }
+.boss-hp::before{
+  content:'BOSS';color:var(--mario-red);font-family:'Press Start 2P',monospace;
+  font-size:14px;margin-right:8px;text-shadow:1px 1px 0 #fff;
+}
+.boss-hp .heart{
+  font-size:34px;filter:drop-shadow(2px 2px 0 #000);transition:all .35s;
+}
+.boss-hp .heart.empty{
+  filter:grayscale(1) opacity(.25) drop-shadow(2px 2px 0 #000);
+  transform:scale(.6) rotate(20deg);
+}
+
+/* BOSS 本體 - 變大！ */
 .boss{
-  width:110px;height:110px;
+  width:200px;height:200px;
   background:radial-gradient(circle at 50% 30%,#5C6BC0 0%,#1A237E 100%);
-  border:6px solid #000;border-radius:50% 50% 28% 28%;
+  border:8px solid #000;border-radius:50% 50% 28% 28%;
   position:relative;cursor:pointer;
-  box-shadow:0 8px 0 #000,6px 12px 16px rgba(0,0,0,.5);
-  animation:bossWobble 1.5s ease-in-out infinite;
+  box-shadow:0 12px 0 #000,8px 16px 24px rgba(0,0,0,.6);
+}
+/* 只在 BOSS 舞台顯示時才跑動畫，每次都會重跑入場效果 */
+.boss-stage.show .boss{
+  animation:bossEntry 1.2s cubic-bezier(.34,1.56,.64,1) both,
+            bossWobble 1.5s ease-in-out 1.2s infinite;
+}
+@keyframes bossEntry{
+  0%{transform:scale(.05);opacity:0;filter:brightness(4) blur(8px)}
+  30%{transform:scale(1.4);opacity:.8;filter:brightness(2)}
+  60%{transform:scale(.85);opacity:1;filter:brightness(1.3)}
+  100%{transform:scale(1);opacity:1;filter:none}
 }
 .boss::before,.boss::after{
-  content:'';position:absolute;top:24px;
-  width:18px;height:24px;background:#fff;border:3px solid #000;border-radius:50%;
+  content:'';position:absolute;top:42px;
+  width:32px;height:42px;background:#fff;border:4px solid #000;border-radius:50%;
 }
-.boss::before{left:18px}
-.boss::after{right:18px}
+.boss::before{left:32px}
+.boss::after{right:32px}
 .boss-eyes{position:absolute;inset:0;pointer-events:none}
 .boss-eyes::before,.boss-eyes::after{
-  content:'';position:absolute;top:32px;width:8px;height:12px;background:#FF1744;border-radius:50%;
+  content:'';position:absolute;top:54px;width:14px;height:18px;background:#FF1744;border-radius:50%;
   animation:bossPupil 1.5s ease-in-out infinite;
+  box-shadow:0 0 8px #FF1744;
 }
-.boss-eyes::before{left:25px}
-.boss-eyes::after{right:25px}
-@keyframes bossPupil{0%,100%{transform:translateX(0)}50%{transform:translateX(2px)}}
+.boss-eyes::before{left:42px}
+.boss-eyes::after{right:42px}
+@keyframes bossPupil{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
 .boss-fangs{
-  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
-  width:50px;height:18px;
-  display:flex;justify-content:space-around;
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  width:90px;height:30px;display:flex;justify-content:space-around;
 }
 .boss-fangs::before,.boss-fangs::after{
-  content:'';width:10px;height:14px;background:#fff;
-  clip-path:polygon(50% 100%,0 0,100% 0);border-left:2px solid #000;border-right:2px solid #000;
+  content:'';width:18px;height:24px;background:#fff;
+  clip-path:polygon(50% 100%,0 0,100% 0);border-left:3px solid #000;border-right:3px solid #000;
 }
 @keyframes bossWobble{
   0%,100%{transform:translateY(0) rotate(-2deg)}
-  50%{transform:translateY(-8px) rotate(2deg)}
+  50%{transform:translateY(-10px) rotate(2deg)}
 }
-.boss.hit{animation:bossHit .35s ease-out}
+
+/* HP 越低 BOSS 越生氣：變紅、變大、抖更兇 */
+.boss.angry-1{
+  filter:hue-rotate(-30deg) saturate(1.4) brightness(1.1);
+  animation:bossWobbleAngry1 .8s ease-in-out infinite;
+}
+@keyframes bossWobbleAngry1{
+  0%,100%{transform:translateY(0) rotate(-4deg) scale(1.05)}
+  50%{transform:translateY(-14px) rotate(4deg) scale(1.05)}
+}
+.boss.angry-2{
+  filter:hue-rotate(-90deg) saturate(2) brightness(1.25) drop-shadow(0 0 14px #FF1744);
+  animation:bossWobbleRage .35s ease-in-out infinite;
+}
+@keyframes bossWobbleRage{
+  0%,100%{transform:translate(0,0) rotate(-6deg) scale(1.18)}
+  20%{transform:translate(-6px,-10px) rotate(6deg) scale(1.22)}
+  40%{transform:translate(8px,-14px) rotate(-4deg) scale(1.18)}
+  60%{transform:translate(-4px,-8px) rotate(5deg) scale(1.2)}
+  80%{transform:translate(6px,-12px) rotate(-3deg) scale(1.18)}
+}
+
+/* BOSS 被打 - 白光閃 + 旋轉 */
+.boss.hit{animation:bossHit .4s ease-out}
 @keyframes bossHit{
-  0%{transform:scale(1) rotate(0);filter:brightness(1)}
-  30%{transform:scale(1.2) rotate(-12deg);filter:brightness(2.5) hue-rotate(180deg)}
-  60%{transform:scale(.85) rotate(10deg)}
+  0%{filter:brightness(1)}
+  20%{transform:scale(1.3) rotate(-15deg);filter:brightness(5) saturate(0)}
+  40%{transform:scale(.8) rotate(15deg);filter:brightness(3)}
+  60%{transform:scale(1.15) rotate(-8deg);filter:brightness(2)}
   100%{transform:scale(1) rotate(0);filter:none}
 }
-.boss.defeated{animation:bossDefeated 1s ease-in forwards;pointer-events:none}
-@keyframes bossDefeated{
-  0%{transform:scale(1) rotate(0);opacity:1}
-  40%{transform:scale(1.4) rotate(-180deg);filter:hue-rotate(180deg) brightness(2)}
-  70%{transform:scale(2) rotate(360deg);opacity:.5}
-  100%{transform:scale(0) rotate(720deg);opacity:0}
+
+/* BOSS 被打倒 - 史詩級爆炸 */
+.boss.defeating{
+  animation:bossDefeating 1.6s ease-in forwards !important;
+  pointer-events:none;
 }
-.boss-hp{margin-top:8px;display:flex;gap:4px}
-.boss-hp .heart{font-size:26px;filter:drop-shadow(2px 2px 0 #000);transition:all .3s}
-.boss-hp .heart.empty{filter:grayscale(1) opacity(.3) drop-shadow(2px 2px 0 #000);transform:scale(.8)}
+@keyframes bossDefeating{
+  0%{transform:scale(1.18) rotate(0);filter:hue-rotate(-90deg) saturate(2) brightness(1.3)}
+  15%{transform:scale(1.6) rotate(-90deg);filter:brightness(4) saturate(0)}
+  30%{transform:scale(1.3) rotate(90deg);filter:brightness(2) hue-rotate(60deg)}
+  45%{transform:scale(2) rotate(-180deg);filter:brightness(5) saturate(2) blur(2px)}
+  60%{transform:scale(2.6) rotate(360deg);filter:brightness(6) saturate(0) blur(4px)}
+  80%{transform:scale(3.5) rotate(720deg);opacity:.4;filter:brightness(8) blur(12px)}
+  100%{transform:scale(.05) rotate(1440deg);opacity:0;filter:blur(30px)}
+}
+
+/* 標籤 */
 .boss-label{
-  margin-top:6px;background:#000;color:#FF1744;
-  padding:5px 12px;font-family:'Press Start 2P',monospace;font-size:11px;
-  border:3px solid #FF1744;border-radius:6px;
+  background:#000;color:#FF1744;
+  padding:8px 18px;font-family:'Press Start 2P',monospace;font-size:14px;
+  border:4px solid #FF1744;border-radius:8px;
   animation:flashRed .5s ease-in-out infinite;
+  box-shadow:4px 4px 0 #000;
 }
 @keyframes flashRed{
   0%,100%{background:#000;color:#FF1744;transform:scale(1)}
-  50%{background:#FF1744;color:#000;transform:scale(1.05)}
+  50%{background:#FF1744;color:#000;transform:scale(1.06)}
+}
+
+/* 全屏白光閃爍（被打時 + 打倒時） */
+.screen-flash{
+  position:fixed;inset:0;background:#fff;
+  z-index:270;pointer-events:none;
+  animation:flashOut .35s ease-out forwards;
+}
+@keyframes flashOut{
+  0%{opacity:0}
+  20%{opacity:1}
+  100%{opacity:0}
+}
+
+/* 勝利文字 */
+.victory-text{
+  position:fixed;top:30%;left:50%;transform:translate(-50%,-50%) scale(0);
+  font-family:'Press Start 2P',monospace;font-size:80px;
+  color:#FFD700;
+  text-shadow:5px 5px 0 #FF1744,10px 10px 0 #000;
+  z-index:290;pointer-events:none;
+  letter-spacing:6px;text-align:center;
+  animation:victoryPop 1.6s ease-out forwards;
+}
+@keyframes victoryPop{
+  0%{transform:translate(-50%,-50%) scale(0) rotate(-720deg);opacity:0}
+  50%{transform:translate(-50%,-50%) scale(1.4) rotate(0);opacity:1}
+  75%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1}
+  100%{transform:translate(-50%,-50%) scale(2.5) rotate(0);opacity:0}
 }
 
 /* ========== 連擊 ========== */
@@ -796,14 +919,21 @@ body.boss-active .stage{opacity:.45;transition:opacity .4s}
 <!-- Mario 角色 -->
 <div class="mario-char" id="marioChar" onclick="marioJump();event.stopPropagation()" title="點我跳！">😀</div>
 
+<!-- BOSS 開場警告 -->
+<div class="boss-warning" id="bossWarning">
+  <div class="warning-icon">⚠️</div>
+  <div class="warning-text">大魔王來了！</div>
+  <div class="warning-sub">準備戰鬥 ⚔️</div>
+</div>
+
 <!-- BOSS 戰 -->
 <div class="boss-stage" id="bossStage">
-  <div class="boss" id="boss" onclick="hitBoss();event.stopPropagation()" title="連點 3 下打倒！">
+  <div class="boss-hp" id="bossHp"></div>
+  <div class="boss" id="boss" onclick="hitBoss();event.stopPropagation()" title="連點打倒！">
     <div class="boss-eyes"></div>
     <div class="boss-fangs"></div>
   </div>
-  <div class="boss-hp" id="bossHp"></div>
-  <div class="boss-label">點我打倒 BOSS！</div>
+  <div class="boss-label">⚔️ 連點打倒 ⚔️</div>
 </div>
 
 <!-- 重來 + BGM -->
@@ -886,9 +1016,67 @@ function sBoss(){
   g.gain.setValueAtTime(.25,ctx.currentTime);
   g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.5);
   o.start();o.stop(ctx.currentTime+.5);
-  // 加上高頻打擊
   tone(880,.1,'square',.12,.05);
   tone(440,.15,'square',.12,.1);
+}
+/* BOSS 警告：警報聲 */
+function sBossWarning(){
+  for(let i=0;i<4;i++){
+    tone(880,.12,'sawtooth',.12,i*.28);
+    tone(440,.12,'sawtooth',.12,i*.28+.14);
+  }
+}
+/* BOSS 出場：低頻怒吼 */
+function sBossRoar(){
+  const ctx=getCtx();if(!ctx)return;
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type='sawtooth';
+  o.frequency.setValueAtTime(50,ctx.currentTime);
+  o.frequency.linearRampToValueAtTime(150,ctx.currentTime+.4);
+  o.frequency.linearRampToValueAtTime(35,ctx.currentTime+1.0);
+  g.gain.setValueAtTime(.3,ctx.currentTime);
+  g.gain.linearRampToValueAtTime(.25,ctx.currentTime+.6);
+  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+1.1);
+  o.start();o.stop(ctx.currentTime+1.1);
+  // 加上高音呼嘯
+  setTimeout(()=>{ tone(220,.2,'sawtooth',.08); tone(330,.3,'sawtooth',.08,.1); },300);
+}
+/* BOSS 打倒：白雜訊爆炸 + 下滑音 */
+function sBossDefeat(){
+  const ctx=getCtx();if(!ctx)return;
+  // 白雜訊
+  const buf = ctx.createBuffer(1, ctx.sampleRate*.8, ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for(let i=0;i<data.length;i++){
+    data[i] = (Math.random()*2-1) * Math.exp(-i/(ctx.sampleRate*.3));
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const ng = ctx.createGain();
+  noise.connect(ng); ng.connect(ctx.destination);
+  ng.gain.setValueAtTime(.3, ctx.currentTime);
+  noise.start();
+  // 下滑音模擬墜落
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type='sawtooth';
+  o.frequency.setValueAtTime(880,ctx.currentTime+.1);
+  o.frequency.exponentialRampToValueAtTime(50,ctx.currentTime+1.2);
+  g.gain.setValueAtTime(.22,ctx.currentTime+.1);
+  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+1.3);
+  o.start(ctx.currentTime+.1);o.stop(ctx.currentTime+1.3);
+  // 勝利和弦
+  setTimeout(()=>{
+    [523,659,784,1047,1318].forEach((f,i)=>tone(f,.18,'square',.14,i*.1));
+  },1100);
+}
+/* 全屏白光閃 */
+function screenFlash(){
+  const f = document.createElement('div');
+  f.className = 'screen-flash';
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(), 400);
 }
 function sClear(){
   const m=[[392,.13],[523,.13],[659,.13],[784,.13],[1047,.13],[784,.13],[830,.4]];
@@ -1098,10 +1286,28 @@ function showBoss(hp=3){
   bossHP = hp;
   const stage = document.getElementById('bossStage');
   const boss = document.getElementById('boss');
-  boss.classList.remove('hit','defeated');
-  stage.classList.add('show');
-  document.body.classList.add('boss-active'); // 把 stage 變淡
-  updateBossHP();
+  const warning = document.getElementById('bossWarning');
+
+  // 1. 開場警告：紅黑閃 4 次 + 警報聲
+  warning.classList.add('show');
+  sBossWarning();
+
+  setTimeout(()=>{
+    // 2. 警告消失，BOSS 從小放大登場 + 怒吼 + 大震動
+    warning.classList.remove('show');
+    boss.classList.remove('hit','defeating','angry-1','angry-2');
+    stage.classList.add('show');
+    document.body.classList.add('boss-active');
+
+    // 強制重啟入場動畫
+    void boss.offsetWidth;
+
+    sBossRoar();
+    setTimeout(()=>shakeScreen(true), 100);
+    setTimeout(()=>shakeScreen(true), 350);
+    setTimeout(()=>shakeScreen(true), 600);
+    updateBossHP();
+  }, 1400);
 }
 function updateBossHP(){
   const hp = document.getElementById('bossHp');
@@ -1117,32 +1323,70 @@ function updateBossHP(){
 function hitBoss(){
   if(bossHP<=0) return;
   const boss = document.getElementById('boss');
-  boss.classList.remove('hit'); void boss.offsetWidth;
-  boss.classList.add('hit');
+
+  // 白光閃 + 大震動 + 火花 + 嘶吼聲
+  screenFlash();
   shakeScreen(true);
   sStomp();
+  tone(120,.15,'sawtooth',.18); // 厚重打擊聲
+
+  boss.classList.remove('hit'); void boss.offsetWidth;
+  boss.classList.add('hit');
 
   bossHP--;
   updateBossHP();
 
   const rect = boss.getBoundingClientRect();
-  popScore(rect.left + rect.width/2 - 40, rect.top, '-1 HP', '#FF1744');
-  sparkBurst(rect.left + rect.width/2, rect.top + rect.height/2, 14);
+  popScore(rect.left + rect.width/2 - 40, rect.top - 10, '-1 HP', '#FF1744');
+  sparkBurst(rect.left + rect.width/2, rect.top + rect.height/2, 18);
 
-  setTimeout(()=>boss.classList.remove('hit'), 350);
+  setTimeout(()=>boss.classList.remove('hit'), 400);
+
+  // BOSS 越打越生氣（變大、變紅、抖更兇）
+  setTimeout(()=>{
+    boss.classList.remove('angry-1','angry-2');
+    if(bossHP === 1){
+      boss.classList.add('angry-2'); // 暴怒
+      sBossRoar();
+    } else if(bossHP === 2){
+      boss.classList.add('angry-1'); // 生氣
+    }
+  }, 420);
 
   if(bossHP <= 0){
+    // 史詩級爆炸序列
     setTimeout(()=>{
-      boss.classList.add('defeated');
-      sBoss();
+      // 連續 3 次白光 + 強震
+      screenFlash();
       shakeScreen(true);
-      bigConfetti();
+      setTimeout(()=>{ screenFlash(); shakeScreen(true); }, 200);
+      setTimeout(()=>{ screenFlash(); shakeScreen(true); }, 400);
+
+      // BOSS 開始爆炸動畫（旋轉變大消失）
+      boss.classList.remove('hit','angry-1','angry-2');
+      boss.classList.add('defeating');
+      sBossDefeat();
+
+      // 中途爆出彩花
+      setTimeout(bigConfetti, 600);
+      setTimeout(()=>sparkBurst(window.innerWidth/2, window.innerHeight/2, 30), 800);
+
+      // 顯示 VICTORY 大字
+      setTimeout(()=>{
+        const v = document.createElement('div');
+        v.className = 'victory-text';
+        v.textContent = '勝利!';
+        document.body.appendChild(v);
+        setTimeout(()=>v.remove(), 1700);
+      }, 1100);
+
+      // 收尾、進下一關
       setTimeout(()=>{
         document.getElementById('bossStage').classList.remove('show');
         document.body.classList.remove('boss-active');
         defeatBossReward();
-      }, 1000);
-    }, 200);
+      }, 1900);
+    }, 250);
   }
 }
 function defeatBossReward(){
