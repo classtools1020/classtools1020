@@ -145,6 +145,88 @@
   .q-svg-wrap{display:flex;justify-content:center;margin:14px 0}
   .q-svg-wrap svg{max-width:100%;height:auto;border-radius:10px}
 
+  /* ===== 步驟提示卡 ===== */
+  .steps-panel{
+    background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,140,0,.1));
+    border:2px dashed #FFD700;border-radius:14px;
+    padding:14px 16px;margin:12px 0;
+    box-shadow:0 0 14px rgba(255,215,0,.2);
+  }
+  .steps-title{
+    color:#FFD700;font-weight:900;font-size:1.05em;
+    margin-bottom:10px;letter-spacing:1px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .step-row{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:8px 0;border-bottom:1px dashed rgba(255,215,0,.2);
+    color:#fff;font-size:.98em;line-height:1.6;
+  }
+  .step-row:last-child{border-bottom:none}
+  .step-num{
+    font-size:1.2em;font-weight:900;color:#FFD700;flex-shrink:0;
+    width:28px;text-align:center;
+  }
+  .step-row b{color:#FF1493;font-size:1.1em}
+
+  /* ===== 答對爆炸特效 ===== */
+  .victory-burst{
+    position:fixed;top:50%;left:50%;
+    transform:translate(-50%,-50%) scale(0);
+    z-index:9997;pointer-events:none;
+    font-size:6em;font-weight:900;letter-spacing:8px;
+    background:linear-gradient(90deg,#FFD700,#FF1493,#00FFFF,#FFD700);
+    background-size:200% 100%;
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-shadow:0 0 20px rgba(255,215,0,.8);
+    animation:burstAnim 1.4s ease forwards;
+  }
+  @keyframes burstAnim{
+    0%{transform:translate(-50%,-50%) scale(0) rotate(-180deg);opacity:0}
+    40%{transform:translate(-50%,-50%) scale(1.4) rotate(10deg);opacity:1}
+    70%{transform:translate(-50%,-50%) scale(1) rotate(0);opacity:1}
+    100%{transform:translate(-50%,-50%) scale(1.5) rotate(0);opacity:0}
+  }
+
+  /* ===== BOSS 慶祝畫面 ===== */
+  .boss-celebrate{
+    position:fixed;inset:0;z-index:9996;
+    background:radial-gradient(circle,rgba(255,20,147,.3),rgba(0,0,0,.85));
+    display:flex;align-items:center;justify-content:center;
+    pointer-events:none;
+    animation:bossFade 2.5s ease forwards;
+  }
+  @keyframes bossFade{
+    0%{opacity:0}30%{opacity:1}80%{opacity:1}100%{opacity:0}
+  }
+  .boss-celebrate-text{
+    text-align:center;
+    transform:scale(0);
+    animation:bossText 2.5s ease forwards;
+  }
+  @keyframes bossText{
+    0%{transform:scale(0) rotate(-10deg)}
+    30%{transform:scale(1.3) rotate(5deg)}
+    50%{transform:scale(1) rotate(0)}
+    80%{transform:scale(1) rotate(0)}
+    100%{transform:scale(1.5);opacity:0}
+  }
+  .boss-celebrate-text .bc-line1{
+    font-size:1.8em;color:#FFD700;font-weight:900;
+    letter-spacing:6px;text-shadow:0 0 30px #FFD700,2px 2px 0 #000;
+    margin-bottom:8px;
+  }
+  .boss-celebrate-text .bc-line2{
+    font-size:3em;font-weight:900;letter-spacing:8px;
+    background:linear-gradient(90deg,#FFD700,#FF1493,#00FFFF,#9D00FF,#FFD700);
+    background-size:300% 100%;
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:rainbow 2s infinite linear;
+    text-shadow:0 0 40px rgba(255,215,0,.6);
+  }
+
   /* ===== 答案按鈕 ===== */
   .answers{display:grid;gap:10px;margin-top:10px}
   .answers.two{grid-template-columns:1fr 1fr}
@@ -520,6 +602,11 @@ const ISLANDS = [
     visualConfig:{
       a:12,b:10,c:10,sides:[12,10,10],vertices:['A','B','C'],isoEdges:true,eqMarks:['AB','AC','BD','DC'],highMid:true,showHeight:true
     },
+    steps:[
+      {n:'①', txt:'等腰三角形 + AD 從 A 到底邊 → <b>三線合一</b>'},
+      {n:'②', txt:'三線合一 → AD <b>平分 BC</b> → BD = DC'},
+      {n:'③', txt:'BD = BC ÷ 2 = <b>12 ÷ 2 = 6</b>'}
+    ],
     options:[
       {label:'4', correct:false},
       {label:'5', correct:false},
@@ -543,6 +630,11 @@ const ISLANDS = [
     visualConfig:{
       a:10,b:13,c:13,sides:[10,13,13],vertices:['A','B','C'],isoEdges:true,eqMarks:['AB','AC'],highMid:true,showHeight:true
     },
+    steps:[
+      {n:'①', txt:'三線合一 → BD = BC ÷ 2 = <b>10 ÷ 2 = 5</b>'},
+      {n:'②', txt:'畢氏定理：AD² = AB² − BD² = <b>13² − 5² = 169 − 25 = 144</b>'},
+      {n:'③', txt:'AD = √144 = <b>12</b>'}
+    ],
     options:[
       {label:'8', correct:false},
       {label:'12', correct:true},
@@ -566,6 +658,12 @@ const ISLANDS = [
     visualConfig:{
       a:4,b:4,c:4,sides:[4,4,4],vertices:['A','B','C'],isoEdges:true,eqMarks:['AB','AC','BC']
     },
+    steps:[
+      {n:'①', txt:'三線合一 → BD = BC ÷ 2 = <b>4 ÷ 2 = 2</b>'},
+      {n:'②', txt:'畢氏定理：AD² = AB² − BD² = <b>4² − 2² = 16 − 4 = 12</b>'},
+      {n:'③', txt:'AD = √12 = <b>2√3</b>（正三角形的高）'},
+      {n:'④', txt:'面積 = ½ × BC × AD = ½ × 4 × 2√3 = <b>4√3</b>'}
+    ],
     options:[
       {label:'2√3', correct:false},
       {label:'3√3', correct:false},
@@ -755,6 +853,12 @@ function renderQuest(idx){
         <div class="q-text">${isle.qText}</div>
         <div class="q-svg-wrap" id="quest-svg"></div>
       </div>
+      ${isle.steps ? `
+        <div class="steps-panel">
+          <div class="steps-title">💡 步驟提示（照著做就會！）</div>
+          ${isle.steps.map(s=>`<div class="step-row"><span class="step-num">${s.n}</span><span>${s.txt}</span></div>`).join('')}
+        </div>
+      ` : ''}
       <div class="answers ${isle.answersClass||'two'}" id="ans-area"></div>
     </div>
   `;
@@ -799,12 +903,54 @@ function handleAnswer(btn,correct,isle,idx){
     btn.classList.add('right');sfxRight();
     showFeedback(true,isle.msg);
     document.querySelectorAll('.ans-btn').forEach(b=>b.disabled=true);
-    setTimeout(()=>completeIsland(idx),900);
+    // 爆炸特效
+    showVictoryBurst(isle.isBoss?'🐉 BOSS 撃破！':'⚡ 答對！');
+    confetti(isle.isBoss?80:30);
+    if(isle.isBoss){
+      // BOSS 專屬慶祝
+      setTimeout(()=>showBossCelebrate(),300);
+      setTimeout(()=>completeIsland(idx),3000);
+    } else {
+      setTimeout(()=>completeIsland(idx),1300);
+    }
   } else {
     btn.classList.add('wrong');sfxWrong();
     setTimeout(()=>{btn.classList.remove('wrong');btn.disabled=false},500);
     showFeedback(false,'❌ 不對！'+isle.hint);
   }
+}
+
+// 答對爆炸特效
+function showVictoryBurst(text){
+  const el=document.createElement('div');
+  el.className='victory-burst';
+  el.textContent=text;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1500);
+}
+
+// BOSS 慶祝畫面
+function showBossCelebrate(){
+  const el=document.createElement('div');
+  el.className='boss-celebrate';
+  el.innerHTML=`
+    <div class="boss-celebrate-text">
+      <div class="bc-line1">⚔️ BOSS 撃破 ⚔️</div>
+      <div class="bc-line2">傳說大師</div>
+    </div>
+  `;
+  document.body.appendChild(el);
+  // BOSS 音效（爆炸 + 勝利凱旋）
+  ensureAudio();
+  [60,80,100,150,200,300].forEach((f,i)=>setTimeout(()=>beep(f,0.3,'sawtooth',0.25),i*100));
+  setTimeout(()=>{
+    [523,659,784,1047,1319,1568,2093].forEach((f,i)=>setTimeout(()=>beep(f,0.18,'square',0.2),i*80));
+  },700);
+  setTimeout(()=>el.remove(),2700);
+  // 多波撒花
+  setTimeout(()=>confetti(60),300);
+  setTimeout(()=>confetti(60),900);
+  setTimeout(()=>confetti(60),1500);
 }
 
 function showFeedback(ok,msg){
