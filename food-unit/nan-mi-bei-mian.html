@@ -13,112 +13,155 @@
   --mario-green:#43B047;
   --block-yellow:#F5BD3E;
   --block-shadow:#9C6B00;
-  --brick:#B8651E;
-  --sky:#5C94FC;
+  --pipe-green:#2E7D32;
+  --pipe-dark:#1B5E20;
+  --ground-brown:#8B4513;
+  --ground-light:#A0522D;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;width:100%;overflow:hidden}
 body{
   font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;
   font-weight:900;
-  background:linear-gradient(180deg,#5C94FC 0%, #5C94FC 75%, #43B047 75%, #43B047 100%);
+  background:linear-gradient(180deg,#5C94FC 0%,#5C94FC 70%,#7BAEFF 75%,#7BAEFF 100%);
   color:#fff;
   user-select:none;
   position:relative;
 }
-
-/* ========== 背景 ========== */
-.cloud{
-  position:absolute;background:#fff;border-radius:30px;opacity:.95;z-index:1;pointer-events:none;
+body.shake{animation:shake .3s ease-out}
+body.shake-big{animation:shakeBig .5s ease-out}
+@keyframes shake{
+  0%,100%{transform:translate(0,0)}
+  20%{transform:translate(-4px,2px)}
+  40%{transform:translate(4px,-2px)}
+  60%{transform:translate(-3px,-3px)}
+  80%{transform:translate(3px,3px)}
 }
+@keyframes shakeBig{
+  0%,100%{transform:translate(0,0)}
+  10%{transform:translate(-10px,5px) rotate(-1deg)}
+  25%{transform:translate(10px,-5px) rotate(1deg)}
+  40%{transform:translate(-8px,-8px) rotate(-1deg)}
+  55%{transform:translate(8px,8px) rotate(1deg)}
+  70%{transform:translate(-5px,3px)}
+  85%{transform:translate(5px,-3px)}
+}
+
+/* ========== 雲朵 ========== */
+.cloud{position:absolute;background:#fff;border-radius:30px;opacity:.95;z-index:1;pointer-events:none}
 .cloud::before,.cloud::after{content:'';position:absolute;background:#fff;border-radius:50%}
 .cloud::before{width:50%;height:140%;top:-30%;left:15%}
 .cloud::after{width:35%;height:120%;top:-15%;left:55%}
-.c1{top:6%;left:4%;width:90px;height:30px;animation:float1 18s linear infinite}
-.c2{top:10%;left:55%;width:120px;height:36px;animation:float1 24s linear infinite reverse}
-.c3{top:4%;left:78%;width:70px;height:24px;animation:float1 14s linear infinite}
+.c1{top:7%;left:4%;width:90px;height:30px;animation:float1 18s linear infinite}
+.c2{top:11%;left:55%;width:120px;height:36px;animation:float1 24s linear infinite reverse}
+.c3{top:5%;left:78%;width:70px;height:24px;animation:float1 14s linear infinite}
 @keyframes float1{0%{transform:translateX(0)}50%{transform:translateX(40px)}100%{transform:translateX(0)}}
+
+/* ========== 地面磚塊 ========== */
+.ground{
+  position:fixed;left:0;right:0;bottom:0;height:64px;
+  background:
+    repeating-linear-gradient(90deg,#7C3F0E 0,#7C3F0E 28px,#5D2F0A 28px,#5D2F0A 32px),
+    linear-gradient(180deg,#A0522D 0%,#7C3F0E 100%);
+  border-top:6px solid #000;z-index:30;pointer-events:none;
+}
+.ground::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:14px;
+  background:repeating-linear-gradient(0deg,#3FA84A 0,#3FA84A 4px,#2E8B36 4px,#2E8B36 8px);
+  border-bottom:3px solid #000;
+}
+
+/* ========== 水管裝飾 ========== */
+.pipe{
+  position:fixed;bottom:64px;width:64px;height:80px;z-index:31;pointer-events:none;
+}
+.pipe-body{
+  width:100%;height:100%;
+  background:linear-gradient(180deg,#43A047 0%,#1B5E20 100%);
+  border:4px solid #000;border-radius:6px;
+  position:relative;
+}
+.pipe-top{
+  position:absolute;top:-14px;left:-8px;right:-8px;height:24px;
+  background:linear-gradient(180deg,#66BB6A 0%,#1B5E20 100%);
+  border:4px solid #000;border-radius:6px;
+}
+.pipe.left{left:0}
+.pipe.right{right:0}
 
 /* ========== HUD ========== */
 .hud{
   position:fixed;top:0;left:0;right:0;
   background:#000;color:#fff;
   font-family:'Press Start 2P',monospace;font-size:13px;
-  padding:10px 18px;
-  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 16px;display:flex;justify-content:space-between;align-items:center;
   z-index:200;border-bottom:5px solid var(--mario-yellow);
 }
 .hud .title-h{color:var(--mario-yellow);text-shadow:2px 2px 0 var(--mario-red)}
 .hud .level-h{color:#fff;background:var(--mario-red);padding:6px 12px;border:3px solid #fff;border-radius:6px}
-.hud .stats-h{display:flex;gap:18px;align-items:center}
-.hud .coin-h{color:var(--mario-yellow);font-size:15px}
-.hud .star-h{color:#FFEB3B;font-size:15px}
+.hud .stats-h{display:flex;gap:14px;align-items:center}
+.hud .coin-h{color:var(--mario-yellow);font-size:14px}
+.hud .star-h{color:#FFEB3B;font-size:14px}
+
+/* 頂部提示條 */
+.hint-strip{
+  position:fixed;top:54px;left:0;right:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.85) 0%,rgba(0,0,0,.7) 100%);
+  color:#fff;padding:6px 14px;font-size:14px;
+  border-bottom:3px solid var(--mario-yellow);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  z-index:120;text-align:center;
+}
 
 /* ========== 舞台 ========== */
 .stage{
-  position:fixed;inset:54px 0 0 0;
+  position:fixed;inset:90px 0 64px 0;
   display:flex;align-items:center;justify-content:center;flex-direction:column;
   z-index:5;
 }
 .scene{
   display:none;width:100%;height:100%;position:relative;
   flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:14px 22px 110px;
+  padding:8px 18px 8px;
 }
 .scene.active{display:flex}
 .scene.scaling-out{animation:scaleOut .5s ease-in forwards}
 .scene.scaling-in{animation:scaleInScene .55s cubic-bezier(.34,1.56,.64,1) forwards}
-@keyframes scaleOut{
-  0%{transform:scale(1);opacity:1}
-  100%{transform:scale(1.5);opacity:0}
-}
-@keyframes scaleInScene{
-  0%{transform:scale(.3);opacity:0}
-  100%{transform:scale(1);opacity:1}
-}
+@keyframes scaleOut{0%{transform:scale(1);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@keyframes scaleInScene{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
 
 .scene-title{
-  font-size:34px;color:#fff;
-  text-shadow:3px 3px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
-  margin-bottom:12px;text-align:center;letter-spacing:2px;
+  font-size:30px;color:#fff;
+  text-shadow:3px 3px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000;
+  margin-bottom:8px;text-align:center;letter-spacing:2px;
   animation:popIn .6s cubic-bezier(.34,1.56,.64,1);
 }
-@keyframes popIn{
-  0%{transform:scale(.3) rotate(-8deg);opacity:0}
-  100%{transform:scale(1) rotate(0);opacity:1}
-}
+@keyframes popIn{0%{transform:scale(.3) rotate(-8deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
 
 /* ========== 對戰區 ========== */
 .compare{
-  display:grid;grid-template-columns:1fr 70px 1fr;gap:14px;
+  display:grid;grid-template-columns:1fr 60px 1fr;gap:12px;
   width:96%;max-width:1500px;flex:1;align-items:stretch;
-  position:relative;z-index:10;
+  position:relative;z-index:10;padding:0 90px; /* 左右留空給水管 */
 }
 .vs{
   display:flex;align-items:center;justify-content:center;
-  font-family:'Press Start 2P',monospace;font-size:30px;
+  font-family:'Press Start 2P',monospace;font-size:28px;
   color:var(--mario-yellow);text-shadow:3px 3px 0 #000;
   animation:vsBeat 1s ease-in-out infinite;
 }
 @keyframes vsBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 
 .side{
-  border:6px solid #000;border-radius:18px;padding:12px;
+  border:6px solid #000;border-radius:18px;padding:10px;
   display:flex;flex-direction:column;align-items:center;
   position:relative;box-shadow:6px 6px 0 rgba(0,0,0,.4);
-  overflow:hidden;
-  background:#fff;
+  background:#fff;isolation:isolate;
 }
-.side.north{
-  background:linear-gradient(180deg,#FFE082 0%, #FFB74D 100%);
-  border-color:#E65100;
-}
-.side.south{
-  background:linear-gradient(180deg,#A5D6A7 0%, #4FC3F7 100%);
-  border-color:#2E7D32;
-}
+.side.north{background:linear-gradient(180deg,#FFE082 0%,#FFB74D 100%);border-color:#E65100}
+.side.south{background:linear-gradient(180deg,#A5D6A7 0%,#4FC3F7 100%);border-color:#2E7D32}
 .side h2{
-  font-size:32px;margin-bottom:8px;text-align:center;
+  font-size:28px;margin-bottom:6px;text-align:center;
   letter-spacing:2px;text-shadow:2px 2px 0 rgba(255,255,255,.5);
   color:#5D4037;position:relative;z-index:5;
 }
@@ -126,127 +169,134 @@ body{
 
 /* ========== 真實照片 ========== */
 .feature-img{
-  width:100%;height:130px;object-fit:cover;
+  width:100%;height:110px;object-fit:cover;
   border:4px solid #000;border-radius:10px;
-  background:#eee;
-  position:relative;z-index:5;
+  background:#eee;position:relative;z-index:5;
   box-shadow:3px 3px 0 rgba(0,0,0,.3);
 }
 .img-fallback{
-  width:100%;height:130px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:80px;background:#fff;
-  border:4px solid #000;border-radius:10px;
+  width:100%;height:110px;display:flex;align-items:center;justify-content:center;
+  font-size:70px;background:#fff;border:4px solid #000;border-radius:10px;
   position:relative;z-index:5;
 }
 
 /* ========== 問號磚塊 ========== */
 .blocks-row{
-  display:flex;justify-content:center;gap:10px;
-  margin:10px 0 6px 0;position:relative;z-index:6;
-  flex-wrap:wrap;
+  display:flex;justify-content:center;gap:8px;
+  margin:8px 0 4px 0;position:relative;z-index:6;flex-wrap:wrap;
 }
 .q-block{
-  width:60px;height:60px;
+  width:54px;height:54px;
   background:linear-gradient(180deg,#FFD54F 0%,#F5BD3E 50%,#E6A52A 100%);
   border:4px solid #000;border-radius:6px;
   display:flex;align-items:center;justify-content:center;
-  font-family:'Press Start 2P',monospace;font-size:28px;color:#fff;
-  text-shadow:2px 2px 0 #000;
-  cursor:pointer;
-  box-shadow:0 5px 0 var(--block-shadow), 5px 5px 0 rgba(0,0,0,.3);
-  transition:transform .1s;
-  position:relative;
+  font-family:'Press Start 2P',monospace;font-size:24px;color:#fff;
+  text-shadow:2px 2px 0 #000;cursor:pointer;
+  box-shadow:0 5px 0 var(--block-shadow),5px 5px 0 rgba(0,0,0,.3);
+  transition:transform .1s;position:relative;
 }
-.q-block:hover{transform:translateY(-3px)}
-.q-block.bumping{animation:bump .35s ease-out}
+.q-block:hover{transform:translateY(-3px);filter:brightness(1.1)}
+.q-block.bumping{animation:bump .4s ease-out}
 @keyframes bump{
   0%{transform:translateY(0)}
-  40%{transform:translateY(-30px)}
+  30%{transform:translateY(-35px) rotate(-5deg)}
+  50%{transform:translateY(-35px) rotate(5deg)}
   70%{transform:translateY(-30px)}
   100%{transform:translateY(0)}
 }
 .q-block.used{
   background:repeating-linear-gradient(0deg,#A0531A 0,#A0531A 12px,#7A3F12 12px,#7A3F12 14px),
              repeating-linear-gradient(90deg,#8D4719 0,#8D4719 18px,#6E3712 18px,#6E3712 20px);
-  background-blend-mode:multiply;
-  color:transparent;cursor:default;
-  box-shadow:0 5px 0 #4E280C, 5px 5px 0 rgba(0,0,0,.3);
+  background-blend-mode:multiply;color:transparent;cursor:default;
+  box-shadow:0 5px 0 #4E280C,5px 5px 0 rgba(0,0,0,.3);
 }
-.q-block.used:hover{transform:none}
+.q-block.used:hover{transform:none;filter:none}
+.q-block.star-block{
+  background:linear-gradient(180deg,#FFEE58 0%,#FBC02D 50%,#F57F17 100%);
+  animation:starGlow 1.2s ease-in-out infinite;
+}
+@keyframes starGlow{
+  0%,100%{box-shadow:0 5px 0 var(--block-shadow),5px 5px 0 rgba(0,0,0,.3),0 0 12px var(--mario-yellow)}
+  50%{box-shadow:0 5px 0 var(--block-shadow),5px 5px 0 rgba(0,0,0,.3),0 0 28px var(--mario-yellow)}
+}
 
-/* 飛出的金幣動畫 */
-.coin-pop{
-  position:absolute;font-size:40px;pointer-events:none;
-  animation:coinUp 1s ease-out forwards;z-index:50;
-}
+/* ========== 飄出金幣/分數 ========== */
+.coin-pop{position:absolute;font-size:38px;pointer-events:none;animation:coinUp 1s ease-out forwards;z-index:50}
 @keyframes coinUp{
   0%{transform:translateY(0) scale(.5);opacity:0}
   20%{transform:translateY(-30px) scale(1.2);opacity:1}
   60%{transform:translateY(-100px) scale(1) rotateY(360deg);opacity:1}
   100%{transform:translateY(-130px) scale(.5) rotateY(720deg);opacity:0}
 }
+.score-pop{
+  position:fixed;font-family:'Press Start 2P',monospace;font-size:22px;
+  color:#FFD700;text-shadow:3px 3px 0 #000;
+  pointer-events:none;z-index:120;
+  animation:scorePop 1.2s ease-out forwards;
+}
+@keyframes scorePop{
+  0%{transform:translateY(0) scale(.3);opacity:0}
+  20%{transform:translateY(-20px) scale(1.5);opacity:1}
+  100%{transform:translateY(-90px) scale(1);opacity:0}
+}
+.spark{
+  position:fixed;width:10px;height:10px;background:#FFD700;border-radius:50%;
+  pointer-events:none;z-index:115;
+  animation:sparkOut .7s ease-out forwards;
+}
+@keyframes sparkOut{
+  0%{opacity:1;transform:translate(0,0) scale(1)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2)}
+}
 
 /* ========== 答案卡片 ========== */
-.info-slots{
-  display:flex;flex-direction:column;gap:6px;
-  width:100%;flex:1;position:relative;z-index:5;
-}
+.info-slots{display:flex;flex-direction:column;gap:5px;width:100%;flex:1;position:relative;z-index:5}
 .info-item{
-  visibility:hidden;
-  font-size:22px;
-  background:rgba(255,255,255,.95);color:#222;
-  padding:10px 14px;border-radius:10px;
-  border:3px solid #000;
+  visibility:hidden;font-size:20px;
+  background:rgba(255,255,255,.96);color:#222;
+  padding:8px 12px;border-radius:10px;border:3px solid #000;
   box-shadow:3px 3px 0 rgba(0,0,0,.3);
-  width:100%;text-align:center;font-weight:900;
-  letter-spacing:1px;
+  width:100%;text-align:center;font-weight:900;letter-spacing:1px;
 }
-.info-item.show{
-  visibility:visible;
-  animation:slideIn .5s cubic-bezier(.34,1.56,.64,1);
-}
+.info-item.show{visibility:visible;animation:slideIn .5s cubic-bezier(.34,1.56,.64,1)}
 @keyframes slideIn{
   0%{transform:translateY(-20px) scale(.6) rotate(-3deg);opacity:0}
   100%{transform:translateY(0) scale(1) rotate(0);opacity:1}
 }
 
-/* ========== 食物卡（第5關專用） ========== */
+/* ========== 食物卡 ========== */
 .food-card{
-  visibility:hidden;
-  background:#fff;color:#222;
-  padding:6px;border-radius:10px;border:3px solid #000;
+  visibility:hidden;background:#fff;color:#222;
+  padding:5px;border-radius:10px;border:3px solid #000;
   box-shadow:3px 3px 0 rgba(0,0,0,.3);
   display:flex;align-items:center;gap:8px;width:100%;
-  font-size:20px;font-weight:900;
+  font-size:18px;font-weight:900;
 }
 .food-card.show{visibility:visible;animation:slideIn .5s cubic-bezier(.34,1.56,.64,1)}
 .food-card img,.food-card .food-fallback{
-  width:54px;height:54px;object-fit:cover;border-radius:6px;
+  width:48px;height:48px;object-fit:cover;border-radius:6px;
   border:2px solid #000;flex-shrink:0;background:#fff;
 }
-.food-card .food-fallback{display:flex;align-items:center;justify-content:center;font-size:32px}
+.food-card .food-fallback{display:flex;align-items:center;justify-content:center;font-size:28px}
 
 /* ========== 第1關地圖 ========== */
 .map-stage{
-  width:78%;max-width:880px;height:48vh;position:relative;
+  width:78%;max-width:880px;height:46vh;position:relative;
   background:linear-gradient(180deg,#FFE082 0%,#FFB74D 49%,#43A047 51%,#A5D6A7 100%);
   border:8px solid #000;border-radius:30px;
   box-shadow:8px 8px 0 rgba(0,0,0,.4);overflow:hidden;
 }
 .map-label{
-  position:absolute;font-size:54px;font-weight:900;
-  text-shadow:4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
-  z-index:3;
-  animation:popIn .6s cubic-bezier(.34,1.56,.64,1) .3s both;
+  position:absolute;font-size:50px;font-weight:900;
+  text-shadow:4px 4px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000;
+  z-index:3;animation:popIn .6s cubic-bezier(.34,1.56,.64,1) .3s both;
 }
 .map-label.north-lbl{top:12%;left:50%;transform:translateX(-50%);color:#FFE082}
 .map-label.south-lbl{bottom:12%;left:50%;transform:translateX(-50%);color:#fff}
 .divide-line{
   position:absolute;top:50%;left:-100%;width:100%;height:10px;
   background:repeating-linear-gradient(90deg,red 0,red 22px,#fff 22px,#fff 44px);
-  animation:slideLine 1.6s ease-out 1s forwards;
-  box-shadow:0 0 0 3px #000;z-index:2;
+  animation:slideLine 1.6s ease-out 1s forwards;box-shadow:0 0 0 3px #000;z-index:2;
 }
 @keyframes slideLine{to{left:0}}
 .divide-label{
@@ -254,25 +304,21 @@ body{
   background:#000;color:var(--mario-yellow);
   padding:8px 16px;font-family:'Press Start 2P',monospace;font-size:14px;
   border:4px solid var(--mario-yellow);border-radius:6px;
-  opacity:0;animation:fadeInDelay .5s ease-out 2.5s forwards;
-  z-index:5;white-space:nowrap;
+  opacity:0;animation:fadeInDelay .5s ease-out 2.5s forwards;z-index:5;white-space:nowrap;
 }
 @keyframes fadeInDelay{to{opacity:1}}
-.sun{position:absolute;font-size:54px;top:6%;right:8%;animation:rot 8s linear infinite;z-index:2}
+.sun{position:absolute;font-size:50px;top:6%;right:8%;animation:rot 8s linear infinite;z-index:2}
 @keyframes rot{to{transform:rotate(360deg)}}
 .start-prompt{
-  font-size:24px;margin-top:14px;background:rgba(0,0,0,.7);
+  font-size:22px;margin-top:10px;background:rgba(0,0,0,.7);
   padding:10px 22px;border-radius:14px;border:4px solid #fff;text-align:center;
   animation:bounceY 1.4s ease-in-out infinite;
 }
 @keyframes bounceY{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-/* ========== 粒子（雪/雨） ========== */
-.weather-layer{
-  position:absolute;inset:0;pointer-events:none;overflow:hidden;
-  z-index:2;
-}
-.particle{position:absolute;font-size:24px;animation:fall 4s linear forwards}
+/* ========== 雪/雨 粒子 ========== */
+.weather-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2;border-radius:14px}
+.particle{position:absolute;font-size:22px;animation:fall 4s linear forwards}
 @keyframes fall{
   0%{transform:translateY(-30px) rotate(0);opacity:1}
   100%{transform:translateY(70vh) rotate(360deg);opacity:.5}
@@ -280,178 +326,219 @@ body{
 
 /* ========== Mario 角色 ========== */
 .mario-char{
-  position:fixed;bottom:14px;left:14px;
-  width:64px;height:64px;
+  position:fixed;bottom:70px;left:14px;
+  width:48px;height:48px;
   background:linear-gradient(180deg,var(--mario-red) 0%,var(--mario-red) 50%,var(--mario-blue) 50%,var(--mario-blue) 100%);
   border:4px solid #000;border-radius:8px;
   display:flex;align-items:center;justify-content:center;
-  font-size:36px;cursor:pointer;
-  box-shadow:4px 4px 0 #000;
-  z-index:80;transition:transform .1s;
+  font-size:26px;cursor:pointer;
+  box-shadow:4px 4px 0 #000;z-index:80;transition:transform .1s;
 }
 .mario-char::before{
-  content:'';position:absolute;top:-12px;left:50%;transform:translateX(-50%);
-  width:40px;height:14px;background:var(--mario-red);
+  content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  width:32px;height:12px;background:var(--mario-red);
   border:3px solid #000;border-radius:50% 50% 0 0;
 }
-.mario-char:hover{transform:scale(1.05)}
+.mario-char:hover{transform:scale(1.1)}
 .mario-char.jumping{animation:marioJump .6s cubic-bezier(.34,1.56,.64,1)}
 @keyframes marioJump{
   0%{transform:translateY(0) rotate(0)}
-  40%{transform:translateY(-80px) rotate(-10deg)}
-  60%{transform:translateY(-80px) rotate(10deg)}
+  40%{transform:translateY(-100px) rotate(-10deg)}
+  60%{transform:translateY(-100px) rotate(10deg)}
   100%{transform:translateY(0) rotate(0)}
 }
 .mario-char.power-up{animation:powerUp 1s ease-out}
 @keyframes powerUp{
   0%{transform:scale(1)}
-  20%{transform:scale(1.3) rotate(-10deg);filter:hue-rotate(60deg)}
+  20%{transform:scale(1.5) rotate(-10deg);filter:hue-rotate(60deg)}
   40%{transform:scale(.8) rotate(10deg);filter:hue-rotate(180deg)}
-  60%{transform:scale(1.4) rotate(-5deg);filter:hue-rotate(270deg)}
+  60%{transform:scale(1.6) rotate(-5deg);filter:hue-rotate(270deg)}
   80%{transform:scale(1) rotate(5deg);filter:hue-rotate(360deg)}
   100%{transform:scale(1) rotate(0);filter:none}
 }
 
-/* ========== 栗寶寶（Goomba） ========== */
+/* ========== 栗寶寶 ========== */
 .goomba{
-  position:fixed;bottom:14px;
-  width:54px;height:54px;
+  position:fixed;bottom:70px;
+  width:48px;height:48px;
   background:radial-gradient(circle at 50% 35%,#A0522D 0%,#6B3410 100%);
   border:4px solid #000;border-radius:50% 50% 30% 30%;
   cursor:pointer;z-index:75;
-  display:flex;align-items:flex-start;justify-content:center;
-  font-size:18px;padding-top:6px;
   box-shadow:3px 3px 0 rgba(0,0,0,.4);
   animation:goombaWalk 14s linear forwards;
 }
 .goomba::before,.goomba::after{
-  content:'';position:absolute;top:14px;
-  width:10px;height:14px;background:#fff;border:2px solid #000;border-radius:50%;
+  content:'';position:absolute;top:12px;
+  width:9px;height:12px;background:#fff;border:2px solid #000;border-radius:50%;
 }
-.goomba::before{left:8px}
-.goomba::after{right:8px}
+.goomba::before{left:7px}
+.goomba::after{right:7px}
 .goomba .pupils{position:absolute;inset:0;pointer-events:none}
 .goomba .pupils::before,.goomba .pupils::after{
-  content:'';position:absolute;top:18px;width:4px;height:6px;background:#000;border-radius:50%;
+  content:'';position:absolute;top:15px;width:4px;height:6px;background:#000;border-radius:50%;
 }
-.goomba .pupils::before{left:13px}
-.goomba .pupils::after{right:13px}
+.goomba .pupils::before{left:11px}
+.goomba .pupils::after{right:11px}
 @keyframes goombaWalk{
   0%{right:-80px}
   100%{right:calc(100% + 80px)}
 }
-.goomba:hover{filter:brightness(1.2)}
+.goomba:hover{filter:brightness(1.3)}
 .goomba.stomped{
   animation:none;transform:scaleY(.2) translateY(20px);
-  background:#5D2F0E;pointer-events:none;
-  transition:opacity .5s .3s;
+  background:#5D2F0E;pointer-events:none;transition:opacity .5s .3s;
 }
 .goomba.stomped.fadeout{opacity:0}
 
-/* ========== 蘑菇 power-up ========== */
-.mushroom-prompt{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-  display:none;flex-direction:column;align-items:center;
-  z-index:90;
-  animation:mushroomEmerge .8s cubic-bezier(.34,1.56,.64,1);
+/* ========== BOSS 戰 ========== */
+.boss-stage{
+  position:fixed;left:50%;bottom:80px;transform:translateX(-50%);
+  display:none;flex-direction:column;align-items:center;z-index:90;
 }
-.mushroom-prompt.show{display:flex}
-@keyframes mushroomEmerge{
-  0%{transform:translateX(-50%) translateY(80px) scale(.3);opacity:0}
+.boss-stage.show{display:flex;animation:bossEmerge 1s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bossEmerge{
+  0%{transform:translateX(-50%) translateY(150px) scale(.2);opacity:0}
+  60%{transform:translateX(-50%) translateY(-20px) scale(1.2)}
   100%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}
 }
-.mushroom-btn{
-  width:80px;height:80px;
-  background:radial-gradient(circle at 35% 35%,#fff 0%,#fff 30%,#E52521 30%,#E52521 100%);
-  border:5px solid #000;border-radius:50% 50% 30% 30%;
+.boss{
+  width:110px;height:110px;
+  background:radial-gradient(circle at 50% 30%,#5C6BC0 0%,#1A237E 100%);
+  border:6px solid #000;border-radius:50% 50% 28% 28%;
   position:relative;cursor:pointer;
-  box-shadow:0 6px 0 #000, 4px 8px 12px rgba(0,0,0,.4);
-  animation:mushroomPulse 1s ease-in-out infinite;
+  box-shadow:0 8px 0 #000,6px 12px 16px rgba(0,0,0,.5);
+  animation:bossWobble 1.5s ease-in-out infinite;
 }
-.mushroom-btn::before,.mushroom-btn::after{
-  content:'';position:absolute;background:#fff;border:3px solid #000;border-radius:50%;
+.boss::before,.boss::after{
+  content:'';position:absolute;top:24px;
+  width:18px;height:24px;background:#fff;border:3px solid #000;border-radius:50%;
 }
-.mushroom-btn::before{width:14px;height:14px;top:18px;left:14px}
-.mushroom-btn::after{width:18px;height:18px;top:10px;right:14px}
-@keyframes mushroomPulse{
-  0%,100%{transform:translateY(0) scale(1);box-shadow:0 6px 0 #000, 0 0 20px var(--mario-yellow)}
-  50%{transform:translateY(-6px) scale(1.06);box-shadow:0 8px 0 #000, 0 0 36px var(--mario-yellow)}
+.boss::before{left:18px}
+.boss::after{right:18px}
+.boss-eyes{position:absolute;inset:0;pointer-events:none}
+.boss-eyes::before,.boss-eyes::after{
+  content:'';position:absolute;top:32px;width:8px;height:12px;background:#FF1744;border-radius:50%;
+  animation:bossPupil 1.5s ease-in-out infinite;
 }
-.mushroom-label{
-  margin-top:4px;background:#000;color:var(--mario-yellow);
-  padding:6px 14px;font-family:'Press Start 2P',monospace;font-size:12px;
-  border:3px solid var(--mario-yellow);border-radius:6px;
+.boss-eyes::before{left:25px}
+.boss-eyes::after{right:25px}
+@keyframes bossPupil{0%,100%{transform:translateX(0)}50%{transform:translateX(2px)}}
+.boss-fangs{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+  width:50px;height:18px;
+  display:flex;justify-content:space-around;
+}
+.boss-fangs::before,.boss-fangs::after{
+  content:'';width:10px;height:14px;background:#fff;
+  clip-path:polygon(50% 100%,0 0,100% 0);border-left:2px solid #000;border-right:2px solid #000;
+}
+@keyframes bossWobble{
+  0%,100%{transform:translateY(0) rotate(-2deg)}
+  50%{transform:translateY(-8px) rotate(2deg)}
+}
+.boss.hit{animation:bossHit .35s ease-out}
+@keyframes bossHit{
+  0%{transform:scale(1) rotate(0);filter:brightness(1)}
+  30%{transform:scale(1.2) rotate(-12deg);filter:brightness(2.5) hue-rotate(180deg)}
+  60%{transform:scale(.85) rotate(10deg)}
+  100%{transform:scale(1) rotate(0);filter:none}
+}
+.boss.defeated{animation:bossDefeated 1s ease-in forwards;pointer-events:none}
+@keyframes bossDefeated{
+  0%{transform:scale(1) rotate(0);opacity:1}
+  40%{transform:scale(1.4) rotate(-180deg);filter:hue-rotate(180deg) brightness(2)}
+  70%{transform:scale(2) rotate(360deg);opacity:.5}
+  100%{transform:scale(0) rotate(720deg);opacity:0}
+}
+.boss-hp{margin-top:8px;display:flex;gap:4px}
+.boss-hp .heart{font-size:26px;filter:drop-shadow(2px 2px 0 #000);transition:all .3s}
+.boss-hp .heart.empty{filter:grayscale(1) opacity(.3) drop-shadow(2px 2px 0 #000);transform:scale(.8)}
+.boss-label{
+  margin-top:6px;background:#000;color:#FF1744;
+  padding:5px 12px;font-family:'Press Start 2P',monospace;font-size:11px;
+  border:3px solid #FF1744;border-radius:6px;
+  animation:flashRed .5s ease-in-out infinite;
+}
+@keyframes flashRed{
+  0%,100%{background:#000;color:#FF1744;transform:scale(1)}
+  50%{background:#FF1744;color:#000;transform:scale(1.05)}
 }
 
-/* ========== 提示 ========== */
-.hint-bar{
-  position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
-  background:rgba(0,0,0,.7);color:#fff;
-  padding:10px 22px;border-radius:14px;border:3px solid var(--mario-yellow);
-  font-size:18px;letter-spacing:1px;z-index:55;
-  display:flex;align-items:center;gap:10px;
+/* ========== 連擊 ========== */
+.combo-display{
+  position:fixed;top:96px;right:14px;
+  background:linear-gradient(180deg,#FF6B6B,#E52521);
+  color:#fff;font-family:'Press Start 2P',monospace;font-size:18px;
+  padding:8px 14px;border:4px solid #000;border-radius:8px;
+  box-shadow:4px 4px 0 #000;z-index:90;display:none;
+  text-shadow:2px 2px 0 #000;
+}
+.combo-display.show{display:block;animation:comboBump .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes comboBump{
+  0%{transform:scale(.5) rotate(-10deg);opacity:0}
+  60%{transform:scale(1.3) rotate(5deg);opacity:1}
+  100%{transform:scale(1) rotate(0);opacity:1}
 }
 
-/* ========== 工具列按鈕 ========== */
+/* ========== 控制按鈕 ========== */
 .btn{
   font-family:'Press Start 2P',monospace;font-size:13px;
-  padding:12px 20px;border:5px solid #000;border-radius:10px;
-  cursor:pointer;box-shadow:4px 4px 0 #000;
-  color:#fff;transition:transform .1s;
+  padding:10px 16px;border:4px solid #000;border-radius:10px;
+  cursor:pointer;box-shadow:4px 4px 0 #000;color:#fff;transition:transform .1s;
 }
 .btn:hover{transform:scale(1.05)}
 .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
-.btn-reset{position:fixed;bottom:14px;right:14px;background:#666;z-index:80}
-.btn-skip{position:fixed;top:64px;right:14px;background:#888;font-size:11px;padding:8px 12px;z-index:80;opacity:.6}
+.btn-reset{position:fixed;bottom:14px;right:14px;background:#666;z-index:80;font-size:11px;padding:8px 12px}
+.btn-skip{position:fixed;top:96px;left:14px;background:#888;font-size:10px;padding:6px 10px;z-index:80;opacity:.6}
 .btn-skip:hover{opacity:1}
+.btn-bgm{
+  position:fixed;bottom:14px;left:78px;background:var(--mario-blue);z-index:80;
+  font-size:18px;padding:10px 14px;
+}
 
-/* ========== 通關 ========== */
+/* ========== 通關畫面 ========== */
 .world-clear{
   position:fixed;inset:54px 0 0 0;
-  background:linear-gradient(180deg,#000 0%, #1a1a40 50%, #4a148c 100%);
+  background:linear-gradient(180deg,#000 0%,#1a1a40 50%,#4a148c 100%);
   display:none;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;z-index:150;padding:20px;
 }
 .world-clear.active{display:flex}
 .world-clear h1{
-  font-size:72px;color:var(--mario-yellow);
+  font-size:60px;color:var(--mario-yellow);
   text-shadow:4px 4px 0 var(--mario-red),8px 8px 0 #000;
-  margin-bottom:20px;animation:scaleInScene 1s cubic-bezier(.34,1.56,.64,1);
+  margin-bottom:18px;animation:scaleInScene 1s cubic-bezier(.34,1.56,.64,1);
   letter-spacing:6px;
 }
 .summary{
-  font-size:30px;background:rgba(255,255,255,.1);
-  padding:20px 36px;border-radius:18px;border:5px solid var(--mario-yellow);
+  font-size:26px;background:rgba(255,255,255,.1);
+  padding:18px 32px;border-radius:18px;border:5px solid var(--mario-yellow);
   margin-bottom:18px;color:#fff;text-shadow:2px 2px 0 #000;line-height:1.5;
 }
 .summary .big{
-  font-size:64px;color:var(--mario-yellow);
+  font-size:54px;color:var(--mario-yellow);
   letter-spacing:14px;margin:6px 0;
   text-shadow:3px 3px 0 var(--mario-red),6px 6px 0 #000;
 }
 .clear-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
-
-/* 煙火彩帶 */
-.celebrate{
-  position:fixed;inset:0;pointer-events:none;overflow:hidden;
-  z-index:151;
-}
+.celebrate{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:151}
 .firework{position:absolute;font-size:30px;animation:fireworkFall 4s linear forwards}
 @keyframes fireworkFall{
   0%{transform:translateY(-50px) rotate(0);opacity:1}
   100%{transform:translateY(110vh) rotate(720deg);opacity:.8}
 }
 
-/* 尺寸彈性 */
+/* 響應式 */
 @media (max-width:1100px){
-  .scene-title{font-size:26px}
-  .side h2{font-size:26px}
-  .info-item{font-size:18px;padding:8px 10px}
-  .feature-img,.img-fallback{height:100px}
-  .q-block{width:50px;height:50px;font-size:24px}
+  .compare{padding:0 80px}
+  .scene-title{font-size:24px}
+  .side h2{font-size:24px}
+  .info-item{font-size:17px;padding:6px 10px}
+  .feature-img,.img-fallback{height:90px}
+  .q-block{width:46px;height:46px;font-size:20px}
 }
 @media (max-width:760px){
-  .compare{grid-template-columns:1fr;gap:8px}
+  .compare{grid-template-columns:1fr;gap:8px;padding:0 70px}
   .vs{transform:rotate(90deg)}
 }
 </style>
@@ -465,7 +552,7 @@ body{
 
 <!-- HUD -->
 <div class="hud">
-  <span class="title-h">🍚 南米北麵大冒險 🌾</span>
+  <span class="title-h">🍚 南米北麵 🌾</span>
   <span class="level-h" id="hudLevel">WORLD 1-1</span>
   <span class="stats-h">
     <span class="coin-h">🪙 <span id="hudCoins">0</span></span>
@@ -473,11 +560,19 @@ body{
   </span>
 </div>
 
+<!-- 頂部提示 -->
+<div class="hint-strip" id="hintBar">
+  👉 敲 <span style="color:var(--mario-yellow)">❓ 磚塊</span> 看答案 ｜ 踩 <span style="color:#A0522D">🟫 栗寶寶</span> 加分 ｜ 連續敲有 <span style="color:#FF6B6B">🔥 連擊</span>！
+</div>
+
 <button class="btn btn-skip" onclick="forceNext()">略過 ▶▶</button>
+
+<!-- 連擊顯示 -->
+<div class="combo-display" id="comboDisplay">🔥 COMBO x2!</div>
 
 <div class="stage" id="stage">
 
-<!-- ========== 第1關 ========== -->
+<!-- ========== 第1關 地圖 ========== -->
 <div class="scene active" data-scene="1">
   <h1 class="scene-title">🗺️ 第 1 關　認識舞台</h1>
   <div class="map-stage">
@@ -487,7 +582,7 @@ body{
     <div class="divide-label">秦嶺 ─ 淮河線</div>
     <div class="map-label south-lbl">🍚 南方</div>
   </div>
-  <p class="start-prompt">點下方 🍄 或按 → 開始闖關！</p>
+  <p class="start-prompt">點下方 👹 BOSS 或按 → 開始闖關！</p>
 </div>
 
 <!-- ========== 第2關 氣候 ========== -->
@@ -582,7 +677,7 @@ body{
         <div class="q-block" data-side="n" data-step="3">?</div>
       </div>
       <div class="info-slots">
-        <div class="info-item" data-side="n" data-step="1" style="font-size:30px;background:#FFEB3B">🌾 小麥</div>
+        <div class="info-item" data-side="n" data-step="1" style="font-size:26px;background:#FFEB3B">🌾 小麥</div>
         <div class="info-item" data-side="n" data-step="2">磨成「<span style="color:#E65100">麵粉</span>」</div>
         <div class="info-item" data-side="n" data-step="3">做成各種麵食</div>
       </div>
@@ -598,7 +693,7 @@ body{
         <div class="q-block" data-side="s" data-step="3">?</div>
       </div>
       <div class="info-slots">
-        <div class="info-item" data-side="s" data-step="1" style="font-size:30px;background:#fff">🍚 水稻</div>
+        <div class="info-item" data-side="s" data-step="1" style="font-size:26px;background:#fff">🍚 水稻</div>
         <div class="info-item" data-side="s" data-step="2">脫殼變成「<span style="color:#0277BD">米</span>」</div>
         <div class="info-item" data-side="s" data-step="3">煮成香香的米飯</div>
       </div>
@@ -606,7 +701,7 @@ body{
   </div>
 </div>
 
-<!-- ========== 第5關 餐桌（食物卡） ========== -->
+<!-- ========== 第5關 餐桌 ========== -->
 <div class="scene" data-scene="5">
   <h1 class="scene-title">🍽️ 第 5 關　餐桌大集合</h1>
   <div class="compare">
@@ -667,7 +762,7 @@ body{
           <span>🍡 米粉</span>
         </div>
         <div class="food-card" data-side="s" data-step="4">
-          <span class="food-fallback" style="font-size:32px">🥣</span>
+          <span class="food-fallback">🥣</span>
           <span>🥣 米篩目、米線</span>
         </div>
       </div>
@@ -679,36 +774,44 @@ body{
 
 <!-- ========== 通關畫面 ========== -->
 <div class="scene world-clear" data-scene="6">
-  <h1>🎉 WORLD CLEAR! 🎉</h1>
+  <h1>🎉 ALL CLEAR! 🎉</h1>
   <div class="summary">
     <div>口訣記起來</div>
     <div class="big">南米 ★ 北麵</div>
-    <div style="font-size:22px;color:#A5D6A7;line-height:1.6">
+    <div style="font-size:20px;color:#A5D6A7;line-height:1.6">
       🍚 南方多雨 → 種水稻 → 吃米飯<br>
       🌾 北方乾冷 → 種小麥 → 吃麵食
     </div>
   </div>
   <div class="clear-btns">
-    <button class="btn" style="background:var(--mario-yellow);color:#000;font-size:18px" onclick="bigConfetti();event.stopPropagation()">🎊 灑花！</button>
-    <button class="btn" style="background:var(--mario-green);font-size:18px" onclick="reset();event.stopPropagation()">🔄 再玩一次</button>
+    <button class="btn" style="background:var(--mario-yellow);color:#000;font-size:16px" onclick="bigConfetti();event.stopPropagation()">🎊 灑花！</button>
+    <button class="btn" style="background:var(--mario-green);font-size:16px" onclick="reset();event.stopPropagation()">🔄 再玩一次</button>
   </div>
 </div>
 
 <!-- 煙火層 -->
 <div class="celebrate" id="celebrate"></div>
 
-<!-- 永久 UI -->
-<div class="mario-char" id="marioChar" onclick="marioJump();event.stopPropagation()" title="點我跳一下！">😀</div>
+<!-- 地面 + 水管 -->
+<div class="ground"></div>
+<div class="pipe left"><div class="pipe-body"><div class="pipe-top"></div></div></div>
+<div class="pipe right"><div class="pipe-body"><div class="pipe-top"></div></div></div>
 
-<div class="hint-bar" id="hintBar">
-  👉 敲 <span style="color:var(--mario-yellow)">❓ 磚塊</span> 看答案，踩 <span style="color:#A0522D">🟫 栗寶寶</span> 加分！
+<!-- Mario 角色 -->
+<div class="mario-char" id="marioChar" onclick="marioJump();event.stopPropagation()" title="點我跳！">😀</div>
+
+<!-- BOSS 戰 -->
+<div class="boss-stage" id="bossStage">
+  <div class="boss" id="boss" onclick="hitBoss();event.stopPropagation()" title="連點 3 下打倒！">
+    <div class="boss-eyes"></div>
+    <div class="boss-fangs"></div>
+  </div>
+  <div class="boss-hp" id="bossHp"></div>
+  <div class="boss-label">點我打倒 BOSS！</div>
 </div>
 
-<div class="mushroom-prompt" id="mushroomPrompt">
-  <div class="mushroom-btn" onclick="advanceLevel();event.stopPropagation()" title="點我去下一關！"></div>
-  <div class="mushroom-label">點我繼續！</div>
-</div>
-
+<!-- 重來 + BGM -->
+<button class="btn btn-bgm" id="bgmBtn" onclick="toggleBGM();event.stopPropagation()" title="背景音樂">🔇</button>
 <button class="btn btn-reset" onclick="reset();event.stopPropagation()">🔄 重來</button>
 
 <script>
@@ -719,10 +822,15 @@ let currentScene = 1;
 let coins = 0;
 let stars = 0;
 let blocksHitInScene = 0;
+let combo = 0;
+let comboTimer = null;
+let bossHP = 0;
 let goombaInterval = null;
 let weatherInterval = null;
+let bgmEnabled = false;
+let bgmTimeout = null;
 
-/* ============ 音效（Web Audio API） ============ */
+/* ============ 音效 ============ */
 let audioCtx = null;
 function getCtx(){
   if(!audioCtx){
@@ -731,7 +839,7 @@ function getCtx(){
   return audioCtx;
 }
 function tone(freq, dur=.15, type='square', vol=.12, delay=0){
-  const ctx = getCtx(); if(!ctx) return;
+  const ctx = getCtx(); if(!ctx || freq<=0) return;
   const o = ctx.createOscillator(), g = ctx.createGain();
   o.connect(g); g.connect(ctx.destination);
   o.type = type;
@@ -766,17 +874,101 @@ function sStomp(){
 }
 function sBump(){ tone(220,.08,'square',.15) }
 function sPower(){
-  const notes=[392,523,587,698,784,1047,1175];
-  notes.forEach((f,i)=>tone(f,.1,'square',.13,i*.07));
+  [392,523,587,698,784,1047,1175].forEach((f,i)=>tone(f,.1,'square',.13,i*.07));
 }
 function s1up(){
-  const notes=[659,784,1047,1318,1568];
-  notes.forEach((f,i)=>tone(f,.12,'square',.13,i*.08));
+  [659,784,1047,1318,1568].forEach((f,i)=>tone(f,.12,'square',.13,i*.08));
+}
+function sBoss(){
+  // 重低音爆炸
+  const ctx=getCtx();if(!ctx)return;
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type='sawtooth';
+  o.frequency.setValueAtTime(80,ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(20,ctx.currentTime+.4);
+  g.gain.setValueAtTime(.25,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.5);
+  o.start();o.stop(ctx.currentTime+.5);
+  // 加上高頻打擊
+  tone(880,.1,'square',.12,.05);
+  tone(440,.15,'square',.12,.1);
 }
 function sClear(){
   const m=[[392,.13],[523,.13],[659,.13],[784,.13],[1047,.13],[784,.13],[830,.4]];
-  let t=0;
-  m.forEach(([f,d])=>{tone(f,d-.02,'square',.13,t);t+=d});
+  let t=0; m.forEach(([f,d])=>{tone(f,d-.02,'square',.13,t);t+=d});
+}
+
+/* 背景音樂：簡單馬力歐風格旋律 loop */
+const bgm = [
+  [659,.12],[659,.12],[0,.12],[659,.12],[0,.12],[523,.12],[659,.12],[0,.12],
+  [784,.24],[0,.36],[392,.24],[0,.36],
+  [523,.18],[0,.18],[392,.18],[0,.18],[330,.24],[0,.12],
+  [440,.18],[494,.18],[466,.18],[440,.24],[0,.12],
+];
+let bgmIdx = 0;
+function bgmStep(){
+  if(!bgmEnabled) return;
+  const [f,d] = bgm[bgmIdx % bgm.length];
+  if(f>0) tone(f, d, 'triangle', .05);
+  bgmIdx++;
+  bgmTimeout = setTimeout(bgmStep, d*1000);
+}
+function toggleBGM(){
+  getCtx();
+  bgmEnabled = !bgmEnabled;
+  document.getElementById('bgmBtn').textContent = bgmEnabled?'🔊':'🔇';
+  if(bgmEnabled){ bgmStep(); }
+  else if(bgmTimeout){ clearTimeout(bgmTimeout); bgmTimeout=null; }
+}
+
+/* ============ 視覺特效 ============ */
+function shakeScreen(big=false){
+  const cls = big ? 'shake-big' : 'shake';
+  document.body.classList.remove('shake','shake-big');
+  void document.body.offsetWidth;
+  document.body.classList.add(cls);
+  setTimeout(()=>document.body.classList.remove(cls), big?500:300);
+}
+function popScore(x, y, text, color='#FFD700'){
+  const p = document.createElement('div');
+  p.className = 'score-pop';
+  p.textContent = text;
+  p.style.left = x+'px';
+  p.style.top = y+'px';
+  p.style.color = color;
+  document.body.appendChild(p);
+  setTimeout(()=>p.remove(), 1300);
+}
+function sparkBurst(x, y, count=8){
+  const colors = ['#FFD700','#FF6B6B','#4FC3F7','#A5D6A7','#FF9800'];
+  for(let i=0;i<count;i++){
+    const s = document.createElement('div');
+    s.className = 'spark';
+    s.style.left = x+'px';
+    s.style.top = y+'px';
+    s.style.background = colors[Math.floor(Math.random()*colors.length)];
+    const angle = (Math.PI*2*i/count) + Math.random()*0.5;
+    const dist = 50 + Math.random()*40;
+    s.style.setProperty('--dx', Math.cos(angle)*dist+'px');
+    s.style.setProperty('--dy', Math.sin(angle)*dist+'px');
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(), 800);
+  }
+}
+function bumpCombo(){
+  combo++;
+  const el = document.getElementById('comboDisplay');
+  if(combo >= 2){
+    el.textContent = `🔥 連擊 x${combo}!`;
+    el.classList.remove('show'); void el.offsetWidth;
+    el.classList.add('show');
+  }
+  if(comboTimer) clearTimeout(comboTimer);
+  comboTimer = setTimeout(()=>{
+    combo = 0;
+    el.classList.remove('show');
+  }, 2500);
 }
 
 /* ============ 場景切換 ============ */
@@ -785,20 +977,24 @@ function showScene(n){
   if(weatherInterval){ clearInterval(weatherInterval); weatherInterval=null; }
   document.querySelectorAll('.weather-layer').forEach(l=>l.innerHTML='');
   document.querySelectorAll('.goomba').forEach(g=>g.remove());
-  document.getElementById('mushroomPrompt').classList.remove('show');
+  document.getElementById('bossStage').classList.remove('show');
 
   const scenes = document.querySelectorAll('.scene');
-  scenes.forEach(s=>{
-    s.classList.remove('active','scaling-out','scaling-in');
-  });
+  scenes.forEach(s=>s.classList.remove('active','scaling-out','scaling-in'));
   const target = document.querySelector(`[data-scene="${n}"]`);
   target.classList.add('active','scaling-in');
   setTimeout(()=>target.classList.remove('scaling-in'), 600);
 
   currentScene = n;
   blocksHitInScene = 0;
+  combo = 0;
+  document.getElementById('comboDisplay').classList.remove('show');
 
-  target.querySelectorAll('.q-block').forEach(b=>b.classList.remove('used','bumping'));
+  target.querySelectorAll('.q-block').forEach((b,i)=>{
+    b.classList.remove('used','bumping','star-block');
+    // 隨機 1/8 變成星星塊
+    if(Math.random() < 0.12) b.classList.add('star-block');
+  });
   target.querySelectorAll('.info-item, .food-card').forEach(it=>it.classList.remove('show'));
 
   let label = `WORLD 1-${n>5?5:n}`;
@@ -806,7 +1002,7 @@ function showScene(n){
   document.getElementById('hudLevel').textContent = label;
 
   if(n===1){
-    setTimeout(()=>showMushroom(), 3500);
+    setTimeout(()=>showBoss(2), 3500); // 第1關 BOSS HP=2 (簡單版開場)
   }
 
   if(n===2){
@@ -818,7 +1014,7 @@ function showScene(n){
 
   if(n>=2 && n<=5){
     setTimeout(spawnGoomba, 1500);
-    goombaInterval = setInterval(spawnGoomba, 6000);
+    goombaInterval = setInterval(spawnGoomba, 5500);
   }
 
   if(n===6){
@@ -828,56 +1024,135 @@ function showScene(n){
 
   const hint = document.getElementById('hintBar');
   if(n===1){
-    hint.innerHTML = '👉 看一下地圖，然後點下方 <span style="color:var(--mario-yellow)">🍄 蘑菇</span> 開始！';
-    hint.style.display = 'flex';
+    hint.innerHTML = '👉 看一下地圖（紅線把中國分成北方和南方），然後打倒 <span style="color:#FF1744">👹 BOSS</span> 進入第 2 關！';
   } else if(n===6){
     hint.style.display = 'none';
   } else {
-    hint.innerHTML = '👉 敲 <span style="color:var(--mario-yellow)">❓ 磚塊</span> 看答案，踩 <span style="color:#A0522D">🟫 栗寶寶</span> 加分！';
     hint.style.display = 'flex';
+    hint.innerHTML = '👉 敲 <span style="color:var(--mario-yellow)">❓ 磚塊</span>（金色 ⭐ 是隱藏星塊獎勵 +50！）｜ 踩 <span style="color:#A0522D">🟫 栗寶寶</span>｜連續敲有 <span style="color:#FF6B6B">🔥 連擊倍數</span>！';
   }
 }
 
 /* ============ 點擊問號磚塊 ============ */
 function hitBlock(block){
   if(block.classList.contains('used')) return;
+  const isStar = block.classList.contains('star-block');
+
   block.classList.add('bumping');
   sBump();
+  shakeScreen(false);
+  bumpCombo();
 
   const rect = block.getBoundingClientRect();
+  // 飛出金幣
   const coin = document.createElement('div');
   coin.className = 'coin-pop';
-  coin.textContent = '🪙';
+  coin.textContent = isStar ? '⭐' : '🪙';
   coin.style.left = (rect.left + rect.width/2 - 20) + 'px';
   coin.style.top  = (rect.top - 10) + 'px';
   coin.style.position = 'fixed';
   document.body.appendChild(coin);
   setTimeout(()=>coin.remove(), 1100);
 
+  sparkBurst(rect.left + rect.width/2, rect.top + rect.height/2, isStar?12:6);
+
   setTimeout(()=>{
     block.classList.remove('bumping');
     block.classList.add('used');
     sCoin();
-    coins += 10;
+
+    // 計分（連擊加成）
+    const base = isStar ? 50 : 10;
+    const mult = combo >= 2 ? combo : 1;
+    const total = base * mult;
+    coins += total;
     document.getElementById('hudCoins').textContent = coins;
 
-    const side = block.dataset.side;
-    const step = block.dataset.step;
+    if(isStar){
+      stars++;
+      document.getElementById('hudStars').textContent = stars;
+      s1up();
+    }
+
+    // 飄分
+    const txt = `+${total}` + (mult>1?` 🔥x${mult}`:'') + (isStar?' ⭐':'');
+    popScore(rect.left + rect.width/2 - 40, rect.top - 30, txt, isStar?'#FFD700':'#fff');
+
+    // 顯示對應 info
     const slot = document.querySelector(
-      `.scene.active .info-item[data-side="${side}"][data-step="${step}"], .scene.active .food-card[data-side="${side}"][data-step="${step}"]`
+      `.scene.active .info-item[data-side="${block.dataset.side}"][data-step="${block.dataset.step}"], .scene.active .food-card[data-side="${block.dataset.side}"][data-step="${block.dataset.step}"]`
     );
     if(slot) slot.classList.add('show');
 
     blocksHitInScene++;
-    const total = stepsPerScene[currentScene] * 2;
-    if(blocksHitInScene >= total){
-      setTimeout(()=>{ showMushroom(); s1up(); }, 400);
+    const totalBlocks = stepsPerScene[currentScene] * 2;
+    if(blocksHitInScene >= totalBlocks){
+      // 全部敲完 → BOSS 出現！
+      setTimeout(()=>{
+        showBoss(3);
+        sBoss();
+      }, 500);
     }
-  }, 350);
+  }, 380);
 }
 
-function showMushroom(){
-  document.getElementById('mushroomPrompt').classList.add('show');
+/* ============ BOSS 戰 ============ */
+function showBoss(hp=3){
+  bossHP = hp;
+  const stage = document.getElementById('bossStage');
+  const boss = document.getElementById('boss');
+  boss.classList.remove('hit','defeated');
+  stage.classList.add('show');
+  updateBossHP();
+}
+function updateBossHP(){
+  const hp = document.getElementById('bossHp');
+  hp.innerHTML = '';
+  const max = currentScene===1 ? 2 : 3;
+  for(let i=0;i<max;i++){
+    const h = document.createElement('span');
+    h.className = 'heart' + (i<bossHP?'':' empty');
+    h.textContent = '❤️';
+    hp.appendChild(h);
+  }
+}
+function hitBoss(){
+  if(bossHP<=0) return;
+  const boss = document.getElementById('boss');
+  boss.classList.remove('hit'); void boss.offsetWidth;
+  boss.classList.add('hit');
+  shakeScreen(true);
+  sStomp();
+
+  bossHP--;
+  updateBossHP();
+
+  const rect = boss.getBoundingClientRect();
+  popScore(rect.left + rect.width/2 - 40, rect.top, '-1 HP', '#FF1744');
+  sparkBurst(rect.left + rect.width/2, rect.top + rect.height/2, 14);
+
+  setTimeout(()=>boss.classList.remove('hit'), 350);
+
+  if(bossHP <= 0){
+    setTimeout(()=>{
+      boss.classList.add('defeated');
+      sBoss();
+      shakeScreen(true);
+      bigConfetti();
+      setTimeout(()=>{
+        document.getElementById('bossStage').classList.remove('show');
+        defeatBossReward();
+      }, 1000);
+    }, 200);
+  }
+}
+function defeatBossReward(){
+  s1up();
+  const bonus = 100;
+  coins += bonus;
+  document.getElementById('hudCoins').textContent = coins;
+  popScore(window.innerWidth/2 - 80, window.innerHeight/2, `+${bonus} BOSS!`, '#FFD700');
+  setTimeout(advanceLevel, 800);
 }
 
 function advanceLevel(){
@@ -898,7 +1173,7 @@ function advanceLevel(){
   }, 500);
 }
 
-/* ============ 雪/雨粒子 ============ */
+/* ============ 雪/雨 ============ */
 function addParticle(layerId, emoji){
   const layer = document.getElementById(layerId);
   if(!layer) return;
@@ -923,14 +1198,15 @@ function spawnGoomba(){
     if(g.classList.contains('stomped')) return;
     g.classList.add('stomped');
     sStomp();
-    coins += 5;
+    shakeScreen(false);
+    bumpCombo();
+    const mult = combo >= 2 ? combo : 1;
+    const total = 5 * mult;
+    coins += total;
     document.getElementById('hudCoins').textContent = coins;
     const rect = g.getBoundingClientRect();
-    const score = document.createElement('div');
-    score.textContent = '+5';
-    score.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top-20}px;color:#FFD700;font-family:'Press Start 2P',monospace;font-size:22px;text-shadow:2px 2px 0 #000;z-index:120;animation:coinUp 1s ease-out forwards;pointer-events:none`;
-    document.body.appendChild(score);
-    setTimeout(()=>score.remove(), 1000);
+    popScore(rect.left, rect.top - 20, `+${total}`+(mult>1?` 🔥x${mult}`:''), '#FFD700');
+    sparkBurst(rect.left + rect.width/2, rect.top + rect.height/2, 8);
     setTimeout(()=>g.classList.add('fadeout'), 400);
     setTimeout(()=>g.remove(), 900);
   };
@@ -938,7 +1214,7 @@ function spawnGoomba(){
   setTimeout(()=>{ if(g.parentNode) g.remove(); }, 14500);
 }
 
-/* ============ Mario 跳 ============ */
+/* ============ Mario ============ */
 function marioJump(){
   const m = document.getElementById('marioChar');
   if(m.classList.contains('jumping')) return;
@@ -950,7 +1226,7 @@ function marioJump(){
 /* ============ 灑花 ============ */
 function smallConfetti(){
   const layer = document.getElementById('celebrate');
-  const emojis = ['🪙','⭐','🍄','🌟','✨','🎊','🎉','🍓','💎'];
+  const emojis = ['🪙','⭐','🍄','🌟','✨','🎊','🎉','💎','🏆'];
   for(let i=0;i<35;i++){
     const p = document.createElement('div');
     p.className = 'firework';
@@ -972,9 +1248,10 @@ function bigConfetti(){
 
 /* ============ 重來 ============ */
 function reset(){
-  coins = 0; stars = 0; blocksHitInScene = 0;
+  coins = 0; stars = 0; blocksHitInScene = 0; combo = 0;
   document.getElementById('hudCoins').textContent = 0;
   document.getElementById('hudStars').textContent = 0;
+  document.getElementById('comboDisplay').classList.remove('show');
   document.getElementById('celebrate').innerHTML = '';
   document.querySelectorAll('.goomba').forEach(g=>g.remove());
   document.querySelectorAll('.world-clear').forEach(s=>s.classList.remove('active'));
@@ -991,6 +1268,7 @@ function forceNext(){
     );
     if(slot) slot.classList.add('show');
   });
+  document.getElementById('bossStage').classList.remove('show');
   advanceLevel();
 }
 
@@ -1004,14 +1282,15 @@ document.addEventListener('click', (e)=>{
 document.addEventListener('keydown', e=>{
   if(e.code==='Space'||e.code==='ArrowRight'||e.code==='Enter'){
     e.preventDefault();
-    const mp = document.getElementById('mushroomPrompt');
-    if(mp.classList.contains('show')){ advanceLevel(); }
+    const bs = document.getElementById('bossStage');
+    if(bs.classList.contains('show')){ hitBoss(); }
     else {
       const next = document.querySelector('.scene.active .q-block:not(.used)');
       if(next) hitBlock(next);
     }
   } else if(e.code==='KeyR'){ reset(); }
   else if(e.code==='KeyM'){ marioJump(); }
+  else if(e.code==='KeyB'){ toggleBGM(); }
 });
 
 /* 初始化 */
