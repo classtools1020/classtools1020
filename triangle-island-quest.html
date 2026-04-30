@@ -427,7 +427,8 @@ function drawTri(opts){
     }
     if(highMid){
       svg.appendChild(svgEl('circle',{cx:D.x,cy:D.y,r:6,fill:'#FFD700',stroke:'#000','stroke-width':2}));
-      const dt=svgEl('text',{x:D.x,y:D.y+25,'text-anchor':'middle','font-size':18,
+      // D 標籤放右上角避開 BC 長度文字
+      const dt=svgEl('text',{x:D.x+22,y:D.y-6,'text-anchor':'start','font-size':20,
         'font-weight':900,fill:'#FFD700','stroke':'#000','stroke-width':3,'paint-order':'stroke'});
       dt.textContent='D';
       svg.appendChild(dt);
