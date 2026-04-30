@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>🥷 中垂線應用 · 周長解謎 · 隨堂練習 P160-1</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;
+  font-family:"Microsoft JhengHei","微軟正黑體","Impact",sans-serif;
+  font-size:20px;user-select:none;touch-action:manipulation;color:#fff}
+body{display:flex;flex-direction:column;
+  background:
+    radial-gradient(ellipse at top, rgba(255,107,157,.22) 0%, transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(0,201,255,.15) 0%, transparent 60%),
+    linear-gradient(135deg, #0A0E27 0%, #1A0F3E 40%, #2D1B4E 100%)}
+
+:root{
+  --gold:#FFD700; --gold-dk:#C9A227;
+  --cyan:#00F5FF; --cyan-dk:#00B8D4;
+  --red:#FF3B30; --red-dk:#C00A03;
+  --purple:#B967FF; --purple-dk:#7D2AE8;
+  --green:#39FF14; --green-dk:#00C853;
+  --orange:#FF8A00; --orange-dk:#E67E00;
+  --pink:#FF6B9D; --pink-dk:#D14B7D;       /* 中垂線 */
+  --tealb:#00BCD4;                          /* 角平分線（備用） */
+  --bg-dark:#0A0E27; --bg-mid:#1A1F3A;
+  --text:#FFFFFF; --text-dim:#B8C5D6;
+  --shadow:0 4px 20px rgba(0,0,0,.5);
+  --glow-gold:0 0 20px rgba(255,215,0,.6),0 0 40px rgba(255,215,0,.3);
+  --glow-cyan:0 0 20px rgba(0,245,255,.6),0 0 40px rgba(0,245,255,.3);
+  --glow-purple:0 0 20px rgba(185,103,255,.6),0 0 40px rgba(185,103,255,.3);
+  --glow-pink:0 0 20px rgba(255,107,157,.7),0 0 40px rgba(255,107,157,.3);
+  --glow-red:0 0 20px rgba(255,59,48,.6),0 0 40px rgba(255,59,48,.3);
+  --glow-green:0 0 20px rgba(57,255,20,.6),0 0 40px rgba(57,255,20,.3);
+}
+
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 30% 70%, #fff, transparent),
+    radial-gradient(1px 1px at 50% 40%, #FFD700, transparent),
+    radial-gradient(2px 2px at 70% 25%, #FF6B9D, transparent),
+    radial-gradient(1px 1px at 85% 60%, #fff, transparent),
+    radial-gradient(1px 1px at 15% 85%, #B967FF, transparent),
+    radial-gradient(1px 1px at 95% 90%, #fff, transparent),
+    radial-gradient(2px 2px at 40% 10%, #fff, transparent),
+    radial-gradient(1px 1px at 60% 55%, #00F5FF, transparent),
+    radial-gradient(1px 1px at 25% 45%, #FFD700, transparent);
+  background-size:200% 200%; animation:starMove 60s linear infinite}
+@keyframes starMove{0%{background-position:0 0}100%{background-position:200% 200%}}
+
+#teacher-tip{background:linear-gradient(90deg,rgba(255,215,0,.15),rgba(255,107,157,.08));
+  border-bottom:3px solid var(--gold);padding:12px 20px;min-height:74px;
+  display:flex;align-items:center;gap:12px;position:relative;z-index:3;
+  backdrop-filter:blur(10px)}
+#teacher-tip .badge{background:linear-gradient(135deg,var(--gold),var(--orange));
+  color:#1A0F3E;padding:6px 14px;border-radius:20px;font-weight:900;
+  font-size:15px;white-space:nowrap;box-shadow:var(--glow-gold)}
+#teacher-tip .content{flex:1;font-size:19px;line-height:1.5;color:#fff;
+  font-weight:600;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+#teacher-tip .content b{color:var(--gold);text-shadow:0 0 10px rgba(255,215,0,.5)}
+#teacher-tip .scene-tag{background:linear-gradient(135deg,var(--pink),var(--pink-dk));
+  color:#fff;padding:6px 12px;border-radius:10px;font-size:14px;font-weight:900;
+  white-space:nowrap;box-shadow:var(--glow-pink)}
+
+#progress{height:12px;background:rgba(0,0,0,.5);display:flex;
+  position:relative;z-index:3;border-bottom:2px solid var(--pink-dk)}
+.prog-seg{flex:1;background:transparent;border-right:2px solid rgba(255,255,255,.1);
+  transition:background .3s;position:relative}
+.prog-seg:last-child{border-right:none}
+.prog-seg.done{background:linear-gradient(90deg,var(--purple),var(--pink))}
+.prog-seg.current{background:linear-gradient(90deg,var(--gold),var(--orange));
+  animation:progPulse 1.4s infinite}
+@keyframes progPulse{0%,100%{opacity:.85;box-shadow:0 0 10px var(--gold)}
+  50%{opacity:1;box-shadow:0 0 22px var(--gold)}}
+
+#stage{flex:1;position:relative;overflow:hidden;z-index:2}
+#canvas{width:100%;height:100%;display:block;position:relative;z-index:2}
+
+#narration{position:absolute;top:18px;left:50%;transform:translateX(-50%);
+  max-width:84%;background:linear-gradient(135deg,rgba(10,14,39,.88),rgba(45,27,78,.88));
+  border:3px solid var(--gold);border-radius:20px;padding:14px 30px;
+  font-size:28px;font-weight:900;color:#fff;text-align:center;line-height:1.35;
+  box-shadow:var(--glow-gold);z-index:20;display:none;
+  text-shadow:0 0 10px rgba(255,215,0,.5);
+  backdrop-filter:blur(6px);letter-spacing:1px}
+#narration.visible{display:block;animation:narIn .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes narIn{from{opacity:0;transform:translate(-50%,-20px) scale(.9)}
+  to{opacity:1;transform:translate(-50%,0) scale(1)}}
+
+#stage-label{position:absolute;top:18px;left:20px;z-index:15;
+  background:linear-gradient(135deg,var(--pink),var(--pink-dk));
+  color:#fff;padding:8px 28px;border-radius:6px;font-weight:900;
+  font-size:20px;box-shadow:var(--glow-pink);display:none;
+  clip-path:polygon(12% 0, 100% 0, 88% 100%, 0 100%)}
+#stage-label.visible{display:block;animation:stageIn .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes stageIn{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:translateX(0)}}
+
+#problem-card{position:absolute;top:78px;left:24px;z-index:14;max-width:380px;
+  background:linear-gradient(135deg,rgba(10,14,39,.92),rgba(26,15,62,.92));
+  border:2px solid var(--cyan-dk);border-radius:14px;padding:14px 18px;
+  font-size:17px;line-height:1.55;color:#E0EFFF;
+  box-shadow:0 6px 24px rgba(0,0,0,.5);display:none}
+#problem-card.visible{display:block}
+#problem-card .ttl{color:var(--cyan);font-weight:900;font-size:16px;letter-spacing:2px;
+  text-shadow:0 0 8px rgba(0,245,255,.5);margin-bottom:6px}
+#problem-card b{color:var(--gold)}
+
+#control-bar{background:linear-gradient(0deg,rgba(10,14,39,.95),rgba(26,15,62,.9));
+  padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;z-index:15;border-top:3px solid var(--purple);
+  box-shadow:0 -4px 20px rgba(185,103,255,.3)}
+#progress-info{font-size:17px;color:var(--cyan);font-weight:800;min-width:140px;
+  text-shadow:0 0 8px var(--cyan-dk);letter-spacing:.5px}
+#main-actions{display:flex;gap:10px;flex:1;justify-content:center;flex-wrap:wrap}
+#side-controls{display:flex;gap:6px}
+
+.btn{background:linear-gradient(135deg,#2C3E50,#1A252F);
+  border:3px solid var(--cyan-dk);border-radius:12px;
+  padding:12px 22px;font-size:20px;cursor:pointer;min-height:60px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-weight:900;color:#fff;transition:all .2s;
+  font-family:inherit;gap:8px;letter-spacing:.5px;
+  text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:var(--glow-cyan)}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn-next{background:linear-gradient(135deg,#FFD700,#FF8A00);
+  border:3px solid var(--gold);color:#1A0F3E;
+  min-width:240px;font-size:24px;font-weight:900;
+  box-shadow:var(--glow-gold);animation:skillGlow 1.8s infinite;
+  text-shadow:0 1px 2px rgba(255,255,255,.5)}
+.btn-next:hover{background:linear-gradient(135deg,#FFF200,#FF9F1A);
+  transform:translateY(-2px) scale(1.05);
+  box-shadow:0 0 30px rgba(255,215,0,.8),0 0 60px rgba(255,215,0,.4)}
+@keyframes skillGlow{0%,100%{box-shadow:0 0 20px rgba(255,215,0,.5)}
+  50%{box-shadow:0 0 40px rgba(255,215,0,.9),0 0 60px rgba(255,138,0,.4)}}
+.btn-small{min-height:48px;padding:8px 14px;font-size:18px;min-width:auto;
+  background:linear-gradient(135deg,#2C3E50,#1A252F);
+  border-color:rgba(255,255,255,.3)}
+
+.flash{position:absolute;inset:0;pointer-events:none;z-index:25;
+  display:flex;align-items:center;justify-content:center;
+  animation:flashIn .9s ease}
+.flash-text{font-size:160px;font-weight:900;
+  text-shadow:0 0 20px currentColor,0 0 40px currentColor,0 6px 0 rgba(0,0,0,.4);
+  letter-spacing:-2px}
+@keyframes flashIn{0%{opacity:0;transform:scale(.3) rotate(-10deg)}
+  50%{opacity:1;transform:scale(1.25) rotate(4deg)}
+  100%{opacity:0;transform:scale(1) rotate(0)}}
+
+.confetti{position:fixed;width:14px;height:18px;z-index:50;
+  animation:fall 3s linear;pointer-events:none;border-radius:2px;
+  box-shadow:0 0 8px currentColor}
+@keyframes fall{0%{transform:translateY(-20vh) rotate(0)}100%{transform:translateY(110vh) rotate(720deg)}}
+
+@keyframes pulseStroke{0%,100%{stroke-width:6}50%{stroke-width:12}}
+.pulse-stroke{animation:pulseStroke 1.2s ease-in-out infinite}
+
+@keyframes ghostFade{0%{opacity:1}100%{opacity:.18}}
+.ghost{animation:ghostFade .8s forwards}
+
+@media (max-width:720px){
+  #teacher-tip{padding:8px 12px;flex-wrap:wrap;min-height:auto}
+  #teacher-tip .content{font-size:15px}
+  #narration{font-size:20px;padding:10px 18px;max-width:92%}
+  #problem-card{font-size:14px;max-width:62%;left:10px;top:70px;padding:10px 12px}
+  .btn{font-size:17px;padding:8px 14px;min-height:48px}
+  .btn-next{min-width:160px;font-size:18px}
+  .flash-text{font-size:90px}
+  #stage-label{font-size:14px;padding:6px 18px}
+}
+</style>
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<div id="teacher-tip">
+  <div class="badge">👩‍🏫 老師</div>
+  <div class="content" id="tip-content">這題隱藏密技：把「不知道的」換成「知道的」 → 點 <b>▶ 發動技能</b> 開始解謎！</div>
+  <div class="scene-tag" id="scene-tag">0 / 7</div>
+</div>
+
+<div id="progress">
+  <div class="prog-seg current"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+  <div class="prog-seg"></div>
+</div>
+
+<div id="stage">
+  <svg id="canvas" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="gradGold" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFE34D"/>
+        <stop offset="100%" stop-color="#FF8A00"/>
+      </linearGradient>
+      <linearGradient id="gradPink" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFA0C0"/>
+        <stop offset="100%" stop-color="#D14B7D"/>
+      </linearGradient>
+      <linearGradient id="gradPurple" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#D690FF"/>
+        <stop offset="100%" stop-color="#7D2AE8"/>
+      </linearGradient>
+      <linearGradient id="gradCyan" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#7CF6FF"/>
+        <stop offset="100%" stop-color="#0099B8"/>
+      </linearGradient>
+      <linearGradient id="gradGreen" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#5EFF8F"/>
+        <stop offset="100%" stop-color="#00A849"/>
+      </linearGradient>
+
+      <filter id="neonGold" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#FFD700"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonPink" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur"/>
+        <feFlood flood-color="#FF6B9D"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonPurple" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="5" result="blur"/>
+        <feFlood flood-color="#B967FF"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonCyan" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#00F5FF"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="neonGreen" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feFlood flood-color="#39FF14"/>
+        <feComposite in2="blur" operator="in"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <g id="scene-root"></g>
+    <g id="overlay-root"></g>
+  </svg>
+
+  <div id="stage-label"></div>
+  <div id="narration"></div>
+  <div id="problem-card">
+    <div class="ttl">📖 隨堂練習 P160-1</div>
+    如圖，在 △ABC 中，<br>
+    直線 <b>L</b> 是 <b>AB</b> 的中垂線。<br>
+    若 <b>AB = 14</b>，<b>BC = 15</b>，<b>AC = 13</b>，<br>
+    求 <b>△ACE</b> 的周長＝？
+  </div>
+</div>
+
+<div id="control-bar">
+  <div id="progress-info">🥷 第 <span id="s-n">0</span> / 7 步</div>
+  <div id="main-actions">
+    <button class="btn btn-next" id="btn-next">▶ 發動技能</button>
+  </div>
+  <div id="side-controls">
+    <button class="btn btn-small" id="btn-prev" title="上一步">◀</button>
+    <button class="btn btn-small" id="btn-restart" title="重新開始">🔁</button>
+    <button class="btn btn-small" id="btn-mute" title="靜音">🔊</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   中垂線應用題 · 周長解謎（隨堂練習 P160-1）
+   題目：△ABC 中，L 是 AB 的中垂線，
+         AB=14、BC=15、AC=13，求 △ACE 的周長。
+   核心招式：E 在 L 上 → EA = EB
+            周長 = AC + CE + EA = AC + CE + EB = AC + CB = 13 + 15 = 28
+   ============================================================ */
+
+const state = { stepIdx: 0, audioOn: true, totalSteps: 8 };
+
+/* === 8-bit 馬力歐風音效（沿用 lesson4 風格） === */
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+}
+function beep(f,d=0.15,t="square",g=0.18){
+  if(!state.audioOn||!audioCtx) return;
+  const o=audioCtx.createOscillator(), gn=audioCtx.createGain();
+  o.type=t; o.frequency.value=f;
+  gn.gain.setValueAtTime(g, audioCtx.currentTime);
+  gn.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+d);
+  o.connect(gn); gn.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime+d);
+}
+const SFX = {
+  click(){ beep(800,0.04,"square",0.1); },
+  coin(){ beep(988,0.08,"square",0.15); setTimeout(()=>beep(1319,0.18,"square",0.15),70); },
+  jump(){
+    if(!state.audioOn||!audioCtx) return;
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type="square"; o.frequency.setValueAtTime(400, audioCtx.currentTime);
+    o.frequency.linearRampToValueAtTime(900, audioCtx.currentTime+0.15);
+    g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.15);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime+0.15);
+  },
+  reveal(){ beep(659,0.1,"square",0.15); setTimeout(()=>beep(880,0.15,"square",0.15),80); },
+  swap(){
+    beep(700,0.08,"square",0.13);
+    setTimeout(()=>beep(900,0.08,"square",0.13),80);
+    setTimeout(()=>beep(1100,0.12,"square",0.13),160);
+  },
+  success(){
+    [523,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,0.12,"square",0.15),i*70));
+  },
+  win(){
+    const seq = [
+      {f:1319,d:0.13,t:0},   {f:1568,d:0.13,t:130},  {f:2093,d:0.13,t:260},
+      {f:1760,d:0.13,t:390}, {f:1976,d:0.13,t:520},  {f:2349,d:0.13,t:650},
+      {f:2637,d:0.13,t:780}, {f:3136,d:0.4, t:910}
+    ];
+    seq.forEach(n=>setTimeout(()=>beep(n.f,n.d,"square",0.15),n.t));
+  }
+};
+
+/* === SVG 工具 === */
+const NS="http://www.w3.org/2000/svg";
+function el(tag,attrs={},parent=null,text=null){
+  const e=document.createElementNS(NS,tag);
+  for(const k in attrs) e.setAttribute(k,attrs[k]);
+  if(text!=null) e.textContent = text;
+  if(parent) parent.appendChild(e);
+  return e;
+}
+function clearScene(){ document.getElementById("scene-root").innerHTML=""; return document.getElementById("scene-root"); }
+function clearOverlay(){ document.getElementById("overlay-root").innerHTML=""; return document.getElementById("overlay-root"); }
+
+/* === 幾何（畫面座標，y 軸向下） === */
+/*  原始幾何：A(0,0) B(14,0) C(5,12) ⇒ 真實邊長 AB=14, AC=13, BC=15
+    縮放與置中到 1600×900 畫布右半邊（左邊留給題目卡片）
+    scale = 38, 平移 (cx0, cy0) 讓圖在 (700, 700) 附近
+    y 軸翻轉：螢幕 y = cy0 - 真實 y * scale
+*/
+const SCALE = 40;
+const OX = 720, OY = 700;            // 真實 (0,0) → 畫面 (OX, OY)
+function P(rx, ry){ return { x: OX + rx*SCALE, y: OY - ry*SCALE }; }
+
+const PT = {
+  A: P(0, 0),
+  B: P(14, 0),
+  C: P(5, 12),
+  D: P(7, 0),                // AB 中點
+  E: P(7, 28/9*1)            // L (x=7) 與 BC 的交點 ≈ (7, 9.33)
+};
+// 算 E：BC: B(14,0) → C(5,12), 參數 t∈[0,1]：(14-9t, 12t)
+// x=7 ⇒ t=7/9 ⇒ y=12·7/9 = 84/9 ≈ 9.333
+PT.E = P(7, 84/9);
+
+// 線 L 的上下端（向上延伸到圖外、向下少許）
+const L_TOP = P(7, 14), L_BOT = P(7, -1.5);
+
+/* === 繪圖小工具 === */
+function line(parent, p1, p2, opts={}){
+  const {stroke="#fff", sw=4, dash=null, glow=null, opacity=1, id=""} = opts;
+  const a = { stroke, "stroke-width":sw, "stroke-linecap":"round", opacity, fill:"none",
+    x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y };
+  if(dash) a["stroke-dasharray"] = dash;
+  if(glow) a.filter = `url(#${glow})`;
+  if(id) a.id = id;
+  return el("line", a, parent);
+}
+function dot(parent, p, opts={}){
+  const {r=8, fill="#fff", stroke="#000", sw=2, glow=null, id=""} = opts;
+  const a = { cx:p.x, cy:p.y, r, fill, stroke, "stroke-width":sw };
+  if(glow) a.filter = `url(#${glow})`;
+  if(id) a.id = id;
+  return el("circle", a, parent);
+}
+function label(parent, p, txt, opts={}){
+  const {dx=0, dy=0, size=30, color="#fff", weight=900, glow=null, id=""} = opts;
+  const a = { x:p.x+dx, y:p.y+dy, "font-size":size, "font-weight":weight,
+    fill:color, "text-anchor":"middle",
+    stroke:"#000", "stroke-width":4, "paint-order":"stroke" };
+  if(glow) a.filter = `url(#${glow})`;
+  if(id) a.id = id;
+  return el("text", a, parent, txt);
+}
+// 在線段中點旁標數字
+function midLabel(parent, p1, p2, txt, opts={}){
+  const m = { x:(p1.x+p2.x)/2, y:(p1.y+p2.y)/2 };
+  return label(parent, m, txt, opts);
+}
+// 等距「//」記號（垂直於線段中段）
+function tickMark(parent, p1, p2, opts={}){
+  const {color="#B967FF", size=14, sw=4, count=2, id=""} = opts;
+  const m = { x:(p1.x+p2.x)/2, y:(p1.y+p2.y)/2 };
+  const dx = p2.x - p1.x, dy = p2.y - p1.y;
+  const len = Math.hypot(dx,dy);
+  const ux = dx/len, uy = dy/len;        // 線段方向
+  const nx = -uy,    ny = ux;             // 垂直方向
+  const g = el("g", id?{id}:{}, parent);
+  for(let i=0; i<count; i++){
+    const off = (i - (count-1)/2) * 8;
+    const mx = m.x + ux*off, my = m.y + uy*off;
+    el("line", {
+      x1: mx - nx*size, y1: my - ny*size,
+      x2: mx + nx*size, y2: my + ny*size,
+      stroke: color, "stroke-width": sw, "stroke-linecap":"round",
+      filter: "url(#neonPurple)"
+    }, g);
+  }
+  return g;
+}
+// 直角小方框（在中垂線與 AB 的交點）
+function rightAngle(parent, corner, dirX, dirY, size=18, color="#FF3B30"){
+  const px = -dirY, py = dirX;
+  const p1 = { x: corner.x + dirX*size, y: corner.y + dirY*size };
+  const p2 = { x: p1.x + px*size, y: p1.y + py*size };
+  const p3 = { x: corner.x + px*size, y: corner.y + py*size };
+  return el("path", {
+    d:`M${p1.x},${p1.y} L${p2.x},${p2.y} L${p3.x},${p3.y}`,
+    fill:"none", stroke:color, "stroke-width":3
+  }, parent);
+}
+
+/* === UI helpers === */
+function setNarration(text){
+  const n = document.getElementById("narration");
+  if(text){ n.innerHTML = text; n.classList.add("visible"); }
+  else n.classList.remove("visible");
+}
+function setStageLabel(text){
+  const t = document.getElementById("stage-label");
+  if(text){ t.textContent = text; t.classList.add("visible"); }
+  else t.classList.remove("visible");
+}
+function setTeacherTip(html){ document.getElementById("tip-content").innerHTML = html; }
+function setProblemCardVisible(v){ document.getElementById("problem-card").classList.toggle("visible", v); }
+function flashBig(text, color="#39FF14", size=160){
+  const f = document.createElement("div"); f.className="flash";
+  const s = document.createElement("div"); s.className="flash-text";
+  s.textContent = text; s.style.color = color; s.style.fontSize = size+"px";
+  f.appendChild(s); document.getElementById("stage").appendChild(f);
+  setTimeout(()=>f.remove(), 900);
+}
+function confetti(n=30){
+  const colors = ["#FFD700","#FF6B9D","#B967FF","#39FF14","#00F5FF","#FF8A00"];
+  for(let i=0;i<n;i++){
+    const d = document.createElement("div"); d.className="confetti";
+    d.style.left = Math.random()*100+"vw";
+    d.style.background = colors[i%colors.length];
+    d.style.color = colors[i%colors.length];
+    d.style.animationDelay = (Math.random()*0.8)+"s";
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(), 3500);
+  }
+}
+
+/* === 進度條 === */
+function updateProgress(){
+  const segs = document.querySelectorAll(".prog-seg");
+  segs.forEach((s,i)=>{
+    s.classList.remove("done","current");
+    if(i < state.stepIdx-1) s.classList.add("done");
+    else if(i === state.stepIdx-1) s.classList.add("current");
+  });
+  document.getElementById("s-n").textContent = state.stepIdx;
+  document.getElementById("scene-tag").textContent = state.stepIdx + " / 7";
+}
+
+/* === 三角形基底（不變） === */
+function drawBaseTriangle(parent, opts={}){
+  const {showAB=true, showBC=true, showCA=true, withLabels=true, withSides=true} = opts;
+  const g = el("g", {id:"base-tri"}, parent);
+  // 三角形面（淡色填充）
+  el("path", {
+    d:`M${PT.A.x},${PT.A.y} L${PT.B.x},${PT.B.y} L${PT.C.x},${PT.C.y} Z`,
+    fill:"rgba(0,245,255,.06)", stroke:"none"
+  }, g);
+  // 三邊（先用淡色，之後可疊上彩色高亮版）
+  if(showAB) line(g, PT.A, PT.B, { stroke:"#A8B5C7", sw:5, id:"side-AB-base"});
+  if(showBC) line(g, PT.B, PT.C, { stroke:"#A8B5C7", sw:5, id:"side-BC-base"});
+  if(showCA) line(g, PT.C, PT.A, { stroke:"#A8B5C7", sw:5, id:"side-CA-base"});
+  if(withSides){
+    midLabel(g, PT.A, PT.B, "14", {dy:36, color:"#FFD700", size:30, glow:"neonGold"});
+    midLabel(g, PT.B, PT.C, "15", {dx:32, dy:0,  color:"#FFD700", size:30, glow:"neonGold"});
+    midLabel(g, PT.C, PT.A, "13", {dx:-32, dy:6, color:"#FFD700", size:30, glow:"neonGold"});
+  }
+  // 頂點
+  dot(g, PT.A, {r:9, fill:"#fff", stroke:"#FFD700", sw:3});
+  dot(g, PT.B, {r:9, fill:"#fff", stroke:"#FFD700", sw:3});
+  dot(g, PT.C, {r:9, fill:"#fff", stroke:"#FFD700", sw:3});
+  if(withLabels){
+    label(g, PT.A, "A", {dx:-22, dy:8,  size:36, color:"#FFD700", glow:"neonGold"});
+    label(g, PT.B, "B", {dx:24,  dy:8,  size:36, color:"#FFD700", glow:"neonGold"});
+    label(g, PT.C, "C", {dx:-26, dy:-8, size:36, color:"#FFD700", glow:"neonGold"});
+  }
+  return g;
+}
+
+/* ============================================================
+   8 個步驟（state.stepIdx 0..7，0=封面，1..7=動畫步驟）
+   ============================================================ */
+function render(){
+  const root = clearScene();
+  clearOverlay();
+
+  switch(state.stepIdx){
+
+    case 0: { // 封面
+      setStageLabel("");
+      setProblemCardVisible(false);
+      setNarration("");
+      setTeacherTip("這題隱藏密技：把「不知道的」換成「知道的」 → 點 <b>▶ 發動技能</b> 開始解謎！");
+      // 大標題
+      label(root, {x:800, y:280}, "🥷 中垂線應用 · 周長解謎", {
+        size:64, color:"#FFD700", glow:"neonGold"
+      });
+      label(root, {x:800, y:360}, "隨堂練習 P160-1", {
+        size:36, color:"#FF6B9D", glow:"neonPink"
+      });
+      // 小三角預覽
+      drawBaseTriangle(root, {});
+      label(root, {x:800, y:830}, "▶ 點下方按鈕，跟著夜櫻家一步一步破關！", {
+        size:24, color:"#00F5FF", glow:"neonCyan"
+      });
+      document.getElementById("btn-next").textContent = "▶ 發動技能";
+      break;
+    }
+
+    case 1: { // 讀題：三角形 + 標出三邊
+      setStageLabel("第 1 步｜讀題");
+      setProblemCardVisible(true);
+      setNarration("先看清楚三角形：<span style='color:#FFD700'>AB=14、BC=15、AC=13</span>");
+      setTeacherTip("先把三邊看清楚。<b>14、15、13</b> — 這就是我們的戰場。");
+      drawBaseTriangle(root, {});
+      document.getElementById("btn-next").textContent = "▶ 畫出中垂線";
+      break;
+    }
+
+    case 2: { // 中垂線出場 + 標出 D 和 E
+      setStageLabel("第 2 步｜中垂線登場");
+      setProblemCardVisible(true);
+      setNarration("中垂線 <span style='color:#FF6B9D'>L</span> 從 AB 中點 D 直直往上，碰到 BC 在 <span style='color:#FF6B9D'>E</span> 點。");
+      setTeacherTip("中垂線 <b style='color:#FF6B9D'>L</b> 是粉紅色，<b>D</b> 是 AB 中點，<b>E</b> 是它撞到 BC 的點。");
+      drawBaseTriangle(root, {});
+      // L 線（虛線粉紅，從上到下穿透）
+      line(root, L_TOP, L_BOT, { stroke:"#FF6B9D", sw:5, dash:"10 6", glow:"neonPink", id:"line-L"});
+      // D 點與直角記號
+      dot(root, PT.D, {r:8, fill:"#FF6B9D", stroke:"#fff", sw:2});
+      label(root, PT.D, "D", {dx:0, dy:42, size:28, color:"#FF6B9D", glow:"neonPink"});
+      // 直角小方框（在 D 的右上）
+      rightAngle(root, PT.D, 0, -1, 18, "#FF3B30");
+      // 等號：AD = DB（紫色 ✦）
+      tickMark(root, PT.A, PT.D, { count:2, size:12, color:"#B967FF" });
+      tickMark(root, PT.D, PT.B, { count:2, size:12, color:"#B967FF" });
+      // E 點
+      dot(root, PT.E, {r:10, fill:"#FF6B9D", stroke:"#fff", sw:3, glow:"neonPink"});
+      label(root, PT.E, "E", {dx:30, dy:6, size:34, color:"#FF6B9D", glow:"neonPink"});
+      // L 的標籤
+      label(root, {x:L_TOP.x+30, y:L_TOP.y+30}, "L", {
+        size:38, color:"#FF6B9D", glow:"neonPink"
+      });
+      document.getElementById("btn-next").textContent = "▶ 圈出目標：△ACE";
+      break;
+    }
+
+    case 3: { // 圈出 △ACE，提出問題
+      setStageLabel("第 3 步｜目標出現");
+      setProblemCardVisible(true);
+      setNarration("題目要算 <span style='color:#FFD700'>△ACE 的周長</span> = AC + CE + EA = ?");
+      setTeacherTip("我們的目標：<b style='color:#FFD700'>△ACE 的周長</b> = AC + CE + EA。");
+      drawBaseTriangle(root, {});
+      // L + D + E
+      line(root, L_TOP, L_BOT, { stroke:"#FF6B9D", sw:5, dash:"10 6", glow:"neonPink"});
+      dot(root, PT.D, {r:8, fill:"#FF6B9D", stroke:"#fff", sw:2});
+      label(root, PT.D, "D", {dx:0, dy:42, size:28, color:"#FF6B9D", glow:"neonPink"});
+      rightAngle(root, PT.D, 0, -1, 18, "#FF3B30");
+      tickMark(root, PT.A, PT.D, { count:2, size:12, color:"#B967FF" });
+      tickMark(root, PT.D, PT.B, { count:2, size:12, color:"#B967FF" });
+      dot(root, PT.E, {r:10, fill:"#FF6B9D", stroke:"#fff", sw:3, glow:"neonPink"});
+      label(root, PT.E, "E", {dx:30, dy:6, size:34, color:"#FF6B9D", glow:"neonPink"});
+      label(root, {x:L_TOP.x+30, y:L_TOP.y+30}, "L", { size:38, color:"#FF6B9D", glow:"neonPink"});
+
+      // 用金色描出 △ACE 並用半透明金色填滿
+      const tri = el("path", {
+        d:`M${PT.A.x},${PT.A.y} L${PT.C.x},${PT.C.y} L${PT.E.x},${PT.E.y} Z`,
+        fill:"rgba(255,215,0,.18)", stroke:"#FFD700", "stroke-width":7,
+        "stroke-linejoin":"round", filter:"url(#neonGold)",
+        class:"pulse-stroke"
+      }, root);
+
+      // 公式版：右側 — 三段彩色，知道 / 不知道 用顏色區分
+      const fx = 1180, fy = 380;
+      label(root, {x:fx, y:fy-50}, "△ACE 周長", {size:32, color:"#FFD700", glow:"neonGold"});
+      label(root, {x:fx-160, y:fy+30}, "AC", {size:42, color:"#39FF14", glow:"neonGreen"});
+      label(root, {x:fx-100, y:fy+30}, "+", {size:42, color:"#fff"});
+      label(root, {x:fx-30,  y:fy+30}, "CE", {size:42, color:"#FF3B30"});
+      label(root, {x:fx+38,  y:fy+30}, "+", {size:42, color:"#fff"});
+      label(root, {x:fx+110, y:fy+30}, "EA", {size:42, color:"#FF3B30"});
+      // 標出已知未知
+      label(root, {x:fx-160, y:fy+72}, "= 13 ✓", {size:24, color:"#39FF14", glow:"neonGreen"});
+      label(root, {x:fx-30,  y:fy+72}, "= ?", {size:24, color:"#FF3B30"});
+      label(root, {x:fx+110, y:fy+72}, "= ?", {size:24, color:"#FF3B30"});
+
+      document.getElementById("btn-next").textContent = "▶ 召喚中垂線性質";
+      break;
+    }
+
+    case 4: { // 性質回顧：EA = EB
+      setStageLabel("第 4 步｜中垂線最強性質");
+      setProblemCardVisible(true);
+      setNarration("E 在中垂線上 → <span style='color:#B967FF'>EA = EB</span> ✨");
+      setTeacherTip("還記得嗎？ <b style='color:#B967FF'>中垂線上的點，到兩端等距離</b> ⇒ EA = EB！");
+      drawBaseTriangle(root, {});
+      line(root, L_TOP, L_BOT, { stroke:"#FF6B9D", sw:5, dash:"10 6", glow:"neonPink"});
+      dot(root, PT.D, {r:8, fill:"#FF6B9D", stroke:"#fff", sw:2});
+      label(root, PT.D, "D", {dx:0, dy:42, size:28, color:"#FF6B9D", glow:"neonPink"});
+      rightAngle(root, PT.D, 0, -1, 18, "#FF3B30");
+      tickMark(root, PT.A, PT.D, { count:2, size:12, color:"#B967FF" });
+      tickMark(root, PT.D, PT.B, { count:2, size:12, color:"#B967FF" });
+
+      // EA、EB 高亮成紫色 + 等距「/」記號
+      line(root, PT.E, PT.A, { stroke:"#B967FF", sw:8, glow:"neonPurple"});
+      line(root, PT.E, PT.B, { stroke:"#B967FF", sw:8, glow:"neonPurple"});
+      tickMark(root, PT.E, PT.A, { count:1, size:14, color:"#B967FF" });
+      tickMark(root, PT.E, PT.B, { count:1, size:14, color:"#B967FF" });
+
+      dot(root, PT.E, {r:12, fill:"#B967FF", stroke:"#fff", sw:3, glow:"neonPurple"});
+      label(root, PT.E, "E", {dx:30, dy:6, size:34, color:"#B967FF", glow:"neonPurple"});
+      label(root, {x:L_TOP.x+30, y:L_TOP.y+30}, "L", { size:38, color:"#FF6B9D", glow:"neonPink"});
+
+      // 公式區：EA = EB
+      const fx = 1180, fy = 380;
+      label(root, {x:fx, y:fy-30}, "中垂線性質", {size:30, color:"#B967FF", glow:"neonPurple"});
+      label(root, {x:fx-90,  y:fy+50}, "EA", {size:54, color:"#B967FF", glow:"neonPurple"});
+      label(root, {x:fx,     y:fy+50}, "=",  {size:54, color:"#FFD700", glow:"neonGold"});
+      label(root, {x:fx+90,  y:fy+50}, "EB", {size:54, color:"#B967FF", glow:"neonPurple"});
+      label(root, {x:fx, y:fy+110}, "🪄 招式：可以互換！", {
+        size:24, color:"#FFD700", glow:"neonGold"
+      });
+
+      document.getElementById("btn-next").textContent = "▶ 替換大絕招";
+      break;
+    }
+
+    case 5: { // 替代：EA → EB
+      setStageLabel("第 5 步｜🪄 替代魔法");
+      setProblemCardVisible(true);
+      setNarration("把 <span style='color:#B967FF'>EA</span> 偷偷換成 <span style='color:#FF6B9D'>EB</span> — 反正一樣長！");
+      setTeacherTip("把 EA「翻」到對面變成 EB（反正一樣長）— 等下你會看到神奇的事情。");
+      drawBaseTriangle(root, {});
+      line(root, L_TOP, L_BOT, { stroke:"#FF6B9D", sw:5, dash:"10 6", glow:"neonPink"});
+      dot(root, PT.D, {r:8, fill:"#FF6B9D", stroke:"#fff", sw:2});
+      label(root, PT.D, "D", {dx:0, dy:42, size:28, color:"#FF6B9D", glow:"neonPink"});
+      rightAngle(root, PT.D, 0, -1, 18, "#FF3B30");
+
+      // EA 變淡（鬼影）
+      const eaGhost = line(root, PT.E, PT.A, { stroke:"#B967FF", sw:6, glow:"neonPurple", opacity:0.18 });
+      el("text", {
+        x:(PT.E.x+PT.A.x)/2-10, y:(PT.E.y+PT.A.y)/2-10,
+        "font-size":24, "font-weight":900, fill:"#B967FF", opacity:0.4,
+        stroke:"#000", "stroke-width":3, "paint-order":"stroke"
+      }, root, "EA");
+
+      // CE 段先用紅色高亮（一段）
+      line(root, PT.C, PT.E, { stroke:"#FFD700", sw:9, glow:"neonGold"});
+
+      // 新的 EB（粉紅亮起來，從 E 出發到 B）
+      line(root, PT.E, PT.B, { stroke:"#FF6B9D", sw:9, glow:"neonPink", id:"line-EB"});
+      tickMark(root, PT.E, PT.B, { count:1, size:14, color:"#FF6B9D" });
+
+      dot(root, PT.E, {r:12, fill:"#FF6B9D", stroke:"#fff", sw:3, glow:"neonPink"});
+      label(root, PT.E, "E", {dx:30, dy:6, size:34, color:"#FF6B9D", glow:"neonPink"});
+      label(root, {x:L_TOP.x+30, y:L_TOP.y+30}, "L", { size:38, color:"#FF6B9D", glow:"neonPink"});
+
+      // 公式區：周長 = AC + CE + EA → AC + CE + EB
+      const fx = 1180, fy = 360;
+      label(root, {x:fx, y:fy-50}, "周長 = AC + CE + EA", {size:28, color:"#fff"});
+      // 箭頭
+      label(root, {x:fx, y:fy-10}, "↓ 把 EA 換成 EB", {size:24, color:"#FFD700", glow:"neonGold"});
+      label(root, {x:fx-160, y:fy+50}, "AC", {size:42, color:"#39FF14", glow:"neonGreen"});
+      label(root, {x:fx-100, y:fy+50}, "+", {size:42, color:"#fff"});
+      label(root, {x:fx-30,  y:fy+50}, "CE", {size:42, color:"#FFD700", glow:"neonGold"});
+      label(root, {x:fx+38,  y:fy+50}, "+", {size:42, color:"#fff"});
+      label(root, {x:fx+110, y:fy+50}, "EB", {size:42, color:"#FF6B9D", glow:"neonPink"});
+
+      document.getElementById("btn-next").textContent = "▶ 重組成 BC";
+      break;
+    }
+
+    case 6: { // 重組：CE + EB = CB
+      setStageLabel("第 6 步｜🔥 重組成 BC");
+      setProblemCardVisible(true);
+      setNarration("CE 和 EB 接起來，剛好就是 <span style='color:#FFD700'>CB = 15</span>！");
+      setTeacherTip("看～ <b>CE + EB</b> 是 C 經 E 到 B 的整條路徑，加起來剛好就是 <b style='color:#FFD700'>BC = 15</b>！");
+      drawBaseTriangle(root, {});
+      line(root, L_TOP, L_BOT, { stroke:"#FF6B9D", sw:5, dash:"10 6", glow:"neonPink", opacity:0.45});
+      dot(root, PT.D, {r:8, fill:"#FF6B9D", stroke:"#fff", sw:2, glow:"neonPink"});
+
+      // 整條 BC 用金色粗線發光
+      line(root, PT.C, PT.B, { stroke:"#FFD700", sw:11, glow:"neonGold", id:"line-CB" });
+      // 中間 E 點當分隔
+      dot(root, PT.E, {r:10, fill:"#FFD700", stroke:"#fff", sw:3, glow:"neonGold"});
+      label(root, PT.E, "E", {dx:30, dy:6, size:30, color:"#FFD700", glow:"neonGold"});
+
+      // 在 CE、EB 上方分別加標
+      midLabel(root, PT.C, PT.E, "CE", {dx:-30, dy:-12, size:24, color:"#FFD700", glow:"neonGold"});
+      midLabel(root, PT.E, PT.B, "EB", {dx:30,  dy:-12, size:24, color:"#FF6B9D", glow:"neonPink"});
+
+      // 強化標出 CB = 15
+      midLabel(root, PT.C, PT.B, "= 15", {dx:55, dy:30, size:36, color:"#FFD700", glow:"neonGold"});
+
+      // 公式
+      const fx = 1180, fy = 380;
+      label(root, {x:fx, y:fy-60}, "CE + EB = CB", {size:34, color:"#FFD700", glow:"neonGold"});
+      label(root, {x:fx, y:fy-10}, "↓", {size:32, color:"#fff"});
+      label(root, {x:fx, y:fy+40}, "周長 = AC + BC", {size:32, color:"#39FF14", glow:"neonGreen"});
+      label(root, {x:fx, y:fy+90}, "= 13 + 15", {size:36, color:"#fff"});
+
+      document.getElementById("btn-next").textContent = "▶ 揭曉答案！";
+      break;
+    }
+
+    case 7: { // 答案：28
+      setStageLabel("第 7 步｜🎉 解開！");
+      setProblemCardVisible(true);
+      setNarration("△ACE 周長 = 13 + 15 = <span style='color:#39FF14;font-size:48px'>28</span> ✨");
+      setTeacherTip("<b style='color:#39FF14'>△ACE 周長 = 28</b>！這就是中垂線的密技：<b>等距 → 替代 → 重組</b>。");
+      drawBaseTriangle(root, {});
+      line(root, L_TOP, L_BOT, { stroke:"#FF6B9D", sw:4, dash:"10 6", glow:"neonPink", opacity:0.4});
+      dot(root, PT.D, {r:7, fill:"#FF6B9D", stroke:"#fff", sw:2, glow:"neonPink"});
+
+      // △ACE 完整高亮
+      el("path", {
+        d:`M${PT.A.x},${PT.A.y} L${PT.C.x},${PT.C.y} L${PT.E.x},${PT.E.y} Z`,
+        fill:"rgba(57,255,20,.18)", stroke:"#39FF14", "stroke-width":6,
+        filter:"url(#neonGreen)"
+      }, root);
+      dot(root, PT.E, {r:11, fill:"#39FF14", stroke:"#fff", sw:3, glow:"neonGreen"});
+      label(root, PT.E, "E", {dx:30, dy:6, size:32, color:"#39FF14", glow:"neonGreen"});
+
+      // 大答案
+      const fx = 1180, fy = 320;
+      label(root, {x:fx, y:fy-30}, "△ACE 的周長", {size:34, color:"#FFD700", glow:"neonGold"});
+      label(root, {x:fx, y:fy+50}, "= AC + CB", {size:36, color:"#fff"});
+      label(root, {x:fx, y:fy+110}, "= 13 + 15", {size:40, color:"#fff"});
+      label(root, {x:fx, y:fy+200}, "= 28", {size:96, color:"#39FF14", glow:"neonGreen"});
+
+      // 三步密技
+      label(root, {x:fx, y:fy+290}, "🥷 密技：等距 → 替代 → 重組", {
+        size:24, color:"#FF6B9D", glow:"neonPink"
+      });
+      document.getElementById("btn-next").textContent = "🔁 再玩一次";
+      break;
+    }
+  }
+  updateProgress();
+}
+
+/* === 步驟切換 + 音效 === */
+function nextStep(){
+  ensureAudio();
+  if(state.stepIdx >= 7){
+    state.stepIdx = 0;
+    render();
+    return;
+  }
+  state.stepIdx++;
+  render();
+  // 各步驟對應音效
+  switch(state.stepIdx){
+    case 1: SFX.click(); break;
+    case 2: SFX.reveal(); break;
+    case 3: SFX.coin(); break;
+    case 4: SFX.reveal(); setTimeout(()=>SFX.coin(),200); break;
+    case 5: SFX.swap(); flashBig("替代!", "#B967FF", 110); break;
+    case 6: SFX.success(); flashBig("重組!", "#FFD700", 110); break;
+    case 7: SFX.win(); flashBig("28!", "#39FF14", 200); confetti(40); break;
+  }
+}
+function prevStep(){
+  ensureAudio();
+  if(state.stepIdx > 0){ state.stepIdx--; render(); SFX.click(); }
+}
+function restart(){
+  ensureAudio();
+  state.stepIdx = 0;
+  render();
+  SFX.click();
+}
+
+document.getElementById("btn-next").addEventListener("click", nextStep);
+document.getElementById("btn-prev").addEventListener("click", prevStep);
+document.getElementById("btn-restart").addEventListener("click", restart);
+document.getElementById("btn-mute").addEventListener("click", (e)=>{
+  state.audioOn = !state.audioOn;
+  e.currentTarget.textContent = state.audioOn ? "🔊" : "🔇";
+});
+
+// 鍵盤：→ ← Space
+document.addEventListener("keydown", (e)=>{
+  if(e.key==="ArrowRight" || e.key===" ") { e.preventDefault(); nextStep(); }
+  else if(e.key==="ArrowLeft") prevStep();
+  else if(e.key==="r" || e.key==="R") restart();
+});
+
+// 初始化
+render();
+</script>
+</body>
+</html>
