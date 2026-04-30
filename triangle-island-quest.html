@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>🗺️ 三角形島嶼大冒險 · 3-4 等腰+正三角形</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+  html,body{overflow-x:hidden}
+  body{
+    font-family:'Microsoft JhengHei','Noto Sans TC',-apple-system,sans-serif;
+    background:
+      radial-gradient(circle at 20% 10%,#FF1493 0%,transparent 40%),
+      radial-gradient(circle at 80% 90%,#00FFFF 0%,transparent 40%),
+      radial-gradient(circle at 50% 50%,#9D00FF 0%,transparent 60%),
+      linear-gradient(135deg,#0A0E27 0%,#1A0F3E 50%,#000 100%);
+    color:#fff;min-height:100vh;line-height:1.5;
+    user-select:none;-webkit-user-select:none;
+  }
+  #app{max-width:780px;margin:0 auto;padding:12px;min-height:100vh;display:flex;flex-direction:column}
+
+  /* ===== 頂部 HUD ===== */
+  header{
+    background:rgba(0,0,0,.65);
+    backdrop-filter:blur(8px);
+    border:2px solid #00FFFF;
+    border-radius:14px;padding:12px 14px;margin-bottom:12px;
+    box-shadow:0 0 20px rgba(0,255,255,.4),inset 0 0 12px rgba(0,255,255,.1);
+  }
+  .h-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .h-title{
+    font-size:1.05em;font-weight:900;
+    background:linear-gradient(90deg,#FF1493,#FFD700,#00FFFF);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    letter-spacing:1px;
+  }
+  .player-info{
+    display:flex;gap:10px;align-items:center;font-size:.92em;font-weight:800;
+  }
+  .lvl-badge{background:linear-gradient(135deg,#FFD700,#FF8C00);color:#000;
+    padding:3px 10px;border-radius:10px;font-weight:900;font-size:.85em}
+  .xp-bar{
+    margin-top:8px;background:rgba(255,255,255,.1);
+    border-radius:10px;height:14px;overflow:hidden;position:relative;
+    border:1px solid rgba(0,255,255,.4);
+  }
+  .xp-fill{
+    height:100%;background:linear-gradient(90deg,#00FFFF,#FF1493,#FFD700);
+    transition:width .5s ease;box-shadow:0 0 10px #FF1493;
+  }
+  .xp-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:.78em;font-weight:900;color:#fff;text-shadow:1px 1px 0 #000}
+
+  /* ===== 主舞台 ===== */
+  main{
+    flex:1;
+    background:rgba(10,14,39,.7);
+    border:2px solid rgba(255,20,147,.4);
+    border-radius:14px;padding:16px;margin-bottom:12px;min-height:520px;
+    box-shadow:0 0 24px rgba(255,20,147,.2);
+  }
+
+  /* ===== 島嶼地圖 ===== */
+  .world-map{padding:10px 0}
+  .map-title{
+    text-align:center;font-size:1.5em;font-weight:900;
+    background:linear-gradient(90deg,#FF1493,#FFD700);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    margin-bottom:10px;letter-spacing:2px;
+  }
+  .map-sub{text-align:center;color:#00FFFF;font-size:.95em;margin-bottom:18px}
+  .island-grid{display:grid;gap:14px}
+  .island{
+    background:linear-gradient(135deg,rgba(0,0,0,.7),rgba(157,0,255,.15));
+    border:3px solid #555;border-radius:18px;
+    padding:16px 18px;
+    cursor:pointer;transition:all .25s;
+    position:relative;overflow:hidden;
+  }
+  .island::before{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(45deg,transparent 40%,rgba(255,255,255,.1) 50%,transparent 60%);
+    transform:translateX(-100%);transition:transform .6s;
+  }
+  .island.unlocked{border-color:#00FFFF;box-shadow:0 0 18px rgba(0,255,255,.4)}
+  .island.unlocked:hover::before{transform:translateX(100%)}
+  .island.cleared{border-color:#FFD700;box-shadow:0 0 22px rgba(255,215,0,.5);
+    background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(0,0,0,.6))}
+  .island.locked{opacity:.4;cursor:not-allowed}
+  .island.locked .lock{font-size:2em;float:right}
+  .isle-row{display:flex;align-items:center;gap:14px}
+  .isle-icon{font-size:3em;flex-shrink:0;line-height:1;filter:drop-shadow(0 0 8px currentColor)}
+  .isle-body{flex:1;min-width:0}
+  .isle-num{font-size:.78em;color:#FFD700;font-weight:900;letter-spacing:2px;text-shadow:0 0 8px #FFD700}
+  .isle-name{font-size:1.25em;font-weight:900;color:#fff;margin:2px 0;text-shadow:1px 1px 0 #000}
+  .isle-desc{font-size:.88em;color:#B0E0E6;font-weight:600}
+  .isle-status{font-size:.85em;color:#FFD700;margin-top:6px;font-weight:800}
+  .isle-cleared-mark{
+    background:linear-gradient(135deg,#FFD700,#FF8C00);color:#000;
+    padding:3px 10px;border-radius:8px;display:inline-block;
+    font-size:.78em;font-weight:900;
+  }
+  .isle-rare{
+    display:inline-block;padding:2px 8px;border-radius:6px;
+    font-size:.72em;font-weight:900;letter-spacing:1px;
+  }
+  .rare-common{background:#666;color:#fff}
+  .rare-rare{background:#4DBCFF;color:#000}
+  .rare-epic{background:#B967FF;color:#fff}
+  .rare-legendary{background:linear-gradient(135deg,#FFD700,#FF8C00);color:#000;
+    text-shadow:0 0 4px #fff;animation:legPulse 1.5s infinite}
+  @keyframes legPulse{0%,100%{box-shadow:0 0 8px #FFD700}50%{box-shadow:0 0 18px #FFD700}}
+
+  /* ===== 任務畫面 ===== */
+  .quest-screen{padding:8px}
+  .quest-header{
+    background:linear-gradient(135deg,#1A0F3E,#3D1A6E);
+    border:2px solid #00FFFF;border-radius:14px;
+    padding:12px 16px;margin-bottom:14px;
+    box-shadow:0 0 16px rgba(0,255,255,.3);
+  }
+  .qh-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .qh-icon{font-size:2em;line-height:1}
+  .qh-title{flex:1;font-size:1.2em;font-weight:900;color:#FFD700;text-shadow:1px 1px 0 #000}
+  .qh-back{
+    background:rgba(255,255,255,.1);color:#fff;
+    border:1px solid #555;border-radius:8px;
+    padding:6px 12px;font-size:.85em;cursor:pointer;font-weight:700;
+  }
+  .qh-back:hover{background:rgba(255,255,255,.2)}
+  .qh-story{margin-top:8px;color:#B0E0E6;font-size:.92em;line-height:1.6}
+
+  .question-card{
+    background:linear-gradient(135deg,rgba(157,0,255,.2),rgba(0,255,255,.1));
+    border:3px solid #FF1493;border-radius:16px;
+    padding:18px;margin:14px 0;
+    box-shadow:0 0 22px rgba(255,20,147,.3);
+  }
+  .q-text{
+    text-align:center;font-size:1.18em;font-weight:900;color:#fff;
+    text-shadow:1px 1px 0 #000;line-height:1.6;
+  }
+  .q-svg-wrap{display:flex;justify-content:center;margin:14px 0}
+  .q-svg-wrap svg{max-width:100%;height:auto;border-radius:10px}
+
+  /* ===== 答案按鈕 ===== */
+  .answers{display:grid;gap:10px;margin-top:10px}
+  .answers.two{grid-template-columns:1fr 1fr}
+  .answers.four{grid-template-columns:1fr 1fr}
+  @media(max-width:480px){.answers.four{grid-template-columns:1fr 1fr}}
+  .ans-btn{
+    background:linear-gradient(135deg,#1B5E8F,#0D3A5C);
+    color:#fff;border:3px solid #00FFFF;border-radius:14px;
+    padding:16px 12px;font-size:1.1em;font-weight:900;
+    cursor:pointer;transition:all .15s;min-height:64px;
+    box-shadow:0 4px 12px rgba(0,255,255,.3);
+    text-align:left;
+  }
+  .ans-btn:active{transform:scale(.96)}
+  .ans-btn .ans-letter{
+    display:inline-block;background:#00FFFF;color:#000;
+    width:30px;height:30px;border-radius:50%;
+    text-align:center;line-height:30px;font-weight:900;
+    margin-right:10px;
+  }
+  .ans-btn.right{
+    background:linear-gradient(135deg,#39FF14,#1B8B0A) !important;
+    border-color:#39FF14 !important;
+    animation:pulse .4s ease;box-shadow:0 0 24px #39FF14 !important;
+  }
+  .ans-btn.right .ans-letter{background:#000;color:#39FF14}
+  .ans-btn.wrong{
+    background:linear-gradient(135deg,#FF3B30,#A02020) !important;
+    border-color:#FF3B30 !important;
+    animation:shake .4s ease;
+  }
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+  /* ===== 反饋 ===== */
+  .feedback{
+    margin-top:14px;padding:14px;border-radius:12px;
+    font-size:1.05em;font-weight:800;text-align:center;line-height:1.55;
+  }
+  .fb-ok{background:rgba(57,255,20,.18);border:2px solid #39FF14;color:#39FF14}
+  .fb-no{background:rgba(255,138,0,.18);border:2px solid #FF8A00;color:#FFB347}
+
+  /* ===== 寶箱開箱 ===== */
+  .lootbox-overlay{
+    position:fixed;inset:0;z-index:9999;
+    background:rgba(0,0,0,.92);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    opacity:0;pointer-events:none;transition:opacity .3s;
+  }
+  .lootbox-overlay.show{opacity:1;pointer-events:auto}
+  .lootbox-box{
+    background:radial-gradient(circle,#3D1A6E,#0A0E27);
+    border:5px solid #FFD700;border-radius:24px;
+    padding:30px;text-align:center;max-width:90%;width:380px;
+    box-shadow:0 0 60px #FFD700,inset 0 0 30px rgba(255,215,0,.2);
+  }
+  .lootbox-icon{font-size:6em;margin:0 auto 14px;animation:chestShake .4s infinite}
+  @keyframes chestShake{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.05)}}
+  .lootbox-title{font-size:1.5em;font-weight:900;color:#FFD700;margin-bottom:6px;letter-spacing:2px}
+  .lootbox-prize{font-size:7em;margin:18px 0;animation:prizeBurst .9s ease}
+  @keyframes prizeBurst{
+    0%{transform:scale(0) rotate(-360deg);opacity:0}
+    50%{transform:scale(1.5) rotate(20deg);opacity:1}
+    100%{transform:scale(1) rotate(0);opacity:1}
+  }
+  .lootbox-name{font-size:1.4em;font-weight:900;color:#fff;margin:6px 0;text-shadow:0 0 10px currentColor}
+  .lootbox-rare-tag{
+    display:inline-block;padding:5px 16px;border-radius:10px;
+    font-weight:900;font-size:1em;margin:8px 0;letter-spacing:2px;
+  }
+  .lootbox-close{
+    margin-top:18px;
+    background:linear-gradient(135deg,#FFD700,#FF8C00);
+    color:#000;border:none;border-radius:12px;
+    padding:14px 36px;font-size:1.1em;font-weight:900;cursor:pointer;
+    box-shadow:0 0 20px #FFD700;letter-spacing:1px;
+  }
+
+  /* ===== 結局 ===== */
+  .victory{text-align:center;padding:20px}
+  .vic-crown{font-size:5em;animation:crownFloat 2s infinite ease}
+  @keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+  .vic-title{
+    font-size:2em;font-weight:900;margin:14px 0;letter-spacing:3px;
+    background:linear-gradient(90deg,#FFD700,#FF1493,#00FFFF,#FFD700);
+    background-size:300% 100%;
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:rainbow 3s infinite linear;
+  }
+  @keyframes rainbow{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+  .collection{
+    background:rgba(255,215,0,.12);border:2px solid #FFD700;
+    border-radius:14px;padding:14px;margin-top:18px;
+  }
+  .col-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+  @media(max-width:480px){.col-grid{grid-template-columns:repeat(3,1fr)}}
+  .col-item{
+    background:rgba(255,255,255,.08);border-radius:10px;padding:10px 6px;
+    text-align:center;border:1px solid rgba(255,255,255,.2);
+  }
+  .col-emoji{font-size:1.8em}
+  .col-label{font-size:.7em;color:#fff;margin-top:2px;font-weight:700}
+
+  /* ===== 底部 ===== */
+  footer{display:flex;gap:8px;justify-content:center;padding:6px 0}
+  .foot-btn{
+    background:rgba(255,255,255,.1);color:#fff;
+    border:1px solid rgba(255,255,255,.3);border-radius:10px;
+    padding:10px 18px;font-size:.95em;cursor:pointer;font-weight:700;
+  }
+
+  /* ===== 名字 modal ===== */
+  .name-modal{
+    position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.92);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .name-box{
+    background:linear-gradient(135deg,#1A0F3E,#3D1A6E);
+    border:3px solid #00FFFF;border-radius:20px;padding:28px 22px;
+    max-width:380px;width:100%;text-align:center;
+    box-shadow:0 0 50px #00FFFF;
+  }
+  .name-box h2{
+    background:linear-gradient(90deg,#FF1493,#FFD700);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    font-size:1.6em;margin-bottom:6px;
+  }
+  .name-box p{color:#B0E0E6;font-size:.95em;margin-bottom:14px}
+  .name-box input{
+    width:100%;padding:14px;border-radius:10px;
+    border:2px solid #FF1493;background:#0A0E27;color:#fff;
+    font-size:1.15em;text-align:center;outline:none;
+  }
+  .name-box button{
+    margin-top:12px;width:100%;
+    background:linear-gradient(135deg,#FFD700,#FF8C00);
+    color:#000;border:none;border-radius:10px;padding:14px;
+    font-size:1.1em;font-weight:900;cursor:pointer;letter-spacing:1px;
+    box-shadow:0 0 20px #FFD700;
+  }
+
+  /* ===== 答完慶祝動畫 ===== */
+  .confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:9998}
+
+  @media(max-width:480px){
+    body{font-size:14px}
+    .h-title{font-size:.95em}
+    .map-title{font-size:1.25em}
+    .isle-icon{font-size:2.4em}
+    .isle-name{font-size:1.1em}
+    .ans-btn{padding:14px 10px;font-size:1em;min-height:56px}
+    .lootbox-icon{font-size:5em}
+    .lootbox-prize{font-size:5em}
+    .vic-title{font-size:1.5em}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="h-row">
+      <div class="h-title">🗺️ 三角形島嶼大冒險</div>
+      <div class="player-info">
+        <span id="player-name">勇者</span>
+        <span class="lvl-badge">LV <span id="player-lvl">1</span></span>
+      </div>
+    </div>
+    <div class="xp-bar">
+      <div class="xp-fill" id="xp-fill" style="width:0%"></div>
+      <div class="xp-text" id="xp-text">XP 0 / 5</div>
+    </div>
+  </header>
+
+  <main id="stage"></main>
+
+  <footer>
+    <button class="foot-btn" id="reset-btn">🔄 重來</button>
+  </footer>
+
+</div>
+
+<!-- 寶箱開箱 -->
+<div class="lootbox-overlay" id="lootbox-overlay">
+  <div class="lootbox-box">
+    <div class="lootbox-icon" id="lootbox-icon">🎁</div>
+    <div class="lootbox-title" id="lootbox-title">解鎖戰利品！</div>
+    <div id="lootbox-content" style="display:none">
+      <div class="lootbox-prize" id="lootbox-prize">🗡️</div>
+      <div class="lootbox-name" id="lootbox-name">??</div>
+      <div class="lootbox-rare-tag" id="lootbox-rare">??</div>
+    </div>
+    <button class="lootbox-close" id="lootbox-close" style="display:none">⚔️ 繼續冒險</button>
+  </div>
+</div>
+
+<!-- 名字 modal -->
+<div class="name-modal" id="name-modal" style="display:none">
+  <div class="name-box">
+    <div style="font-size:3em;margin-bottom:6px">🗡️</div>
+    <h2>取個英雄暱稱</h2>
+    <p>2026 等腰大冒險開始！<br>取個喜歡的暱稱讓老師記住你～</p>
+    <input id="name-input" type="text" placeholder="例：神龍勇者、星之卡比..." maxlength="12">
+    <button id="name-confirm">⚡ 開始冒險</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ============================================================
+// SVG 工具
+// ============================================================
+const NS='http://www.w3.org/2000/svg';
+function svgEl(tag,attrs={}){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e}
+function triPts(a,b,c){
+  if(a+b<=c||b+c<=a||a+c<=b)return null;
+  const x=(c*c+a*a-b*b)/(2*a);
+  const y=Math.sqrt(Math.max(c*c-x*x,0));
+  return [{x,y:-y},{x:0,y:0},{x:a,y:0}];
+}
+function fitTri(pts,cx,cy,scale){
+  const mx=(pts[0].x+pts[1].x+pts[2].x)/3;
+  const my=(pts[0].y+pts[1].y+pts[2].y)/3;
+  return pts.map(p=>({x:cx+(p.x-mx)*scale,y:cy+(p.y-my)*scale}));
+}
+
+function drawTri(opts){
+  const {a,b,c, w=300,h=240, sides=null, vertices=null, isoEdges=false, eqMarks=false, highMid=false, showHeight=false, color='#FF1493'} = opts;
+  const svg = svgEl('svg',{width:w,height:h,viewBox:`0 0 ${w} ${h}`});
+  svg.appendChild(svgEl('rect',{x:0,y:0,width:w,height:h,fill:'#0A0E27',rx:10,stroke:color,'stroke-width':2}));
+
+  const aa=parseFloat(a),bb=parseFloat(b),cc=parseFloat(c);
+  const raw=triPts(aa,bb,cc);
+  if(!raw)return svg;
+  const span=Math.max(aa,bb,cc);
+  const scale=Math.min((w-60)/span,(h-60)/span)*0.85;
+  const pts=fitTri(raw,w/2,h/2+10,scale);
+
+  // 主三角
+  svg.appendChild(svgEl('path',{
+    d:`M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y} Z`,
+    fill:'rgba(255,20,147,0.12)',stroke:color,'stroke-width':4,'stroke-linejoin':'round'
+  }));
+
+  // 等腰邊高亮
+  if(isoEdges){
+    const hl=(p1,p2)=>svg.appendChild(svgEl('line',{x1:p1.x,y1:p1.y,x2:p2.x,y2:p2.y,
+      stroke:'#FF1493','stroke-width':6,'stroke-linecap':'round'}));
+    hl(pts[0],pts[1]); hl(pts[0],pts[2]);
+  }
+
+  // 等長雙線記號
+  if(eqMarks && eqMarks.length){
+    eqMarks.forEach(edge=>{
+      let p1,p2;
+      if(edge==='AB'){p1=pts[0];p2=pts[1]}
+      else if(edge==='AC'){p1=pts[0];p2=pts[2]}
+      else if(edge==='BC'){p1=pts[1];p2=pts[2]}
+      else if(edge==='BD'){p1=pts[1];p2={x:(pts[1].x+pts[2].x)/2,y:(pts[1].y+pts[2].y)/2}}
+      else if(edge==='DC'){p1={x:(pts[1].x+pts[2].x)/2,y:(pts[1].y+pts[2].y)/2};p2=pts[2]}
+      const mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2;
+      const dx=p2.x-p1.x,dy=p2.y-p1.y,len=Math.sqrt(dx*dx+dy*dy);
+      const nx=-dy/len*7,ny=dx/len*7;
+      svg.appendChild(svgEl('line',{x1:mx-nx-4,y1:my-ny,x2:mx+nx-4,y2:my+ny,stroke:'#FFD700','stroke-width':3}));
+      svg.appendChild(svgEl('line',{x1:mx-nx+4,y1:my-ny,x2:mx+nx+4,y2:my+ny,stroke:'#FFD700','stroke-width':3}));
+    });
+  }
+
+  // 中點 D + 高
+  if(highMid || showHeight){
+    const D={x:(pts[1].x+pts[2].x)/2,y:(pts[1].y+pts[2].y)/2};
+    if(showHeight){
+      svg.appendChild(svgEl('line',{x1:pts[0].x,y1:pts[0].y,x2:D.x,y2:D.y,
+        stroke:'#FFD700','stroke-width':5,'stroke-linecap':'round'}));
+      svg.appendChild(svgEl('rect',{x:D.x-2,y:D.y-18,width:16,height:16,
+        fill:'none',stroke:'#FF3B30','stroke-width':3}));
+    }
+    if(highMid){
+      svg.appendChild(svgEl('circle',{cx:D.x,cy:D.y,r:6,fill:'#FFD700',stroke:'#000','stroke-width':2}));
+      const dt=svgEl('text',{x:D.x,y:D.y+25,'text-anchor':'middle','font-size':18,
+        'font-weight':900,fill:'#FFD700','stroke':'#000','stroke-width':3,'paint-order':'stroke'});
+      dt.textContent='D';
+      svg.appendChild(dt);
+    }
+  }
+
+  // 邊長
+  if(sides){
+    const lblSide=(p1,p2,txt,offY)=>{
+      if(txt==null)return;
+      const mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2;
+      const t=svgEl('text',{x:mx,y:my+offY,'text-anchor':'middle','font-size':22,'font-weight':900,
+        fill:'#00FFFF','stroke':'#000','stroke-width':3,'paint-order':'stroke'});
+      t.textContent=txt;svg.appendChild(t);
+    };
+    lblSide(pts[1],pts[2],sides[0],26);
+    lblSide(pts[0],pts[2],sides[1],-8);
+    lblSide(pts[0],pts[1],sides[2],-8);
+  }
+
+  // 頂點
+  if(vertices){
+    const offsets=[{x:0,y:-15},{x:-18,y:18},{x:18,y:18}];
+    pts.forEach((p,i)=>{
+      const o=offsets[i];
+      const t=svgEl('text',{x:p.x+o.x,y:p.y+o.y,'text-anchor':'middle','font-size':24,'font-weight':900,
+        fill:'#fff','stroke':'#000','stroke-width':3,'paint-order':'stroke'});
+      t.textContent=vertices[i];svg.appendChild(t);
+    });
+  }
+  return svg;
+}
+
+// ============================================================
+// 5 個關卡（島嶼）
+// ============================================================
+const ISLANDS = [
+
+  // ===== 島 1 · 等腰偵察 =====
+  {
+    icon:'🏝️',
+    name:'熱帶偵察島',
+    desc:'找出地圖上的等腰三角形',
+    story:'第一個島嶼是熱帶偵察島。隊長說：「3 個三角形混進來，找出『等腰』那一個！」',
+    boss:'🦜',
+    qText:'哪一個是「等腰三角形」？',
+    options:[
+      {label:'三邊：5、7、8（左圖）', tri:{a:5,b:7,c:8}, correct:false},
+      {label:'三邊：6、6、4（中圖）', tri:{a:4,b:6,c:6}, correct:true},
+      {label:'三邊：3、4、5（右圖）', tri:{a:3,b:4,c:5}, correct:false},
+    ],
+    multipleVisuals:true,
+    hint:'等腰 = 兩邊相等',
+    msg:'答對！6=6 兩邊相同 → 等腰！',
+    prize:{emoji:'🗡️', name:'木刀', rarity:'common'}
+  },
+
+  // ===== 島 2 · 三線合一神殿 =====
+  {
+    icon:'🏛️',
+    name:'三線合一神殿',
+    desc:'解開等腰三角形的神祕祕密',
+    story:'神殿裡有等腰 △ABC（AB=AC），從 A 畫一條線 AD 到 BC 中點 D。神殿守衛問：「AD 同時是哪 3 件事？」',
+    boss:'🧙',
+    qText:'AD 同時是哪 3 件事？',
+    visualConfig:{
+      a:8,b:7,c:7,sides:[8,7,7],vertices:['A','B','C'],isoEdges:true,eqMarks:['AB','AC'],highMid:true,showHeight:true
+    },
+    options:[
+      {label:'A. 角平分線 + 中線 + 高', correct:true},
+      {label:'B. 對角線 + 中線 + 中垂線', correct:false},
+      {label:'C. 角平分線 + 對邊 + 邊長', correct:false},
+      {label:'D. 三邊長度', correct:false},
+    ],
+    answersClass:'four',
+    hint:'等腰三角形 AD 是「三線合一」',
+    msg:'答對！AD 三線合一：角平分線 + 中線 + 高！',
+    prize:{emoji:'💎', name:'神殿水晶', rarity:'rare'}
+  },
+
+  // ===== 島 3 · 火山測量 =====
+  {
+    icon:'🌋',
+    name:'火山測量島',
+    desc:'用三線合一找 BD 長度',
+    story:'火山口！等腰 △ABC，AB=AC=10，BC=12。要算出 BD（D 是 BC 中點）才能過火山！',
+    boss:'🐉',
+    qText:'BD 是多少？',
+    visualConfig:{
+      a:12,b:10,c:10,sides:[12,10,10],vertices:['A','B','C'],isoEdges:true,eqMarks:['AB','AC','BD','DC'],highMid:true,showHeight:true
+    },
+    options:[
+      {label:'4', correct:false},
+      {label:'5', correct:false},
+      {label:'6', correct:true},
+      {label:'8', correct:false},
+    ],
+    answersClass:'four',
+    hint:'三線合一 → BD = BC ÷ 2',
+    msg:'答對！BD = 12 ÷ 2 = 6',
+    prize:{emoji:'🔥', name:'火焰護甲', rarity:'rare'}
+  },
+
+  // ===== 島 4 · 雪山高峰 =====
+  {
+    icon:'🏔️',
+    name:'雪山高峰島',
+    desc:'用畢氏定理求等腰三角形的高',
+    story:'雪山頂！等腰 △ABC，AB=AC=13，BC=10。求高 AD 才能登頂！',
+    boss:'❄️',
+    qText:'高 AD 是多少？',
+    visualConfig:{
+      a:10,b:13,c:13,sides:[10,13,13],vertices:['A','B','C'],isoEdges:true,eqMarks:['AB','AC'],highMid:true,showHeight:true
+    },
+    options:[
+      {label:'8', correct:false},
+      {label:'12', correct:true},
+      {label:'15', correct:false},
+      {label:'18', correct:false},
+    ],
+    answersClass:'four',
+    hint:'BD=5，畢氏：13² - 5² = AD² → AD² = 144 → AD = 12',
+    msg:'答對！畢氏 13² - 5² = 144 → AD = 12！',
+    prize:{emoji:'🧊', name:'冰霜法杖', rarity:'epic'}
+  },
+
+  // ===== 島 5 · 龍之巢穴 BOSS =====
+  {
+    icon:'🐲',
+    name:'龍之巢穴（BOSS）',
+    desc:'最終 BOSS：正三角形面積',
+    story:'龍王守在最後一個島！邊長 4 的正三角形，面積等於多少？打敗龍王你就是傳說大師！',
+    boss:'👑',
+    qText:'邊長 4 的正三角形，面積 = ？',
+    visualConfig:{
+      a:4,b:4,c:4,sides:[4,4,4],vertices:['A','B','C'],isoEdges:true,eqMarks:['AB','AC','BC']
+    },
+    options:[
+      {label:'2√3', correct:false},
+      {label:'3√3', correct:false},
+      {label:'4√3', correct:true},
+      {label:'6√3', correct:false},
+    ],
+    answersClass:'four',
+    hint:'公式：(√3 / 4) × a² = (√3 / 4) × 16 = 4√3',
+    msg:'答對！正三角形公式：(√3/4) × 4² = 4√3！',
+    prize:{emoji:'🐉', name:'龍王傳說', rarity:'legendary'},
+    isBoss:true
+  }
+];
+
+// ============================================================
+// 雲端同步 API（跟 congruence-homework 用同一個）
+// ============================================================
+const API='https://script.google.com/macros/s/AKfycbxXBdWtuWvMDqJh7HzTc5K954ZF-UwrT7mhVQFJjbc9AW4MnzCyd3tmyV5SYxT2PiG2/exec';
+const TOOL='triangleIsland';
+const STORAGE_KEY='triangle-island-v1';
+const NAME_KEY='triangle-island-name';
+
+function getStudentName(){
+  return localStorage.getItem(NAME_KEY)||'';
+}
+function setStudentName(n){
+  if(n&&n.trim())localStorage.setItem(NAME_KEY,n.trim());
+}
+
+let state=loadState();
+function loadState(){
+  try{
+    const s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    return {
+      cleared: s.cleared||new Array(ISLANDS.length).fill(false),
+      collection: s.collection||{},
+      currentIsland: null
+    };
+  }catch(e){
+    return {cleared:new Array(ISLANDS.length).fill(false),collection:{},currentIsland:null};
+  }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
+  syncCloud();
+}
+function syncCloud(){
+  const name=getStudentName();
+  if(!name)return;
+  try{
+    fetch(API,{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'save_progress',name,tool:TOOL,
+        data:JSON.stringify({
+          cleared:state.cleared,
+          stars:state.cleared.filter(x=>x).length,
+          collection:state.collection,
+          updated:new Date().toISOString()
+        })})
+    }).catch(()=>{});
+  }catch(e){}
+}
+
+// ============================================================
+// 音效
+// ============================================================
+let audioCtx=null;
+function ensureAudio(){if(!audioCtx)try{audioCtx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}
+function beep(f,d,t='sine',v=.15){
+  if(!audioCtx)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type=t;o.frequency.value=f;
+  g.gain.value=0;g.gain.linearRampToValueAtTime(v,audioCtx.currentTime+0.01);
+  g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+d);
+  o.connect(g);g.connect(audioCtx.destination);
+  o.start();o.stop(audioCtx.currentTime+d);
+}
+function sfxClick(){ensureAudio();beep(440,0.08,'square',0.1)}
+function sfxRight(){ensureAudio();[659,784,988,1175].forEach((f,i)=>setTimeout(()=>beep(f,0.16,'square',0.15),i*70))}
+function sfxWrong(){ensureAudio();beep(220,0.3,'sawtooth',0.12)}
+function sfxLoot(){ensureAudio();[523,659,784,1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,0.12,'square',0.18),i*60))}
+function sfxBoss(){ensureAudio();[100,150,200].forEach((f,i)=>setTimeout(()=>beep(f,0.4,'sawtooth',0.3),i*150))}
+
+function confetti(n=30){
+  const colors=['#FFD700','#FF1493','#00FFFF','#9D00FF','#39FF14','#FF8A00'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div');
+    c.className='confetti';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.left=(50+Math.random()*40-20)+'%';
+    c.style.top='30%';
+    c.style.borderRadius=Math.random()<0.5?'50%':'2px';
+    document.body.appendChild(c);
+    const dx=(Math.random()-0.5)*500;
+    const dy=200+Math.random()*350;
+    c.animate([
+      {transform:'translate(0,0) rotate(0)',opacity:1},
+      {transform:`translate(${dx}px,${dy}px) rotate(${Math.random()*720}deg)`,opacity:0}
+    ],{duration:1500+Math.random()*800,easing:'ease-out'}).onfinish=()=>c.remove();
+  }
+}
+
+// ============================================================
+// 渲染：HUD
+// ============================================================
+function renderHUD(){
+  const name=getStudentName()||'勇者';
+  document.getElementById('player-name').textContent=name;
+  const cleared=state.cleared.filter(x=>x).length;
+  document.getElementById('player-lvl').textContent=cleared+1;
+  const pct=(cleared/ISLANDS.length)*100;
+  document.getElementById('xp-fill').style.width=pct+'%';
+  document.getElementById('xp-text').textContent=`XP ${cleared} / ${ISLANDS.length}`;
+}
+
+// ============================================================
+// 渲染：世界地圖
+// ============================================================
+function renderMap(){
+  state.currentIsland=null;
+  const stage=document.getElementById('stage');
+  const allCleared=state.cleared.every(x=>x);
+  if(allCleared){return renderVictory()}
+
+  let html='<div class="world-map">';
+  html+='<div class="map-title">⚡ 等腰島嶼地圖 ⚡</div>';
+  html+='<div class="map-sub">闖關 5 個島嶼 · 收集傳說戰利品</div>';
+  html+='<div class="island-grid">';
+
+  ISLANDS.forEach((isle,i)=>{
+    const cleared=state.cleared[i];
+    const unlocked = i===0 || state.cleared[i-1];
+    const cls=cleared?'cleared':(unlocked?'unlocked':'locked');
+    let status='';
+    if(cleared){
+      status=`<div class="isle-status"><span class="isle-cleared-mark">✓ 已通關</span> · 戰利品 ${isle.prize.emoji} ${isle.prize.name}</div>`;
+    } else if(unlocked){
+      const rare=isle.prize.rarity;
+      status=`<div class="isle-status">📦 戰利品 <span class="isle-rare rare-${rare}">${rare.toUpperCase()}</span></div>`;
+    } else {
+      status=`<div class="isle-status">🔒 完成上一島解鎖</div>`;
+    }
+    html+=`
+      <div class="island ${cls}" ${unlocked?`onclick="openIsland(${i})"`:''}>
+        <div class="isle-row">
+          <div class="isle-icon" style="color:${cleared?'#FFD700':(unlocked?'#00FFFF':'#666')}">${isle.icon}</div>
+          <div class="isle-body">
+            <div class="isle-num">ISLAND ${i+1}</div>
+            <div class="isle-name">${isle.name}</div>
+            <div class="isle-desc">${isle.desc}</div>
+            ${status}
+          </div>
+        </div>
+      </div>`;
+  });
+
+  html+='</div></div>';
+  stage.innerHTML=html;
+  renderHUD();
+}
+
+window.openIsland=function(idx){
+  sfxClick();
+  state.currentIsland=idx;
+  if(idx===ISLANDS.length-1)sfxBoss();
+  renderQuest(idx);
+};
+
+// ============================================================
+// 渲染：任務
+// ============================================================
+function renderQuest(idx){
+  const isle=ISLANDS[idx];
+  const stage=document.getElementById('stage');
+  let html=`
+    <div class="quest-screen">
+      <div class="quest-header">
+        <div class="qh-row">
+          <div class="qh-icon">${isle.icon}</div>
+          <div class="qh-title">${isle.name}</div>
+          <button class="qh-back" onclick="renderMap()">← 地圖</button>
+        </div>
+        <div class="qh-story">${isle.boss} ${isle.story}</div>
+      </div>
+      <div class="question-card">
+        <div class="q-text">${isle.qText}</div>
+        <div class="q-svg-wrap" id="quest-svg"></div>
+      </div>
+      <div class="answers ${isle.answersClass||'two'}" id="ans-area"></div>
+    </div>
+  `;
+  stage.innerHTML=html;
+
+  // 圖
+  const svgWrap=document.getElementById('quest-svg');
+  if(isle.multipleVisuals){
+    // 多個三角形（島 1）
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;gap:6px;justify-content:center;flex-wrap:wrap';
+    isle.options.forEach((opt,i)=>{
+      const tri=opt.tri;
+      const w=window.innerWidth<480?100:140;
+      row.appendChild(drawTri({a:tri.a,b:tri.b,c:tri.c,w,h:120,sides:[tri.a,tri.b,tri.c],
+        color:opt.correct?'#39FF14':'#FF1493'}));
+    });
+    svgWrap.appendChild(row);
+  } else if(isle.visualConfig){
+    const cfg=isle.visualConfig;
+    const w=window.innerWidth<480?280:340;
+    svgWrap.appendChild(drawTri({...cfg,w,h:230,color:'#FF1493'}));
+  }
+
+  // 答案按鈕
+  const ans=document.getElementById('ans-area');
+  isle.options.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='ans-btn';
+    const letter=String.fromCharCode(65+i);
+    b.innerHTML=`<span class="ans-letter">${letter}</span>${opt.label}`;
+    b.onclick=()=>handleAnswer(b,opt.correct,isle,idx);
+    ans.appendChild(b);
+  });
+
+  renderHUD();
+}
+
+function handleAnswer(btn,correct,isle,idx){
+  sfxClick();
+  if(correct){
+    btn.classList.add('right');sfxRight();
+    showFeedback(true,isle.msg);
+    document.querySelectorAll('.ans-btn').forEach(b=>b.disabled=true);
+    setTimeout(()=>completeIsland(idx),900);
+  } else {
+    btn.classList.add('wrong');sfxWrong();
+    setTimeout(()=>{btn.classList.remove('wrong');btn.disabled=false},500);
+    showFeedback(false,'❌ 不對！'+isle.hint);
+  }
+}
+
+function showFeedback(ok,msg){
+  let fb=document.querySelector('.feedback');
+  if(!fb){
+    fb=document.createElement('div');
+    fb.className='feedback';
+    document.querySelector('.quest-screen').appendChild(fb);
+  }
+  fb.className='feedback '+(ok?'fb-ok':'fb-no');
+  fb.textContent=msg;
+}
+
+function completeIsland(idx){
+  const isle=ISLANDS[idx];
+  if(!state.cleared[idx]){
+    state.cleared[idx]=true;
+    state.collection[isle.prize.emoji]=(state.collection[isle.prize.emoji]||0)+1;
+    saveState();
+  }
+  showLootbox(isle.prize, idx===ISLANDS.length-1);
+}
+
+// ============================================================
+// 寶箱開箱
+// ============================================================
+function showLootbox(prize, isFinal){
+  const ov=document.getElementById('lootbox-overlay');
+  const icon=document.getElementById('lootbox-icon');
+  const content=document.getElementById('lootbox-content');
+  const close=document.getElementById('lootbox-close');
+  const prizeEl=document.getElementById('lootbox-prize');
+  const nameEl=document.getElementById('lootbox-name');
+  const rareEl=document.getElementById('lootbox-rare');
+
+  icon.style.display='block';
+  icon.textContent='🎁';
+  content.style.display='none';
+  close.style.display='none';
+  ov.classList.add('show');
+  sfxLoot();
+
+  setTimeout(()=>{
+    icon.style.display='none';
+    content.style.display='block';
+    prizeEl.textContent=prize.emoji;
+    nameEl.textContent=prize.name;
+    const rareNames={common:'⚪ 普通',rare:'🔵 稀有',epic:'🟣 史詩',legendary:'🌟 傳說 🌟'};
+    rareEl.textContent=rareNames[prize.rarity];
+    rareEl.className='lootbox-rare-tag rare-'+prize.rarity;
+    rareEl.style.background={
+      common:'#666',rare:'#4DBCFF',epic:'#B967FF',
+      legendary:'linear-gradient(135deg,#FFD700,#FF8C00)'
+    }[prize.rarity];
+    rareEl.style.color=prize.rarity==='legendary'||prize.rarity==='rare'?'#000':'#fff';
+    close.style.display='inline-block';
+    close.textContent=isFinal?'🏆 看結局':'⚔️ 繼續冒險';
+    if(prize.rarity==='legendary'||prize.rarity==='epic')confetti(50);
+  },1100);
+
+  close.onclick=()=>{
+    sfxClick();
+    ov.classList.remove('show');
+    if(isFinal){
+      renderVictory();
+    } else {
+      renderMap();
+    }
+  };
+}
+
+// ============================================================
+// 結局畫面
+// ============================================================
+function renderVictory(){
+  const stage=document.getElementById('stage');
+  const colHtml=Object.entries(state.collection).map(([emoji,count])=>{
+    const isle=ISLANDS.find(x=>x.prize.emoji===emoji);
+    const name=isle?isle.prize.name:emoji;
+    return `<div class="col-item"><div class="col-emoji">${emoji}</div><div class="col-label">${name}</div></div>`;
+  }).join('');
+
+  stage.innerHTML=`
+    <div class="victory">
+      <div class="vic-crown">👑</div>
+      <div class="vic-title">傳說等腰大師</div>
+      <div style="color:#fff;font-size:1.1em;font-weight:700;margin:14px 0;line-height:1.7">
+        你打敗了所有島嶼！<br>
+        ⚖️ 等腰 + 💎 三線合一 + 🐉 正三角形<br>
+        全部精通！
+      </div>
+      <div class="collection">
+        <div style="color:#FFD700;font-weight:900;font-size:1.1em;margin-bottom:8px">🎁 戰利品收藏</div>
+        <div class="col-grid">${colHtml||'<div style="grid-column:1/-1;color:#888">尚無</div>'}</div>
+      </div>
+      <button class="lootbox-close" id="restart-btn" style="margin-top:18px">🔄 重新冒險</button>
+    </div>
+  `;
+  document.getElementById('restart-btn').onclick=()=>{
+    sfxClick();
+    if(confirm('要重新冒險嗎？戰利品保留～')){
+      state.cleared=new Array(ISLANDS.length).fill(false);
+      saveState();
+      renderMap();
+    }
+  };
+  confetti(80);
+  setTimeout(()=>confetti(60),700);
+  renderHUD();
+}
+
+// ============================================================
+// 名字 modal
+// ============================================================
+function showNameModal(){
+  const modal=document.getElementById('name-modal');
+  if(getStudentName()){modal.style.display='none';return}
+  modal.style.display='flex';
+  const input=document.getElementById('name-input');
+  const btn=document.getElementById('name-confirm');
+  setTimeout(()=>input.focus(),100);
+  const submit=()=>{
+    const v=input.value.trim();
+    if(!v){input.style.borderColor='#FF3B30';return}
+    setStudentName(v);
+    modal.style.display='none';
+    syncCloud();
+    renderMap();
+  };
+  btn.onclick=submit;
+  input.onkeypress=e=>{if(e.key==='Enter')submit()};
+}
+
+document.getElementById('reset-btn').onclick=()=>{
+  if(confirm('重來會清空所有進度（戰利品也會清空）！確定？')){
+    state={cleared:new Array(ISLANDS.length).fill(false),collection:{},currentIsland:null};
+    saveState();
+    renderMap();
+  }
+};
+
+document.addEventListener('click',ensureAudio,{once:true});
+document.addEventListener('touchstart',ensureAudio,{once:true});
+
+// 啟動
+showNameModal();
+renderMap();
+</script>
+
+</body>
+</html>
