@@ -20,9 +20,12 @@ html, body {
   background: linear-gradient(135deg, var(--c-bg-1) 0%, var(--c-bg-2) 100%);
   color: #fff;
   min-height: 100vh;
+  min-height: 100dvh;            /* iOS Safari 動態高度 */
   user-select: none;
   -webkit-user-select: none;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%; /* 防止 iOS 旋轉時文字放大 */
+  text-size-adjust: 100%;
 }
 body {
   padding: 16px;
@@ -320,6 +323,7 @@ body {
   padding: 14px 16px;
   margin-bottom: 16px;
   display: flex; gap: 12px; align-items: center;
+  flex-wrap: wrap;
 }
 .name-input-wrap label { color: var(--c-gold); font-weight: 800; }
 .name-input-wrap input {
@@ -327,13 +331,88 @@ body {
   background: rgba(255,255,255,.05);
   border: 1px solid rgba(255,255,255,.15);
   color: white;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 16px;             /* 16px 防止 iOS 自動放大 */
   font-family: inherit;
-  min-width: 80px;
+  min-width: 120px;
+  min-height: 44px;            /* 觸控目標 */
 }
 .name-input-wrap input:focus { outline: none; border-color: var(--c-perp); background: rgba(255,255,255,.1); }
+
+/* ===== 響應式 ===== */
+/* 手機（< 600px） */
+@media (max-width: 600px) {
+  body { padding: 12px; }
+  .cover { padding: 28px 12px; }
+  .cover h1 { font-size: 1.8rem; }
+  .cover .sub { font-size: 1rem; margin-bottom: 22px; }
+  .cover .start-btn { padding: 18px 38px; font-size: 1.25rem; letter-spacing: 1.5px; }
+  .cover .badge { font-size: .8rem; padding: 6px 12px; }
+  .cover .badge-row { gap: 8px; margin-bottom: 24px; }
+
+  .hud { padding: 10px 12px; gap: 8px; }
+  .hud .stage { font-size: .85rem; }
+  .hud .lives, .hud .coins { font-size: .95rem; }
+
+  .q-card { padding: 20px 16px; border-radius: 18px; }
+  .q-emoji { font-size: 2rem; }
+  .q-title { font-size: 1.2rem; line-height: 1.45; }
+  .q-hint { font-size: .88rem; margin-bottom: 14px; }
+  .q-stage { font-size: .78rem; padding: 5px 12px; }
+
+  .option {
+    padding: 14px 14px;
+    font-size: 1rem;
+    min-height: 60px;
+    gap: 12px;
+  }
+  .option .letter { width: 32px; height: 32px; font-size: .92rem; }
+
+  .feedback { font-size: .95rem; padding: 10px 14px; }
+  .next-btn { font-size: 1.1rem; padding: 16px; }
+
+  .victory { padding: 24px 12px; }
+  .victory h1 { font-size: 1.9rem; }
+  .victory .crown { font-size: 4rem; }
+  .victory .title-card { padding: 14px 22px; }
+  .victory .title-card .name { font-size: 1.3rem; }
+  .stat { padding: 10px 14px; min-width: 88px; }
+  .stat .num { font-size: 1.4rem; }
+
+  .stages-bar { gap: 4px; margin-bottom: 14px; }
+  .stage-dot { height: 6px; }
+}
+
+/* 超小手機（< 380px） */
+@media (max-width: 380px) {
+  .cover h1 { font-size: 1.55rem; }
+  .cover .start-btn { padding: 16px 30px; font-size: 1.1rem; }
+  .q-title { font-size: 1.08rem; }
+  .option { font-size: .92rem; padding: 12px 12px; min-height: 56px; }
+  .option .letter { width: 28px; height: 28px; }
+  .victory h1 { font-size: 1.65rem; }
+  .stats { gap: 8px; }
+  .stat { min-width: 76px; padding: 8px 10px; }
+  .stat .num { font-size: 1.2rem; }
+  .stat .lab { font-size: .72rem; }
+}
+
+/* 平板直立 / 大手機（橫式）— 加大字 + 兩欄選項 */
+@media (min-width: 720px) {
+  .wrap { max-width: 760px; }
+  .cover { padding: 56px 32px; }
+  .cover h1 { font-size: 2.8rem; }
+  .q-card { padding: 32px 28px; }
+  .q-title { font-size: 1.7rem; }
+  .option { font-size: 1.25rem; padding: 18px 22px; min-height: 72px; }
+  .option .letter { width: 42px; height: 42px; font-size: 1.1rem; }
+}
+
+/* 觸控設備：取消 hover 視覺效果（避免黏住） */
+@media (hover: none) {
+  .option:hover { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.15); }
+}
 </style>
 </head>
 <body>
@@ -456,7 +535,6 @@ function renderCover() {
       <div class="sub">3-4 初探 · 中垂線 + 角平分線</div>
       <div class="badge-row">
         <div class="badge">🎯 5 關</div>
-        <div class="badge">🎵 8-bit 音效</div>
         <div class="badge">👑 通關得稱號</div>
       </div>
       <button class="start-btn" onclick="startGame()">開始冒險 ▶</button>
