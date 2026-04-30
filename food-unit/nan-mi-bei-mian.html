@@ -71,23 +71,7 @@ body.shake-big{animation:shakeBig .5s ease-out}
   border-bottom:3px solid #000;
 }
 
-/* ========== 水管裝飾 ========== */
-.pipe{
-  position:fixed;bottom:64px;width:64px;height:80px;z-index:31;pointer-events:none;
-}
-.pipe-body{
-  width:100%;height:100%;
-  background:linear-gradient(180deg,#43A047 0%,#1B5E20 100%);
-  border:4px solid #000;border-radius:6px;
-  position:relative;
-}
-.pipe-top{
-  position:absolute;top:-14px;left:-8px;right:-8px;height:24px;
-  background:linear-gradient(180deg,#66BB6A 0%,#1B5E20 100%);
-  border:4px solid #000;border-radius:6px;
-}
-.pipe.left{left:0}
-.pipe.right{right:0}
+/* 水管已移除 — 太大塊會擋到側欄文字 */
 
 /* ========== HUD ========== */
 .hud{
@@ -115,7 +99,8 @@ body.shake-big{animation:shakeBig .5s ease-out}
 
 /* ========== 舞台 ========== */
 .stage{
-  position:fixed;inset:90px 0 64px 0;
+  /* 上 90 (HUD+hint)，下 140 留給角色和地面，內容不會跟角色搶位置 */
+  position:fixed;inset:90px 0 140px 0;
   display:flex;align-items:center;justify-content:center;flex-direction:column;
   z-index:5;
 }
@@ -142,7 +127,7 @@ body.shake-big{animation:shakeBig .5s ease-out}
 .compare{
   display:grid;grid-template-columns:1fr 60px 1fr;gap:12px;
   width:96%;max-width:1500px;flex:1;align-items:stretch;
-  position:relative;z-index:10;padding:0 90px; /* 左右留空給水管 */
+  position:relative;z-index:10;
 }
 .vs{
   display:flex;align-items:center;justify-content:center;
@@ -324,9 +309,9 @@ body.shake-big{animation:shakeBig .5s ease-out}
   100%{transform:translateY(70vh) rotate(360deg);opacity:.5}
 }
 
-/* ========== Mario 角色 ========== */
+/* ========== Mario 角色 - 站在地面上 ========== */
 .mario-char{
-  position:fixed;bottom:70px;left:14px;
+  position:fixed;bottom:14px;left:14px;
   width:48px;height:48px;
   background:linear-gradient(180deg,var(--mario-red) 0%,var(--mario-red) 50%,var(--mario-blue) 50%,var(--mario-blue) 100%);
   border:4px solid #000;border-radius:8px;
@@ -357,10 +342,10 @@ body.shake-big{animation:shakeBig .5s ease-out}
   100%{transform:scale(1) rotate(0);filter:none}
 }
 
-/* ========== 栗寶寶 ========== */
+/* ========== 栗寶寶 - 走在地面上，不蓋訊息 ========== */
 .goomba{
-  position:fixed;bottom:70px;
-  width:48px;height:48px;
+  position:fixed;bottom:14px;
+  width:46px;height:46px;
   background:radial-gradient(circle at 50% 35%,#A0522D 0%,#6B3410 100%);
   border:4px solid #000;border-radius:50% 50% 30% 30%;
   cursor:pointer;z-index:75;
@@ -392,7 +377,8 @@ body.shake-big{animation:shakeBig .5s ease-out}
 
 /* ========== BOSS 戰 ========== */
 .boss-stage{
-  position:fixed;left:50%;bottom:80px;transform:translateX(-50%);
+  /* BOSS 也站在地面上，不擋訊息卡 */
+  position:fixed;left:50%;bottom:8px;transform:translateX(-50%);
   display:none;flex-direction:column;align-items:center;z-index:90;
 }
 .boss-stage.show{display:flex;animation:bossEmerge 1s cubic-bezier(.34,1.56,.64,1)}
@@ -528,17 +514,29 @@ body.shake-big{animation:shakeBig .5s ease-out}
   100%{transform:translateY(110vh) rotate(720deg);opacity:.8}
 }
 
-/* 響應式 */
+/* BOSS 出現時把 stage 變淡，不要跟訊息卡搶注意力 */
+body.boss-active .stage{opacity:.45;transition:opacity .4s}
+
+/* 響應式 - 高度小的螢幕也要塞得下 */
 @media (max-width:1100px){
-  .compare{padding:0 80px}
   .scene-title{font-size:24px}
   .side h2{font-size:24px}
   .info-item{font-size:17px;padding:6px 10px}
   .feature-img,.img-fallback{height:90px}
   .q-block{width:46px;height:46px;font-size:20px}
 }
+@media (max-height:760px){
+  .feature-img,.img-fallback{height:80px}
+  .scene-title{font-size:22px;margin-bottom:4px}
+  .side h2{font-size:22px;margin-bottom:4px}
+  .info-item{font-size:15px;padding:5px 10px}
+  .food-card{font-size:15px;padding:4px}
+  .food-card img,.food-card .food-fallback{width:42px;height:42px;font-size:24px}
+  .q-block{width:42px;height:42px;font-size:18px}
+  .blocks-row{margin:6px 0 4px 0;gap:6px}
+}
 @media (max-width:760px){
-  .compare{grid-template-columns:1fr;gap:8px;padding:0 70px}
+  .compare{grid-template-columns:1fr;gap:6px}
   .vs{transform:rotate(90deg)}
 }
 </style>
@@ -792,10 +790,8 @@ body.shake-big{animation:shakeBig .5s ease-out}
 <!-- 煙火層 -->
 <div class="celebrate" id="celebrate"></div>
 
-<!-- 地面 + 水管 -->
+<!-- 地面（水管移除，避免遮字） -->
 <div class="ground"></div>
-<div class="pipe left"><div class="pipe-body"><div class="pipe-top"></div></div></div>
-<div class="pipe right"><div class="pipe-body"><div class="pipe-top"></div></div></div>
 
 <!-- Mario 角色 -->
 <div class="mario-char" id="marioChar" onclick="marioJump();event.stopPropagation()" title="點我跳！">😀</div>
@@ -978,6 +974,7 @@ function showScene(n){
   document.querySelectorAll('.weather-layer').forEach(l=>l.innerHTML='');
   document.querySelectorAll('.goomba').forEach(g=>g.remove());
   document.getElementById('bossStage').classList.remove('show');
+  document.body.classList.remove('boss-active');
 
   const scenes = document.querySelectorAll('.scene');
   scenes.forEach(s=>s.classList.remove('active','scaling-out','scaling-in'));
@@ -1103,6 +1100,7 @@ function showBoss(hp=3){
   const boss = document.getElementById('boss');
   boss.classList.remove('hit','defeated');
   stage.classList.add('show');
+  document.body.classList.add('boss-active'); // 把 stage 變淡
   updateBossHP();
 }
 function updateBossHP(){
@@ -1141,6 +1139,7 @@ function hitBoss(){
       bigConfetti();
       setTimeout(()=>{
         document.getElementById('bossStage').classList.remove('show');
+        document.body.classList.remove('boss-active');
         defeatBossReward();
       }, 1000);
     }, 200);
