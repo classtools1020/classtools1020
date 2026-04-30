@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>5/4 數學闖關 · 中垂線・角平分線初探</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --c-perp: #FF6B9D;       /* 中垂線粉紅 */
+  --c-bisect: #00BCD4;     /* 角平分線藍綠 */
+  --c-equal: #B967FF;      /* 等距紫 */
+  --c-right: #FF3B30;      /* 直角紅 */
+  --c-bg-1: #0f0f23;
+  --c-bg-2: #1a1a3e;
+  --c-gold: #FFD700;
+}
+html, body {
+  font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  background: linear-gradient(135deg, var(--c-bg-1) 0%, var(--c-bg-2) 100%);
+  color: #fff;
+  min-height: 100vh;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow-x: hidden;
+}
+body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 60% 70%, rgba(255,107,157,0.6), transparent),
+    radial-gradient(2px 2px at 40% 80%, rgba(0,188,212,0.5), transparent),
+    radial-gradient(1px 1px at 80% 20%, rgba(185,103,255,0.6), transparent),
+    linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+  background-size: 100% 100%;
+}
+
+.wrap { max-width: 720px; width: 100%; }
+
+/* ===== 入口畫面 ===== */
+.cover {
+  text-align: center;
+  padding: 40px 24px;
+  animation: fadeUp .6s ease-out;
+}
+.cover h1 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--c-perp), var(--c-bisect), var(--c-equal));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  text-shadow: 0 0 30px rgba(255,107,157,.4);
+}
+.cover .sub {
+  font-size: 1.15rem;
+  color: #aab;
+  margin-bottom: 28px;
+}
+.cover .badge-row {
+  display: flex; justify-content: center; gap: 14px; margin-bottom: 32px; flex-wrap: wrap;
+}
+.cover .badge {
+  background: rgba(255,255,255,.06);
+  border: 2px solid rgba(255,255,255,.15);
+  padding: 8px 14px;
+  border-radius: 50px;
+  font-size: .9rem;
+  color: #ccd;
+}
+.cover .start-btn {
+  background: linear-gradient(135deg, var(--c-perp), var(--c-equal));
+  color: white;
+  border: none;
+  padding: 22px 50px;
+  font-size: 1.5rem;
+  font-weight: 900;
+  font-family: inherit;
+  border-radius: 60px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255,107,157,.4), inset 0 -3px 0 rgba(0,0,0,.2);
+  letter-spacing: 2px;
+  transition: transform .15s;
+  animation: pulse 1.6s infinite;
+}
+.cover .start-btn:active { transform: scale(.96); }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(255,107,157,.4), inset 0 -3px 0 rgba(0,0,0,.2); }
+  50%      { box-shadow: 0 8px 36px rgba(255,107,157,.7), inset 0 -3px 0 rgba(0,0,0,.2); }
+}
+.cover .hint {
+  margin-top: 24px;
+  color: #889;
+  font-size: .9rem;
+}
+
+/* ===== 進度條 ===== */
+.hud {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px;
+  background: rgba(0,0,0,.4);
+  border: 2px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  margin-bottom: 16px;
+  font-weight: 800;
+}
+.hud .stage { font-size: 1rem; color: var(--c-gold); }
+.hud .lives { font-size: 1.1rem; color: #ff6b6b; }
+.hud .coins { font-size: 1.1rem; color: var(--c-gold); }
+.stages-bar {
+  display: flex; gap: 6px; margin-bottom: 18px;
+}
+.stage-dot {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,.1);
+  transition: background .3s;
+}
+.stage-dot.active { background: linear-gradient(90deg, var(--c-perp), var(--c-bisect)); }
+.stage-dot.done { background: var(--c-gold); }
+
+/* ===== 題目卡 ===== */
+.q-card {
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(255,255,255,.1);
+  border-radius: 24px;
+  padding: 26px 22px;
+  margin-bottom: 16px;
+  animation: fadeUp .4s ease-out;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.q-stage {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--c-perp), var(--c-equal));
+  color: white;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: .85rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(255,107,157,.3);
+}
+.q-emoji { font-size: 2.4rem; margin-bottom: 6px; }
+.q-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  color: #fff;
+}
+.q-hint {
+  color: #aac;
+  font-size: .95rem;
+  margin-bottom: 18px;
+  font-style: italic;
+}
+
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option {
+  background: rgba(255,255,255,.05);
+  border: 2px solid rgba(255,255,255,.15);
+  padding: 16px 18px;
+  border-radius: 16px;
+  font-size: 1.15rem;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all .18s;
+  font-family: inherit;
+  text-align: left;
+  min-height: 64px;
+  font-weight: 600;
+  line-height: 1.4;
+  width: 100%;
+}
+.option:active { transform: scale(.98); }
+.option:hover {
+  background: rgba(255,255,255,.1);
+  border-color: rgba(255,255,255,.3);
+}
+.option .letter {
+  width: 38px; height: 38px; flex-shrink: 0;
+  background: rgba(255,255,255,.1);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900;
+}
+.option.correct {
+  background: linear-gradient(135deg, rgba(34,197,94,.3), rgba(34,197,94,.15));
+  border-color: #22c55e;
+  animation: correctPop .5s;
+}
+.option.correct .letter { background: #22c55e; color: white; }
+.option.wrong {
+  background: linear-gradient(135deg, rgba(239,68,68,.3), rgba(239,68,68,.15));
+  border-color: #ef4444;
+  animation: shake .4s;
+}
+.option.wrong .letter { background: #ef4444; color: white; }
+@keyframes correctPop {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+.feedback {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-align: center;
+  font-size: 1.05rem;
+  display: none;
+  animation: fadeUp .3s ease-out;
+}
+.feedback.show { display: block; }
+.feedback.ok { background: rgba(34,197,94,.2); color: #4ade80; border: 1px solid rgba(34,197,94,.4); }
+.feedback.bad { background: rgba(239,68,68,.2); color: #f87171; border: 1px solid rgba(239,68,68,.4); }
+
+.next-btn {
+  margin-top: 12px; width: 100%;
+  background: linear-gradient(135deg, var(--c-bisect), var(--c-equal));
+  color: white; border: none;
+  padding: 18px;
+  font-size: 1.25rem;
+  font-weight: 900;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: inherit;
+  display: none;
+  box-shadow: 0 6px 18px rgba(0,188,212,.4);
+}
+.next-btn.show { display: block; animation: fadeUp .3s; }
+.next-btn:active { transform: scale(.97); }
+
+/* ===== 通關畫面 ===== */
+.victory {
+  text-align: center; padding: 30px 24px;
+  animation: fadeUp .8s ease-out;
+}
+.victory h1 {
+  font-size: 2.6rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, var(--c-gold), var(--c-perp), var(--c-bisect));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  margin-bottom: 14px;
+  animation: rainbow 3s infinite;
+}
+@keyframes rainbow {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50%      { filter: hue-rotate(60deg); }
+}
+.victory .crown { font-size: 5rem; margin-bottom: 14px; animation: bounce 1.4s infinite; }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+.victory .title-card {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(255,215,0,.2), rgba(255,107,157,.2));
+  border: 2px solid var(--c-gold);
+  padding: 18px 30px;
+  border-radius: 24px;
+  margin: 18px 0;
+}
+.victory .title-card .label { font-size: .9rem; color: var(--c-gold); margin-bottom: 4px; }
+.victory .title-card .name { font-size: 1.6rem; font-weight: 900; color: white; }
+.victory .stats {
+  display: flex; justify-content: center; gap: 14px;
+  margin: 22px 0;
+  flex-wrap: wrap;
+}
+.stat {
+  background: rgba(255,255,255,.06);
+  padding: 12px 18px; border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  min-width: 100px;
+}
+.stat .num { font-size: 1.6rem; font-weight: 900; color: var(--c-gold); }
+.stat .lab { font-size: .8rem; color: #aab; margin-top: 2px; }
+.victory .restart {
+  margin-top: 18px;
+  background: rgba(255,255,255,.08);
+  color: white; border: 2px solid rgba(255,255,255,.2);
+  padding: 14px 30px; font-size: 1rem; font-weight: 700;
+  border-radius: 50px;
+  cursor: pointer; font-family: inherit;
+}
+.victory .restart:active { transform: scale(.97); }
+
+/* 煙火 */
+#fireworks { position: fixed; inset: 0; pointer-events: none; z-index: 9999; display: none; }
+
+/* 名字輸入 */
+.name-input-wrap {
+  background: rgba(0,0,0,.4);
+  border: 2px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex; gap: 12px; align-items: center;
+}
+.name-input-wrap label { color: var(--c-gold); font-weight: 800; }
+.name-input-wrap input {
+  flex: 1;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.15);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  min-width: 80px;
+}
+.name-input-wrap input:focus { outline: none; border-color: var(--c-perp); background: rgba(255,255,255,.1); }
+</style>
+</head>
+<body>
+<canvas id="fireworks"></canvas>
+
+<div class="wrap" id="app"></div>
+
+<script>
+/* ====== 8-bit 馬力歐風音效 ====== */
+let audioCtx = null;
+function ctx() {
+  if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
+  return audioCtx;
+}
+function tone(freq, dur, type='square', vol=0.1) {
+  const c = ctx(); if (!c) return;
+  const osc = c.createOscillator(), gain = c.createGain();
+  osc.type = type; osc.frequency.value = freq;
+  gain.gain.setValueAtTime(vol, c.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+  osc.connect(gain); gain.connect(c.destination);
+  osc.start(); osc.stop(c.currentTime + dur);
+}
+function sndCoin() {  // 馬力歐金幣
+  tone(988, 0.07, 'square', 0.13);
+  setTimeout(() => tone(1318, 0.18, 'square', 0.13), 70);
+}
+function sndJump() { tone(523, 0.05, 'square', 0.1); setTimeout(()=>tone(880, 0.1, 'square', 0.1), 50); }
+function sndWrong() { tone(220, 0.15, 'square', 0.12); setTimeout(()=>tone(110, 0.25, 'square', 0.12), 150); }
+function sndLevelUp() {  // 過關
+  const notes = [523, 659, 784, 1046, 1318];
+  notes.forEach((n, i) => setTimeout(() => tone(n, 0.1, 'square', 0.13), i * 80));
+}
+function sndVictory() {  // 全破
+  const notes = [659, 659, 659, 523, 659, 784, 392, 523, 392];
+  notes.forEach((n, i) => setTimeout(() => tone(n, 0.18, 'square', 0.14), i * 130));
+}
+
+/* ====== 題庫（3-4 初探） ====== */
+const QUESTIONS = [
+  {
+    emoji: '📏',
+    boss: '中垂線守門員',
+    title: '什麼叫「中垂線」？',
+    hint: '兩個關鍵字：垂直 + 平分',
+    options: [
+      { text: '把線段切成 2 段不等長的線', emoji: '✂️' },
+      { text: '把線段「垂直」+「平分」的線', emoji: '🎯', correct: true },
+      { text: '跟線段平行的線', emoji: '═' }
+    ],
+    explain: '答對！中垂線 = 垂直 + 平分線段。'
+  },
+  {
+    emoji: '📐',
+    boss: '直角戰士',
+    title: '中垂線跟線段交叉的角度是？',
+    hint: '直角！跟桌子的角一樣～',
+    options: [
+      { text: '45 度', emoji: '🔺' },
+      { text: '60 度', emoji: '🔶' },
+      { text: '90 度', emoji: '⬜', correct: true }
+    ],
+    explain: '答對！90 度直角，所以叫「垂直」。'
+  },
+  {
+    emoji: '✨',
+    boss: '等距精靈',
+    title: '中垂線上「任一個點」到線段兩端的距離？',
+    hint: '中垂線最神奇的地方就在這～',
+    options: [
+      { text: '左邊比較長', emoji: '⬅️' },
+      { text: '一樣長（等距）', emoji: '🟰', correct: true },
+      { text: '不一定', emoji: '🤷' }
+    ],
+    explain: '答對！中垂線上「任何一點」到兩端都「等距」。'
+  },
+  {
+    emoji: '🪓',
+    boss: '角平分大師',
+    title: '「角平分線」會把一個角分成幾份？',
+    hint: '平分 = 平均分',
+    options: [
+      { text: '2 等份', emoji: '✌️', correct: true },
+      { text: '3 等份', emoji: '🤟' },
+      { text: '看心情', emoji: '😎' }
+    ],
+    explain: '答對！平均分成 2 等份。'
+  },
+  {
+    emoji: '👑',
+    boss: '最終 BOSS · 等距大魔王',
+    title: '角平分線上「任一個點」到「角的兩邊」距離？',
+    hint: '跟中垂線一樣神奇！',
+    options: [
+      { text: '不一定', emoji: '🤷' },
+      { text: '一樣（等距）', emoji: '🟰', correct: true },
+      { text: '看誰拿尺量', emoji: '📏' }
+    ],
+    explain: '答對！角平分線上的任一點到「角兩邊」也等距！通關！'
+  }
+];
+
+/* ====== 狀態 ====== */
+const state = {
+  current: 0,
+  coins: 0,
+  lives: 3,
+  startTime: null,
+  attempts: 0,
+  studentName: ''
+};
+const TOTAL = QUESTIONS.length;
+const app = document.getElementById('app');
+
+/* ====== 畫面 ====== */
+function renderCover() {
+  app.innerHTML = `
+    <div class="cover">
+      <h1>數學闖關 Lv.5</h1>
+      <div class="sub">3-4 初探 · 中垂線 + 角平分線</div>
+      <div class="badge-row">
+        <div class="badge">🎯 5 關</div>
+        <div class="badge">🎵 8-bit 音效</div>
+        <div class="badge">👑 通關得稱號</div>
+      </div>
+      <button class="start-btn" onclick="startGame()">開始冒險 ▶</button>
+      <div class="hint">5/4 數學作業 · 8A</div>
+    </div>
+  `;
+}
+
+function startGame() {
+  sndJump();
+  state.startTime = Date.now();
+  state.current = 0;
+  state.coins = 0;
+  state.lives = 3;
+  state.attempts = 0;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[state.current];
+
+  const stagesBarHtml = QUESTIONS.map((_, i) => {
+    let cls = '';
+    if (i < state.current) cls = 'done';
+    else if (i === state.current) cls = 'active';
+    return `<div class="stage-dot ${cls}"></div>`;
+  }).join('');
+
+  const optsHtml = q.options.map((opt, i) => `
+    <button class="option" data-idx="${i}" onclick="pick(${i})">
+      <div class="letter">${String.fromCharCode(65 + i)}</div>
+      <div style="flex:1;">
+        <span style="font-size:1.4rem;margin-right:8px;">${opt.emoji}</span>${opt.text}
+      </div>
+    </button>
+  `).join('');
+
+  app.innerHTML = `
+    ${state.current === 0 ? `
+      <div class="name-input-wrap">
+        <label>👤 我的名字：</label>
+        <input id="nameInput" type="text" placeholder="輸入你的名字（可跳過）" autocomplete="off" value="${state.studentName}">
+      </div>
+    ` : ''}
+
+    <div class="hud">
+      <div class="stage">⚔️ 第 ${state.current + 1} 關 / ${TOTAL}</div>
+      <div class="lives">❤️ ${'❤️'.repeat(state.lives)}</div>
+      <div class="coins">🪙 ${state.coins}</div>
+    </div>
+
+    <div class="stages-bar">${stagesBarHtml}</div>
+
+    <div class="q-card">
+      <div class="q-stage">⚔️ ${q.boss}</div>
+      <div class="q-emoji">${q.emoji}</div>
+      <div class="q-title">${q.title}</div>
+      <div class="q-hint">💡 ${q.hint}</div>
+      <div class="options">${optsHtml}</div>
+      <div class="feedback" id="fb"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">下一關 →</button>
+    </div>
+  `;
+
+  const nameInput = document.getElementById('nameInput');
+  if (nameInput) {
+    nameInput.addEventListener('input', e => state.studentName = e.target.value);
+  }
+}
+
+function pick(idx) {
+  const q = QUESTIONS[state.current];
+  const opts = document.querySelectorAll('.option');
+  if (opts[0].classList.contains('correct') || opts[0].classList.contains('wrong')) return;
+
+  state.attempts++;
+  const isCorrect = q.options[idx].correct;
+
+  if (isCorrect) {
+    opts[idx].classList.add('correct');
+    state.coins += 10 + state.lives * 2;
+    sndCoin();
+    setTimeout(() => sndLevelUp(), 200);
+    showFeedback('ok', `✨ ${q.explain} +${10 + state.lives * 2} 🪙`);
+    document.getElementById('nextBtn').classList.add('show');
+    document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
+    miniSpark();
+  } else {
+    opts[idx].classList.add('wrong');
+    state.lives = Math.max(0, state.lives - 1);
+    sndWrong();
+    showFeedback('bad', state.lives > 0 ? '💔 答錯了，再試一次！' : '💥 沒命了！但你還可以繼續～');
+    setTimeout(() => {
+      opts[idx].classList.remove('wrong');
+      // 重新整理 hud lives
+      const livesEl = document.querySelector('.lives');
+      if (livesEl) livesEl.innerHTML = `❤️ ${'❤️'.repeat(state.lives) || '💀'}`;
+    }, 800);
+  }
+}
+
+function showFeedback(type, msg) {
+  const fb = document.getElementById('fb');
+  fb.className = `feedback show ${type}`;
+  fb.textContent = msg;
+}
+
+function nextQ() {
+  state.current++;
+  if (state.current >= TOTAL) {
+    renderVictory();
+  } else {
+    sndJump();
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function getTitle() {
+  if (state.lives === 3 && state.attempts === 5) return '中垂線王者 👑';
+  if (state.lives >= 2) return '幾何高手 🥇';
+  if (state.lives >= 1) return '勇敢冒險者 🎖️';
+  return '不放棄的勇者 💪';
+}
+
+function renderVictory() {
+  const elapsedSec = Math.floor((Date.now() - state.startTime) / 1000);
+  const min = Math.floor(elapsedSec / 60);
+  const sec = elapsedSec % 60;
+  const timeStr = `${min}:${String(sec).padStart(2, '0')}`;
+  const greet = state.studentName ? `${state.studentName}！` : '';
+
+  app.innerHTML = `
+    <div class="victory">
+      <div class="crown">👑</div>
+      <h1>${greet}通關啦！</h1>
+      <div style="color:#aab;font-size:1.05rem;margin-bottom:8px;">中垂線 + 角平分線初探 · 全部破關</div>
+      <div class="title-card">
+        <div class="label">獲得稱號</div>
+        <div class="name">${getTitle()}</div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="num">${state.coins}</div><div class="lab">🪙 金幣</div></div>
+        <div class="stat"><div class="num">${state.lives}</div><div class="lab">❤️ 剩命</div></div>
+        <div class="stat"><div class="num">${timeStr}</div><div class="lab">⏱ 時間</div></div>
+      </div>
+      <div style="color:#aac;font-size:.95rem;margin-top:18px;line-height:1.7;">
+        🎯 學會了「中垂線 + 角平分線」的 5 個重點！<br>
+        把這個畫面截圖傳到老師 LINE 就完成作業 ✅
+      </div>
+      <button class="restart" onclick="startGame()">🔄 再玩一次</button>
+    </div>
+  `;
+  sndVictory();
+  bigFireworks();
+}
+
+/* ====== 煙火 ====== */
+const fwCanvas = document.getElementById('fireworks');
+const fwCtx = fwCanvas.getContext('2d');
+let fwParticles = [];
+function resizeFW() { fwCanvas.width = innerWidth; fwCanvas.height = innerHeight; }
+resizeFW(); addEventListener('resize', resizeFW);
+
+function bigFireworks() {
+  fwCanvas.style.display = 'block';
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => burst(Math.random() * innerWidth, Math.random() * innerHeight * 0.6 + 50), i * 350);
+  }
+  fwLoop();
+  setTimeout(() => { fwCanvas.style.display = 'none'; fwParticles = []; }, 4500);
+}
+function miniSpark() {
+  fwCanvas.style.display = 'block';
+  burst(innerWidth / 2, innerHeight / 2);
+  fwLoop();
+  setTimeout(() => {
+    if (fwParticles.length === 0) fwCanvas.style.display = 'none';
+  }, 1500);
+}
+function burst(x, y) {
+  const colors = ['#FF6B9D', '#00BCD4', '#B967FF', '#FFD700', '#FF3B30', '#22c55e'];
+  for (let i = 0; i < 36; i++) {
+    const a = (i / 36) * Math.PI * 2;
+    fwParticles.push({
+      x, y,
+      vx: Math.cos(a) * (Math.random() * 5 + 2),
+      vy: Math.sin(a) * (Math.random() * 5 + 2),
+      life: 70,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
+  }
+}
+function fwLoop() {
+  fwCtx.fillStyle = 'rgba(0,0,0,0.12)';
+  fwCtx.fillRect(0, 0, fwCanvas.width, fwCanvas.height);
+  fwParticles.forEach(p => {
+    p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.life--;
+    fwCtx.fillStyle = p.color;
+    fwCtx.globalAlpha = p.life / 70;
+    fwCtx.fillRect(p.x, p.y, 4, 4);
+  });
+  fwCtx.globalAlpha = 1;
+  fwParticles = fwParticles.filter(p => p.life > 0);
+  if (fwParticles.length > 0) requestAnimationFrame(fwLoop);
+  else if (fwCanvas.style.display === 'block') fwCanvas.style.display = 'none';
+}
+
+renderCover();
+</script>
+</body>
+</html>
