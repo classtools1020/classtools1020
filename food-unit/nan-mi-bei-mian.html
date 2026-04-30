@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🍚 南米北麵大冒險 🌾 馬力歐風</title>
+<title>🍚 南米北麵大冒險 🌾 馬力歐闖關</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -11,12 +11,9 @@
   --mario-blue:#049CD8;
   --mario-yellow:#FBD000;
   --mario-green:#43B047;
-  --south-bg:#A5D6A7;
-  --south-deep:#2E7D32;
-  --south-water:#4FC3F7;
-  --north-bg:#FFE082;
-  --north-deep:#E65100;
-  --north-soil:#A1887F;
+  --block-yellow:#F5BD3E;
+  --block-shadow:#9C6B00;
+  --brick:#B8651E;
   --sky:#5C94FC;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -28,246 +25,217 @@ body{
   color:#fff;
   user-select:none;
   position:relative;
-  cursor:pointer;
 }
 
-/* ==== 雲朵 ==== */
+/* ========== 背景 ========== */
 .cloud{
-  position:absolute;
-  background:#fff;
-  border-radius:30px;
-  opacity:.95;
-  box-shadow:6px 0 0 #ddd;
-  z-index:1;
-  pointer-events:none;
+  position:absolute;background:#fff;border-radius:30px;opacity:.95;z-index:1;pointer-events:none;
 }
-.cloud::before,.cloud::after{
-  content:'';position:absolute;background:#fff;border-radius:50%;
-}
+.cloud::before,.cloud::after{content:'';position:absolute;background:#fff;border-radius:50%}
 .cloud::before{width:50%;height:140%;top:-30%;left:15%}
 .cloud::after{width:35%;height:120%;top:-15%;left:55%}
-.c1{top:8%;left:5%;width:90px;height:30px;animation:float1 18s linear infinite}
-.c2{top:14%;left:55%;width:120px;height:36px;animation:float1 24s linear infinite reverse}
-.c3{top:5%;left:80%;width:70px;height:24px;animation:float1 14s linear infinite}
-@keyframes float1{
-  0%{transform:translateX(0)}
-  50%{transform:translateX(40px)}
-  100%{transform:translateX(0)}
-}
+.c1{top:6%;left:4%;width:90px;height:30px;animation:float1 18s linear infinite}
+.c2{top:10%;left:55%;width:120px;height:36px;animation:float1 24s linear infinite reverse}
+.c3{top:4%;left:78%;width:70px;height:24px;animation:float1 14s linear infinite}
+@keyframes float1{0%{transform:translateX(0)}50%{transform:translateX(40px)}100%{transform:translateX(0)}}
 
-/* ==== HUD ==== */
+/* ========== HUD ========== */
 .hud{
-  position:fixed;
-  top:0;left:0;right:0;
-  background:#000;
-  color:#fff;
-  font-family:'Press Start 2P',monospace;
-  font-size:13px;
-  padding:12px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  z-index:100;
-  border-bottom:5px solid var(--mario-yellow);
+  position:fixed;top:0;left:0;right:0;
+  background:#000;color:#fff;
+  font-family:'Press Start 2P',monospace;font-size:13px;
+  padding:10px 18px;
+  display:flex;justify-content:space-between;align-items:center;
+  z-index:200;border-bottom:5px solid var(--mario-yellow);
 }
 .hud .title-h{color:var(--mario-yellow);text-shadow:2px 2px 0 var(--mario-red)}
 .hud .level-h{color:#fff;background:var(--mario-red);padding:6px 12px;border:3px solid #fff;border-radius:6px}
-.hud .coins-h{color:var(--mario-yellow);font-size:16px}
+.hud .stats-h{display:flex;gap:18px;align-items:center}
+.hud .coin-h{color:var(--mario-yellow);font-size:15px}
+.hud .star-h{color:#FFEB3B;font-size:15px}
 
-/* ==== 舞台 ==== */
+/* ========== 舞台 ========== */
 .stage{
-  position:fixed;
-  inset:60px 0 0 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
+  position:fixed;inset:54px 0 0 0;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
   z-index:5;
 }
-
 .scene{
-  display:none;
-  width:100%;
-  height:100%;
-  position:relative;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
-  padding:20px 30px 100px;
+  display:none;width:100%;height:100%;position:relative;
+  flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:14px 22px 110px;
 }
 .scene.active{display:flex}
+.scene.scaling-out{animation:scaleOut .5s ease-in forwards}
+.scene.scaling-in{animation:scaleInScene .55s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes scaleOut{
+  0%{transform:scale(1);opacity:1}
+  100%{transform:scale(1.5);opacity:0}
+}
+@keyframes scaleInScene{
+  0%{transform:scale(.3);opacity:0}
+  100%{transform:scale(1);opacity:1}
+}
 
 .scene-title{
-  font-size:46px;
-  color:#fff;
-  text-shadow:4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
-  margin-bottom:20px;
-  text-align:center;
+  font-size:34px;color:#fff;
+  text-shadow:3px 3px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+  margin-bottom:12px;text-align:center;letter-spacing:2px;
   animation:popIn .6s cubic-bezier(.34,1.56,.64,1);
-  letter-spacing:2px;
 }
 @keyframes popIn{
   0%{transform:scale(.3) rotate(-8deg);opacity:0}
   100%{transform:scale(1) rotate(0);opacity:1}
 }
 
-/* ==== 對比區 ==== */
+/* ========== 對戰區 ========== */
 .compare{
-  display:grid;
-  grid-template-columns:1fr 80px 1fr;
-  gap:20px;
-  width:96%;
-  max-width:1500px;
-  flex:1;
-  align-items:stretch;
+  display:grid;grid-template-columns:1fr 70px 1fr;gap:14px;
+  width:96%;max-width:1500px;flex:1;align-items:stretch;
+  position:relative;z-index:10;
 }
 .vs{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:'Press Start 2P',monospace;
-  font-size:36px;
-  color:var(--mario-yellow);
-  text-shadow:3px 3px 0 #000;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Press Start 2P',monospace;font-size:30px;
+  color:var(--mario-yellow);text-shadow:3px 3px 0 #000;
   animation:vsBeat 1s ease-in-out infinite;
 }
-@keyframes vsBeat{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.15)}
-}
+@keyframes vsBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
 .side{
-  border:6px solid #000;
-  border-radius:20px;
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  position:relative;
-  box-shadow:8px 8px 0 rgba(0,0,0,.4);
+  border:6px solid #000;border-radius:18px;padding:12px;
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;box-shadow:6px 6px 0 rgba(0,0,0,.4);
   overflow:hidden;
-  min-height:60vh;
+  background:#fff;
 }
 .side.north{
   background:linear-gradient(180deg,#FFE082 0%, #FFB74D 100%);
-  color:#5D4037;
   border-color:#E65100;
 }
 .side.south{
   background:linear-gradient(180deg,#A5D6A7 0%, #4FC3F7 100%);
-  color:#0D47A1;
   border-color:#2E7D32;
 }
 .side h2{
-  font-size:42px;
-  margin-bottom:12px;
-  text-align:center;
-  letter-spacing:2px;
-  text-shadow:3px 3px 0 rgba(255,255,255,.5);
+  font-size:32px;margin-bottom:8px;text-align:center;
+  letter-spacing:2px;text-shadow:2px 2px 0 rgba(255,255,255,.5);
+  color:#5D4037;position:relative;z-index:5;
 }
-.side .icon-row{
-  font-size:90px;
-  margin:6px 0 14px 0;
-  height:110px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  filter:drop-shadow(3px 3px 0 rgba(0,0,0,.3));
+.side.south h2{color:#0D47A1}
+
+/* ========== 真實照片 ========== */
+.feature-img{
+  width:100%;height:130px;object-fit:cover;
+  border:4px solid #000;border-radius:10px;
+  background:#eee;
+  position:relative;z-index:5;
+  box-shadow:3px 3px 0 rgba(0,0,0,.3);
+}
+.img-fallback{
+  width:100%;height:130px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:80px;background:#fff;
+  border:4px solid #000;border-radius:10px;
+  position:relative;z-index:5;
 }
 
-.item{
-  display:none;
-  font-size:30px;
-  background:rgba(255,255,255,.92);
-  color:#222;
-  padding:12px 18px;
-  margin:6px 0;
-  border-radius:14px;
-  border:4px solid #000;
-  box-shadow:5px 5px 0 rgba(0,0,0,.3);
-  width:100%;
-  text-align:center;
-  font-weight:900;
+/* ========== 問號磚塊 ========== */
+.blocks-row{
+  display:flex;justify-content:center;gap:10px;
+  margin:10px 0 6px 0;position:relative;z-index:6;
+  flex-wrap:wrap;
+}
+.q-block{
+  width:60px;height:60px;
+  background:linear-gradient(180deg,#FFD54F 0%,#F5BD3E 50%,#E6A52A 100%);
+  border:4px solid #000;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Press Start 2P',monospace;font-size:28px;color:#fff;
+  text-shadow:2px 2px 0 #000;
+  cursor:pointer;
+  box-shadow:0 5px 0 var(--block-shadow), 5px 5px 0 rgba(0,0,0,.3);
+  transition:transform .1s;
+  position:relative;
+}
+.q-block:hover{transform:translateY(-3px)}
+.q-block.bumping{animation:bump .35s ease-out}
+@keyframes bump{
+  0%{transform:translateY(0)}
+  40%{transform:translateY(-30px)}
+  70%{transform:translateY(-30px)}
+  100%{transform:translateY(0)}
+}
+.q-block.used{
+  background:repeating-linear-gradient(0deg,#A0531A 0,#A0531A 12px,#7A3F12 12px,#7A3F12 14px),
+             repeating-linear-gradient(90deg,#8D4719 0,#8D4719 18px,#6E3712 18px,#6E3712 20px);
+  background-blend-mode:multiply;
+  color:transparent;cursor:default;
+  box-shadow:0 5px 0 #4E280C, 5px 5px 0 rgba(0,0,0,.3);
+}
+.q-block.used:hover{transform:none}
+
+/* 飛出的金幣動畫 */
+.coin-pop{
+  position:absolute;font-size:40px;pointer-events:none;
+  animation:coinUp 1s ease-out forwards;z-index:50;
+}
+@keyframes coinUp{
+  0%{transform:translateY(0) scale(.5);opacity:0}
+  20%{transform:translateY(-30px) scale(1.2);opacity:1}
+  60%{transform:translateY(-100px) scale(1) rotateY(360deg);opacity:1}
+  100%{transform:translateY(-130px) scale(.5) rotateY(720deg);opacity:0}
+}
+
+/* ========== 答案卡片 ========== */
+.info-slots{
+  display:flex;flex-direction:column;gap:6px;
+  width:100%;flex:1;position:relative;z-index:5;
+}
+.info-item{
+  visibility:hidden;
+  font-size:22px;
+  background:rgba(255,255,255,.95);color:#222;
+  padding:10px 14px;border-radius:10px;
+  border:3px solid #000;
+  box-shadow:3px 3px 0 rgba(0,0,0,.3);
+  width:100%;text-align:center;font-weight:900;
   letter-spacing:1px;
 }
-.item.show{
-  display:block;
-  animation:slideIn .55s cubic-bezier(.34,1.56,.64,1);
+.info-item.show{
+  visibility:visible;
+  animation:slideIn .5s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes slideIn{
-  0%{transform:translateY(-40px) scale(.5) rotate(-5deg);opacity:0}
+  0%{transform:translateY(-20px) scale(.6) rotate(-3deg);opacity:0}
   100%{transform:translateY(0) scale(1) rotate(0);opacity:1}
 }
 
-/* ==== 按鈕 ==== */
-.next-btn{
-  position:fixed;
-  bottom:24px;
-  right:30px;
-  background:var(--mario-red);
-  color:#fff;
-  font-family:'Press Start 2P',monospace;
-  font-size:18px;
-  padding:18px 32px;
-  border:6px solid #000;
-  border-radius:14px;
-  cursor:pointer;
-  box-shadow:6px 6px 0 #000;
-  animation:bounce 1.2s ease-in-out infinite;
-  z-index:50;
-  transition:transform .1s;
+/* ========== 食物卡（第5關專用） ========== */
+.food-card{
+  visibility:hidden;
+  background:#fff;color:#222;
+  padding:6px;border-radius:10px;border:3px solid #000;
+  box-shadow:3px 3px 0 rgba(0,0,0,.3);
+  display:flex;align-items:center;gap:8px;width:100%;
+  font-size:20px;font-weight:900;
 }
-.next-btn:hover{transform:scale(1.05)}
-.next-btn:active{transform:translate(3px,3px);box-shadow:3px 3px 0 #000}
-@keyframes bounce{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(-8px)}
+.food-card.show{visibility:visible;animation:slideIn .5s cubic-bezier(.34,1.56,.64,1)}
+.food-card img,.food-card .food-fallback{
+  width:54px;height:54px;object-fit:cover;border-radius:6px;
+  border:2px solid #000;flex-shrink:0;background:#fff;
 }
-.prev-btn{
-  position:fixed;
-  bottom:24px;
-  left:30px;
-  background:#666;
-  color:#fff;
-  font-family:'Press Start 2P',monospace;
-  font-size:13px;
-  padding:14px 22px;
-  border:5px solid #000;
-  border-radius:10px;
-  cursor:pointer;
-  box-shadow:4px 4px 0 #000;
-  z-index:50;
-}
-.replay-btn{
-  background:var(--mario-green);
-  color:#fff;
-  font-family:'Press Start 2P',monospace;
-  font-size:22px;
-  padding:22px 44px;
-  border:6px solid #000;
-  border-radius:14px;
-  cursor:pointer;
-  box-shadow:8px 8px 0 #000;
-  margin-top:20px;
-}
-.replay-btn:hover{transform:scale(1.05)}
+.food-card .food-fallback{display:flex;align-items:center;justify-content:center;font-size:32px}
 
-/* ==== 第1關地圖 ==== */
+/* ========== 第1關地圖 ========== */
 .map-stage{
-  width:80%;
-  max-width:900px;
-  height:55vh;
-  position:relative;
+  width:78%;max-width:880px;height:48vh;position:relative;
   background:linear-gradient(180deg,#FFE082 0%,#FFB74D 49%,#43A047 51%,#A5D6A7 100%);
-  border:8px solid #000;
-  border-radius:30px;
-  box-shadow:10px 10px 0 rgba(0,0,0,.4);
-  overflow:hidden;
+  border:8px solid #000;border-radius:30px;
+  box-shadow:8px 8px 0 rgba(0,0,0,.4);overflow:hidden;
 }
 .map-label{
-  position:absolute;
-  font-size:64px;
-  font-weight:900;
+  position:absolute;font-size:54px;font-weight:900;
   text-shadow:4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
   z-index:3;
   animation:popIn .6s cubic-bezier(.34,1.56,.64,1) .3s both;
@@ -275,205 +243,241 @@ body{
 .map-label.north-lbl{top:12%;left:50%;transform:translateX(-50%);color:#FFE082}
 .map-label.south-lbl{bottom:12%;left:50%;transform:translateX(-50%);color:#fff}
 .divide-line{
-  position:absolute;
-  top:50%;
-  left:-100%;
-  width:100%;
-  height:10px;
+  position:absolute;top:50%;left:-100%;width:100%;height:10px;
   background:repeating-linear-gradient(90deg,red 0,red 22px,#fff 22px,#fff 44px);
   animation:slideLine 1.6s ease-out 1s forwards;
-  box-shadow:0 0 0 3px #000;
-  z-index:2;
+  box-shadow:0 0 0 3px #000;z-index:2;
 }
-@keyframes slideLine{ to{left:0} }
+@keyframes slideLine{to{left:0}}
 .divide-label{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:#000;
-  color:var(--mario-yellow);
-  padding:10px 18px;
-  font-family:'Press Start 2P',monospace;
-  font-size:16px;
-  border:4px solid var(--mario-yellow);
-  border-radius:6px;
-  opacity:0;
-  animation:fadeIn .5s ease-out 2.5s forwards;
-  z-index:5;
-  white-space:nowrap;
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:#000;color:var(--mario-yellow);
+  padding:8px 16px;font-family:'Press Start 2P',monospace;font-size:14px;
+  border:4px solid var(--mario-yellow);border-radius:6px;
+  opacity:0;animation:fadeInDelay .5s ease-out 2.5s forwards;
+  z-index:5;white-space:nowrap;
 }
-@keyframes fadeIn{ to{opacity:1} }
+@keyframes fadeInDelay{to{opacity:1}}
+.sun{position:absolute;font-size:54px;top:6%;right:8%;animation:rot 8s linear infinite;z-index:2}
+@keyframes rot{to{transform:rotate(360deg)}}
+.start-prompt{
+  font-size:24px;margin-top:14px;background:rgba(0,0,0,.7);
+  padding:10px 22px;border-radius:14px;border:4px solid #fff;text-align:center;
+  animation:bounceY 1.4s ease-in-out infinite;
+}
+@keyframes bounceY{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-/* 動畫太陽和雲 */
-.sun{
-  position:absolute;
-  font-size:60px;
-  top:8%;
-  right:10%;
-  animation:rot 8s linear infinite;
+/* ========== 粒子（雪/雨） ========== */
+.weather-layer{
+  position:absolute;inset:0;pointer-events:none;overflow:hidden;
   z-index:2;
 }
-@keyframes rot{ to{transform:rotate(360deg)} }
-
-/* ==== 粒子（雪/雨） ==== */
-.weather-layer{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-  z-index:1;
-}
-.particle{
-  position:absolute;
-  font-size:28px;
-  animation:fall 4s linear forwards;
-}
+.particle{position:absolute;font-size:24px;animation:fall 4s linear forwards}
 @keyframes fall{
   0%{transform:translateY(-30px) rotate(0);opacity:1}
-  100%{transform:translateY(70vh) rotate(360deg);opacity:.6}
+  100%{transform:translateY(70vh) rotate(360deg);opacity:.5}
 }
 
-/* ==== 第3關田地視覺 ==== */
-.field-viz{
-  font-size:120px;
-  margin:8px 0 14px 0;
-  height:140px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  filter:drop-shadow(4px 4px 0 rgba(0,0,0,.3));
+/* ========== Mario 角色 ========== */
+.mario-char{
+  position:fixed;bottom:14px;left:14px;
+  width:64px;height:64px;
+  background:linear-gradient(180deg,var(--mario-red) 0%,var(--mario-red) 50%,var(--mario-blue) 50%,var(--mario-blue) 100%);
+  border:4px solid #000;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;cursor:pointer;
+  box-shadow:4px 4px 0 #000;
+  z-index:80;transition:transform .1s;
 }
-.field-viz.dry{
-  background:repeating-linear-gradient(45deg,#A1887F 0,#A1887F 20px,#8D6E63 20px,#8D6E63 40px);
-  border:4px solid #5D4037;
-  border-radius:12px;
-  width:100%;
-  font-size:80px;
+.mario-char::before{
+  content:'';position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+  width:40px;height:14px;background:var(--mario-red);
+  border:3px solid #000;border-radius:50% 50% 0 0;
 }
-.field-viz.water{
-  background:linear-gradient(180deg,#4FC3F7,#0288D1);
-  border:4px solid #01579B;
-  border-radius:12px;
-  width:100%;
-  font-size:80px;
-  position:relative;
-  overflow:hidden;
+.mario-char:hover{transform:scale(1.05)}
+.mario-char.jumping{animation:marioJump .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes marioJump{
+  0%{transform:translateY(0) rotate(0)}
+  40%{transform:translateY(-80px) rotate(-10deg)}
+  60%{transform:translateY(-80px) rotate(10deg)}
+  100%{transform:translateY(0) rotate(0)}
 }
-.field-viz.water::before{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:repeating-linear-gradient(90deg,transparent 0,transparent 30px,rgba(255,255,255,.3) 30px,rgba(255,255,255,.3) 32px);
-  animation:wave 3s linear infinite;
-}
-@keyframes wave{
-  0%{transform:translateX(0)}
-  100%{transform:translateX(60px)}
+.mario-char.power-up{animation:powerUp 1s ease-out}
+@keyframes powerUp{
+  0%{transform:scale(1)}
+  20%{transform:scale(1.3) rotate(-10deg);filter:hue-rotate(60deg)}
+  40%{transform:scale(.8) rotate(10deg);filter:hue-rotate(180deg)}
+  60%{transform:scale(1.4) rotate(-5deg);filter:hue-rotate(270deg)}
+  80%{transform:scale(1) rotate(5deg);filter:hue-rotate(360deg)}
+  100%{transform:scale(1) rotate(0);filter:none}
 }
 
-/* ==== 第4關作物彈跳 ==== */
-.crop-jump{
-  font-size:140px;
-  height:160px;
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-  filter:drop-shadow(4px 4px 0 rgba(0,0,0,.3));
+/* ========== 栗寶寶（Goomba） ========== */
+.goomba{
+  position:fixed;bottom:14px;
+  width:54px;height:54px;
+  background:radial-gradient(circle at 50% 35%,#A0522D 0%,#6B3410 100%);
+  border:4px solid #000;border-radius:50% 50% 30% 30%;
+  cursor:pointer;z-index:75;
+  display:flex;align-items:flex-start;justify-content:center;
+  font-size:18px;padding-top:6px;
+  box-shadow:3px 3px 0 rgba(0,0,0,.4);
+  animation:goombaWalk 14s linear forwards;
 }
-.crop-jump.go{
-  animation:jump .6s cubic-bezier(.34,1.56,.64,1);
+.goomba::before,.goomba::after{
+  content:'';position:absolute;top:14px;
+  width:10px;height:14px;background:#fff;border:2px solid #000;border-radius:50%;
 }
-@keyframes jump{
-  0%{transform:translateY(100px) scale(.3);opacity:0}
-  60%{transform:translateY(-20px) scale(1.2);opacity:1}
-  100%{transform:translateY(0) scale(1);opacity:1}
+.goomba::before{left:8px}
+.goomba::after{right:8px}
+.goomba .pupils{position:absolute;inset:0;pointer-events:none}
+.goomba .pupils::before,.goomba .pupils::after{
+  content:'';position:absolute;top:18px;width:4px;height:6px;background:#000;border-radius:50%;
+}
+.goomba .pupils::before{left:13px}
+.goomba .pupils::after{right:13px}
+@keyframes goombaWalk{
+  0%{right:-80px}
+  100%{right:calc(100% + 80px)}
+}
+.goomba:hover{filter:brightness(1.2)}
+.goomba.stomped{
+  animation:none;transform:scaleY(.2) translateY(20px);
+  background:#5D2F0E;pointer-events:none;
+  transition:opacity .5s .3s;
+}
+.goomba.stomped.fadeout{opacity:0}
+
+/* ========== 蘑菇 power-up ========== */
+.mushroom-prompt{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  display:none;flex-direction:column;align-items:center;
+  z-index:90;
+  animation:mushroomEmerge .8s cubic-bezier(.34,1.56,.64,1);
+}
+.mushroom-prompt.show{display:flex}
+@keyframes mushroomEmerge{
+  0%{transform:translateX(-50%) translateY(80px) scale(.3);opacity:0}
+  100%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}
+}
+.mushroom-btn{
+  width:80px;height:80px;
+  background:radial-gradient(circle at 35% 35%,#fff 0%,#fff 30%,#E52521 30%,#E52521 100%);
+  border:5px solid #000;border-radius:50% 50% 30% 30%;
+  position:relative;cursor:pointer;
+  box-shadow:0 6px 0 #000, 4px 8px 12px rgba(0,0,0,.4);
+  animation:mushroomPulse 1s ease-in-out infinite;
+}
+.mushroom-btn::before,.mushroom-btn::after{
+  content:'';position:absolute;background:#fff;border:3px solid #000;border-radius:50%;
+}
+.mushroom-btn::before{width:14px;height:14px;top:18px;left:14px}
+.mushroom-btn::after{width:18px;height:18px;top:10px;right:14px}
+@keyframes mushroomPulse{
+  0%,100%{transform:translateY(0) scale(1);box-shadow:0 6px 0 #000, 0 0 20px var(--mario-yellow)}
+  50%{transform:translateY(-6px) scale(1.06);box-shadow:0 8px 0 #000, 0 0 36px var(--mario-yellow)}
+}
+.mushroom-label{
+  margin-top:4px;background:#000;color:var(--mario-yellow);
+  padding:6px 14px;font-family:'Press Start 2P',monospace;font-size:12px;
+  border:3px solid var(--mario-yellow);border-radius:6px;
 }
 
-/* ==== 通關畫面 ==== */
+/* ========== 提示 ========== */
+.hint-bar{
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.7);color:#fff;
+  padding:10px 22px;border-radius:14px;border:3px solid var(--mario-yellow);
+  font-size:18px;letter-spacing:1px;z-index:55;
+  display:flex;align-items:center;gap:10px;
+}
+
+/* ========== 工具列按鈕 ========== */
+.btn{
+  font-family:'Press Start 2P',monospace;font-size:13px;
+  padding:12px 20px;border:5px solid #000;border-radius:10px;
+  cursor:pointer;box-shadow:4px 4px 0 #000;
+  color:#fff;transition:transform .1s;
+}
+.btn:hover{transform:scale(1.05)}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
+.btn-reset{position:fixed;bottom:14px;right:14px;background:#666;z-index:80}
+.btn-skip{position:fixed;top:64px;right:14px;background:#888;font-size:11px;padding:8px 12px;z-index:80;opacity:.6}
+.btn-skip:hover{opacity:1}
+
+/* ========== 通關 ========== */
 .world-clear{
-  background:linear-gradient(180deg,#000 0%, #1a1a40 100%);
-  position:fixed;
-  inset:60px 0 0 0;
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  z-index:200;
-  padding:20px;
+  position:fixed;inset:54px 0 0 0;
+  background:linear-gradient(180deg,#000 0%, #1a1a40 50%, #4a148c 100%);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;z-index:150;padding:20px;
 }
 .world-clear.active{display:flex}
 .world-clear h1{
-  font-size:100px;
-  color:var(--mario-yellow);
-  text-shadow:5px 5px 0 var(--mario-red),10px 10px 0 #000;
-  margin-bottom:30px;
-  animation:scaleIn 1s cubic-bezier(.34,1.56,.64,1);
+  font-size:72px;color:var(--mario-yellow);
+  text-shadow:4px 4px 0 var(--mario-red),8px 8px 0 #000;
+  margin-bottom:20px;animation:scaleInScene 1s cubic-bezier(.34,1.56,.64,1);
   letter-spacing:6px;
 }
-@keyframes scaleIn{
-  0%{transform:scale(0) rotate(-360deg);opacity:0}
-  100%{transform:scale(1) rotate(0);opacity:1}
-}
 .summary{
-  font-size:40px;
-  background:rgba(255,255,255,.1);
-  padding:24px 48px;
-  border-radius:20px;
-  border:6px solid var(--mario-yellow);
-  margin-bottom:20px;
-  color:#fff;
-  text-shadow:2px 2px 0 #000;
-  line-height:1.6;
+  font-size:30px;background:rgba(255,255,255,.1);
+  padding:20px 36px;border-radius:18px;border:5px solid var(--mario-yellow);
+  margin-bottom:18px;color:#fff;text-shadow:2px 2px 0 #000;line-height:1.5;
 }
 .summary .big{
-  font-size:80px;
-  color:var(--mario-yellow);
-  letter-spacing:20px;
-  margin:10px 0;
-  text-shadow:3px 3px 0 var(--mario-red), 6px 6px 0 #000;
+  font-size:64px;color:var(--mario-yellow);
+  letter-spacing:14px;margin:6px 0;
+  text-shadow:3px 3px 0 var(--mario-red),6px 6px 0 #000;
 }
+.clear-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 
-/* 通關背景金幣下落 */
+/* 煙火彩帶 */
 .celebrate{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-  z-index:201;
-  display:none;
+  position:fixed;inset:0;pointer-events:none;overflow:hidden;
+  z-index:151;
 }
-.world-clear.active ~ .celebrate{display:block}
+.firework{position:absolute;font-size:30px;animation:fireworkFall 4s linear forwards}
+@keyframes fireworkFall{
+  0%{transform:translateY(-50px) rotate(0);opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:.8}
+}
 
-/* 響應式 */
-@media (max-width:900px){
-  .scene-title{font-size:32px}
-  .side h2{font-size:32px}
-  .item{font-size:22px}
-  .compare{grid-template-columns:1fr;gap:14px}
-  .vs{font-size:24px}
+/* 尺寸彈性 */
+@media (max-width:1100px){
+  .scene-title{font-size:26px}
+  .side h2{font-size:26px}
+  .info-item{font-size:18px;padding:8px 10px}
+  .feature-img,.img-fallback{height:100px}
+  .q-block{width:50px;height:50px;font-size:24px}
+}
+@media (max-width:760px){
+  .compare{grid-template-columns:1fr;gap:8px}
+  .vs{transform:rotate(90deg)}
 }
 </style>
 </head>
 <body>
 
-<!-- 雲朵裝飾 -->
+<!-- 雲朵 -->
 <div class="cloud c1"></div>
 <div class="cloud c2"></div>
 <div class="cloud c3"></div>
 
-<!-- HUD 上方狀態列 -->
+<!-- HUD -->
 <div class="hud">
   <span class="title-h">🍚 南米北麵大冒險 🌾</span>
   <span class="level-h" id="hudLevel">WORLD 1-1</span>
-  <span class="coins-h">🪙 <span id="hudCoins">0</span></span>
+  <span class="stats-h">
+    <span class="coin-h">🪙 <span id="hudCoins">0</span></span>
+    <span class="star-h">⭐ <span id="hudStars">0</span></span>
+  </span>
 </div>
 
-<div class="stage">
+<button class="btn btn-skip" onclick="forceNext()">略過 ▶▶</button>
 
-<!-- ========== 第1關：認識舞台 ========== -->
+<div class="stage" id="stage">
+
+<!-- ========== 第1關 ========== -->
 <div class="scene active" data-scene="1">
   <h1 class="scene-title">🗺️ 第 1 關　認識舞台</h1>
   <div class="map-stage">
@@ -483,100 +487,190 @@ body{
     <div class="divide-label">秦嶺 ─ 淮河線</div>
     <div class="map-label south-lbl">🍚 南方</div>
   </div>
-  <p style="font-size:30px;margin-top:24px;background:rgba(0,0,0,.6);padding:14px 28px;border-radius:14px;border:4px solid #fff;text-align:center;line-height:1.5">
-    一條線，把中國分成兩半！<br>
-    <span style="color:#FFE082">北邊</span> 跟 <span style="color:#A5D6A7">南邊</span> 很不一樣喔～
-  </p>
+  <p class="start-prompt">點下方 🍄 或按 → 開始闖關！</p>
 </div>
 
-<!-- ========== 第2關：氣候 ========== -->
+<!-- ========== 第2關 氣候 ========== -->
 <div class="scene" data-scene="2">
   <h1 class="scene-title">☀️🌧️ 第 2 關　氣候大比拚</h1>
   <div class="compare">
     <div class="side north">
       <div class="weather-layer" id="snowLayer"></div>
       <h2>🌾 北方</h2>
-      <div class="icon-row">❄️ ☀️</div>
-      <div class="item" data-step="1">😨 又冷又乾</div>
-      <div class="item" data-step="2">❄️ 冬天會下雪</div>
-      <div class="item" data-step="3">💧 雨水比較少</div>
+      <img class="feature-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Forbidden_City_after_snow_%2820200106114559%29.jpg/640px-Forbidden_City_after_snow_%2820200106114559%29.jpg"
+           alt="北方雪景" onerror="this.outerHTML='<div class=&quot;img-fallback&quot;>❄️🏙️</div>'">
+      <div class="blocks-row">
+        <div class="q-block" data-side="n" data-step="1">?</div>
+        <div class="q-block" data-side="n" data-step="2">?</div>
+        <div class="q-block" data-side="n" data-step="3">?</div>
+      </div>
+      <div class="info-slots">
+        <div class="info-item" data-side="n" data-step="1">😨 又冷又乾</div>
+        <div class="info-item" data-side="n" data-step="2">❄️ 冬天會下雪</div>
+        <div class="info-item" data-side="n" data-step="3">💧 雨水比較少</div>
+      </div>
     </div>
     <div class="vs">VS</div>
     <div class="side south">
       <div class="weather-layer" id="rainLayer"></div>
       <h2>🍚 南方</h2>
-      <div class="icon-row">🌧️ ☀️</div>
-      <div class="item" data-step="1">😊 又熱又濕</div>
-      <div class="item" data-step="2">☔ 冬天不太冷</div>
-      <div class="item" data-step="3">💦 雨水非常多</div>
+      <img class="feature-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Zhouzhuang_water_town.jpg/640px-Zhouzhuang_water_town.jpg"
+           alt="南方水鄉" onerror="this.outerHTML='<div class=&quot;img-fallback&quot;>🌧️🏘️</div>'">
+      <div class="blocks-row">
+        <div class="q-block" data-side="s" data-step="1">?</div>
+        <div class="q-block" data-side="s" data-step="2">?</div>
+        <div class="q-block" data-side="s" data-step="3">?</div>
+      </div>
+      <div class="info-slots">
+        <div class="info-item" data-side="s" data-step="1">😊 又熱又濕</div>
+        <div class="info-item" data-side="s" data-step="2">☔ 冬天不太冷</div>
+        <div class="info-item" data-side="s" data-step="3">💦 雨水非常多</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ========== 第3關：田地 ========== -->
+<!-- ========== 第3關 田地 ========== -->
 <div class="scene" data-scene="3">
   <h1 class="scene-title">🚜 第 3 關　田地大不同</h1>
   <div class="compare">
     <div class="side north">
       <h2>🌾 北方田</h2>
-      <div class="field-viz dry">🌱 🌱 🌱</div>
-      <div class="item" data-step="1">叫做「<span style="color:#E65100">旱田</span>」</div>
-      <div class="item" data-step="2">不需要積水</div>
-      <div class="item" data-step="3">適合種小麥</div>
+      <img class="feature-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Sunset-over-the-wheat-field-featured.jpg/640px-Sunset-over-the-wheat-field-featured.jpg"
+           alt="小麥田" onerror="this.outerHTML='<div class=&quot;img-fallback&quot;>🌾🟫</div>'">
+      <div class="blocks-row">
+        <div class="q-block" data-side="n" data-step="1">?</div>
+        <div class="q-block" data-side="n" data-step="2">?</div>
+        <div class="q-block" data-side="n" data-step="3">?</div>
+      </div>
+      <div class="info-slots">
+        <div class="info-item" data-side="n" data-step="1">叫做「<span style="color:#E65100">旱田</span>」</div>
+        <div class="info-item" data-side="n" data-step="2">不需要積水</div>
+        <div class="info-item" data-side="n" data-step="3">適合種小麥</div>
+      </div>
     </div>
     <div class="vs">VS</div>
     <div class="side south">
       <h2>🍚 南方田</h2>
-      <div class="field-viz water">🌾 🌾 🌾</div>
-      <div class="item" data-step="1">叫做「<span style="color:#0277BD">水田</span>」</div>
-      <div class="item" data-step="2">田裡要有水</div>
-      <div class="item" data-step="3">適合種水稻</div>
+      <img class="feature-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Longji_Rice_Terraces_002.jpg/640px-Longji_Rice_Terraces_002.jpg"
+           alt="水稻田" onerror="this.outerHTML='<div class=&quot;img-fallback&quot;>🌾🟦</div>'">
+      <div class="blocks-row">
+        <div class="q-block" data-side="s" data-step="1">?</div>
+        <div class="q-block" data-side="s" data-step="2">?</div>
+        <div class="q-block" data-side="s" data-step="3">?</div>
+      </div>
+      <div class="info-slots">
+        <div class="info-item" data-side="s" data-step="1">叫做「<span style="color:#0277BD">水田</span>」</div>
+        <div class="info-item" data-side="s" data-step="2">田裡要積水</div>
+        <div class="info-item" data-side="s" data-step="3">適合種水稻</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ========== 第4關：作物 ========== -->
+<!-- ========== 第4關 作物 ========== -->
 <div class="scene" data-scene="4">
   <h1 class="scene-title">🌱 第 4 關　種出什麼？</h1>
   <div class="compare">
     <div class="side north">
       <h2>北方種...</h2>
-      <div class="crop-jump" id="cropNorth">🌾</div>
-      <div class="item" data-step="1" style="font-size:42px;background:#FFEB3B">🌾 小麥</div>
-      <div class="item" data-step="2">磨成「<span style="color:#E65100">麵粉</span>」</div>
-      <div class="item" data-step="3">做成各種麵食</div>
+      <img class="feature-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Wheat_close-up.JPG/640px-Wheat_close-up.JPG"
+           alt="小麥穗" onerror="this.outerHTML='<div class=&quot;img-fallback&quot;>🌾</div>'">
+      <div class="blocks-row">
+        <div class="q-block" data-side="n" data-step="1">?</div>
+        <div class="q-block" data-side="n" data-step="2">?</div>
+        <div class="q-block" data-side="n" data-step="3">?</div>
+      </div>
+      <div class="info-slots">
+        <div class="info-item" data-side="n" data-step="1" style="font-size:30px;background:#FFEB3B">🌾 小麥</div>
+        <div class="info-item" data-side="n" data-step="2">磨成「<span style="color:#E65100">麵粉</span>」</div>
+        <div class="info-item" data-side="n" data-step="3">做成各種麵食</div>
+      </div>
     </div>
     <div class="vs">VS</div>
     <div class="side south">
       <h2>南方種...</h2>
-      <div class="crop-jump" id="cropSouth">🌾</div>
-      <div class="item" data-step="1" style="font-size:42px;background:#fff">🍚 水稻</div>
-      <div class="item" data-step="2">脫殼變成「<span style="color:#0277BD">米</span>」</div>
-      <div class="item" data-step="3">煮成香香的米飯</div>
+      <img class="feature-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Longji_Rice_Terraces_002.jpg/640px-Longji_Rice_Terraces_002.jpg"
+           alt="水稻" onerror="this.outerHTML='<div class=&quot;img-fallback&quot;>🌾</div>'">
+      <div class="blocks-row">
+        <div class="q-block" data-side="s" data-step="1">?</div>
+        <div class="q-block" data-side="s" data-step="2">?</div>
+        <div class="q-block" data-side="s" data-step="3">?</div>
+      </div>
+      <div class="info-slots">
+        <div class="info-item" data-side="s" data-step="1" style="font-size:30px;background:#fff">🍚 水稻</div>
+        <div class="info-item" data-side="s" data-step="2">脫殼變成「<span style="color:#0277BD">米</span>」</div>
+        <div class="info-item" data-side="s" data-step="3">煮成香香的米飯</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ========== 第5關：餐桌 ========== -->
+<!-- ========== 第5關 餐桌（食物卡） ========== -->
 <div class="scene" data-scene="5">
   <h1 class="scene-title">🍽️ 第 5 關　餐桌大集合</h1>
   <div class="compare">
     <div class="side north">
       <h2>北方人吃什麼？</h2>
-      <div class="icon-row" style="font-size:60px">🥟 🍞 🍜 🥞</div>
-      <div class="item" data-step="1" style="font-size:34px">🥟 餃子</div>
-      <div class="item" data-step="2" style="font-size:34px">🍞 饅頭、包子</div>
-      <div class="item" data-step="3" style="font-size:34px">🍜 麵條</div>
-      <div class="item" data-step="4" style="font-size:34px">🥞 蔥油餅</div>
+      <div class="blocks-row">
+        <div class="q-block" data-side="n" data-step="1">?</div>
+        <div class="q-block" data-side="n" data-step="2">?</div>
+        <div class="q-block" data-side="n" data-step="3">?</div>
+        <div class="q-block" data-side="n" data-step="4">?</div>
+      </div>
+      <div class="info-slots">
+        <div class="food-card" data-side="n" data-step="1">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Jiaozi_GS_CN.jpg/320px-Jiaozi_GS_CN.jpg"
+               alt="餃子" onerror="this.outerHTML='<div class=&quot;food-fallback&quot;>🥟</div>'">
+          <span>🥟 餃子</span>
+        </div>
+        <div class="food-card" data-side="n" data-step="2">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/ClassicwhiteMantou.jpg/320px-ClassicwhiteMantou.jpg"
+               alt="饅頭" onerror="this.outerHTML='<div class=&quot;food-fallback&quot;>🍞</div>'">
+          <span>🍞 饅頭、包子</span>
+        </div>
+        <div class="food-card" data-side="n" data-step="3">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Shanghai_oil_noodle.jpg/320px-Shanghai_oil_noodle.jpg"
+               alt="麵條" onerror="this.outerHTML='<div class=&quot;food-fallback&quot;>🍜</div>'">
+          <span>🍜 麵條</span>
+        </div>
+        <div class="food-card" data-side="n" data-step="4">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Scallion_pancakes.jpg/320px-Scallion_pancakes.jpg"
+               alt="蔥油餅" onerror="this.outerHTML='<div class=&quot;food-fallback&quot;>🥞</div>'">
+          <span>🥞 蔥油餅</span>
+        </div>
+      </div>
     </div>
     <div class="vs">VS</div>
     <div class="side south">
       <h2>南方人吃什麼？</h2>
-      <div class="icon-row" style="font-size:60px">🍚 🍙 🍡 🥣</div>
-      <div class="item" data-step="1" style="font-size:34px">🍚 白米飯</div>
-      <div class="item" data-step="2" style="font-size:34px">🍙 粽子</div>
-      <div class="item" data-step="3" style="font-size:34px">🍡 米糕、米粉</div>
-      <div class="item" data-step="4" style="font-size:34px">🥣 米篩目、米線</div>
+      <div class="blocks-row">
+        <div class="q-block" data-side="s" data-step="1">?</div>
+        <div class="q-block" data-side="s" data-step="2">?</div>
+        <div class="q-block" data-side="s" data-step="3">?</div>
+        <div class="q-block" data-side="s" data-step="4">?</div>
+      </div>
+      <div class="info-slots">
+        <div class="food-card" data-side="s" data-step="1">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/A_bowl_of_rice.jpg/320px-A_bowl_of_rice.jpg"
+               alt="白米飯" onerror="this.outerHTML='<div class=&quot;food-fallback&quot;>🍚</div>'">
+          <span>🍚 白米飯</span>
+        </div>
+        <div class="food-card" data-side="s" data-step="2">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Two_Zongzi.jpg/320px-Two_Zongzi.jpg"
+               alt="粽子" onerror="this.outerHTML='<div class=&quot;food-fallback&quot;>🍙</div>'">
+          <span>🍙 粽子</span>
+        </div>
+        <div class="food-card" data-side="s" data-step="3">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Hsinchu_foods.jpg/320px-Hsinchu_foods.jpg"
+               alt="米粉" onerror="this.outerHTML='<div class=&quot;food-fallback&quot;>🍡</div>'">
+          <span>🍡 米粉</span>
+        </div>
+        <div class="food-card" data-side="s" data-step="4">
+          <span class="food-fallback" style="font-size:32px">🥣</span>
+          <span>🥣 米篩目、米線</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -589,30 +683,46 @@ body{
   <div class="summary">
     <div>口訣記起來</div>
     <div class="big">南米 ★ 北麵</div>
-    <div style="font-size:28px;color:#A5D6A7;line-height:1.7">
+    <div style="font-size:22px;color:#A5D6A7;line-height:1.6">
       🍚 南方多雨 → 種水稻 → 吃米飯<br>
       🌾 北方乾冷 → 種小麥 → 吃麵食
     </div>
   </div>
-  <button class="replay-btn" onclick="reset();event.stopPropagation()">🔄 再玩一次</button>
+  <div class="clear-btns">
+    <button class="btn" style="background:var(--mario-yellow);color:#000;font-size:18px" onclick="bigConfetti();event.stopPropagation()">🎊 灑花！</button>
+    <button class="btn" style="background:var(--mario-green);font-size:18px" onclick="reset();event.stopPropagation()">🔄 再玩一次</button>
+  </div>
 </div>
 
+<!-- 煙火層 -->
 <div class="celebrate" id="celebrate"></div>
 
-<!-- 控制按鈕 -->
-<button class="prev-btn" onclick="prev();event.stopPropagation()">◀ 上一步</button>
-<button class="next-btn" id="nextBtn" onclick="next();event.stopPropagation()">下一步 ▶</button>
+<!-- 永久 UI -->
+<div class="mario-char" id="marioChar" onclick="marioJump();event.stopPropagation()" title="點我跳一下！">😀</div>
+
+<div class="hint-bar" id="hintBar">
+  👉 敲 <span style="color:var(--mario-yellow)">❓ 磚塊</span> 看答案，踩 <span style="color:#A0522D">🟫 栗寶寶</span> 加分！
+</div>
+
+<div class="mushroom-prompt" id="mushroomPrompt">
+  <div class="mushroom-btn" onclick="advanceLevel();event.stopPropagation()" title="點我去下一關！"></div>
+  <div class="mushroom-label">點我繼續！</div>
+</div>
+
+<button class="btn btn-reset" onclick="reset();event.stopPropagation()">🔄 重來</button>
 
 <script>
-const scenes = document.querySelectorAll('.scene');
-let currentScene = 1;
-let currentStep = 0;
-let coins = 0;
-let weatherInterval = null;
+'use strict';
 
 const stepsPerScene = {1:0, 2:3, 3:3, 4:3, 5:4, 6:0};
+let currentScene = 1;
+let coins = 0;
+let stars = 0;
+let blocksHitInScene = 0;
+let goombaInterval = null;
+let weatherInterval = null;
 
-// ==== 馬力歐風音效 ====
+/* ============ 音效（Web Audio API） ============ */
 let audioCtx = null;
 function getCtx(){
   if(!audioCtx){
@@ -622,8 +732,7 @@ function getCtx(){
 }
 function tone(freq, dur=.15, type='square', vol=.12, delay=0){
   const ctx = getCtx(); if(!ctx) return;
-  const o = ctx.createOscillator();
-  const g = ctx.createGain();
+  const o = ctx.createOscillator(), g = ctx.createGain();
   o.connect(g); g.connect(ctx.destination);
   o.type = type;
   o.frequency.setValueAtTime(freq, ctx.currentTime+delay);
@@ -632,44 +741,74 @@ function tone(freq, dur=.15, type='square', vol=.12, delay=0){
   o.start(ctx.currentTime+delay);
   o.stop(ctx.currentTime+delay+dur);
 }
-function coinSound(){ tone(988,.08); tone(1319,.3,'square',.12,.08); }
-function jumpSound(){
-  const ctx = getCtx(); if(!ctx) return;
-  const o = ctx.createOscillator(), g = ctx.createGain();
-  o.connect(g); g.connect(ctx.destination);
+function sCoin(){ tone(988,.08); tone(1319,.3,'square',.12,.08); }
+function sJump(){
+  const ctx=getCtx();if(!ctx)return;
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
   o.type='square';
-  o.frequency.setValueAtTime(330, ctx.currentTime);
-  o.frequency.linearRampToValueAtTime(880, ctx.currentTime+.15);
-  g.gain.setValueAtTime(.1, ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+.3);
-  o.start(); o.stop(ctx.currentTime+.3);
+  o.frequency.setValueAtTime(330,ctx.currentTime);
+  o.frequency.linearRampToValueAtTime(880,ctx.currentTime+.15);
+  g.gain.setValueAtTime(.1,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.3);
+  o.start();o.stop(ctx.currentTime+.3);
 }
-function clearSound(){
-  const notes = [523, 659, 784, 1047, 1319];
-  notes.forEach((f,i)=>tone(f,.18,'square',.13,i*.13));
+function sStomp(){
+  const ctx=getCtx();if(!ctx)return;
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);
+  o.type='sawtooth';
+  o.frequency.setValueAtTime(180,ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(40,ctx.currentTime+.15);
+  g.gain.setValueAtTime(.18,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.2);
+  o.start();o.stop(ctx.currentTime+.2);
+}
+function sBump(){ tone(220,.08,'square',.15) }
+function sPower(){
+  const notes=[392,523,587,698,784,1047,1175];
+  notes.forEach((f,i)=>tone(f,.1,'square',.13,i*.07));
+}
+function s1up(){
+  const notes=[659,784,1047,1318,1568];
+  notes.forEach((f,i)=>tone(f,.12,'square',.13,i*.08));
+}
+function sClear(){
+  const m=[[392,.13],[523,.13],[659,.13],[784,.13],[1047,.13],[784,.13],[830,.4]];
+  let t=0;
+  m.forEach(([f,d])=>{tone(f,d-.02,'square',.13,t);t+=d});
 }
 
-// ==== 場景切換 ====
+/* ============ 場景切換 ============ */
 function showScene(n){
-  // 關閉天氣粒子
+  if(goombaInterval){ clearInterval(goombaInterval); goombaInterval=null; }
   if(weatherInterval){ clearInterval(weatherInterval); weatherInterval=null; }
   document.querySelectorAll('.weather-layer').forEach(l=>l.innerHTML='');
+  document.querySelectorAll('.goomba').forEach(g=>g.remove());
+  document.getElementById('mushroomPrompt').classList.remove('show');
 
-  scenes.forEach(s=>s.classList.remove('active'));
-  document.querySelector(`[data-scene="${n}"]`).classList.add('active');
+  const scenes = document.querySelectorAll('.scene');
+  scenes.forEach(s=>{
+    s.classList.remove('active','scaling-out','scaling-in');
+  });
+  const target = document.querySelector(`[data-scene="${n}"]`);
+  target.classList.add('active','scaling-in');
+  setTimeout(()=>target.classList.remove('scaling-in'), 600);
+
   currentScene = n;
-  currentStep = 0;
+  blocksHitInScene = 0;
+
+  target.querySelectorAll('.q-block').forEach(b=>b.classList.remove('used','bumping'));
+  target.querySelectorAll('.info-item, .food-card').forEach(it=>it.classList.remove('show'));
 
   let label = `WORLD 1-${n>5?5:n}`;
   if(n===6) label = 'CLEAR!';
   document.getElementById('hudLevel').textContent = label;
 
-  // 重置 item
-  document.querySelectorAll(`[data-scene="${n}"] .item`).forEach(it=>{
-    it.classList.remove('show');
-  });
+  if(n===1){
+    setTimeout(()=>showMushroom(), 3500);
+  }
 
-  // 第2關：撒雪/雨
   if(n===2){
     weatherInterval = setInterval(()=>{
       addParticle('snowLayer','❄️');
@@ -677,22 +816,89 @@ function showScene(n){
     }, 350);
   }
 
-  // 第4關：作物彈跳
-  if(n===4){
-    const cn = document.getElementById('cropNorth');
-    const cs = document.getElementById('cropSouth');
-    cn.classList.remove('go'); cs.classList.remove('go');
-    cn.textContent = '🌾'; cs.textContent = '🌾';
-    setTimeout(()=>{ cn.classList.add('go'); cs.classList.add('go'); jumpSound(); }, 300);
+  if(n>=2 && n<=5){
+    setTimeout(spawnGoomba, 1500);
+    goombaInterval = setInterval(spawnGoomba, 6000);
   }
 
-  // 通關畫面
   if(n===6){
-    clearSound();
-    spawnConfetti();
+    sClear();
+    smallConfetti();
+  }
+
+  const hint = document.getElementById('hintBar');
+  if(n===1){
+    hint.innerHTML = '👉 看一下地圖，然後點下方 <span style="color:var(--mario-yellow)">🍄 蘑菇</span> 開始！';
+    hint.style.display = 'flex';
+  } else if(n===6){
+    hint.style.display = 'none';
+  } else {
+    hint.innerHTML = '👉 敲 <span style="color:var(--mario-yellow)">❓ 磚塊</span> 看答案，踩 <span style="color:#A0522D">🟫 栗寶寶</span> 加分！';
+    hint.style.display = 'flex';
   }
 }
 
+/* ============ 點擊問號磚塊 ============ */
+function hitBlock(block){
+  if(block.classList.contains('used')) return;
+  block.classList.add('bumping');
+  sBump();
+
+  const rect = block.getBoundingClientRect();
+  const coin = document.createElement('div');
+  coin.className = 'coin-pop';
+  coin.textContent = '🪙';
+  coin.style.left = (rect.left + rect.width/2 - 20) + 'px';
+  coin.style.top  = (rect.top - 10) + 'px';
+  coin.style.position = 'fixed';
+  document.body.appendChild(coin);
+  setTimeout(()=>coin.remove(), 1100);
+
+  setTimeout(()=>{
+    block.classList.remove('bumping');
+    block.classList.add('used');
+    sCoin();
+    coins += 10;
+    document.getElementById('hudCoins').textContent = coins;
+
+    const side = block.dataset.side;
+    const step = block.dataset.step;
+    const slot = document.querySelector(
+      `.scene.active .info-item[data-side="${side}"][data-step="${step}"], .scene.active .food-card[data-side="${side}"][data-step="${step}"]`
+    );
+    if(slot) slot.classList.add('show');
+
+    blocksHitInScene++;
+    const total = stepsPerScene[currentScene] * 2;
+    if(blocksHitInScene >= total){
+      setTimeout(()=>{ showMushroom(); s1up(); }, 400);
+    }
+  }, 350);
+}
+
+function showMushroom(){
+  document.getElementById('mushroomPrompt').classList.add('show');
+}
+
+function advanceLevel(){
+  if(currentScene >= 6) return;
+  sPower();
+  const mario = document.getElementById('marioChar');
+  mario.classList.add('power-up');
+  setTimeout(()=>mario.classList.remove('power-up'), 1000);
+
+  stars += 1;
+  document.getElementById('hudStars').textContent = stars;
+
+  const cur = document.querySelector('.scene.active');
+  cur.classList.add('scaling-out');
+  setTimeout(()=>{
+    cur.classList.remove('active','scaling-out');
+    showScene(currentScene + 1);
+  }, 500);
+}
+
+/* ============ 雪/雨粒子 ============ */
 function addParticle(layerId, emoji){
   const layer = document.getElementById(layerId);
   if(!layer) return;
@@ -705,79 +911,111 @@ function addParticle(layerId, emoji){
   setTimeout(()=>p.remove(), 5500);
 }
 
-function spawnConfetti(){
-  const layer = document.getElementById('celebrate');
-  layer.innerHTML='';
-  const emojis = ['🪙','⭐','🍄','🌟','✨','🎊'];
-  for(let i=0;i<40;i++){
-    const p = document.createElement('div');
-    p.style.position='absolute';
-    p.style.fontSize = (28+Math.random()*30)+'px';
-    p.style.left = Math.random()*100+'%';
-    p.style.top = '-50px';
-    p.style.animation = `fall ${3+Math.random()*3}s linear ${Math.random()*2}s infinite`;
-    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-    layer.appendChild(p);
-  }
+/* ============ 栗寶寶 ============ */
+function spawnGoomba(){
+  if(currentScene<2 || currentScene>5) return;
+  const g = document.createElement('div');
+  g.className = 'goomba';
+  g.innerHTML = '<div class="pupils"></div>';
+  g.title = '點我踩扁！';
+  g.onclick = (e)=>{
+    e.stopPropagation();
+    if(g.classList.contains('stomped')) return;
+    g.classList.add('stomped');
+    sStomp();
+    coins += 5;
+    document.getElementById('hudCoins').textContent = coins;
+    const rect = g.getBoundingClientRect();
+    const score = document.createElement('div');
+    score.textContent = '+5';
+    score.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top-20}px;color:#FFD700;font-family:'Press Start 2P',monospace;font-size:22px;text-shadow:2px 2px 0 #000;z-index:120;animation:coinUp 1s ease-out forwards;pointer-events:none`;
+    document.body.appendChild(score);
+    setTimeout(()=>score.remove(), 1000);
+    setTimeout(()=>g.classList.add('fadeout'), 400);
+    setTimeout(()=>g.remove(), 900);
+  };
+  document.body.appendChild(g);
+  setTimeout(()=>{ if(g.parentNode) g.remove(); }, 14500);
 }
 
-// ==== 控制 ====
-function next(){
-  const max = stepsPerScene[currentScene];
-  if(currentStep < max){
-    currentStep++;
-    const items = document.querySelectorAll(`[data-scene="${currentScene}"] .item[data-step="${currentStep}"]`);
-    items.forEach(it=>it.classList.add('show'));
-    coins += items.length;
-    document.getElementById('hudCoins').textContent = coins;
-    coinSound();
-  } else {
-    if(currentScene < 6){
-      jumpSound();
-      showScene(currentScene+1);
-    }
+/* ============ Mario 跳 ============ */
+function marioJump(){
+  const m = document.getElementById('marioChar');
+  if(m.classList.contains('jumping')) return;
+  m.classList.add('jumping');
+  sJump();
+  setTimeout(()=>m.classList.remove('jumping'), 600);
+}
+
+/* ============ 灑花 ============ */
+function smallConfetti(){
+  const layer = document.getElementById('celebrate');
+  const emojis = ['🪙','⭐','🍄','🌟','✨','🎊','🎉','🍓','💎'];
+  for(let i=0;i<35;i++){
+    const p = document.createElement('div');
+    p.className = 'firework';
+    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    p.style.left = Math.random()*100 + '%';
+    p.style.top = '-50px';
+    p.style.animationDuration = (3 + Math.random()*3) + 's';
+    p.style.animationDelay = Math.random()*1 + 's';
+    layer.appendChild(p);
+    setTimeout(()=>p.remove(), 7000);
   }
 }
-function prev(){
-  if(currentStep > 0){
-    const items = document.querySelectorAll(`[data-scene="${currentScene}"] .item[data-step="${currentStep}"]`);
-    items.forEach(it=>it.classList.remove('show'));
-    coins = Math.max(0, coins - items.length);
-    document.getElementById('hudCoins').textContent = coins;
-    currentStep--;
-  } else if(currentScene > 1){
-    showScene(currentScene-1);
-    const max = stepsPerScene[currentScene];
-    for(let s=1;s<=max;s++){
-      document.querySelectorAll(`[data-scene="${currentScene}"] .item[data-step="${s}"]`).forEach(it=>it.classList.add('show'));
-    }
-    currentStep = max;
-  }
+function bigConfetti(){
+  smallConfetti();
+  setTimeout(smallConfetti, 400);
+  setTimeout(smallConfetti, 800);
+  s1up();
 }
+
+/* ============ 重來 ============ */
 function reset(){
-  coins = 0;
+  coins = 0; stars = 0; blocksHitInScene = 0;
   document.getElementById('hudCoins').textContent = 0;
-  document.getElementById('celebrate').innerHTML='';
+  document.getElementById('hudStars').textContent = 0;
+  document.getElementById('celebrate').innerHTML = '';
+  document.querySelectorAll('.goomba').forEach(g=>g.remove());
+  document.querySelectorAll('.world-clear').forEach(s=>s.classList.remove('active'));
   showScene(1);
 }
 
-// ==== 鍵盤 ====
-document.addEventListener('keydown', e=>{
-  if(e.code==='Space'||e.code==='ArrowRight'||e.code==='Enter'){
-    e.preventDefault(); next();
-  } else if(e.code==='ArrowLeft'){
-    e.preventDefault(); prev();
-  } else if(e.code==='KeyR'){
-    reset();
-  }
+/* ============ 略過 ============ */
+function forceNext(){
+  if(currentScene >= 6){ reset(); return; }
+  document.querySelectorAll('.scene.active .q-block:not(.used)').forEach(b=>{
+    b.classList.add('used');
+    const slot = document.querySelector(
+      `.scene.active .info-item[data-side="${b.dataset.side}"][data-step="${b.dataset.step}"], .scene.active .food-card[data-side="${b.dataset.side}"][data-step="${b.dataset.step}"]`
+    );
+    if(slot) slot.classList.add('show');
+  });
+  advanceLevel();
+}
+
+/* ============ 事件 ============ */
+document.addEventListener('click', (e)=>{
+  getCtx();
+  const block = e.target.closest('.q-block');
+  if(block){ hitBlock(block); }
 });
 
-// 點擊空白處也可以推進（按鈕 onclick 已 stopPropagation）
-document.addEventListener('click', e=>{
-  // 只有在不是按鈕上點才推進
-  if(e.target.closest('button')) return;
-  next();
+document.addEventListener('keydown', e=>{
+  if(e.code==='Space'||e.code==='ArrowRight'||e.code==='Enter'){
+    e.preventDefault();
+    const mp = document.getElementById('mushroomPrompt');
+    if(mp.classList.contains('show')){ advanceLevel(); }
+    else {
+      const next = document.querySelector('.scene.active .q-block:not(.used)');
+      if(next) hitBlock(next);
+    }
+  } else if(e.code==='KeyR'){ reset(); }
+  else if(e.code==='KeyM'){ marioJump(); }
 });
+
+/* 初始化 */
+showScene(1);
 </script>
 </body>
 </html>
