@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🍚 南米北麵大冒險 🌾 馬力歐風</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mario-red:#E52521;
+  --mario-blue:#049CD8;
+  --mario-yellow:#FBD000;
+  --mario-green:#43B047;
+  --south-bg:#A5D6A7;
+  --south-deep:#2E7D32;
+  --south-water:#4FC3F7;
+  --north-bg:#FFE082;
+  --north-deep:#E65100;
+  --north-soil:#A1887F;
+  --sky:#5C94FC;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;width:100%;overflow:hidden}
+body{
+  font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;
+  font-weight:900;
+  background:linear-gradient(180deg,#5C94FC 0%, #5C94FC 75%, #43B047 75%, #43B047 100%);
+  color:#fff;
+  user-select:none;
+  position:relative;
+  cursor:pointer;
+}
+
+/* ==== 雲朵 ==== */
+.cloud{
+  position:absolute;
+  background:#fff;
+  border-radius:30px;
+  opacity:.95;
+  box-shadow:6px 0 0 #ddd;
+  z-index:1;
+  pointer-events:none;
+}
+.cloud::before,.cloud::after{
+  content:'';position:absolute;background:#fff;border-radius:50%;
+}
+.cloud::before{width:50%;height:140%;top:-30%;left:15%}
+.cloud::after{width:35%;height:120%;top:-15%;left:55%}
+.c1{top:8%;left:5%;width:90px;height:30px;animation:float1 18s linear infinite}
+.c2{top:14%;left:55%;width:120px;height:36px;animation:float1 24s linear infinite reverse}
+.c3{top:5%;left:80%;width:70px;height:24px;animation:float1 14s linear infinite}
+@keyframes float1{
+  0%{transform:translateX(0)}
+  50%{transform:translateX(40px)}
+  100%{transform:translateX(0)}
+}
+
+/* ==== HUD ==== */
+.hud{
+  position:fixed;
+  top:0;left:0;right:0;
+  background:#000;
+  color:#fff;
+  font-family:'Press Start 2P',monospace;
+  font-size:13px;
+  padding:12px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:100;
+  border-bottom:5px solid var(--mario-yellow);
+}
+.hud .title-h{color:var(--mario-yellow);text-shadow:2px 2px 0 var(--mario-red)}
+.hud .level-h{color:#fff;background:var(--mario-red);padding:6px 12px;border:3px solid #fff;border-radius:6px}
+.hud .coins-h{color:var(--mario-yellow);font-size:16px}
+
+/* ==== 舞台 ==== */
+.stage{
+  position:fixed;
+  inset:60px 0 0 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:5;
+}
+
+.scene{
+  display:none;
+  width:100%;
+  height:100%;
+  position:relative;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:20px 30px 100px;
+}
+.scene.active{display:flex}
+
+.scene-title{
+  font-size:46px;
+  color:#fff;
+  text-shadow:4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+  margin-bottom:20px;
+  text-align:center;
+  animation:popIn .6s cubic-bezier(.34,1.56,.64,1);
+  letter-spacing:2px;
+}
+@keyframes popIn{
+  0%{transform:scale(.3) rotate(-8deg);opacity:0}
+  100%{transform:scale(1) rotate(0);opacity:1}
+}
+
+/* ==== 對比區 ==== */
+.compare{
+  display:grid;
+  grid-template-columns:1fr 80px 1fr;
+  gap:20px;
+  width:96%;
+  max-width:1500px;
+  flex:1;
+  align-items:stretch;
+}
+.vs{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Press Start 2P',monospace;
+  font-size:36px;
+  color:var(--mario-yellow);
+  text-shadow:3px 3px 0 #000;
+  animation:vsBeat 1s ease-in-out infinite;
+}
+@keyframes vsBeat{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.15)}
+}
+.side{
+  border:6px solid #000;
+  border-radius:20px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  position:relative;
+  box-shadow:8px 8px 0 rgba(0,0,0,.4);
+  overflow:hidden;
+  min-height:60vh;
+}
+.side.north{
+  background:linear-gradient(180deg,#FFE082 0%, #FFB74D 100%);
+  color:#5D4037;
+  border-color:#E65100;
+}
+.side.south{
+  background:linear-gradient(180deg,#A5D6A7 0%, #4FC3F7 100%);
+  color:#0D47A1;
+  border-color:#2E7D32;
+}
+.side h2{
+  font-size:42px;
+  margin-bottom:12px;
+  text-align:center;
+  letter-spacing:2px;
+  text-shadow:3px 3px 0 rgba(255,255,255,.5);
+}
+.side .icon-row{
+  font-size:90px;
+  margin:6px 0 14px 0;
+  height:110px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  filter:drop-shadow(3px 3px 0 rgba(0,0,0,.3));
+}
+
+.item{
+  display:none;
+  font-size:30px;
+  background:rgba(255,255,255,.92);
+  color:#222;
+  padding:12px 18px;
+  margin:6px 0;
+  border-radius:14px;
+  border:4px solid #000;
+  box-shadow:5px 5px 0 rgba(0,0,0,.3);
+  width:100%;
+  text-align:center;
+  font-weight:900;
+  letter-spacing:1px;
+}
+.item.show{
+  display:block;
+  animation:slideIn .55s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideIn{
+  0%{transform:translateY(-40px) scale(.5) rotate(-5deg);opacity:0}
+  100%{transform:translateY(0) scale(1) rotate(0);opacity:1}
+}
+
+/* ==== 按鈕 ==== */
+.next-btn{
+  position:fixed;
+  bottom:24px;
+  right:30px;
+  background:var(--mario-red);
+  color:#fff;
+  font-family:'Press Start 2P',monospace;
+  font-size:18px;
+  padding:18px 32px;
+  border:6px solid #000;
+  border-radius:14px;
+  cursor:pointer;
+  box-shadow:6px 6px 0 #000;
+  animation:bounce 1.2s ease-in-out infinite;
+  z-index:50;
+  transition:transform .1s;
+}
+.next-btn:hover{transform:scale(1.05)}
+.next-btn:active{transform:translate(3px,3px);box-shadow:3px 3px 0 #000}
+@keyframes bounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+.prev-btn{
+  position:fixed;
+  bottom:24px;
+  left:30px;
+  background:#666;
+  color:#fff;
+  font-family:'Press Start 2P',monospace;
+  font-size:13px;
+  padding:14px 22px;
+  border:5px solid #000;
+  border-radius:10px;
+  cursor:pointer;
+  box-shadow:4px 4px 0 #000;
+  z-index:50;
+}
+.replay-btn{
+  background:var(--mario-green);
+  color:#fff;
+  font-family:'Press Start 2P',monospace;
+  font-size:22px;
+  padding:22px 44px;
+  border:6px solid #000;
+  border-radius:14px;
+  cursor:pointer;
+  box-shadow:8px 8px 0 #000;
+  margin-top:20px;
+}
+.replay-btn:hover{transform:scale(1.05)}
+
+/* ==== 第1關地圖 ==== */
+.map-stage{
+  width:80%;
+  max-width:900px;
+  height:55vh;
+  position:relative;
+  background:linear-gradient(180deg,#FFE082 0%,#FFB74D 49%,#43A047 51%,#A5D6A7 100%);
+  border:8px solid #000;
+  border-radius:30px;
+  box-shadow:10px 10px 0 rgba(0,0,0,.4);
+  overflow:hidden;
+}
+.map-label{
+  position:absolute;
+  font-size:64px;
+  font-weight:900;
+  text-shadow:4px 4px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+  z-index:3;
+  animation:popIn .6s cubic-bezier(.34,1.56,.64,1) .3s both;
+}
+.map-label.north-lbl{top:12%;left:50%;transform:translateX(-50%);color:#FFE082}
+.map-label.south-lbl{bottom:12%;left:50%;transform:translateX(-50%);color:#fff}
+.divide-line{
+  position:absolute;
+  top:50%;
+  left:-100%;
+  width:100%;
+  height:10px;
+  background:repeating-linear-gradient(90deg,red 0,red 22px,#fff 22px,#fff 44px);
+  animation:slideLine 1.6s ease-out 1s forwards;
+  box-shadow:0 0 0 3px #000;
+  z-index:2;
+}
+@keyframes slideLine{ to{left:0} }
+.divide-label{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#000;
+  color:var(--mario-yellow);
+  padding:10px 18px;
+  font-family:'Press Start 2P',monospace;
+  font-size:16px;
+  border:4px solid var(--mario-yellow);
+  border-radius:6px;
+  opacity:0;
+  animation:fadeIn .5s ease-out 2.5s forwards;
+  z-index:5;
+  white-space:nowrap;
+}
+@keyframes fadeIn{ to{opacity:1} }
+
+/* 動畫太陽和雲 */
+.sun{
+  position:absolute;
+  font-size:60px;
+  top:8%;
+  right:10%;
+  animation:rot 8s linear infinite;
+  z-index:2;
+}
+@keyframes rot{ to{transform:rotate(360deg)} }
+
+/* ==== 粒子（雪/雨） ==== */
+.weather-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  z-index:1;
+}
+.particle{
+  position:absolute;
+  font-size:28px;
+  animation:fall 4s linear forwards;
+}
+@keyframes fall{
+  0%{transform:translateY(-30px) rotate(0);opacity:1}
+  100%{transform:translateY(70vh) rotate(360deg);opacity:.6}
+}
+
+/* ==== 第3關田地視覺 ==== */
+.field-viz{
+  font-size:120px;
+  margin:8px 0 14px 0;
+  height:140px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  filter:drop-shadow(4px 4px 0 rgba(0,0,0,.3));
+}
+.field-viz.dry{
+  background:repeating-linear-gradient(45deg,#A1887F 0,#A1887F 20px,#8D6E63 20px,#8D6E63 40px);
+  border:4px solid #5D4037;
+  border-radius:12px;
+  width:100%;
+  font-size:80px;
+}
+.field-viz.water{
+  background:linear-gradient(180deg,#4FC3F7,#0288D1);
+  border:4px solid #01579B;
+  border-radius:12px;
+  width:100%;
+  font-size:80px;
+  position:relative;
+  overflow:hidden;
+}
+.field-viz.water::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(90deg,transparent 0,transparent 30px,rgba(255,255,255,.3) 30px,rgba(255,255,255,.3) 32px);
+  animation:wave 3s linear infinite;
+}
+@keyframes wave{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(60px)}
+}
+
+/* ==== 第4關作物彈跳 ==== */
+.crop-jump{
+  font-size:140px;
+  height:160px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  filter:drop-shadow(4px 4px 0 rgba(0,0,0,.3));
+}
+.crop-jump.go{
+  animation:jump .6s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes jump{
+  0%{transform:translateY(100px) scale(.3);opacity:0}
+  60%{transform:translateY(-20px) scale(1.2);opacity:1}
+  100%{transform:translateY(0) scale(1);opacity:1}
+}
+
+/* ==== 通關畫面 ==== */
+.world-clear{
+  background:linear-gradient(180deg,#000 0%, #1a1a40 100%);
+  position:fixed;
+  inset:60px 0 0 0;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  z-index:200;
+  padding:20px;
+}
+.world-clear.active{display:flex}
+.world-clear h1{
+  font-size:100px;
+  color:var(--mario-yellow);
+  text-shadow:5px 5px 0 var(--mario-red),10px 10px 0 #000;
+  margin-bottom:30px;
+  animation:scaleIn 1s cubic-bezier(.34,1.56,.64,1);
+  letter-spacing:6px;
+}
+@keyframes scaleIn{
+  0%{transform:scale(0) rotate(-360deg);opacity:0}
+  100%{transform:scale(1) rotate(0);opacity:1}
+}
+.summary{
+  font-size:40px;
+  background:rgba(255,255,255,.1);
+  padding:24px 48px;
+  border-radius:20px;
+  border:6px solid var(--mario-yellow);
+  margin-bottom:20px;
+  color:#fff;
+  text-shadow:2px 2px 0 #000;
+  line-height:1.6;
+}
+.summary .big{
+  font-size:80px;
+  color:var(--mario-yellow);
+  letter-spacing:20px;
+  margin:10px 0;
+  text-shadow:3px 3px 0 var(--mario-red), 6px 6px 0 #000;
+}
+
+/* 通關背景金幣下落 */
+.celebrate{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  z-index:201;
+  display:none;
+}
+.world-clear.active ~ .celebrate{display:block}
+
+/* 響應式 */
+@media (max-width:900px){
+  .scene-title{font-size:32px}
+  .side h2{font-size:32px}
+  .item{font-size:22px}
+  .compare{grid-template-columns:1fr;gap:14px}
+  .vs{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<!-- 雲朵裝飾 -->
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+<div class="cloud c3"></div>
+
+<!-- HUD 上方狀態列 -->
+<div class="hud">
+  <span class="title-h">🍚 南米北麵大冒險 🌾</span>
+  <span class="level-h" id="hudLevel">WORLD 1-1</span>
+  <span class="coins-h">🪙 <span id="hudCoins">0</span></span>
+</div>
+
+<div class="stage">
+
+<!-- ========== 第1關：認識舞台 ========== -->
+<div class="scene active" data-scene="1">
+  <h1 class="scene-title">🗺️ 第 1 關　認識舞台</h1>
+  <div class="map-stage">
+    <div class="sun">☀️</div>
+    <div class="map-label north-lbl">🌾 北方</div>
+    <div class="divide-line"></div>
+    <div class="divide-label">秦嶺 ─ 淮河線</div>
+    <div class="map-label south-lbl">🍚 南方</div>
+  </div>
+  <p style="font-size:30px;margin-top:24px;background:rgba(0,0,0,.6);padding:14px 28px;border-radius:14px;border:4px solid #fff;text-align:center;line-height:1.5">
+    一條線，把中國分成兩半！<br>
+    <span style="color:#FFE082">北邊</span> 跟 <span style="color:#A5D6A7">南邊</span> 很不一樣喔～
+  </p>
+</div>
+
+<!-- ========== 第2關：氣候 ========== -->
+<div class="scene" data-scene="2">
+  <h1 class="scene-title">☀️🌧️ 第 2 關　氣候大比拚</h1>
+  <div class="compare">
+    <div class="side north">
+      <div class="weather-layer" id="snowLayer"></div>
+      <h2>🌾 北方</h2>
+      <div class="icon-row">❄️ ☀️</div>
+      <div class="item" data-step="1">😨 又冷又乾</div>
+      <div class="item" data-step="2">❄️ 冬天會下雪</div>
+      <div class="item" data-step="3">💧 雨水比較少</div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="side south">
+      <div class="weather-layer" id="rainLayer"></div>
+      <h2>🍚 南方</h2>
+      <div class="icon-row">🌧️ ☀️</div>
+      <div class="item" data-step="1">😊 又熱又濕</div>
+      <div class="item" data-step="2">☔ 冬天不太冷</div>
+      <div class="item" data-step="3">💦 雨水非常多</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 第3關：田地 ========== -->
+<div class="scene" data-scene="3">
+  <h1 class="scene-title">🚜 第 3 關　田地大不同</h1>
+  <div class="compare">
+    <div class="side north">
+      <h2>🌾 北方田</h2>
+      <div class="field-viz dry">🌱 🌱 🌱</div>
+      <div class="item" data-step="1">叫做「<span style="color:#E65100">旱田</span>」</div>
+      <div class="item" data-step="2">不需要積水</div>
+      <div class="item" data-step="3">適合種小麥</div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="side south">
+      <h2>🍚 南方田</h2>
+      <div class="field-viz water">🌾 🌾 🌾</div>
+      <div class="item" data-step="1">叫做「<span style="color:#0277BD">水田</span>」</div>
+      <div class="item" data-step="2">田裡要有水</div>
+      <div class="item" data-step="3">適合種水稻</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 第4關：作物 ========== -->
+<div class="scene" data-scene="4">
+  <h1 class="scene-title">🌱 第 4 關　種出什麼？</h1>
+  <div class="compare">
+    <div class="side north">
+      <h2>北方種...</h2>
+      <div class="crop-jump" id="cropNorth">🌾</div>
+      <div class="item" data-step="1" style="font-size:42px;background:#FFEB3B">🌾 小麥</div>
+      <div class="item" data-step="2">磨成「<span style="color:#E65100">麵粉</span>」</div>
+      <div class="item" data-step="3">做成各種麵食</div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="side south">
+      <h2>南方種...</h2>
+      <div class="crop-jump" id="cropSouth">🌾</div>
+      <div class="item" data-step="1" style="font-size:42px;background:#fff">🍚 水稻</div>
+      <div class="item" data-step="2">脫殼變成「<span style="color:#0277BD">米</span>」</div>
+      <div class="item" data-step="3">煮成香香的米飯</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 第5關：餐桌 ========== -->
+<div class="scene" data-scene="5">
+  <h1 class="scene-title">🍽️ 第 5 關　餐桌大集合</h1>
+  <div class="compare">
+    <div class="side north">
+      <h2>北方人吃什麼？</h2>
+      <div class="icon-row" style="font-size:60px">🥟 🍞 🍜 🥞</div>
+      <div class="item" data-step="1" style="font-size:34px">🥟 餃子</div>
+      <div class="item" data-step="2" style="font-size:34px">🍞 饅頭、包子</div>
+      <div class="item" data-step="3" style="font-size:34px">🍜 麵條</div>
+      <div class="item" data-step="4" style="font-size:34px">🥞 蔥油餅</div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="side south">
+      <h2>南方人吃什麼？</h2>
+      <div class="icon-row" style="font-size:60px">🍚 🍙 🍡 🥣</div>
+      <div class="item" data-step="1" style="font-size:34px">🍚 白米飯</div>
+      <div class="item" data-step="2" style="font-size:34px">🍙 粽子</div>
+      <div class="item" data-step="3" style="font-size:34px">🍡 米糕、米粉</div>
+      <div class="item" data-step="4" style="font-size:34px">🥣 米篩目、米線</div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ========== 通關畫面 ========== -->
+<div class="scene world-clear" data-scene="6">
+  <h1>🎉 WORLD CLEAR! 🎉</h1>
+  <div class="summary">
+    <div>口訣記起來</div>
+    <div class="big">南米 ★ 北麵</div>
+    <div style="font-size:28px;color:#A5D6A7;line-height:1.7">
+      🍚 南方多雨 → 種水稻 → 吃米飯<br>
+      🌾 北方乾冷 → 種小麥 → 吃麵食
+    </div>
+  </div>
+  <button class="replay-btn" onclick="reset();event.stopPropagation()">🔄 再玩一次</button>
+</div>
+
+<div class="celebrate" id="celebrate"></div>
+
+<!-- 控制按鈕 -->
+<button class="prev-btn" onclick="prev();event.stopPropagation()">◀ 上一步</button>
+<button class="next-btn" id="nextBtn" onclick="next();event.stopPropagation()">下一步 ▶</button>
+
+<script>
+const scenes = document.querySelectorAll('.scene');
+let currentScene = 1;
+let currentStep = 0;
+let coins = 0;
+let weatherInterval = null;
+
+const stepsPerScene = {1:0, 2:3, 3:3, 4:3, 5:4, 6:0};
+
+// ==== 馬力歐風音效 ====
+let audioCtx = null;
+function getCtx(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  }
+  return audioCtx;
+}
+function tone(freq, dur=.15, type='square', vol=.12, delay=0){
+  const ctx = getCtx(); if(!ctx) return;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.type = type;
+  o.frequency.setValueAtTime(freq, ctx.currentTime+delay);
+  g.gain.setValueAtTime(vol, ctx.currentTime+delay);
+  g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+delay+dur);
+  o.start(ctx.currentTime+delay);
+  o.stop(ctx.currentTime+delay+dur);
+}
+function coinSound(){ tone(988,.08); tone(1319,.3,'square',.12,.08); }
+function jumpSound(){
+  const ctx = getCtx(); if(!ctx) return;
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.type='square';
+  o.frequency.setValueAtTime(330, ctx.currentTime);
+  o.frequency.linearRampToValueAtTime(880, ctx.currentTime+.15);
+  g.gain.setValueAtTime(.1, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+.3);
+  o.start(); o.stop(ctx.currentTime+.3);
+}
+function clearSound(){
+  const notes = [523, 659, 784, 1047, 1319];
+  notes.forEach((f,i)=>tone(f,.18,'square',.13,i*.13));
+}
+
+// ==== 場景切換 ====
+function showScene(n){
+  // 關閉天氣粒子
+  if(weatherInterval){ clearInterval(weatherInterval); weatherInterval=null; }
+  document.querySelectorAll('.weather-layer').forEach(l=>l.innerHTML='');
+
+  scenes.forEach(s=>s.classList.remove('active'));
+  document.querySelector(`[data-scene="${n}"]`).classList.add('active');
+  currentScene = n;
+  currentStep = 0;
+
+  let label = `WORLD 1-${n>5?5:n}`;
+  if(n===6) label = 'CLEAR!';
+  document.getElementById('hudLevel').textContent = label;
+
+  // 重置 item
+  document.querySelectorAll(`[data-scene="${n}"] .item`).forEach(it=>{
+    it.classList.remove('show');
+  });
+
+  // 第2關：撒雪/雨
+  if(n===2){
+    weatherInterval = setInterval(()=>{
+      addParticle('snowLayer','❄️');
+      addParticle('rainLayer','💧');
+    }, 350);
+  }
+
+  // 第4關：作物彈跳
+  if(n===4){
+    const cn = document.getElementById('cropNorth');
+    const cs = document.getElementById('cropSouth');
+    cn.classList.remove('go'); cs.classList.remove('go');
+    cn.textContent = '🌾'; cs.textContent = '🌾';
+    setTimeout(()=>{ cn.classList.add('go'); cs.classList.add('go'); jumpSound(); }, 300);
+  }
+
+  // 通關畫面
+  if(n===6){
+    clearSound();
+    spawnConfetti();
+  }
+}
+
+function addParticle(layerId, emoji){
+  const layer = document.getElementById(layerId);
+  if(!layer) return;
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.textContent = emoji;
+  p.style.left = Math.random()*92 + '%';
+  p.style.animationDuration = (3 + Math.random()*2) + 's';
+  layer.appendChild(p);
+  setTimeout(()=>p.remove(), 5500);
+}
+
+function spawnConfetti(){
+  const layer = document.getElementById('celebrate');
+  layer.innerHTML='';
+  const emojis = ['🪙','⭐','🍄','🌟','✨','🎊'];
+  for(let i=0;i<40;i++){
+    const p = document.createElement('div');
+    p.style.position='absolute';
+    p.style.fontSize = (28+Math.random()*30)+'px';
+    p.style.left = Math.random()*100+'%';
+    p.style.top = '-50px';
+    p.style.animation = `fall ${3+Math.random()*3}s linear ${Math.random()*2}s infinite`;
+    p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    layer.appendChild(p);
+  }
+}
+
+// ==== 控制 ====
+function next(){
+  const max = stepsPerScene[currentScene];
+  if(currentStep < max){
+    currentStep++;
+    const items = document.querySelectorAll(`[data-scene="${currentScene}"] .item[data-step="${currentStep}"]`);
+    items.forEach(it=>it.classList.add('show'));
+    coins += items.length;
+    document.getElementById('hudCoins').textContent = coins;
+    coinSound();
+  } else {
+    if(currentScene < 6){
+      jumpSound();
+      showScene(currentScene+1);
+    }
+  }
+}
+function prev(){
+  if(currentStep > 0){
+    const items = document.querySelectorAll(`[data-scene="${currentScene}"] .item[data-step="${currentStep}"]`);
+    items.forEach(it=>it.classList.remove('show'));
+    coins = Math.max(0, coins - items.length);
+    document.getElementById('hudCoins').textContent = coins;
+    currentStep--;
+  } else if(currentScene > 1){
+    showScene(currentScene-1);
+    const max = stepsPerScene[currentScene];
+    for(let s=1;s<=max;s++){
+      document.querySelectorAll(`[data-scene="${currentScene}"] .item[data-step="${s}"]`).forEach(it=>it.classList.add('show'));
+    }
+    currentStep = max;
+  }
+}
+function reset(){
+  coins = 0;
+  document.getElementById('hudCoins').textContent = 0;
+  document.getElementById('celebrate').innerHTML='';
+  showScene(1);
+}
+
+// ==== 鍵盤 ====
+document.addEventListener('keydown', e=>{
+  if(e.code==='Space'||e.code==='ArrowRight'||e.code==='Enter'){
+    e.preventDefault(); next();
+  } else if(e.code==='ArrowLeft'){
+    e.preventDefault(); prev();
+  } else if(e.code==='KeyR'){
+    reset();
+  }
+});
+
+// 點擊空白處也可以推進（按鈕 onclick 已 stopPropagation）
+document.addEventListener('click', e=>{
+  // 只有在不是按鈕上點才推進
+  if(e.target.closest('button')) return;
+  next();
+});
+</script>
+</body>
+</html>
