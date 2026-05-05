@@ -324,11 +324,104 @@ body {
 
 /* SVG 三角形圖形顏色 */
 .tri-line { stroke: #fff; stroke-width: 2; fill: none; }
-.tri-fill { fill: rgba(255,107,157,.15); stroke: var(--c-perp); stroke-width: 2; }
-.tri-equal { fill: rgba(0,188,212,.15); stroke: var(--c-bisect); stroke-width: 2; }
-.tri-bad   { fill: rgba(255,255,255,.05); stroke: rgba(255,255,255,.4); stroke-width: 2; stroke-dasharray: 4 3; }
+.tri-fill { fill: url(#triGradPink); stroke: var(--c-perp); stroke-width: 2.5; filter: drop-shadow(0 4px 12px rgba(255,107,157,.25)); }
+.tri-equal { fill: url(#triGradTeal); stroke: var(--c-bisect); stroke-width: 2.5; filter: drop-shadow(0 4px 12px rgba(0,188,212,.25)); }
+.tri-bad { fill: rgba(255,255,255,.04); stroke: rgba(255,255,255,.35); stroke-width: 2; stroke-dasharray: 5 3; }
 .tri-tag { fill: #fff; font-size: 14px; font-weight: 700; }
 .tri-tick { stroke: var(--c-gold); stroke-width: 3; stroke-linecap: round; }
+
+/* === 解題動畫面板 === */
+.solution-panel {
+  margin-top: 16px;
+  padding: 18px 18px 22px;
+  background: linear-gradient(135deg, rgba(0,188,212,.12), rgba(185,103,255,.12));
+  border-radius: 16px;
+  border: 2px solid rgba(0,188,212,.35);
+  display: none;
+  animation: panelIn .4s ease-out;
+}
+.solution-panel.show { display: block; }
+@keyframes panelIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.sol-title {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 1rem; color: var(--c-bisect); font-weight: 800;
+  letter-spacing: 1px; margin-bottom: 12px;
+}
+.sol-replay {
+  background: rgba(0,188,212,.2); color: var(--c-bisect);
+  border: 1px solid rgba(0,188,212,.4); border-radius: 50px;
+  padding: 4px 12px; font-size: .82rem; cursor: pointer; font-family: inherit;
+}
+.sol-replay:active { transform: scale(.95); }
+
+.sol-steps { display: flex; flex-direction: column; gap: 10px; }
+.sol-step {
+  background: rgba(255,255,255,.04);
+  border-left: 3px solid var(--c-bisect);
+  padding: 10px 14px; border-radius: 0 8px 8px 0;
+  color: #ddd; font-size: .98rem;
+  opacity: 0;
+}
+.sol-panel.playing .sol-step {
+  animation: solStepIn .5s ease-out forwards;
+}
+.sol-panel.playing .sol-step:nth-child(1) { animation-delay: .15s; border-color: var(--c-perp); }
+.sol-panel.playing .sol-step:nth-child(2) { animation-delay: .85s; border-color: var(--c-bisect); }
+.sol-panel.playing .sol-step:nth-child(3) { animation-delay: 1.55s; border-color: var(--c-equal); }
+.sol-panel.playing .sol-step:nth-child(4) { animation-delay: 2.25s; border-color: var(--c-gold); }
+.sol-panel.playing .sol-step:nth-child(5) { animation-delay: 2.95s; border-color: var(--c-perp); }
+@keyframes solStepIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+.sol-step b { color: var(--c-gold); font-weight: 800; }
+.sol-step .eq { display: block; margin-top: 4px; font-size: 1.1rem; color: #fff; font-family: 'Consolas', 'Menlo', monospace; }
+
+.sol-svg { display: block; margin: 0 auto 14px; max-width: 320px; width: 100%; }
+
+/* SVG animated elements */
+.anim-fade-in { opacity: 0; animation: animFadeIn .6s ease-out forwards; }
+.anim-fade-in.d1 { animation-delay: .15s; }
+.anim-fade-in.d2 { animation-delay: .85s; }
+.anim-fade-in.d3 { animation-delay: 1.55s; }
+.anim-fade-in.d4 { animation-delay: 2.25s; }
+.anim-fade-in.d5 { animation-delay: 2.95s; }
+@keyframes animFadeIn { to { opacity: 1; } }
+.anim-pulse { animation: animPulse 1.2s infinite; transform-origin: center; transform-box: fill-box; }
+@keyframes animPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+.sol-panel:not(.playing) .anim-fade-in { opacity: 1; }
+
+/* === Q3 fold animation === */
+.fold-group { transform-box: fill-box; transform-origin: 130px 100px; }
+.sol-panel.playing .fold-group { animation: foldRight 2.5s ease-in-out 1.5s both; }
+@keyframes foldRight {
+  0%   { transform: scaleX(1); }
+  50%  { transform: scaleX(-1); }
+  100% { transform: scaleX(1); }
+}
+
+/* === Q2 slider === */
+.slider-demo {
+  background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px; padding: 14px 16px; margin-bottom: 14px;
+}
+.slider-demo .sd-label { display: flex; justify-content: space-between; font-size: .9rem; color: #aac; margin-bottom: 8px; }
+.slider-demo input[type=range] {
+  width: 100%; height: 6px; -webkit-appearance: none; appearance: none;
+  background: linear-gradient(90deg, var(--c-perp), var(--c-bisect));
+  border-radius: 3px; outline: none;
+}
+.slider-demo input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 22px; height: 22px;
+  background: #fff; border-radius: 50%; cursor: pointer;
+  box-shadow: 0 0 0 4px rgba(255,255,255,.2);
+}
+.slider-demo input[type=range]::-moz-range-thumb {
+  width: 22px; height: 22px; background: #fff;
+  border: none; border-radius: 50%; cursor: pointer;
+  box-shadow: 0 0 0 4px rgba(255,255,255,.2);
+}
+.slider-demo .sd-result {
+  margin-top: 10px; text-align: center; font-size: 1rem;
+  color: var(--c-gold); font-weight: 700;
+}
 
 /* RWD */
 @media (max-width: 600px) {
@@ -360,6 +453,28 @@ body {
 </style>
 </head>
 <body>
+<!-- 全域 SVG 漸層定義 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="triGradPink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF6B9D" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#B967FF" stop-opacity="0.18"/>
+    </linearGradient>
+    <linearGradient id="triGradTeal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00BCD4" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#5DD8E8" stop-opacity="0.15"/>
+    </linearGradient>
+    <linearGradient id="triGradGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#FFA500" stop-opacity="0.15"/>
+    </linearGradient>
+    <radialGradient id="glowGold" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFD700" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>
+
 <canvas id="fireworks"></canvas>
 <div class="level-up-overlay" id="lvOverlay">
   <div class="lv-text">LEVEL UP!</div>
@@ -417,7 +532,14 @@ const QUESTIONS = [
       { text: 'B · 兩邊上有 = 記號（兩邊一樣長）', emoji: '🔺', correct: true },
       { text: 'C · 有直角', emoji: '⬜' }
     ],
-    skill: '等腰辨識'
+    skill: '等腰辨識',
+    solution: `
+      <div class="sol-steps">
+        <div class="sol-step"><b>① 等腰的定義</b>：「兩」邊長度一樣，這兩邊叫「腰」</div>
+        <div class="sol-step"><b>② A 是不等邊</b>：三邊都不同 → 不是等腰</div>
+        <div class="sol-step"><b>③ B 有 = 記號</b>：兩邊有等號 → <span style="color:#22c55e">就是等腰！</span></div>
+        <div class="sol-step"><b>④ C 是直角三角形</b>：有直角，跟「等腰」是不同分類</div>
+      </div>`
   },
   {
     boss: '👯 角度雙胞胎',
@@ -445,7 +567,28 @@ const QUESTIONS = [
       { text: '70°', emoji: '✨', correct: true },
       { text: '110°', emoji: '😵' }
     ],
-    skill: '兩底角相等'
+    skill: '兩底角相等',
+    interactive: 'q2-slider',
+    solution: `
+      <svg class="sol-svg" viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="130,20 50,180 210,180" class="tri-fill anim-fade-in d1"/>
+        <line x1="80" y1="95" x2="92" y2="105" stroke="#FFD700" stroke-width="3" class="anim-fade-in d2"/>
+        <line x1="168" y1="105" x2="180" y2="95" stroke="#FFD700" stroke-width="3" class="anim-fade-in d2"/>
+        <line x1="130" y1="20" x2="130" y2="180" stroke="#FFD700" stroke-width="2" stroke-dasharray="4 4" class="anim-fade-in d3"/>
+        <path d="M 64 168 A 18 18 0 0 0 70 154" fill="none" stroke="#FF6B9D" stroke-width="3" class="anim-fade-in d4"/>
+        <path d="M 196 168 A 18 18 0 0 1 190 154" fill="none" stroke="#FF6B9D" stroke-width="3" class="anim-fade-in d4"/>
+        <text x="130" y="14" fill="#fff" font-weight="900" font-size="18" text-anchor="middle">A</text>
+        <text x="36" y="194" fill="#fff" font-weight="900" font-size="18">B</text>
+        <text x="216" y="194" fill="#fff" font-weight="900" font-size="18">C</text>
+        <text x="78" y="158" fill="#FF6B9D" font-weight="900" font-size="18" class="anim-fade-in d4">70°</text>
+        <text x="170" y="158" fill="#FF6B9D" font-weight="900" font-size="18" class="anim-fade-in d5">70°</text>
+      </svg>
+      <div class="sol-steps">
+        <div class="sol-step"><b>① 等腰三角形</b>：AB = AC（兩腰等長）</div>
+        <div class="sol-step"><b>② 對稱性</b>：AD 是對稱軸，把三角形對折，左右兩半完全重合</div>
+        <div class="sol-step"><b>③ 重合 → ∠B 對到 ∠C</b>：所以 ∠B = ∠C</div>
+        <div class="sol-step"><b>④ 結論</b>：<span class="eq">∠C = ∠B = 70°</span></div>
+      </div>`
   },
   {
     boss: '🗡️ 平分劍',
@@ -480,7 +623,27 @@ const QUESTIONS = [
       { text: 'AD ⊥ BC，而且 BD = DC', emoji: '🎯', correct: true },
       { text: 'AD = BC', emoji: '😅' }
     ],
-    skill: '平分線之劍'
+    skill: '平分線之劍',
+    solution: `
+      <svg class="sol-svg" viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+        <g class="fold-group">
+          <polygon points="130,20 50,180 130,180" fill="rgba(255,107,157,0.3)" stroke="#FF6B9D" stroke-width="2.5"/>
+        </g>
+        <polygon points="130,20 130,180 210,180" fill="rgba(0,188,212,0.3)" stroke="#00BCD4" stroke-width="2.5"/>
+        <line x1="130" y1="20" x2="130" y2="180" stroke="#FFD700" stroke-width="3"/>
+        <rect x="118" y="168" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+        <text x="130" y="14" fill="#fff" font-weight="900" font-size="18" text-anchor="middle">A</text>
+        <text x="36" y="194" fill="#fff" font-weight="900" font-size="18">B</text>
+        <text x="216" y="194" fill="#fff" font-weight="900" font-size="18">C</text>
+        <text x="134" y="200" fill="#fff" font-weight="900" font-size="14">D</text>
+      </svg>
+      <div class="sol-steps">
+        <div class="sol-step"><b>① 沿 AD 對折</b>（看上面動畫，左半邊翻轉到右邊）</div>
+        <div class="sol-step"><b>② 完美重合</b>：左半 △ABD 跟右半 △ACD 完全一樣</div>
+        <div class="sol-step"><b>③ 所以 BD = DC</b>（平分底邊）</div>
+        <div class="sol-step"><b>④ 而且 ∠ADB = ∠ADC = 90°</b>（垂直底邊）</div>
+        <div class="sol-step"><b>⑤ 結論：AD ⊥ BC，且 BD = DC</b> → <span style="color:#22c55e">「垂直」+「平分」</span></div>
+      </div>`
   },
   {
     boss: '🛡️ 反派轉正',
@@ -512,7 +675,29 @@ const QUESTIONS = [
       { text: 'AB = BC', emoji: '🟡' },
       { text: 'BC = AC', emoji: '⭐', correct: true }
     ],
-    skill: '等腰判別'
+    skill: '等腰判別',
+    solution: `
+      <svg class="sol-svg" viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="140,30 40,180 220,180" class="tri-fill anim-fade-in d1"/>
+        <path d="M 124 56 A 22 22 0 0 0 156 56" fill="none" stroke="#FFD700" stroke-width="3" class="anim-fade-in d3"/>
+        <path d="M 60 168 A 20 20 0 0 0 68 152" fill="none" stroke="#FF6B9D" stroke-width="3" class="anim-fade-in d2"/>
+        <path d="M 200 168 A 22 22 0 0 1 190 150" fill="none" stroke="#00BCD4" stroke-width="3" class="anim-fade-in d2"/>
+        <text x="140" y="22" fill="#fff" font-weight="900" font-size="18" text-anchor="middle">A</text>
+        <text x="26" y="194" fill="#fff" font-weight="900" font-size="18">B</text>
+        <text x="226" y="194" fill="#fff" font-weight="900" font-size="18">C</text>
+        <text x="118" y="56" fill="#FFD700" font-weight="900" font-size="16" class="anim-fade-in d3">57°</text>
+        <text x="62" y="156" fill="#FF6B9D" font-weight="900" font-size="16">57°</text>
+        <text x="184" y="156" fill="#00BCD4" font-weight="900" font-size="16">66°</text>
+        <line x1="115" y1="100" x2="125" y2="100" stroke="#FFD700" stroke-width="3" class="anim-fade-in d4"/>
+        <line x1="78" y1="195" x2="78" y2="205" stroke="#FFD700" stroke-width="3" class="anim-fade-in d4"/>
+      </svg>
+      <div class="sol-steps">
+        <div class="sol-step"><b>① 內角和 = 180°</b><span class="eq">∠A = 180° − 57° − 66° = 57°</span></div>
+        <div class="sol-step"><b>② 找出哪兩個角相等</b>：∠A = 57°，∠B = 57° → <span style="color:#22c55e">∠A = ∠B</span></div>
+        <div class="sol-step"><b>③ 等腰判別定理</b>：相等的角「對的邊」就會相等</div>
+        <div class="sol-step"><b>④ ∠A 對的邊是 BC，∠B 對的邊是 AC</b></div>
+        <div class="sol-step"><b>⑤ 結論</b>：<span class="eq">BC = AC ✅</span></div>
+      </div>`
   },
   {
     boss: '👑 直角公主',
@@ -548,7 +733,30 @@ const QUESTIONS = [
       { text: '24', emoji: '🎯', correct: true },
       { text: '25', emoji: '😅' }
     ],
-    skill: '畢氏應用'
+    skill: '畢氏應用',
+    solution: `
+      <svg class="sol-svg" viewBox="0 0 280 240" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="140,20 40,200 240,200" class="tri-fill anim-fade-in d1"/>
+        <line x1="140" y1="20" x2="140" y2="200" stroke="#FFD700" stroke-width="3" class="anim-fade-in d2"/>
+        <polygon points="140,20 40,200 140,200" fill="rgba(0,188,212,0.25)" stroke="#00BCD4" stroke-width="2" class="anim-fade-in d3"/>
+        <rect x="128" y="188" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2" class="anim-fade-in d2"/>
+        <text x="140" y="14" fill="#fff" font-weight="900" font-size="18" text-anchor="middle">A</text>
+        <text x="24" y="218" fill="#fff" font-weight="900" font-size="18">B</text>
+        <text x="246" y="218" fill="#fff" font-weight="900" font-size="18">C</text>
+        <text x="146" y="220" fill="#fff" font-weight="900" font-size="14">D</text>
+        <text x="62" y="100" fill="#00BCD4" font-weight="900" font-size="18">25</text>
+        <text x="200" y="100" fill="#fff" font-weight="900" font-size="18">25</text>
+        <text x="78" y="220" fill="#FF6B9D" font-weight="900" font-size="14">7</text>
+        <text x="194" y="220" fill="#fff" font-weight="900" font-size="14">7</text>
+        <text x="148" y="115" fill="#FFD700" font-weight="900" font-size="20" class="anim-fade-in d4">24</text>
+      </svg>
+      <div class="sol-steps">
+        <div class="sol-step"><b>① 等腰三角形性質</b>：頂角平分線 = 底邊垂直平分線 → BD = DC = 7，AD ⊥ BC</div>
+        <div class="sol-step"><b>② 看左半 △ABD（直角三角形）</b>：BD=7, AB=25, AD=?</div>
+        <div class="sol-step"><b>③ 畢氏定理</b>：<span class="eq">7² + AD² = 25²</span><span class="eq">49 + AD² = 625</span></div>
+        <div class="sol-step"><b>④ 解方程</b>：<span class="eq">AD² = 625 − 49 = 576</span></div>
+        <div class="sol-step"><b>⑤ 開根號</b>：<span class="eq">AD = √576 = 24 ✅</span></div>
+      </div>`
   },
   {
     boss: '🐉 正三角形騎士',
@@ -585,7 +793,29 @@ const QUESTIONS = [
       { text: '√3', emoji: '👑', correct: true },
       { text: '2', emoji: '😅' }
     ],
-    skill: '正三角形高'
+    skill: '正三角形高',
+    solution: `
+      <svg class="sol-svg" viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="130,30 50,180 210,180" class="tri-equal anim-fade-in d1"/>
+        <line x1="130" y1="30" x2="130" y2="180" stroke="#FFD700" stroke-width="3" class="anim-fade-in d2"/>
+        <polygon points="130,30 50,180 130,180" fill="rgba(255,107,157,0.3)" stroke="#FF6B9D" stroke-width="2" class="anim-fade-in d3"/>
+        <rect x="118" y="168" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+        <text x="130" y="22" fill="#fff" font-weight="900" font-size="18" text-anchor="middle">A</text>
+        <text x="36" y="198" fill="#fff" font-weight="900" font-size="18">B</text>
+        <text x="216" y="198" fill="#fff" font-weight="900" font-size="18">C</text>
+        <text x="136" y="200" fill="#fff" font-weight="900" font-size="14">D</text>
+        <text x="68" y="100" fill="#FF6B9D" font-weight="900" font-size="20">2</text>
+        <text x="80" y="200" fill="#FF6B9D" font-weight="900" font-size="14">1</text>
+        <text x="170" y="200" fill="#fff" font-weight="900" font-size="14">1</text>
+        <text x="138" y="115" fill="#FFD700" font-weight="900" font-size="22" class="anim-fade-in d4">√3</text>
+      </svg>
+      <div class="sol-steps">
+        <div class="sol-step"><b>① 正三角形 = 等腰三角形</b>，AD 平分頂角 → BD = DC = 1（半邊）</div>
+        <div class="sol-step"><b>② 看左半（30°-60°-90° 直角三角形）</b>：BD=1, AB=2, AD=?</div>
+        <div class="sol-step"><b>③ 畢氏定理</b>：<span class="eq">1² + AD² = 2²</span><span class="eq">AD² = 4 − 1 = 3</span></div>
+        <div class="sol-step"><b>④ 結論</b>：<span class="eq">AD = √3 ✅</span></div>
+        <div class="sol-step"><b>📌 公式</b>：邊長 a 的正三角形，<span style="color:#FFD700">高 = (√3/2) × a</span></div>
+      </div>`
   },
   {
     boss: '💀 面積大魔王',
@@ -614,7 +844,26 @@ const QUESTIONS = [
       { text: '16√3', emoji: '🏆', correct: true },
       { text: '32√3', emoji: '😵' }
     ],
-    skill: '面積大師'
+    skill: '面積大師',
+    solution: `
+      <svg class="sol-svg" viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="130,30 50,180 210,180" class="tri-equal anim-fade-in d1"/>
+        <line x1="130" y1="30" x2="130" y2="180" stroke="#FFD700" stroke-width="3" stroke-dasharray="5 4" class="anim-fade-in d2"/>
+        <text x="130" y="22" fill="#fff" font-weight="900" font-size="18" text-anchor="middle">A</text>
+        <text x="36" y="198" fill="#fff" font-weight="900" font-size="18">B</text>
+        <text x="216" y="198" fill="#fff" font-weight="900" font-size="18">C</text>
+        <text x="125" y="200" fill="#00BCD4" font-weight="900" font-size="20">8</text>
+        <text x="138" y="115" fill="#FFD700" font-weight="900" font-size="16" class="anim-fade-in d3">4√3</text>
+        <text x="55" y="115" fill="#FFD700" font-weight="900" font-size="20" class="anim-fade-in d4">面積</text>
+        <text x="80" y="140" fill="#FFD700" font-weight="900" font-size="22" class="anim-fade-in d4">= 16√3</text>
+      </svg>
+      <div class="sol-steps">
+        <div class="sol-step"><b>① 用 Q6 公式</b>：高 = (√3/2) × 8 = <span style="color:#FFD700">4√3</span></div>
+        <div class="sol-step"><b>② 三角形面積公式</b>：<span class="eq">面積 = (底 × 高) ÷ 2</span></div>
+        <div class="sol-step"><b>③ 代入</b>：<span class="eq">面積 = (8 × 4√3) ÷ 2</span></div>
+        <div class="sol-step"><b>④ 計算</b>：<span class="eq">= 32√3 ÷ 2 = 16√3 ✅</span></div>
+        <div class="sol-step"><b>📌 直接公式</b>：邊長 a 的正三角形，<span style="color:#FFD700">面積 = (√3/4) × a²</span><span class="eq">= (√3/4) × 64 = 16√3</span></div>
+      </div>`
   }
 ];
 
@@ -701,9 +950,18 @@ function renderQuestion() {
       <div class="q-emoji">${q.emoji}</div>
       <div class="q-title">${q.title}</div>
       ${q.figure ? `<div class="q-figure">${q.figure}</div>` : ''}
+      ${q.interactive === 'q2-slider' ? renderQ2Slider() : ''}
       <div class="q-hint">💡 ${q.hint}</div>
       <div class="options">${optsHtml}</div>
       <div class="feedback" id="fb"></div>
+      <button class="show-sol-btn" id="showSolBtn" onclick="toggleSolution()" style="display:none;width:100%;margin-top:10px;padding:14px;border-radius:50px;border:2px solid var(--c-bisect);background:rgba(0,188,212,.1);color:var(--c-bisect);font-weight:800;font-size:1rem;font-family:inherit;cursor:pointer;">🎬 看解題動畫</button>
+      <div class="solution-panel sol-panel" id="solPanel">
+        <div class="sol-title">
+          <span>🎬 解題步驟（動畫）</span>
+          <button class="sol-replay" onclick="replaySolution()">🔄 重播</button>
+        </div>
+        <div id="solBody">${q.solution || ''}</div>
+      </div>
       <button class="next-btn" id="nextBtn" onclick="nextQ()">${state.current === TOTAL - 1 ? '看通關證 🏆' : '下一關 →'}</button>
     </div>
   `;
@@ -712,6 +970,73 @@ function renderQuestion() {
   if (nameInput) {
     nameInput.addEventListener('input', e => state.studentName = e.target.value);
   }
+  if (q.interactive === 'q2-slider') initQ2Slider();
+}
+
+/* ===== Q2 互動 slider ===== */
+function renderQ2Slider() {
+  return `
+    <div class="slider-demo">
+      <div class="sd-label">
+        <span>🎮 互動演示：拖滑桿改變頂角</span>
+        <span id="q2A">∠A = 40°</span>
+      </div>
+      <input type="range" id="q2Slider" min="20" max="160" value="40">
+      <svg id="q2DemoSvg" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:12px auto 0;max-width:240px;width:100%;"></svg>
+      <div class="sd-result" id="q2Result">∠B = ∠C = 70° （永遠相等！）</div>
+    </div>
+  `;
+}
+
+function initQ2Slider() {
+  const slider = document.getElementById('q2Slider');
+  const drawQ2 = (apexDeg) => {
+    const baseAngle = (180 - apexDeg) / 2;  // 兩底角
+    // 三角形畫成等腰，apex 在 (140, 30)，底寬隨 apex 改變
+    // 高固定 140
+    const h = 140;
+    const halfBase = h * Math.tan(apexDeg * Math.PI / 360);  // tan(A/2) * h
+    const cx = 140;
+    const ay = 30;
+    const by = ay + h;
+    const bx = cx - halfBase, ex = cx + halfBase;
+    const svg = document.getElementById('q2DemoSvg');
+    if (!svg) return;
+    svg.innerHTML = `
+      <polygon points="${cx},${ay} ${bx},${by} ${ex},${by}" fill="url(#triGradPink)" stroke="#FF6B9D" stroke-width="2.5"/>
+      <line x1="${cx}" y1="${ay}" x2="${cx}" y2="${by}" stroke="#FFD700" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.6"/>
+      <text x="${cx}" y="22" fill="#fff" font-weight="900" font-size="14" text-anchor="middle">A</text>
+      <text x="${bx-10}" y="${by+14}" fill="#fff" font-weight="900" font-size="14">B</text>
+      <text x="${ex+4}" y="${by+14}" fill="#fff" font-weight="900" font-size="14">C</text>
+      <text x="${cx-50}" y="${by-6}" fill="#FF6B9D" font-weight="900" font-size="13">${baseAngle.toFixed(0)}°</text>
+      <text x="${cx+30}" y="${by-6}" fill="#FF6B9D" font-weight="900" font-size="13">${baseAngle.toFixed(0)}°</text>
+      <text x="${cx-12}" y="${ay+24}" fill="#FFD700" font-weight="900" font-size="13">${apexDeg}°</text>
+    `;
+    document.getElementById('q2A').textContent = `∠A = ${apexDeg}°`;
+    document.getElementById('q2Result').textContent = `∠B = ∠C = ${baseAngle.toFixed(0)}° （永遠相等！）`;
+  };
+  drawQ2(parseInt(slider.value));
+  slider.addEventListener('input', e => drawQ2(parseInt(e.target.value)));
+}
+
+function toggleSolution() {
+  const panel = document.getElementById('solPanel');
+  const btn = document.getElementById('showSolBtn');
+  if (panel.classList.contains('show')) {
+    panel.classList.remove('show', 'playing');
+    btn.textContent = '🎬 看解題動畫';
+  } else {
+    panel.classList.add('show', 'playing');
+    btn.textContent = '🙈 收起解題';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function replaySolution() {
+  const panel = document.getElementById('solPanel');
+  panel.classList.remove('playing');
+  void panel.offsetWidth;  // force reflow
+  panel.classList.add('playing');
 }
 
 function pick(idx) {
@@ -740,6 +1065,8 @@ function pick(idx) {
       (state.combo >= 3 ? `<div class="reward">🔥 ${state.combo}連對！+${totalCoin} 🪙 (含 COMBO bonus!)</div>` : `<div class="reward">+${totalCoin} 🪙</div>`)
     );
     document.getElementById('nextBtn').classList.add('show');
+    const solBtn = document.getElementById('showSolBtn');
+    if (solBtn && q.solution) solBtn.style.display = 'block';
     document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
     miniSpark();
   } else {
