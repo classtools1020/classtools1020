@@ -393,12 +393,29 @@ const QUESTIONS = [
   {
     boss: '⚔️ 等腰守門員',
     emoji: '🔺',
-    title: '哪一個是「等腰三角形」？',
-    hint: '等腰 = 兩邊等長。生活例子：屋頂、衣架、聖誕樹',
+    title: '下面 3 個三角形，哪一個是「等腰三角形」？',
+    hint: '等腰 = 兩邊等長。看哪個三角形上有「兩邊一樣長」的記號（=）',
+    figure: `<svg viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- 三角形 A：scalene（不等邊）-->
+      <polygon points="40,170 110,30 130,170" fill="rgba(255,255,255,0.05)" stroke="#fff" stroke-width="2"/>
+      <text x="80" y="195" class="tri-tag" fill="#FF6B9D" font-size="22" font-weight="900">A</text>
+
+      <!-- 三角形 B：isosceles（等腰，with tick marks）-->
+      <polygon points="180,30 140,170 220,170" fill="rgba(0,188,212,0.15)" stroke="#00BCD4" stroke-width="2"/>
+      <!-- = 記號在 AB 與 AC 的中點 -->
+      <line x1="156" y1="95" x2="166" y2="105" stroke="#FFD700" stroke-width="3"/>
+      <line x1="194" y1="95" x2="204" y2="105" stroke="#FFD700" stroke-width="3"/>
+      <text x="180" y="195" class="tri-tag" fill="#00BCD4" font-size="22" font-weight="900">B</text>
+
+      <!-- 三角形 C：right triangle（直角）-->
+      <polygon points="240,30 240,170 320,170" fill="rgba(185,103,255,0.15)" stroke="#B967FF" stroke-width="2"/>
+      <rect x="240" y="156" width="14" height="14" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <text x="280" y="195" class="tri-tag" fill="#B967FF" font-size="22" font-weight="900">C</text>
+    </svg>`,
     options: [
-      { text: '三邊都不一樣長的三角形', emoji: '🔻' },
-      { text: '只有兩邊一樣長的三角形', emoji: '🔺', correct: true },
-      { text: '三個角都是直角的三角形', emoji: '⬜' }
+      { text: 'A · 三邊都不一樣長', emoji: '🔻' },
+      { text: 'B · 兩邊上有 = 記號（兩邊一樣長）', emoji: '🔺', correct: true },
+      { text: 'C · 有直角', emoji: '⬜' }
     ],
     skill: '等腰辨識'
   },
@@ -407,13 +424,21 @@ const QUESTIONS = [
     emoji: '📐',
     title: '等腰三角形 AB = AC，已知 ∠B = 70°，那 ∠C 是？',
     hint: '等腰三角形的「兩底角相等」 → 兩個底角是雙胞胎',
-    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="120,20 50,170 190,170" class="tri-fill"/>
-      <text x="120" y="14" class="tri-tag" text-anchor="middle">A</text>
-      <text x="42" y="184" class="tri-tag">B</text>
-      <text x="196" y="184" class="tri-tag">C</text>
-      <text x="74" y="160" class="tri-tag" fill="#FFD700">70°</text>
-      <text x="158" y="160" class="tri-tag" fill="#FFD700">?°</text>
+    figure: `<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="130,20 50,180 210,180" class="tri-fill"/>
+      <!-- = 記號（AB、AC 等長）-->
+      <line x1="80" y1="95" x2="92" y2="105" stroke="#FFD700" stroke-width="3"/>
+      <line x1="168" y1="105" x2="180" y2="95" stroke="#FFD700" stroke-width="3"/>
+      <!-- 角弧 at B (70°) -->
+      <path d="M 64 168 A 18 18 0 0 0 70 154" fill="none" stroke="#FF6B9D" stroke-width="2.5"/>
+      <!-- 角弧 at C (?) -->
+      <path d="M 196 168 A 18 18 0 0 1 190 154" fill="none" stroke="#FFD700" stroke-width="2.5"/>
+      <!-- 標籤 -->
+      <text x="130" y="14" class="tri-tag" text-anchor="middle" font-size="18" font-weight="900">A</text>
+      <text x="36" y="194" class="tri-tag" font-size="18" font-weight="900">B</text>
+      <text x="216" y="194" class="tri-tag" font-size="18" font-weight="900">C</text>
+      <text x="78" y="158" class="tri-tag" fill="#FF6B9D" font-size="18" font-weight="900">70°</text>
+      <text x="170" y="158" class="tri-tag" fill="#FFD700" font-size="20" font-weight="900">?°</text>
     </svg>`,
     options: [
       { text: '50°', emoji: '🤔' },
@@ -427,14 +452,28 @@ const QUESTIONS = [
     emoji: '⚡',
     title: '等腰三角形 AB=AC，AD 平分 ∠BAC 交 BC 於 D。下面哪句對？',
     hint: '頂角平分線 = 底邊的「垂直」+「平分」 → 又垂直又對切',
-    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="120,20 50,170 190,170" class="tri-fill"/>
-      <line x1="120" y1="20" x2="120" y2="170" stroke="#FFD700" stroke-width="2" stroke-dasharray="5 4"/>
-      <text x="120" y="14" class="tri-tag" text-anchor="middle">A</text>
-      <text x="42" y="184" class="tri-tag">B</text>
-      <text x="196" y="184" class="tri-tag">C</text>
-      <text x="124" y="184" class="tri-tag">D</text>
-      <rect x="120" y="155" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+    figure: `<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="130,20 50,180 210,180" class="tri-fill"/>
+      <!-- AD 平分線 -->
+      <line x1="130" y1="20" x2="130" y2="180" stroke="#FFD700" stroke-width="3"/>
+      <!-- = 記號 AB, AC 相等 -->
+      <line x1="80" y1="95" x2="92" y2="105" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="168" y1="105" x2="180" y2="95" stroke="#00BCD4" stroke-width="3"/>
+      <!-- ‖ 記號 BD = DC（一條短線在中點）-->
+      <line x1="86" y1="174" x2="86" y2="186" stroke="#FF6B9D" stroke-width="3"/>
+      <line x1="174" y1="174" x2="174" y2="186" stroke="#FF6B9D" stroke-width="3"/>
+      <!-- 角平分線弧 at A -->
+      <path d="M 110 50 A 25 25 0 0 0 150 50" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <text x="115" y="60" font-size="11" fill="#FFD700">∡</text>
+      <text x="139" y="60" font-size="11" fill="#FFD700">∡</text>
+      <!-- 直角符號 at D -->
+      <rect x="118" y="168" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <!-- 標籤 -->
+      <text x="130" y="14" class="tri-tag" text-anchor="middle" font-size="18" font-weight="900">A</text>
+      <text x="36" y="194" class="tri-tag" font-size="18" font-weight="900">B</text>
+      <text x="216" y="194" class="tri-tag" font-size="18" font-weight="900">C</text>
+      <text x="134" y="200" class="tri-tag" font-size="16" font-weight="900">D</text>
+      <text x="135" y="120" class="tri-tag" fill="#FFD700" font-size="14" font-weight="900">AD</text>
     </svg>`,
     options: [
       { text: 'AD 跟 BC 隨便相交', emoji: '🤷' },
@@ -447,15 +486,26 @@ const QUESTIONS = [
     boss: '🛡️ 反派轉正',
     emoji: '🔄',
     title: '△ABC 中，∠B = 57°, ∠C = 66°，哪兩條邊一定相等？',
-    hint: '先算 ∠A = 180 − 57 − 66 = ?。看哪兩個角相等，對應的兩邊就相等',
-    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="120,30 40,170 200,170" class="tri-fill"/>
-      <text x="120" y="22" class="tri-tag" text-anchor="middle">A</text>
-      <text x="32" y="184" class="tri-tag">B</text>
-      <text x="206" y="184" class="tri-tag">C</text>
-      <text x="62" y="160" class="tri-tag" fill="#FFD700">57°</text>
-      <text x="172" y="160" class="tri-tag" fill="#FFD700">66°</text>
-      <text x="115" y="48" class="tri-tag" fill="#FFD700">?°</text>
+    hint: '先算 ∠A = 180 − 57 − 66 = 57°。∠A 跟誰一樣？相等角對的「邊」就相等',
+    figure: `<svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="140,30 40,180 220,180" class="tri-fill"/>
+      <!-- 角弧 at A (?) -->
+      <path d="M 124 56 A 22 22 0 0 0 156 56" fill="none" stroke="#FFD700" stroke-width="2.5"/>
+      <!-- 角弧 at B (57°) -->
+      <path d="M 60 168 A 20 20 0 0 0 68 152" fill="none" stroke="#FF6B9D" stroke-width="2.5"/>
+      <!-- 角弧 at C (66°) -->
+      <path d="M 200 168 A 22 22 0 0 1 190 150" fill="none" stroke="#00BCD4" stroke-width="2.5"/>
+      <!-- 提示對邊：∠A↔BC, ∠B↔AC -->
+      <text x="140" y="22" class="tri-tag" text-anchor="middle" font-size="18" font-weight="900">A</text>
+      <text x="26" y="194" class="tri-tag" font-size="18" font-weight="900">B</text>
+      <text x="226" y="194" class="tri-tag" font-size="18" font-weight="900">C</text>
+      <text x="115" y="56" class="tri-tag" fill="#FFD700" font-size="18" font-weight="900">?°</text>
+      <text x="62" y="156" class="tri-tag" fill="#FF6B9D" font-size="16" font-weight="900">57°</text>
+      <text x="184" y="156" class="tri-tag" fill="#00BCD4" font-size="16" font-weight="900">66°</text>
+      <!-- 邊標示 -->
+      <text x="74" y="115" class="tri-tag" fill="#aac" font-size="13">AB</text>
+      <text x="200" y="115" class="tri-tag" fill="#aac" font-size="13">AC</text>
+      <text x="120" y="200" class="tri-tag" fill="#aac" font-size="13">BC</text>
     </svg>`,
     options: [
       { text: 'AB = AC', emoji: '🟢' },
@@ -469,18 +519,29 @@ const QUESTIONS = [
     emoji: '📏',
     title: '等腰三角形 AB = AC = 25, BC = 14，高 AD = ?',
     hint: 'D 是 BC 中點 → BD = 7。用畢氏定理：AD² + 7² = 25²',
-    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="120,20 40,170 200,170" class="tri-fill"/>
-      <line x1="120" y1="20" x2="120" y2="170" stroke="#FFD700" stroke-width="2.5"/>
-      <text x="120" y="14" class="tri-tag" text-anchor="middle">A</text>
-      <text x="32" y="184" class="tri-tag">B</text>
-      <text x="206" y="184" class="tri-tag">C</text>
-      <text x="124" y="186" class="tri-tag">D</text>
-      <text x="60" y="100" class="tri-tag" fill="#FF6B9D">25</text>
-      <text x="170" y="100" class="tri-tag" fill="#FF6B9D">25</text>
-      <text x="115" y="186" class="tri-tag" fill="#00BCD4">14</text>
-      <text x="128" y="100" class="tri-tag" fill="#FFD700">?</text>
-      <rect x="120" y="155" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+    figure: `<svg viewBox="0 0 280 240" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="140,20 40,200 240,200" class="tri-fill"/>
+      <!-- 高 AD -->
+      <line x1="140" y1="20" x2="140" y2="200" stroke="#FFD700" stroke-width="3"/>
+      <!-- = 記號（兩邊 25 等長）-->
+      <line x1="80" y1="106" x2="92" y2="116" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="188" y1="116" x2="200" y2="106" stroke="#00BCD4" stroke-width="3"/>
+      <!-- ‖ 記號（BD = DC = 7）-->
+      <line x1="90" y1="194" x2="90" y2="206" stroke="#FF6B9D" stroke-width="3"/>
+      <line x1="190" y1="194" x2="190" y2="206" stroke="#FF6B9D" stroke-width="3"/>
+      <!-- 直角符號 at D -->
+      <rect x="128" y="188" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <!-- 標籤 -->
+      <text x="140" y="14" class="tri-tag" text-anchor="middle" font-size="18" font-weight="900">A</text>
+      <text x="24" y="218" class="tri-tag" font-size="18" font-weight="900">B</text>
+      <text x="246" y="218" class="tri-tag" font-size="18" font-weight="900">C</text>
+      <text x="146" y="220" class="tri-tag" font-size="16" font-weight="900">D</text>
+      <!-- 數字 -->
+      <text x="62" y="100" class="tri-tag" fill="#00BCD4" font-size="18" font-weight="900">25</text>
+      <text x="200" y="100" class="tri-tag" fill="#00BCD4" font-size="18" font-weight="900">25</text>
+      <text x="78" y="220" class="tri-tag" fill="#FF6B9D" font-size="14" font-weight="700">7</text>
+      <text x="194" y="220" class="tri-tag" fill="#FF6B9D" font-size="14" font-weight="700">7</text>
+      <text x="148" y="115" class="tri-tag" fill="#FFD700" font-size="20" font-weight="900">?</text>
     </svg>`,
     options: [
       { text: '21', emoji: '🤔' },
@@ -494,17 +555,30 @@ const QUESTIONS = [
     emoji: '🏰',
     title: '邊長為 2 的正三角形，高 AD = ?',
     hint: '正三角形高公式：(√3/2) × 邊長',
-    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="120,30 50,170 190,170" class="tri-equal"/>
-      <line x1="120" y1="30" x2="120" y2="170" stroke="#FFD700" stroke-width="2.5"/>
-      <text x="120" y="22" class="tri-tag" text-anchor="middle">A</text>
-      <text x="42" y="184" class="tri-tag">B</text>
-      <text x="196" y="184" class="tri-tag">C</text>
-      <text x="124" y="184" class="tri-tag">D</text>
-      <text x="68" y="105" class="tri-tag" fill="#00BCD4">2</text>
-      <text x="172" y="105" class="tri-tag" fill="#00BCD4">2</text>
-      <text x="115" y="184" class="tri-tag" fill="#00BCD4">2</text>
-      <text x="128" y="105" class="tri-tag" fill="#FFD700">?</text>
+    figure: `<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="130,30 50,180 210,180" class="tri-equal"/>
+      <!-- 高 AD -->
+      <line x1="130" y1="30" x2="130" y2="180" stroke="#FFD700" stroke-width="3"/>
+      <!-- = 記號（三邊都相等，用單記號）-->
+      <line x1="82" y1="100" x2="94" y2="110" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="166" y1="110" x2="178" y2="100" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="124" y1="174" x2="136" y2="186" stroke="#00BCD4" stroke-width="3"/>
+      <!-- 60° 角弧 at A、B、C -->
+      <path d="M 116 50 A 18 18 0 0 0 144 50" fill="none" stroke="#FF6B9D" stroke-width="2"/>
+      <path d="M 70 168 A 18 18 0 0 0 78 152" fill="none" stroke="#FF6B9D" stroke-width="2"/>
+      <path d="M 190 168 A 18 18 0 0 1 182 152" fill="none" stroke="#FF6B9D" stroke-width="2"/>
+      <!-- 直角符號 at D -->
+      <rect x="118" y="168" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <!-- 標籤 -->
+      <text x="130" y="22" class="tri-tag" text-anchor="middle" font-size="18" font-weight="900">A</text>
+      <text x="36" y="198" class="tri-tag" font-size="18" font-weight="900">B</text>
+      <text x="216" y="198" class="tri-tag" font-size="18" font-weight="900">C</text>
+      <text x="136" y="200" class="tri-tag" font-size="14" font-weight="900">D</text>
+      <!-- 數字 -->
+      <text x="68" y="100" class="tri-tag" fill="#00BCD4" font-size="22" font-weight="900">2</text>
+      <text x="184" y="100" class="tri-tag" fill="#00BCD4" font-size="22" font-weight="900">2</text>
+      <text x="125" y="200" class="tri-tag" fill="#00BCD4" font-size="22" font-weight="900">2</text>
+      <text x="138" y="115" class="tri-tag" fill="#FFD700" font-size="22" font-weight="900">?</text>
     </svg>`,
     options: [
       { text: '1', emoji: '🤔' },
@@ -518,13 +592,22 @@ const QUESTIONS = [
     emoji: '🔥',
     title: '邊長為 8 的正三角形，面積 = ?',
     hint: '正三角形面積公式：(√3/4) × 邊長² = (√3/4) × 64',
-    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="120,30 50,170 190,170" class="tri-equal"/>
-      <text x="120" y="22" class="tri-tag" text-anchor="middle">A</text>
-      <text x="42" y="184" class="tri-tag">B</text>
-      <text x="196" y="184" class="tri-tag">C</text>
-      <text x="115" y="184" class="tri-tag" fill="#00BCD4">8</text>
-      <text x="105" y="115" class="tri-tag" fill="#FFD700">面積=?</text>
+    figure: `<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="130,30 50,180 210,180" class="tri-equal"/>
+      <!-- = 記號（三邊都相等）-->
+      <line x1="82" y1="100" x2="94" y2="110" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="166" y1="110" x2="178" y2="100" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="124" y1="174" x2="136" y2="186" stroke="#00BCD4" stroke-width="3"/>
+      <!-- 標籤 -->
+      <text x="130" y="22" class="tri-tag" text-anchor="middle" font-size="18" font-weight="900">A</text>
+      <text x="36" y="198" class="tri-tag" font-size="18" font-weight="900">B</text>
+      <text x="216" y="198" class="tri-tag" font-size="18" font-weight="900">C</text>
+      <!-- 數字 -->
+      <text x="68" y="100" class="tri-tag" fill="#00BCD4" font-size="22" font-weight="900">8</text>
+      <text x="184" y="100" class="tri-tag" fill="#00BCD4" font-size="22" font-weight="900">8</text>
+      <text x="125" y="200" class="tri-tag" fill="#00BCD4" font-size="22" font-weight="900">8</text>
+      <!-- 面積 ? -->
+      <text x="100" y="135" class="tri-tag" fill="#FFD700" font-size="22" font-weight="900">面積=?</text>
     </svg>`,
     options: [
       { text: '8√3', emoji: '🤔' },
