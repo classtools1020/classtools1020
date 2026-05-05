@@ -700,10 +700,43 @@ const QUESTIONS = [
       </div>`
   },
   {
+    boss: '🎯 中點哨兵',
+    emoji: '➗',
+    title: '等腰三角形 AB=AC，AD 是高（高也會平分底邊）。BC = 14，BD = ?',
+    hint: '中點 = 把一條線切成「一半」。BC 切兩半 → BD = BC ÷ 2',
+    figure: `<svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="140,20 40,180 240,180" class="tri-fill"/>
+      <line x1="140" y1="20" x2="140" y2="180" stroke="#FFD700" stroke-width="3"/>
+      <line x1="80" y1="172" x2="80" y2="188" stroke="#FF6B9D" stroke-width="3"/>
+      <line x1="200" y1="172" x2="200" y2="188" stroke="#FF6B9D" stroke-width="3"/>
+      <rect x="128" y="168" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <text x="140" y="14" fill="#fff" font-weight="900" font-size="18" text-anchor="middle">A</text>
+      <text x="24" y="198" fill="#fff" font-weight="900" font-size="18">B</text>
+      <text x="246" y="198" fill="#fff" font-weight="900" font-size="18">C</text>
+      <text x="146" y="200" fill="#fff" font-weight="900" font-size="14">D</text>
+      <text x="78" y="200" fill="#FF6B9D" font-weight="900" font-size="14">?</text>
+      <text x="194" y="200" fill="#aac" font-weight="900" font-size="14">?</text>
+      <text x="125" y="200" fill="#00BCD4" font-weight="900" font-size="16">14</text>
+    </svg>`,
+    options: [
+      { text: '7（一半）', emoji: '✂️', correct: true },
+      { text: '14（一樣）', emoji: '🤔' },
+      { text: '28（兩倍）', emoji: '😅' }
+    ],
+    skill: '中點概念',
+    solution: `
+      <div class="sol-steps">
+        <div class="sol-step"><b>① 等腰三角形 AD 是高</b>，會把底邊「平分」</div>
+        <div class="sol-step"><b>② 平分 = 切成兩半</b>，所以 BD = DC</div>
+        <div class="sol-step"><b>③ BC = 14</b>，切兩半 <span class="eq">BD = 14 ÷ 2 = 7 ✅</span></div>
+        <div class="sol-step"><b>📌 記住</b>：等腰高 → 也是中垂線 → 自動把底邊切一半</div>
+      </div>`
+  },
+  {
     boss: '👑 直角公主',
     emoji: '📏',
-    title: '等腰三角形 AB = AC = 25, BC = 14，高 AD = ?',
-    hint: 'D 是 BC 中點 → BD = 7。用畢氏定理：AD² + 7² = 25²',
+    title: '從上題：BD = 7，AB = 25。用畢氏定理求高 AD = ?',
+    hint: '直角三角形：7² + AD² = 25² → 49 + AD² = 625 → AD² = 576 → AD = √576',
     figure: `<svg viewBox="0 0 280 240" xmlns="http://www.w3.org/2000/svg">
       <polygon points="140,20 40,200 240,200" class="tri-fill"/>
       <!-- 高 AD -->
@@ -759,10 +792,46 @@ const QUESTIONS = [
       </div>`
   },
   {
+    boss: '✨ 正三角小兵',
+    emoji: '➗',
+    title: '正三角形邊長 = 2，AD 是高（也平分底邊）。BD = ?',
+    hint: '一樣的招！中點把 2 切成兩半',
+    figure: `<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="130,30 50,180 210,180" class="tri-equal"/>
+      <line x1="130" y1="30" x2="130" y2="180" stroke="#FFD700" stroke-width="3"/>
+      <line x1="82" y1="100" x2="94" y2="110" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="166" y1="110" x2="178" y2="100" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="124" y1="174" x2="136" y2="186" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="90" y1="172" x2="90" y2="188" stroke="#FF6B9D" stroke-width="3"/>
+      <line x1="170" y1="172" x2="170" y2="188" stroke="#FF6B9D" stroke-width="3"/>
+      <rect x="118" y="168" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <text x="130" y="22" fill="#fff" font-weight="900" font-size="18" text-anchor="middle">A</text>
+      <text x="36" y="198" fill="#fff" font-weight="900" font-size="18">B</text>
+      <text x="216" y="198" fill="#fff" font-weight="900" font-size="18">C</text>
+      <text x="136" y="200" fill="#fff" font-weight="900" font-size="14">D</text>
+      <text x="68" y="100" fill="#00BCD4" font-weight="900" font-size="20">2</text>
+      <text x="184" y="100" fill="#00BCD4" font-weight="900" font-size="20">2</text>
+      <text x="125" y="200" fill="#00BCD4" font-weight="900" font-size="16">2</text>
+      <text x="86" y="200" fill="#FF6B9D" font-weight="900" font-size="14">?</text>
+    </svg>`,
+    options: [
+      { text: '1（一半）', emoji: '✂️', correct: true },
+      { text: '2（一樣）', emoji: '🤔' },
+      { text: '4（兩倍）', emoji: '😅' }
+    ],
+    skill: '中點再現',
+    solution: `
+      <div class="sol-steps">
+        <div class="sol-step"><b>① 跟上題一樣的招！</b>正三角形的高也會平分底邊</div>
+        <div class="sol-step"><b>② BC = 2</b>，切兩半 <span class="eq">BD = 2 ÷ 2 = 1 ✅</span></div>
+        <div class="sol-step"><b>📌 招式 RECAP</b>：等腰／正三角形的高 → 把底邊切「一半」</div>
+      </div>`
+  },
+  {
     boss: '🐉 正三角形騎士',
     emoji: '🏰',
-    title: '邊長為 2 的正三角形，高 AD = ?',
-    hint: '正三角形高公式：(√3/2) × 邊長',
+    title: '從上題：BD = 1，AB = 2。用畢氏定理求高 AD = ?',
+    hint: '直角三角形：1² + AD² = 2² → 1 + AD² = 4 → AD² = 3 → AD = √3',
     figure: `<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
       <polygon points="130,30 50,180 210,180" class="tri-equal"/>
       <!-- 高 AD -->
@@ -818,10 +887,44 @@ const QUESTIONS = [
       </div>`
   },
   {
+    boss: '📐 高公式守護者',
+    emoji: '🔢',
+    title: '邊長為 8 的正三角形，高 AD = ?（用 Q8 公式）',
+    hint: '從 Q8 學到：邊長 a 的正三角形高 = (√3/2) × a。代入 a = 8',
+    figure: `<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="130,30 50,180 210,180" class="tri-equal"/>
+      <line x1="130" y1="30" x2="130" y2="180" stroke="#FFD700" stroke-width="3"/>
+      <line x1="82" y1="100" x2="94" y2="110" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="166" y1="110" x2="178" y2="100" stroke="#00BCD4" stroke-width="3"/>
+      <line x1="124" y1="174" x2="136" y2="186" stroke="#00BCD4" stroke-width="3"/>
+      <rect x="118" y="168" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <text x="130" y="22" fill="#fff" font-weight="900" font-size="18" text-anchor="middle">A</text>
+      <text x="36" y="198" fill="#fff" font-weight="900" font-size="18">B</text>
+      <text x="216" y="198" fill="#fff" font-weight="900" font-size="18">C</text>
+      <text x="68" y="100" fill="#00BCD4" font-weight="900" font-size="22">8</text>
+      <text x="184" y="100" fill="#00BCD4" font-weight="900" font-size="22">8</text>
+      <text x="125" y="200" fill="#00BCD4" font-weight="900" font-size="22">8</text>
+      <text x="138" y="115" fill="#FFD700" font-weight="900" font-size="22">?</text>
+    </svg>`,
+    options: [
+      { text: '4√3', emoji: '👑', correct: true },
+      { text: '8√3', emoji: '🤔' },
+      { text: '√3', emoji: '😅' }
+    ],
+    skill: '高公式應用',
+    solution: `
+      <div class="sol-steps">
+        <div class="sol-step"><b>① 公式</b>：正三角形邊長 a，<span style="color:#FFD700">高 = (√3/2) × a</span></div>
+        <div class="sol-step"><b>② 代入 a = 8</b>：<span class="eq">高 = (√3/2) × 8</span></div>
+        <div class="sol-step"><b>③ 計算</b>：<span class="eq">= 8√3 / 2 = 4√3 ✅</span></div>
+        <div class="sol-step"><b>📌 小技巧</b>：(√3/2) × 8 → 把 8 ÷ 2 變 4 → 4√3</div>
+      </div>`
+  },
+  {
     boss: '💀 面積大魔王',
     emoji: '🔥',
-    title: '邊長為 8 的正三角形，面積 = ?',
-    hint: '正三角形面積公式：(√3/4) × 邊長² = (√3/4) × 64',
+    title: '邊長 8、高 4√3 的正三角形，面積 = ?',
+    hint: '三角形面積公式：底 × 高 ÷ 2 = 8 × 4√3 ÷ 2',
     figure: `<svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
       <polygon points="130,30 50,180 210,180" class="tri-equal"/>
       <!-- = 記號（三邊都相等）-->
@@ -901,7 +1004,7 @@ function renderCover() {
         <div class="rank-chip r-king">👑 王者</div>
       </div>
       <button class="start-btn" onclick="startGame()">開始闖關 ▶</button>
-      <div class="hint">7 關 · 連對加 COMBO · 段考前的最後試煉</div>
+      <div class="hint">10 關 · 計算題拆步驟 · 段考前的最後試煉</div>
     </div>
   `;
 }
