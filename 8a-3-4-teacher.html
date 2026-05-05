@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>教師後台 · 8A 等腰王者</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans TC', -apple-system, 'Segoe UI', sans-serif;
+  background: #fafafa; color: #1a1a1a;
+  padding: 24px 16px; min-height: 100vh; line-height: 1.55;
+}
+.wrap { max-width: 960px; margin: 0 auto; }
+
+.gate {
+  max-width: 380px; margin: 80px auto;
+  background: #fff; border: 2px solid #111; border-radius: 14px;
+  padding: 28px 24px; text-align: center;
+}
+.gate h1 { font-size: 1.3rem; margin-bottom: 8px; color: #111; }
+.gate p { font-size: .92rem; color: #666; margin-bottom: 16px; }
+.gate input {
+  width: 100%; padding: 12px 14px; font-size: 1rem;
+  border: 2px solid #ccc; border-radius: 8px; font-family: inherit;
+}
+.gate button {
+  margin-top: 12px; width: 100%; padding: 14px; background: #111;
+  color: #fff; border: none; border-radius: 8px; font-weight: 800;
+  font-size: 1rem; cursor: pointer; font-family: inherit;
+}
+
+header {
+  border-bottom: 2px solid #111; padding-bottom: 14px; margin-bottom: 22px;
+  display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px;
+}
+h1 { font-size: 1.6em; font-weight: 900; letter-spacing: -.5px; }
+.meta { color: #666; font-size: .92em; }
+
+.status-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
+@media(max-width: 600px) { .status-row { grid-template-columns: repeat(2, 1fr); } }
+.stat-box {
+  background: #fff; border: 1px solid #e0e0e0; border-radius: 12px;
+  padding: 14px 16px; text-align: center;
+}
+.stat-box .num { font-size: 1.6rem; font-weight: 900; color: #111; }
+.stat-box .lab { font-size: .82rem; color: #666; margin-top: 4px; }
+
+.bar { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.bar input, .bar button {
+  padding: 10px 14px; border: 2px solid #111; border-radius: 8px;
+  font-family: inherit; font-size: .95rem;
+}
+.bar input { background: #fff; flex: 1; min-width: 160px; }
+.bar button { background: #fff; cursor: pointer; font-weight: 700; }
+.bar button:hover { background: #111; color: #fff; }
+.bar button.danger { border-color: #d32f2f; color: #d32f2f; }
+.bar button.danger:hover { background: #d32f2f; color: #fff; }
+
+table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+th { background: #fafafa; font-size: .82rem; color: #666; text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafafa; }
+td.rank-cell { font-weight: 800; }
+td.score-cell { font-weight: 700; color: #111; }
+td.actions { text-align: right; }
+td.actions button { padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; font-size: .82rem; color: #666; }
+td.actions button:hover { background: #d32f2f; color: #fff; border-color: #d32f2f; }
+
+.empty {
+  text-align: center; padding: 48px 24px; background: #fff;
+  border: 2px dashed #ddd; border-radius: 12px; color: #888;
+}
+.empty .em-emoji { font-size: 3rem; margin-bottom: 10px; }
+.empty .em-msg { font-size: 1rem; margin-bottom: 4px; }
+.empty .em-hint { font-size: .85rem; color: #aaa; }
+
+.section-title { font-size: 1rem; font-weight: 800; margin-bottom: 10px; color: #333; }
+.section { margin-bottom: 26px; }
+
+.alert {
+  background: #fff3cd; border: 1px solid #ffe066; color: #856404;
+  padding: 12px 16px; border-radius: 8px; margin-bottom: 18px; font-size: .92rem;
+}
+
+footer { text-align: center; color: #999; font-size: .82rem; margin-top: 36px; padding-top: 14px; border-top: 1px solid #eee; }
+
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: #111; color: #fff; padding: 10px 18px; border-radius: 8px;
+  font-size: .92rem; z-index: 999;
+  opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="gateWrap" style="display:none;">
+  <div class="gate">
+    <h1>🔒 教師後台</h1>
+    <p>輸入密碼進入</p>
+    <input type="password" id="pwInput" placeholder="密碼">
+    <button onclick="checkPw()">進入</button>
+  </div>
+</div>
+
+<div class="wrap" id="mainWrap" style="display:none;">
+
+<header>
+  <div>
+    <h1>🏆 8A 等腰王者 · 教師後台</h1>
+    <div class="meta">3-4 等腰／正三角形 · 段考衝刺練習 · 學生繳交清單</div>
+  </div>
+</header>
+
+<div class="alert" id="newRecAlert" style="display:none;"></div>
+
+<div class="status-row">
+  <div class="stat-box"><div class="num" id="cntTotal">0</div><div class="lab">已繳交人次</div></div>
+  <div class="stat-box"><div class="num" id="cntKing">0</div><div class="lab">👑 等腰王者</div></div>
+  <div class="stat-box"><div class="num" id="cntDiamond">0</div><div class="lab">💎 鑽石以上</div></div>
+  <div class="stat-box"><div class="num" id="cntAvg">0%</div><div class="lab">平均答對率</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">🔍 篩選 · 操作</div>
+  <div class="bar">
+    <input id="searchInput" placeholder="🔍 搜尋姓名" oninput="render()">
+    <button onclick="exportCSV()">📥 下載 CSV</button>
+    <button class="danger" onclick="clearAll()">🗑️ 清空全部</button>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>姓名</th>
+      <th>段位</th>
+      <th>答對</th>
+      <th>金幣</th>
+      <th>COMBO</th>
+      <th>用時</th>
+      <th>提交時間</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<div class="empty" id="emptyMsg" style="display:none;">
+  <div class="em-emoji">📭</div>
+  <div class="em-msg">還沒有學生繳交</div>
+  <div class="em-hint">學生通關後傳「通關連結」給你，點開後會自動加進清單</div>
+</div>
+
+<footer>Stacey · 8A 段考衝刺 · classtools1020</footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = '8a-3-4-records';
+const PW = 'stacey2026';
+
+function getRecords() {
+  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+}
+function setRecords(arr) { localStorage.setItem(KEY, JSON.stringify(arr)); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* 處理 URL Query：如果學生帶了成績進來，自動加進 records */
+function ingestQuery() {
+  const q = new URLSearchParams(location.search);
+  if (!q.has('n') && !q.has('s')) return null;
+  const r = {
+    name: q.get('n') || '匿名',
+    correct: parseInt(q.get('s') || '0'),
+    total: 7,
+    rank: q.get('r') || '🥉 銅牌新兵',
+    time: q.get('t') || '0:00',
+    coins: parseInt(q.get('c') || '0'),
+    combo: parseInt(q.get('co') || '0'),
+    ts: Date.now()
+  };
+  const arr = getRecords();
+  // 同名學生用最新一筆覆蓋
+  const idx = arr.findIndex(x => x.name === r.name);
+  if (idx >= 0) arr[idx] = r;
+  else arr.push(r);
+  setRecords(arr);
+  // 清掉 query string 但保留 key
+  history.replaceState({}, '', location.pathname + '?key=' + PW);
+  return r;
+}
+
+/* 認證 */
+function authed() {
+  const q = new URLSearchParams(location.search);
+  if (q.get('key') === PW) {
+    sessionStorage.setItem('teacher-auth', '1');
+    return true;
+  }
+  return sessionStorage.getItem('teacher-auth') === '1';
+}
+function checkPw() {
+  const v = document.getElementById('pwInput').value;
+  if (v === PW) {
+    sessionStorage.setItem('teacher-auth', '1');
+    location.search = '?key=' + PW;
+  } else {
+    showToast('密碼錯誤');
+  }
+}
+
+function render() {
+  const arr = getRecords();
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  const filtered = arr.filter(r => !search || r.name.toLowerCase().includes(search));
+
+  // stats
+  document.getElementById('cntTotal').textContent = arr.length;
+  const kings = arr.filter(r => r.rank.includes('王者')).length;
+  const diamonds = arr.filter(r => r.rank.includes('王者') || r.rank.includes('鑽石')).length;
+  document.getElementById('cntKing').textContent = kings;
+  document.getElementById('cntDiamond').textContent = diamonds;
+  const avgPct = arr.length ? Math.round(arr.reduce((s, r) => s + r.correct / r.total, 0) / arr.length * 100) : 0;
+  document.getElementById('cntAvg').textContent = avgPct + '%';
+
+  const tbody = document.getElementById('tbody');
+  const empty = document.getElementById('emptyMsg');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    document.querySelector('table').style.display = 'none';
+    empty.style.display = 'block';
+    if (search) {
+      empty.querySelector('.em-msg').textContent = `沒有「${search}」的紀錄`;
+      empty.querySelector('.em-hint').textContent = '清空搜尋看全部';
+    } else {
+      empty.querySelector('.em-msg').textContent = '還沒有學生繳交';
+      empty.querySelector('.em-hint').textContent = '學生通關後傳「通關連結」給你，點開後會自動加進清單';
+    }
+    return;
+  }
+
+  document.querySelector('table').style.display = '';
+  empty.style.display = 'none';
+
+  // 排序：分數高 > 用時短 > ts 新
+  const sorted = [...filtered].sort((a, b) => {
+    if (b.correct !== a.correct) return b.correct - a.correct;
+    return b.ts - a.ts;
+  });
+
+  tbody.innerHTML = sorted.map((r, i) => {
+    const dt = new Date(r.ts);
+    const tsStr = `${String(dt.getMonth()+1).padStart(2,'0')}/${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+    const idx = arr.indexOf(r);
+    return `<tr>
+      <td><b>${escape(r.name)}</b></td>
+      <td class="rank-cell">${escape(r.rank)}</td>
+      <td class="score-cell">${r.correct}/${r.total}</td>
+      <td>${r.coins} 🪙</td>
+      <td>${r.combo} 🔥</td>
+      <td>${escape(r.time)}</td>
+      <td style="color:#888;font-size:.85rem;">${tsStr}</td>
+      <td class="actions"><button onclick="removeOne(${idx})">刪除</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function escape(s) {
+  return String(s).replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function removeOne(idx) {
+  if (!confirm('確定刪除這筆？')) return;
+  const arr = getRecords();
+  arr.splice(idx, 1);
+  setRecords(arr);
+  render();
+  showToast('已刪除');
+}
+
+function clearAll() {
+  if (!confirm('確定清空所有繳交紀錄？此動作無法復原')) return;
+  localStorage.removeItem(KEY);
+  render();
+  showToast('已清空');
+}
+
+function exportCSV() {
+  const arr = getRecords();
+  if (arr.length === 0) { showToast('沒有資料可下載'); return; }
+  const header = ['姓名','段位','答對','總題數','金幣','COMBO','用時','提交時間'];
+  const lines = arr.map(r => {
+    const dt = new Date(r.ts);
+    const ts = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+    return [r.name, r.rank, r.correct, r.total, r.coins, r.combo, r.time, ts];
+  });
+  const csv = [header, ...lines].map(row => row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `8a-quest-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+/* 啟動 */
+if (!authed()) {
+  document.getElementById('gateWrap').style.display = 'block';
+  document.getElementById('pwInput')?.focus();
+} else {
+  document.getElementById('mainWrap').style.display = 'block';
+  const newRec = ingestQuery();
+  if (newRec) {
+    const a = document.getElementById('newRecAlert');
+    a.style.display = 'block';
+    a.innerHTML = `✅ 已記錄：<b>${escape(newRec.name)}</b> 完成練習，段位：${escape(newRec.rank)}（${newRec.correct}/${newRec.total}）`;
+    setTimeout(() => a.style.display = 'none', 6000);
+  }
+  render();
+}
+</script>
+</body>
+</html>

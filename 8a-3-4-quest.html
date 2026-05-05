@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>等腰王者 · 段考衝刺 · 8A 數學</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --c-perp: #FF6B9D;
+  --c-bisect: #00BCD4;
+  --c-equal: #B967FF;
+  --c-right: #FF3B30;
+  --c-bg-1: #0a0a1f;
+  --c-bg-2: #1a1a3e;
+  --c-bg-3: #2d1a4d;
+  --c-gold: #FFD700;
+  --c-bronze: #CD7F32;
+  --c-silver: #C0C0C0;
+  --c-diamond: #B9F2FF;
+}
+html, body {
+  font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  background: linear-gradient(135deg, var(--c-bg-1) 0%, var(--c-bg-2) 50%, var(--c-bg-3) 100%);
+  color: #fff;
+  min-height: 100vh;
+  min-height: 100dvh;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 60% 70%, rgba(255,107,157,0.6), transparent),
+    radial-gradient(2px 2px at 40% 80%, rgba(0,188,212,0.5), transparent),
+    radial-gradient(1px 1px at 80% 20%, rgba(185,103,255,0.6), transparent),
+    linear-gradient(135deg, #0a0a1f 0%, #1a1a3e 50%, #2d1a4d 100%);
+}
+
+.wrap { max-width: 720px; width: 100%; }
+
+/* ===== 入口 ===== */
+.cover { text-align: center; padding: 30px 16px; animation: fadeUp .6s ease-out; }
+.cover .badge-bg-text {
+  font-size: 0.9rem; color: var(--c-gold); letter-spacing: 4px;
+  font-weight: 700; margin-bottom: 6px;
+}
+.cover h1 {
+  font-size: 2.6rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--c-perp), var(--c-bisect), var(--c-equal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  text-shadow: 0 0 30px rgba(255,107,157,.4);
+  line-height: 1.1;
+}
+.cover .sub { font-size: 1.05rem; color: #aab; margin-bottom: 22px; }
+.cover .ranks-preview {
+  display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.cover .rank-chip {
+  padding: 6px 12px; border-radius: 50px; font-size: .82rem;
+  font-weight: 800; letter-spacing: 1px; opacity: 0.7;
+}
+.r-bronze { background: rgba(205,127,50,.2); color: #d49a5c; border: 1px solid rgba(205,127,50,.4); }
+.r-silver { background: rgba(192,192,192,.2); color: #d8d8d8; border: 1px solid rgba(192,192,192,.4); }
+.r-gold { background: rgba(255,215,0,.2); color: var(--c-gold); border: 1px solid rgba(255,215,0,.4); }
+.r-diamond { background: rgba(185,242,255,.2); color: var(--c-diamond); border: 1px solid rgba(185,242,255,.4); }
+.r-king { background: linear-gradient(135deg, rgba(255,107,157,.3), rgba(185,103,255,.3)); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+
+.cover .start-btn {
+  background: linear-gradient(135deg, var(--c-perp), var(--c-equal));
+  color: white; border: none;
+  padding: 22px 50px; font-size: 1.5rem; font-weight: 900;
+  font-family: inherit; border-radius: 60px; cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255,107,157,.4), inset 0 -3px 0 rgba(0,0,0,.2);
+  letter-spacing: 2px; transition: transform .15s; animation: pulse 1.6s infinite;
+}
+.cover .start-btn:active { transform: scale(.96); }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(255,107,157,.4), inset 0 -3px 0 rgba(0,0,0,.2); }
+  50%      { box-shadow: 0 8px 36px rgba(255,107,157,.7), inset 0 -3px 0 rgba(0,0,0,.2); }
+}
+.cover .hint { margin-top: 18px; color: #889; font-size: .88rem; line-height: 1.6; }
+
+/* ===== HUD ===== */
+.hud {
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  padding: 12px 14px;
+  background: rgba(0,0,0,.4);
+  border: 2px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  margin-bottom: 14px;
+  font-weight: 800;
+}
+.hud .stage { font-size: .98rem; color: var(--c-gold); flex-shrink: 0; }
+.hud .combo { color: var(--c-bisect); font-size: 1rem; }
+.hud .combo.hot { color: var(--c-perp); animation: hotPulse .5s; }
+@keyframes hotPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+.hud .coins { color: var(--c-gold); font-size: 1.05rem; }
+
+.stages-bar { display: flex; gap: 5px; margin-bottom: 16px; }
+.stage-dot { flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,.1); transition: all .3s; }
+.stage-dot.active { background: linear-gradient(90deg, var(--c-perp), var(--c-bisect)); box-shadow: 0 0 8px var(--c-perp); }
+.stage-dot.done { background: var(--c-gold); }
+
+/* ===== 題目卡 ===== */
+.q-card {
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(255,255,255,.12);
+  border-radius: 22px; padding: 24px 22px;
+  margin-bottom: 14px;
+  animation: fadeUp .4s ease-out;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.boss-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, var(--c-perp), var(--c-equal));
+  color: white; padding: 8px 16px; border-radius: 50px;
+  font-size: .92rem; font-weight: 900; letter-spacing: 1px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(255,107,157,.3);
+}
+.q-emoji { font-size: 2.4rem; margin-bottom: 4px; }
+.q-title {
+  font-size: 1.35rem; font-weight: 900;
+  margin-bottom: 14px; line-height: 1.55; color: #fff;
+}
+.q-figure {
+  display: block; margin: 12px auto 14px;
+  max-width: 280px; width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px; padding: 14px;
+}
+.q-hint {
+  color: #aac; font-size: .92rem; margin-bottom: 16px;
+  font-style: italic; padding-left: 8px; border-left: 3px solid var(--c-bisect);
+  padding: 10px 14px; background: rgba(0,188,212,.08); border-radius: 8px;
+}
+
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option {
+  background: rgba(255,255,255,.05);
+  border: 2px solid rgba(255,255,255,.18);
+  padding: 14px 16px; border-radius: 14px;
+  font-size: 1.1rem; color: #fff;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  transition: all .18s; font-family: inherit;
+  text-align: left; min-height: 60px;
+  font-weight: 600; line-height: 1.4; width: 100%;
+}
+.option:active { transform: scale(.98); }
+.option .letter {
+  width: 38px; height: 38px; flex-shrink: 0;
+  background: rgba(255,255,255,.1);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 1.05rem;
+}
+.option.correct {
+  background: linear-gradient(135deg, rgba(34,197,94,.35), rgba(34,197,94,.18));
+  border-color: #22c55e; animation: correctPop .5s;
+}
+.option.correct .letter { background: #22c55e; }
+.option.wrong {
+  background: linear-gradient(135deg, rgba(239,68,68,.35), rgba(239,68,68,.18));
+  border-color: #ef4444; animation: shake .4s;
+}
+.option.wrong .letter { background: #ef4444; }
+@keyframes correctPop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
+.feedback {
+  margin-top: 14px; padding: 14px 16px;
+  border-radius: 12px; font-weight: 700;
+  text-align: center; font-size: 1rem;
+  display: none; animation: fadeUp .3s ease-out;
+  line-height: 1.55;
+}
+.feedback.show { display: block; }
+.feedback.ok { background: rgba(34,197,94,.2); color: #4ade80; border: 1px solid rgba(34,197,94,.4); }
+.feedback.bad { background: rgba(239,68,68,.2); color: #f87171; border: 1px solid rgba(239,68,68,.4); }
+.feedback .reward { font-size: 1.1rem; color: var(--c-gold); margin-top: 6px; font-weight: 900; }
+
+.next-btn {
+  margin-top: 12px; width: 100%;
+  background: linear-gradient(135deg, var(--c-bisect), var(--c-equal));
+  color: white; border: none;
+  padding: 18px; font-size: 1.2rem; font-weight: 900;
+  border-radius: 50px; cursor: pointer; font-family: inherit;
+  display: none;
+  box-shadow: 0 6px 18px rgba(0,188,212,.4);
+}
+.next-btn.show { display: block; animation: fadeUp .3s; }
+.next-btn:active { transform: scale(.97); }
+
+/* level up flash */
+.level-up-overlay {
+  position: fixed; inset: 0;
+  background: linear-gradient(135deg, rgba(255,107,157,.95), rgba(185,103,255,.95));
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 9998; animation: levelUpFlash .6s;
+}
+.level-up-overlay.show { display: flex; }
+@keyframes levelUpFlash {
+  from { opacity: 0; transform: scale(.6); }
+  to { opacity: 1; transform: scale(1); }
+}
+.level-up-overlay .lv-text {
+  font-size: 3rem; font-weight: 900; color: white;
+  text-shadow: 0 0 30px rgba(255,255,255,.6);
+  letter-spacing: 4px; margin-bottom: 12px;
+}
+.level-up-overlay .lv-sub { color: white; font-size: 1.4rem; font-weight: 700; }
+
+/* ===== 通關 ===== */
+.victory { text-align: center; padding: 24px 16px; animation: fadeUp .8s ease-out; }
+.victory h1 {
+  font-size: 2.4rem; font-weight: 900;
+  background: linear-gradient(90deg, var(--c-gold), var(--c-perp), var(--c-bisect));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; letter-spacing: -1px; margin-bottom: 12px;
+  animation: rainbow 3s infinite;
+}
+@keyframes rainbow { 0%, 100% { filter: hue-rotate(0deg); } 50% { filter: hue-rotate(60deg); } }
+.victory .crown { font-size: 4.5rem; margin-bottom: 12px; animation: bounce 1.4s infinite; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+.rank-card {
+  display: inline-block; max-width: 100%;
+  background: linear-gradient(135deg, rgba(255,215,0,.2), rgba(255,107,157,.2));
+  border: 2px solid var(--c-gold);
+  padding: 20px 30px; border-radius: 24px; margin: 14px 0;
+  position: relative; overflow: hidden;
+}
+.rank-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 30% 50%, rgba(255,215,0,.15), transparent 60%);
+  pointer-events: none;
+}
+.rank-card .label { font-size: .92rem; color: var(--c-gold); margin-bottom: 6px; letter-spacing: 2px; font-weight: 700; }
+.rank-card .name { font-size: 1.85rem; font-weight: 900; color: white; letter-spacing: 1px; }
+
+.stats { display: flex; justify-content: center; gap: 12px; margin: 18px 0; flex-wrap: wrap; }
+.stat {
+  background: rgba(255,255,255,.06);
+  padding: 12px 18px; border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.12);
+  min-width: 96px;
+}
+.stat .num { font-size: 1.5rem; font-weight: 900; color: var(--c-gold); }
+.stat .lab { font-size: .78rem; color: #aab; margin-top: 2px; }
+
+.action-row { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.action-row .act {
+  flex: 1; min-width: 140px;
+  padding: 14px 18px; border-radius: 14px;
+  border: 2px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.06);
+  color: #fff; font-weight: 800; font-size: 1rem;
+  cursor: pointer; font-family: inherit;
+  transition: all .15s;
+  text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.action-row .act:active { transform: scale(.97); }
+.action-row .act.primary {
+  background: linear-gradient(135deg, var(--c-perp), var(--c-equal));
+  border-color: transparent;
+  box-shadow: 0 6px 18px rgba(255,107,157,.3);
+}
+.action-row .copied {
+  background: rgba(34,197,94,.3); border-color: #22c55e;
+}
+.victory .restart {
+  margin-top: 14px;
+  background: rgba(255,255,255,.05);
+  color: white; border: 1px solid rgba(255,255,255,.15);
+  padding: 12px 24px; font-size: .92rem; font-weight: 600;
+  border-radius: 50px; cursor: pointer; font-family: inherit;
+}
+
+/* 名字輸入 */
+.name-input-wrap {
+  background: rgba(0,0,0,.4);
+  border: 2px solid rgba(255,255,255,.1);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+}
+.name-input-wrap label { color: var(--c-gold); font-weight: 800; }
+.name-input-wrap input {
+  flex: 1; min-width: 130px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.15);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 16px; font-family: inherit;
+  min-height: 44px;
+}
+.name-input-wrap input:focus { outline: none; border-color: var(--c-perp); background: rgba(255,255,255,.1); }
+
+/* 煙火 */
+#fireworks { position: fixed; inset: 0; pointer-events: none; z-index: 9999; display: none; }
+
+/* SVG 三角形圖形顏色 */
+.tri-line { stroke: #fff; stroke-width: 2; fill: none; }
+.tri-fill { fill: rgba(255,107,157,.15); stroke: var(--c-perp); stroke-width: 2; }
+.tri-equal { fill: rgba(0,188,212,.15); stroke: var(--c-bisect); stroke-width: 2; }
+.tri-bad   { fill: rgba(255,255,255,.05); stroke: rgba(255,255,255,.4); stroke-width: 2; stroke-dasharray: 4 3; }
+.tri-tag { fill: #fff; font-size: 14px; font-weight: 700; }
+.tri-tick { stroke: var(--c-gold); stroke-width: 3; stroke-linecap: round; }
+
+/* RWD */
+@media (max-width: 600px) {
+  body { padding: 12px; }
+  .cover { padding: 22px 8px; }
+  .cover h1 { font-size: 2rem; }
+  .cover .sub { font-size: 1rem; }
+  .cover .start-btn { padding: 18px 38px; font-size: 1.25rem; letter-spacing: 1.5px; }
+  .hud { padding: 10px 12px; }
+  .hud .stage { font-size: .88rem; }
+  .hud .combo, .hud .coins { font-size: .92rem; }
+  .q-card { padding: 18px 14px; }
+  .q-emoji { font-size: 2rem; }
+  .q-title { font-size: 1.15rem; }
+  .q-hint { font-size: .85rem; }
+  .option { padding: 12px 12px; font-size: 1rem; min-height: 56px; gap: 10px; }
+  .option .letter { width: 32px; height: 32px; font-size: .95rem; }
+  .victory h1 { font-size: 1.85rem; }
+  .victory .crown { font-size: 3.4rem; }
+  .rank-card { padding: 16px 22px; }
+  .rank-card .name { font-size: 1.45rem; }
+  .stat { min-width: 80px; padding: 10px 12px; }
+  .stat .num { font-size: 1.3rem; }
+  .level-up-overlay .lv-text { font-size: 2.4rem; }
+}
+@media (hover: none) {
+  .option:hover { background: rgba(255,255,255,.05); }
+}
+</style>
+</head>
+<body>
+<canvas id="fireworks"></canvas>
+<div class="level-up-overlay" id="lvOverlay">
+  <div class="lv-text">LEVEL UP!</div>
+  <div class="lv-sub" id="lvSub">解鎖新技能</div>
+</div>
+
+<div class="wrap" id="app"></div>
+
+<script>
+/* ===== 音效 ===== */
+let audioCtx = null;
+function ctx(){ if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}return audioCtx; }
+function tone(freq, dur, type='square', vol=0.1){
+  const c=ctx(); if(!c)return;
+  const osc=c.createOscillator(), gain=c.createGain();
+  osc.type=type; osc.frequency.value=freq;
+  gain.gain.setValueAtTime(vol, c.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime+dur);
+  osc.connect(gain); gain.connect(c.destination);
+  osc.start(); osc.stop(c.currentTime+dur);
+}
+function sndCoin(){ tone(988,0.07,'square',0.13); setTimeout(()=>tone(1318,0.18,'square',0.13),70); }
+function sndJump(){ tone(523,0.05,'square',0.1); setTimeout(()=>tone(880,0.1,'square',0.1),50); }
+function sndWrong(){ tone(220,0.15,'square',0.12); setTimeout(()=>tone(110,0.25,'square',0.12),150); }
+function sndLevelUp(){ const n=[523,659,784,1046,1318]; n.forEach((f,i)=>setTimeout(()=>tone(f,0.1,'square',0.13),i*80)); }
+function sndCombo(){ tone(1568,0.06,'square',0.13); setTimeout(()=>tone(2093,0.12,'square',0.12),60); }
+function sndVictory(){ const n=[659,659,659,523,659,784,392,523,392]; n.forEach((f,i)=>setTimeout(()=>tone(f,0.18,'square',0.14),i*130)); }
+
+/* ===== 題庫 ===== */
+const QUESTIONS = [
+  {
+    boss: '⚔️ 等腰守門員',
+    emoji: '🔺',
+    title: '哪一個是「等腰三角形」？',
+    hint: '等腰 = 兩邊等長。生活例子：屋頂、衣架、聖誕樹',
+    options: [
+      { text: '三邊都不一樣長的三角形', emoji: '🔻' },
+      { text: '只有兩邊一樣長的三角形', emoji: '🔺', correct: true },
+      { text: '三個角都是直角的三角形', emoji: '⬜' }
+    ],
+    skill: '等腰辨識'
+  },
+  {
+    boss: '👯 角度雙胞胎',
+    emoji: '📐',
+    title: '等腰三角形 AB = AC，已知 ∠B = 70°，那 ∠C 是？',
+    hint: '等腰三角形的「兩底角相等」 → 兩個底角是雙胞胎',
+    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="120,20 50,170 190,170" class="tri-fill"/>
+      <text x="120" y="14" class="tri-tag" text-anchor="middle">A</text>
+      <text x="42" y="184" class="tri-tag">B</text>
+      <text x="196" y="184" class="tri-tag">C</text>
+      <text x="74" y="160" class="tri-tag" fill="#FFD700">70°</text>
+      <text x="158" y="160" class="tri-tag" fill="#FFD700">?°</text>
+    </svg>`,
+    options: [
+      { text: '50°', emoji: '🤔' },
+      { text: '70°', emoji: '✨', correct: true },
+      { text: '110°', emoji: '😵' }
+    ],
+    skill: '兩底角相等'
+  },
+  {
+    boss: '🗡️ 平分劍',
+    emoji: '⚡',
+    title: '等腰三角形 AB=AC，AD 平分 ∠BAC 交 BC 於 D。下面哪句對？',
+    hint: '頂角平分線 = 底邊的「垂直」+「平分」 → 又垂直又對切',
+    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="120,20 50,170 190,170" class="tri-fill"/>
+      <line x1="120" y1="20" x2="120" y2="170" stroke="#FFD700" stroke-width="2" stroke-dasharray="5 4"/>
+      <text x="120" y="14" class="tri-tag" text-anchor="middle">A</text>
+      <text x="42" y="184" class="tri-tag">B</text>
+      <text x="196" y="184" class="tri-tag">C</text>
+      <text x="124" y="184" class="tri-tag">D</text>
+      <rect x="120" y="155" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+    </svg>`,
+    options: [
+      { text: 'AD 跟 BC 隨便相交', emoji: '🤷' },
+      { text: 'AD ⊥ BC，而且 BD = DC', emoji: '🎯', correct: true },
+      { text: 'AD = BC', emoji: '😅' }
+    ],
+    skill: '平分線之劍'
+  },
+  {
+    boss: '🛡️ 反派轉正',
+    emoji: '🔄',
+    title: '△ABC 中，∠B = 57°, ∠C = 66°，哪兩條邊一定相等？',
+    hint: '先算 ∠A = 180 − 57 − 66 = ?。看哪兩個角相等，對應的兩邊就相等',
+    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="120,30 40,170 200,170" class="tri-fill"/>
+      <text x="120" y="22" class="tri-tag" text-anchor="middle">A</text>
+      <text x="32" y="184" class="tri-tag">B</text>
+      <text x="206" y="184" class="tri-tag">C</text>
+      <text x="62" y="160" class="tri-tag" fill="#FFD700">57°</text>
+      <text x="172" y="160" class="tri-tag" fill="#FFD700">66°</text>
+      <text x="115" y="48" class="tri-tag" fill="#FFD700">?°</text>
+    </svg>`,
+    options: [
+      { text: 'AB = AC', emoji: '🟢' },
+      { text: 'AB = BC', emoji: '🟡' },
+      { text: 'BC = AC', emoji: '⭐', correct: true }
+    ],
+    skill: '等腰判別'
+  },
+  {
+    boss: '👑 直角公主',
+    emoji: '📏',
+    title: '等腰三角形 AB = AC = 25, BC = 14，高 AD = ?',
+    hint: 'D 是 BC 中點 → BD = 7。用畢氏定理：AD² + 7² = 25²',
+    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="120,20 40,170 200,170" class="tri-fill"/>
+      <line x1="120" y1="20" x2="120" y2="170" stroke="#FFD700" stroke-width="2.5"/>
+      <text x="120" y="14" class="tri-tag" text-anchor="middle">A</text>
+      <text x="32" y="184" class="tri-tag">B</text>
+      <text x="206" y="184" class="tri-tag">C</text>
+      <text x="124" y="186" class="tri-tag">D</text>
+      <text x="60" y="100" class="tri-tag" fill="#FF6B9D">25</text>
+      <text x="170" y="100" class="tri-tag" fill="#FF6B9D">25</text>
+      <text x="115" y="186" class="tri-tag" fill="#00BCD4">14</text>
+      <text x="128" y="100" class="tri-tag" fill="#FFD700">?</text>
+      <rect x="120" y="155" width="12" height="12" fill="none" stroke="#FFD700" stroke-width="2"/>
+    </svg>`,
+    options: [
+      { text: '21', emoji: '🤔' },
+      { text: '24', emoji: '🎯', correct: true },
+      { text: '25', emoji: '😅' }
+    ],
+    skill: '畢氏應用'
+  },
+  {
+    boss: '🐉 正三角形騎士',
+    emoji: '🏰',
+    title: '邊長為 2 的正三角形，高 AD = ?',
+    hint: '正三角形高公式：(√3/2) × 邊長',
+    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="120,30 50,170 190,170" class="tri-equal"/>
+      <line x1="120" y1="30" x2="120" y2="170" stroke="#FFD700" stroke-width="2.5"/>
+      <text x="120" y="22" class="tri-tag" text-anchor="middle">A</text>
+      <text x="42" y="184" class="tri-tag">B</text>
+      <text x="196" y="184" class="tri-tag">C</text>
+      <text x="124" y="184" class="tri-tag">D</text>
+      <text x="68" y="105" class="tri-tag" fill="#00BCD4">2</text>
+      <text x="172" y="105" class="tri-tag" fill="#00BCD4">2</text>
+      <text x="115" y="184" class="tri-tag" fill="#00BCD4">2</text>
+      <text x="128" y="105" class="tri-tag" fill="#FFD700">?</text>
+    </svg>`,
+    options: [
+      { text: '1', emoji: '🤔' },
+      { text: '√3', emoji: '👑', correct: true },
+      { text: '2', emoji: '😅' }
+    ],
+    skill: '正三角形高'
+  },
+  {
+    boss: '💀 面積大魔王',
+    emoji: '🔥',
+    title: '邊長為 8 的正三角形，面積 = ?',
+    hint: '正三角形面積公式：(√3/4) × 邊長² = (√3/4) × 64',
+    figure: `<svg viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="120,30 50,170 190,170" class="tri-equal"/>
+      <text x="120" y="22" class="tri-tag" text-anchor="middle">A</text>
+      <text x="42" y="184" class="tri-tag">B</text>
+      <text x="196" y="184" class="tri-tag">C</text>
+      <text x="115" y="184" class="tri-tag" fill="#00BCD4">8</text>
+      <text x="105" y="115" class="tri-tag" fill="#FFD700">面積=?</text>
+    </svg>`,
+    options: [
+      { text: '8√3', emoji: '🤔' },
+      { text: '16√3', emoji: '🏆', correct: true },
+      { text: '32√3', emoji: '😵' }
+    ],
+    skill: '面積大師'
+  }
+];
+
+/* ===== 段位 ===== */
+function getRank(correct, total) {
+  const pct = correct / total;
+  if (correct === total) return { name: '👑 等腰王者', cls: 'r-king', desc: '完美通關！全班崇拜你 ⭐' };
+  if (pct >= 0.85) return { name: '💎 鑽石勇者', cls: 'r-diamond', desc: '段考穩了！' };
+  if (pct >= 0.7) return { name: '🥇 金牌學徒', cls: 'r-gold', desc: '快要滿分！再加把勁' };
+  if (pct >= 0.4) return { name: '🥈 銀牌學徒', cls: 'r-silver', desc: '不錯，再來一次更厲害' };
+  return { name: '🥉 銅牌新兵', cls: 'r-bronze', desc: '沒關係！再玩一次會更穩' };
+}
+
+/* ===== 狀態 ===== */
+const state = {
+  current: 0, coins: 0, correct: 0, attempts: 0,
+  combo: 0, maxCombo: 0,
+  startTime: null, studentName: ''
+};
+const TOTAL = QUESTIONS.length;
+const app = document.getElementById('app');
+
+/* ===== Render ===== */
+function renderCover() {
+  app.innerHTML = `
+    <div class="cover">
+      <div class="badge-bg-text">8A · 段考衝刺</div>
+      <h1>等腰王者</h1>
+      <div class="sub">3-4 等腰三角形 · 正三角形 · 高與面積</div>
+      <div class="ranks-preview">
+        <div class="rank-chip r-bronze">🥉 銅</div>
+        <div class="rank-chip r-silver">🥈 銀</div>
+        <div class="rank-chip r-gold">🥇 金</div>
+        <div class="rank-chip r-diamond">💎 鑽石</div>
+        <div class="rank-chip r-king">👑 王者</div>
+      </div>
+      <button class="start-btn" onclick="startGame()">開始闖關 ▶</button>
+      <div class="hint">7 關 · 連對加 COMBO · 段考前的最後試煉</div>
+    </div>
+  `;
+}
+
+function startGame() {
+  sndJump();
+  state.current = 0; state.coins = 0; state.correct = 0; state.attempts = 0;
+  state.combo = 0; state.maxCombo = 0; state.startTime = Date.now();
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[state.current];
+  const stagesBarHtml = QUESTIONS.map((_, i) => {
+    let cls = '';
+    if (i < state.current) cls = 'done';
+    else if (i === state.current) cls = 'active';
+    return `<div class="stage-dot ${cls}"></div>`;
+  }).join('');
+
+  const optsHtml = q.options.map((opt, i) => `
+    <button class="option" data-idx="${i}" onclick="pick(${i})">
+      <div class="letter">${String.fromCharCode(65 + i)}</div>
+      <div style="flex:1;">
+        <span style="font-size:1.4rem;margin-right:8px;">${opt.emoji}</span>${opt.text}
+      </div>
+    </button>
+  `).join('');
+
+  app.innerHTML = `
+    ${state.current === 0 ? `
+      <div class="name-input-wrap">
+        <label>👤 你的名字：</label>
+        <input id="nameInput" type="text" placeholder="輸入名字（給老師對照用）" autocomplete="off" value="${state.studentName}">
+      </div>` : ''}
+
+    <div class="hud">
+      <div class="stage">⚔️ 第 ${state.current + 1} 關 / ${TOTAL}</div>
+      <div class="combo ${state.combo >= 3 ? 'hot' : ''}">🔥 ${state.combo}</div>
+      <div class="coins">🪙 ${state.coins}</div>
+    </div>
+    <div class="stages-bar">${stagesBarHtml}</div>
+
+    <div class="q-card">
+      <div class="boss-tag">${q.boss}</div>
+      <div class="q-emoji">${q.emoji}</div>
+      <div class="q-title">${q.title}</div>
+      ${q.figure ? `<div class="q-figure">${q.figure}</div>` : ''}
+      <div class="q-hint">💡 ${q.hint}</div>
+      <div class="options">${optsHtml}</div>
+      <div class="feedback" id="fb"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">${state.current === TOTAL - 1 ? '看通關證 🏆' : '下一關 →'}</button>
+    </div>
+  `;
+
+  const nameInput = document.getElementById('nameInput');
+  if (nameInput) {
+    nameInput.addEventListener('input', e => state.studentName = e.target.value);
+  }
+}
+
+function pick(idx) {
+  const q = QUESTIONS[state.current];
+  const opts = document.querySelectorAll('.option');
+  if (opts[0].classList.contains('correct') || opts[0].classList.contains('wrong')) return;
+
+  state.attempts++;
+  const isCorrect = q.options[idx].correct;
+
+  if (isCorrect) {
+    opts[idx].classList.add('correct');
+    state.correct++;
+    state.combo++;
+    if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+    const baseCoin = 10;
+    const comboBonus = state.combo >= 3 ? 5 * state.combo : 0;
+    const totalCoin = baseCoin + comboBonus;
+    state.coins += totalCoin;
+    sndCoin();
+    if (state.combo >= 3) setTimeout(() => sndCombo(), 200);
+    setTimeout(() => sndLevelUp(), 350);
+    showLevelUpFlash(q.skill);
+    showFeedback('ok',
+      `✅ 答對！技能解鎖：${q.skill}` +
+      (state.combo >= 3 ? `<div class="reward">🔥 ${state.combo}連對！+${totalCoin} 🪙 (含 COMBO bonus!)</div>` : `<div class="reward">+${totalCoin} 🪙</div>`)
+    );
+    document.getElementById('nextBtn').classList.add('show');
+    document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
+    miniSpark();
+  } else {
+    opts[idx].classList.add('wrong');
+    state.combo = 0;
+    sndWrong();
+    showFeedback('bad', '❌ 答錯了！COMBO 中斷。再試試別的選項～');
+    setTimeout(() => opts[idx].classList.remove('wrong'), 800);
+  }
+}
+
+function showLevelUpFlash(skill) {
+  const ov = document.getElementById('lvOverlay');
+  document.getElementById('lvSub').textContent = `解鎖：${skill}`;
+  ov.classList.add('show');
+  setTimeout(() => ov.classList.remove('show'), 800);
+}
+
+function showFeedback(type, msg) {
+  const fb = document.getElementById('fb');
+  fb.className = `feedback show ${type}`;
+  fb.innerHTML = msg;
+}
+
+function nextQ() {
+  state.current++;
+  if (state.current >= TOTAL) {
+    renderVictory();
+  } else {
+    sndJump();
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function renderVictory() {
+  const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+  const min = Math.floor(elapsed / 60);
+  const sec = elapsed % 60;
+  const timeStr = `${min}:${String(sec).padStart(2, '0')}`;
+  const rank = getRank(state.correct, TOTAL);
+  const greet = state.studentName ? `${state.studentName}` : '勇者';
+
+  // 存 localStorage
+  saveResult({
+    name: state.studentName || '匿名',
+    correct: state.correct,
+    total: TOTAL,
+    rank: rank.name,
+    time: timeStr,
+    coins: state.coins,
+    combo: state.maxCombo,
+    ts: Date.now()
+  });
+
+  const teacherUrl = buildTeacherUrl({
+    n: state.studentName || '匿名',
+    s: state.correct,
+    r: rank.name,
+    t: timeStr,
+    c: state.coins,
+    co: state.maxCombo
+  });
+
+  app.innerHTML = `
+    <div class="victory">
+      <div class="crown">${rank.name.match(/[👑💎🥇🥈🥉]/)?.[0] || '🏆'}</div>
+      <h1>${greet}！通關！</h1>
+      <div style="color:#aab;font-size:1.05rem;margin-bottom:8px;">3-4 等腰／正三角形 · 段考衝刺完成</div>
+
+      <div class="rank-card">
+        <div class="label">獲得段位</div>
+        <div class="name">${rank.name}</div>
+      </div>
+      <div style="color:#ccd;font-size:1rem;margin-bottom:6px;">${rank.desc}</div>
+
+      <div class="stats">
+        <div class="stat"><div class="num">${state.correct}/${TOTAL}</div><div class="lab">✅ 答對</div></div>
+        <div class="stat"><div class="num">${state.coins}</div><div class="lab">🪙 金幣</div></div>
+        <div class="stat"><div class="num">${state.maxCombo}</div><div class="lab">🔥 最高 COMBO</div></div>
+        <div class="stat"><div class="num">${timeStr}</div><div class="lab">⏱ 用時</div></div>
+      </div>
+
+      <div class="action-row">
+        <button class="act primary" id="copyTxtBtn" onclick="copyTextResult()">📋 複製成績傳老師</button>
+        <button class="act" id="copyLinkBtn" onclick="copyTeacherLink('${teacherUrl}')">🔗 複製通關連結</button>
+      </div>
+      <div style="color:#889;font-size:.85rem;margin-top:10px;line-height:1.6;">
+        把成績或連結 LINE 傳老師 = 完成段考衝刺練習 ✅
+      </div>
+
+      <button class="restart" onclick="startGame()">🔄 再玩一次</button>
+    </div>
+  `;
+  sndVictory();
+  bigFireworks();
+}
+
+function saveResult(r) {
+  try {
+    const key = '8a-3-4-records';
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    arr.push(r);
+    localStorage.setItem(key, JSON.stringify(arr));
+  } catch(e) {}
+}
+
+function buildTeacherUrl(p) {
+  const base = location.origin + location.pathname.replace(/[^/]*$/, '') + '8a-3-4-teacher.html';
+  const qs = new URLSearchParams({ key: 'stacey2026', ...p }).toString();
+  return base + '?' + qs;
+}
+
+function copyTextResult() {
+  const r = JSON.parse(localStorage.getItem('8a-3-4-records') || '[]').slice(-1)[0];
+  if (!r) return;
+  const txt = `📊 8A 段考衝刺 · 等腰王者
+👤 姓名：${r.name}
+🏅 段位：${r.rank}
+✅ 答對：${r.correct}/${r.total}
+🪙 金幣：${r.coins}
+🔥 最高 COMBO：${r.combo}
+⏱ 用時：${r.time}`;
+  copyToClipboard(txt, document.getElementById('copyTxtBtn'));
+}
+
+function copyTeacherLink(url) {
+  copyToClipboard(url, document.getElementById('copyLinkBtn'));
+}
+
+function copyToClipboard(text, btn) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => flashBtn(btn, '✓ 已複製'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove();
+    flashBtn(btn, '✓ 已複製');
+  }
+}
+
+function flashBtn(btn, msg) {
+  if (!btn) return;
+  const orig = btn.innerHTML;
+  btn.innerHTML = msg; btn.classList.add('copied');
+  setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 1800);
+}
+
+/* ===== 煙火 ===== */
+const fwCanvas = document.getElementById('fireworks');
+const fwCtx = fwCanvas.getContext('2d');
+let fwParticles = [];
+function resizeFW(){ fwCanvas.width=innerWidth; fwCanvas.height=innerHeight; }
+resizeFW(); addEventListener('resize', resizeFW);
+function bigFireworks(){
+  fwCanvas.style.display='block';
+  for(let i=0;i<6;i++) setTimeout(()=>burst(Math.random()*innerWidth, Math.random()*innerHeight*0.6+50), i*350);
+  fwLoop();
+  setTimeout(()=>{ fwCanvas.style.display='none'; fwParticles=[]; }, 5000);
+}
+function miniSpark(){ fwCanvas.style.display='block'; burst(innerWidth/2, innerHeight/2); fwLoop(); }
+function burst(x,y){
+  const colors=['#FF6B9D','#00BCD4','#B967FF','#FFD700','#FF3B30','#22c55e'];
+  for(let i=0;i<36;i++){
+    const a=(i/36)*Math.PI*2;
+    fwParticles.push({ x, y, vx: Math.cos(a)*(Math.random()*5+2), vy: Math.sin(a)*(Math.random()*5+2), life: 70, color: colors[Math.floor(Math.random()*colors.length)] });
+  }
+}
+function fwLoop(){
+  fwCtx.fillStyle='rgba(0,0,0,0.12)';
+  fwCtx.fillRect(0,0,fwCanvas.width,fwCanvas.height);
+  fwParticles.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.1; p.life--; fwCtx.fillStyle=p.color; fwCtx.globalAlpha=p.life/70; fwCtx.fillRect(p.x,p.y,4,4); });
+  fwCtx.globalAlpha=1;
+  fwParticles=fwParticles.filter(p=>p.life>0);
+  if(fwParticles.length>0) requestAnimationFrame(fwLoop);
+  else if(fwCanvas.style.display==='block') fwCanvas.style.display='none';
+}
+
+renderCover();
+</script>
+</body>
+</html>
