@@ -129,8 +129,12 @@ footer { text-align: center; color: #999; font-size: .82rem; margin-top: 36px; p
   <div class="section-title">🔍 篩選 · 操作</div>
   <div class="bar">
     <input id="searchInput" placeholder="🔍 搜尋姓名" oninput="render()">
+    <button onclick="refreshRecords()">🔄 重新整理</button>
     <button onclick="exportCSV()">📥 下載 CSV</button>
     <button class="danger" onclick="clearAll()">🗑️ 清空全部</button>
+  </div>
+  <div style="font-size:.82rem;color:#888;margin-top:-10px;margin-bottom:14px;">
+    ☁️ 連到 Firebase 雲端 · 每 10 秒自動更新 · 學生在任何裝置通關都會即時出現
   </div>
 </div>
 
@@ -153,7 +157,7 @@ footer { text-align: center; color: #999; font-size: .82rem; margin-top: 36px; p
 <div class="empty" id="emptyMsg" style="display:none;">
   <div class="em-emoji">📭</div>
   <div class="em-msg">還沒有學生繳交</div>
-  <div class="em-hint">學生通關後傳「通關連結」給你，點開後會自動加進清單</div>
+  <div class="em-hint">學生在自己的裝置通關後，名字跟成績會自動出現在這裡</div>
 </div>
 
 <footer>Stacey · 8A 段考衝刺 · classtools1020</footer>
@@ -163,42 +167,59 @@ footer { text-align: center; color: #999; font-size: .82rem; margin-top: 36px; p
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY = '8a-3-4-records';
+/* ===== Firebase RTDB（雲端跨裝置）===== */
+const FIREBASE_URL = 'https://classtools1019-default-rtdb.firebaseio.com';
+const FIREBASE_PATH = '8a-quest-records';
 const PW = 'stacey2026';
 
-function getRecords() {
-  try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+let cachedRecords = [];
+
+async function loadFromFirebase() {
+  const url = `${FIREBASE_URL}/${FIREBASE_PATH}.json`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    if (!data) return [];
+    // Firebase 格式：{ "key1": record1, "key2": record2 }
+    return Object.entries(data).map(([fbKey, r]) => ({ ...r, _fbKey: fbKey }));
+  } catch (e) {
+    console.error('Firebase load failed:', e);
+    return null;
+  }
 }
-function setRecords(arr) { localStorage.setItem(KEY, JSON.stringify(arr)); }
+
+async function deleteFromFirebase(fbKey) {
+  const url = `${FIREBASE_URL}/${FIREBASE_PATH}/${fbKey}.json`;
+  try {
+    await fetch(url, { method: 'DELETE' });
+    return true;
+  } catch (e) { return false; }
+}
+
+async function clearFirebase() {
+  const url = `${FIREBASE_URL}/${FIREBASE_PATH}.json`;
+  try {
+    await fetch(url, { method: 'DELETE' });
+    return true;
+  } catch (e) { return false; }
+}
+
+function getRecords() { return cachedRecords; }
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-/* 處理 URL Query：如果學生帶了成績進來，自動加進 records */
-function ingestQuery() {
-  const q = new URLSearchParams(location.search);
-  if (!q.has('n') && !q.has('s')) return null;
-  const r = {
-    name: q.get('n') || '匿名',
-    correct: parseInt(q.get('s') || '0'),
-    total: 10,
-    rank: q.get('r') || '🥉 銅牌新兵',
-    time: q.get('t') || '0:00',
-    coins: parseInt(q.get('c') || '0'),
-    combo: parseInt(q.get('co') || '0'),
-    ts: Date.now()
-  };
-  const arr = getRecords();
-  // 同名學生用最新一筆覆蓋
-  const idx = arr.findIndex(x => x.name === r.name);
-  if (idx >= 0) arr[idx] = r;
-  else arr.push(r);
-  setRecords(arr);
-  // 清掉 query string 但保留 key
-  history.replaceState({}, '', location.pathname + '?key=' + PW);
-  return r;
+async function refreshRecords() {
+  const recs = await loadFromFirebase();
+  if (recs !== null) {
+    cachedRecords = recs;
+    render();
+  } else {
+    showToast('連不上雲端，請重新整理');
+  }
 }
 
 /* 認證 */
@@ -245,7 +266,7 @@ function render() {
       empty.querySelector('.em-hint').textContent = '清空搜尋看全部';
     } else {
       empty.querySelector('.em-msg').textContent = '還沒有學生繳交';
-      empty.querySelector('.em-hint').textContent = '學生通關後傳「通關連結」給你，點開後會自動加進清單';
+      empty.querySelector('.em-hint').textContent = '學生在自己的裝置通關後，名字跟成績會自動出現在這裡';
     }
     return;
   }
@@ -280,18 +301,23 @@ function escape(s) {
   return String(s).replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function removeOne(idx) {
+async function removeOne(idx) {
   if (!confirm('確定刪除這筆？')) return;
   const arr = getRecords();
+  const rec = arr[idx];
+  if (rec && rec._fbKey) {
+    await deleteFromFirebase(rec._fbKey);
+  }
   arr.splice(idx, 1);
-  setRecords(arr);
+  cachedRecords = arr;
   render();
   showToast('已刪除');
 }
 
-function clearAll() {
+async function clearAll() {
   if (!confirm('確定清空所有繳交紀錄？此動作無法復原')) return;
-  localStorage.removeItem(KEY);
+  await clearFirebase();
+  cachedRecords = [];
   render();
   showToast('已清空');
 }
@@ -313,20 +339,34 @@ function exportCSV() {
   a.click();
 }
 
+/* 認證 */
+function authed() {
+  const q = new URLSearchParams(location.search);
+  if (q.get('key') === PW) {
+    sessionStorage.setItem('teacher-auth', '1');
+    return true;
+  }
+  return sessionStorage.getItem('teacher-auth') === '1';
+}
+function checkPw() {
+  const v = document.getElementById('pwInput').value;
+  if (v === PW) {
+    sessionStorage.setItem('teacher-auth', '1');
+    location.search = '?key=' + PW;
+  } else {
+    showToast('密碼錯誤');
+  }
+}
+
 /* 啟動 */
 if (!authed()) {
   document.getElementById('gateWrap').style.display = 'block';
   document.getElementById('pwInput')?.focus();
 } else {
   document.getElementById('mainWrap').style.display = 'block';
-  const newRec = ingestQuery();
-  if (newRec) {
-    const a = document.getElementById('newRecAlert');
-    a.style.display = 'block';
-    a.innerHTML = `✅ 已記錄：<b>${escape(newRec.name)}</b> 完成練習，段位：${escape(newRec.rank)}（${newRec.correct}/${newRec.total}）`;
-    setTimeout(() => a.style.display = 'none', 6000);
-  }
-  render();
+  refreshRecords();
+  // 每 10 秒自動重新整理一次（即時看到新交的成績）
+  setInterval(refreshRecords, 10000);
 }
 </script>
 </body>

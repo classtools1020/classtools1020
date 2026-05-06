@@ -92,6 +92,42 @@ body {
 }
 .cover .hint { margin-top: 18px; color: #889; font-size: .88rem; line-height: 1.6; }
 
+/* 首頁名字輸入 */
+.cover-name {
+  background: rgba(255,255,255,.06);
+  border: 2px solid rgba(255,255,255,.18);
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin: 18px auto 22px;
+  max-width: 420px;
+}
+.cover-name label {
+  display: block; color: var(--c-gold); font-weight: 800;
+  font-size: .95rem; margin-bottom: 8px;
+}
+.cover-name input {
+  width: 100%;
+  background: rgba(255,255,255,.08);
+  border: 2px solid rgba(255,255,255,.2);
+  color: white;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-family: inherit;
+  text-align: center;
+  font-weight: 700;
+  min-height: 48px;
+  transition: border-color .2s;
+}
+.cover-name input:focus {
+  outline: none; border-color: var(--c-perp); background: rgba(255,255,255,.12);
+}
+.cover-name-hint {
+  margin-top: 8px;
+  color: #ff6b6b; font-size: .85rem;
+  text-align: center; font-weight: 700;
+}
+
 /* ===== HUD ===== */
 .hud {
   display: flex; justify-content: space-between; align-items: center; gap: 8px;
@@ -996,6 +1032,13 @@ function renderCover() {
       <div class="badge-bg-text">8A · 段考衝刺</div>
       <h1>等腰王者</h1>
       <div class="sub">3-4 等腰三角形 · 正三角形 · 高與面積</div>
+
+      <div class="cover-name">
+        <label>👤 請先輸入你的名字（老師才知道是你做的）</label>
+        <input id="coverNameInput" type="text" placeholder="例如：小明" autocomplete="off" maxlength="20" value="${state.studentName}">
+        <div class="cover-name-hint" id="nameHint" style="display:none;">⚠️ 請輸入名字才能開始</div>
+      </div>
+
       <div class="ranks-preview">
         <div class="rank-chip r-bronze">🥉 銅</div>
         <div class="rank-chip r-silver">🥈 銀</div>
@@ -1004,12 +1047,29 @@ function renderCover() {
         <div class="rank-chip r-king">👑 王者</div>
       </div>
       <button class="start-btn" onclick="startGame()">開始闖關 ▶</button>
-      <div class="hint">10 關 · 計算題拆步驟 · 段考前的最後試煉</div>
+      <div class="hint">10 關 · 完成後自動上傳給老師</div>
     </div>
   `;
+  // 自動 focus 名字欄
+  setTimeout(() => {
+    const inp = document.getElementById('coverNameInput');
+    if (inp && !state.studentName) inp.focus();
+  }, 100);
 }
 
 function startGame() {
+  // 驗證名字
+  const inp = document.getElementById('coverNameInput');
+  const name = (inp ? inp.value : state.studentName).trim();
+  if (!name) {
+    document.getElementById('nameHint').style.display = 'block';
+    if (inp) {
+      inp.style.borderColor = '#ff6b6b';
+      inp.focus();
+    }
+    return;
+  }
+  state.studentName = name;
   sndJump();
   state.current = 0; state.coins = 0; state.correct = 0; state.attempts = 0;
   state.combo = 0; state.maxCombo = 0; state.startTime = Date.now();
@@ -1035,12 +1095,6 @@ function renderQuestion() {
   `).join('');
 
   app.innerHTML = `
-    ${state.current === 0 ? `
-      <div class="name-input-wrap">
-        <label>👤 你的名字：</label>
-        <input id="nameInput" type="text" placeholder="輸入名字（給老師對照用）" autocomplete="off" value="${state.studentName}">
-      </div>` : ''}
-
     <div class="hud">
       <div class="stage">⚔️ 第 ${state.current + 1} 關 / ${TOTAL}</div>
       <div class="combo ${state.combo >= 3 ? 'hot' : ''}">🔥 ${state.combo}</div>
@@ -1069,10 +1123,6 @@ function renderQuestion() {
     </div>
   `;
 
-  const nameInput = document.getElementById('nameInput');
-  if (nameInput) {
-    nameInput.addEventListener('input', e => state.studentName = e.target.value);
-  }
   if (q.interactive === 'q2-slider') initQ2Slider();
 }
 
@@ -1253,28 +1303,59 @@ function renderVictory() {
         <div class="stat"><div class="num">${timeStr}</div><div class="lab">⏱ 用時</div></div>
       </div>
 
-      <div class="action-row">
-        <button class="act primary" id="copyTxtBtn" onclick="copyTextResult()">📋 複製成績傳老師</button>
-        <button class="act" id="copyLinkBtn" onclick="copyTeacherLink('${teacherUrl}')">🔗 複製通關連結</button>
-      </div>
-      <div style="color:#889;font-size:.85rem;margin-top:10px;line-height:1.6;">
-        把成績或連結 LINE 傳老師 = 完成段考衝刺練習 ✅
+      <div style="background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(34,197,94,.08));border:1.5px solid #22c55e;border-radius:16px;padding:18px;margin-top:18px;">
+        <div id="uploadTag" style="font-size:1.1rem;font-weight:800;color:#fbbf24;">⏳ 正在上傳到老師後台...</div>
+        <div style="color:#aac;font-size:.92rem;margin-top:6px;line-height:1.6;">
+          老師會在後台看到你的名字跟成績<br>不用截圖、不用 LINE，做完直接交差 ✅
+        </div>
       </div>
 
-      <button class="restart" onclick="startGame()">🔄 再玩一次</button>
+      <button class="restart" onclick="renderCover()">🔄 再玩一次</button>
     </div>
   `;
   sndVictory();
   bigFireworks();
 }
 
+/* ===== Firebase RTDB 雲端後台 ===== */
+const FIREBASE_URL = 'https://classtools1019-default-rtdb.firebaseio.com';
+const FIREBASE_PATH = '8a-quest-records';
+
 function saveResult(r) {
+  // 1. 本機備份（失敗時備案）
   try {
     const key = '8a-3-4-records';
     const arr = JSON.parse(localStorage.getItem(key) || '[]');
     arr.push(r);
     localStorage.setItem(key, JSON.stringify(arr));
   } catch(e) {}
+  // 2. 上傳到 Firebase（不等回應，背景送）
+  uploadToFirebase(r);
+}
+
+function uploadToFirebase(r) {
+  const url = `${FIREBASE_URL}/${FIREBASE_PATH}.json`;
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(r)
+  }).then(res => {
+    if (res.ok) {
+      const tag = document.getElementById('uploadTag');
+      if (tag) {
+        tag.innerHTML = '✅ 已上傳到老師後台';
+        tag.style.color = '#4ade80';
+      }
+    } else {
+      throw new Error('upload failed');
+    }
+  }).catch(err => {
+    const tag = document.getElementById('uploadTag');
+    if (tag) {
+      tag.innerHTML = '⚠️ 上傳失敗，請重試或截圖傳老師';
+      tag.style.color = '#fbbf24';
+    }
+  });
 }
 
 function buildTeacherUrl(p) {
