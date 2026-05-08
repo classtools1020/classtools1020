@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>偷走 Brainrot · 卡比段考冒險</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --pink-1:#FFB6D9;
+  --pink-2:#FF90C4;
+  --pink-3:#E64A9F;
+  --purple:#A569E5;
+  --yellow:#FFE066;
+  --blue:#7DD3FC;
+  --green:#86EFAC;
+  --bg-1:#FFE0F0;
+  --bg-2:#E0D4FF;
+}
+html,body{
+  font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;
+  background:linear-gradient(180deg,var(--bg-1) 0%,var(--bg-2) 100%);
+  color:#333;
+  min-height:100vh;
+  min-height:100dvh;
+  user-select:none;
+  -webkit-user-select:none;
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  padding:14px 12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  background-image:
+    radial-gradient(circle at 10% 20%,rgba(255,255,255,.6) 2px,transparent 2px),
+    radial-gradient(circle at 80% 50%,rgba(255,182,217,.5) 3px,transparent 3px),
+    radial-gradient(circle at 30% 75%,rgba(165,105,229,.4) 2px,transparent 2px),
+    linear-gradient(180deg,var(--bg-1) 0%,var(--bg-2) 100%);
+}
+.wrap{max-width:680px;width:100%}
+
+/* ========== 首頁 ========== */
+.cover{
+  text-align:center;
+  padding:24px 14px;
+  animation:bounceIn .8s;
+}
+@keyframes bounceIn{
+  0%{opacity:0;transform:scale(.5) rotate(-15deg)}
+  60%{transform:scale(1.05) rotate(5deg)}
+  100%{opacity:1;transform:scale(1) rotate(0)}
+}
+.cover .kirby-icon{
+  font-size:5rem;
+  display:block;
+  margin-bottom:6px;
+  animation:floatUp 2s infinite ease-in-out;
+}
+@keyframes floatUp{
+  0%,100%{transform:translateY(0) rotate(-5deg)}
+  50%{transform:translateY(-12px) rotate(5deg)}
+}
+.cover h1{
+  font-size:2.2rem;
+  font-weight:900;
+  margin-bottom:4px;
+  background:linear-gradient(90deg,var(--pink-3),var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  letter-spacing:-1px;
+}
+.cover .sub{
+  font-size:1.05rem;
+  color:#7B5A8E;
+  margin-bottom:20px;
+  font-weight:600;
+}
+.cover .brainrot-row{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+  background:rgba(255,255,255,.6);
+  padding:10px 14px;
+  border-radius:50px;
+  border:2px dashed var(--pink-2);
+}
+.cover .brainrot-row .br{
+  font-size:1.6rem;
+  filter:grayscale(1) opacity(.4);
+  transition:all .3s;
+}
+.cover .label{
+  font-size:.85rem;
+  color:#7B5A8E;
+  margin-bottom:14px;
+  font-weight:600;
+}
+
+.name-input-cover{
+  background:rgba(255,255,255,.85);
+  border:3px solid var(--pink-2);
+  border-radius:20px;
+  padding:14px 18px;
+  margin:0 auto 16px;
+  max-width:380px;
+  box-shadow:0 4px 14px rgba(255,144,196,.25);
+}
+.name-input-cover label{
+  display:block;
+  color:var(--pink-3);
+  font-weight:800;
+  font-size:.95rem;
+  margin-bottom:6px;
+}
+.name-input-cover input{
+  width:100%;
+  background:white;
+  border:2px solid #FFD0E5;
+  color:#333;
+  padding:12px 14px;
+  border-radius:14px;
+  font-size:1.1rem;
+  font-family:inherit;
+  text-align:center;
+  font-weight:700;
+  min-height:48px;
+}
+.name-input-cover input:focus{
+  outline:none;
+  border-color:var(--pink-3);
+  background:#FFF0F8;
+}
+.name-hint{
+  margin-top:6px;
+  color:#E64A9F;
+  font-size:.85rem;
+  text-align:center;
+  font-weight:700;
+  display:none;
+}
+.name-hint.show{display:block}
+
+.start-btn{
+  background:linear-gradient(135deg,var(--pink-2),var(--purple));
+  color:white;
+  border:none;
+  padding:18px 44px;
+  font-size:1.5rem;
+  font-weight:900;
+  font-family:inherit;
+  border-radius:50px;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(165,105,229,.4),inset 0 -4px 0 rgba(0,0,0,.15);
+  letter-spacing:2px;
+  animation:wiggle 2s infinite;
+}
+@keyframes wiggle{
+  0%,100%{transform:rotate(0)}
+  3%{transform:rotate(-3deg)}
+  6%{transform:rotate(3deg)}
+  9%{transform:rotate(0)}
+}
+.start-btn:active{transform:scale(.95)}
+
+/* ========== 進度條 + Brainrot 收藏 ========== */
+.hud-bar{
+  position:sticky;top:0;
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  border:2px solid var(--pink-2);
+  border-radius:18px;
+  padding:8px 12px;
+  margin-bottom:14px;
+  z-index:50;
+  box-shadow:0 2px 10px rgba(255,144,196,.2);
+}
+.hud-bar .row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.hud-bar .stage{
+  font-weight:900;
+  color:var(--pink-3);
+  font-size:1rem;
+}
+.hud-bar .stars{
+  display:flex;
+  gap:4px;
+  font-size:1.4rem;
+}
+.hud-bar .star{
+  filter:grayscale(1) opacity(.3);
+  transition:all .4s;
+}
+.hud-bar .star.got{
+  filter:none;
+  animation:starPop .5s;
+}
+@keyframes starPop{
+  0%{transform:scale(.3) rotate(-180deg)}
+  60%{transform:scale(1.5) rotate(20deg)}
+  100%{transform:scale(1) rotate(0)}
+}
+
+/* ========== 題目卡 ========== */
+.q-card{
+  background:white;
+  border:3px solid var(--pink-2);
+  border-radius:24px;
+  padding:18px 16px;
+  margin-bottom:14px;
+  box-shadow:0 6px 18px rgba(165,105,229,.18);
+  animation:slideIn .4s;
+}
+@keyframes slideIn{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.q-banner{
+  background:linear-gradient(135deg,var(--pink-2),var(--purple));
+  color:white;
+  padding:8px 16px;
+  border-radius:50px;
+  font-weight:900;
+  font-size:.95rem;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:12px;
+  box-shadow:0 3px 8px rgba(165,105,229,.3);
+}
+.q-emoji{font-size:2.6rem;display:block;margin:4px 0}
+.q-title{
+  font-size:1.4rem;
+  font-weight:900;
+  color:#333;
+  margin-bottom:8px;
+  line-height:1.5;
+}
+.q-figure{
+  background:#FFF8FC;
+  border:2px solid #FFD0E5;
+  border-radius:18px;
+  padding:12px 8px;
+  margin:10px auto;
+  max-width:340px;
+}
+.q-figure svg{display:block;margin:0 auto;width:100%;max-width:300px;height:auto}
+.q-tip{
+  background:#FFFCE8;
+  border:2px solid var(--yellow);
+  border-radius:14px;
+  padding:10px 14px;
+  margin:10px 0;
+  font-size:.95rem;
+  color:#7A5C00;
+  font-weight:600;
+}
+.q-tip::before{content:"💡 ";font-size:1.1rem}
+
+/* ========== 選項按鈕 ========== */
+.options{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.option{
+  background:linear-gradient(135deg,#FFF,#FFF0F8);
+  border:3px solid var(--pink-2);
+  padding:18px 20px;
+  border-radius:18px;
+  font-size:1.3rem;
+  font-weight:800;
+  color:#333;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  font-family:inherit;
+  text-align:left;
+  width:100%;
+  min-height:70px;
+  transition:all .15s;
+  box-shadow:0 3px 0 rgba(0,0,0,.08);
+}
+.option:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.08)}
+.option .letter{
+  width:42px;height:42px;
+  background:var(--pink-2);
+  color:white;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  font-size:1.2rem;
+  flex-shrink:0;
+}
+.option.correct{
+  background:linear-gradient(135deg,#86EFAC,#4ADE80);
+  border-color:#16A34A;
+  color:white;
+  animation:correctPop .5s;
+}
+.option.correct .letter{background:#16A34A;color:white}
+.option.correct::after{
+  content:"✨";
+  margin-left:auto;
+  font-size:1.6rem;
+}
+.option.wrong{
+  background:linear-gradient(135deg,#FCA5A5,#F87171);
+  border-color:#DC2626;
+  color:white;
+  animation:shake .4s;
+}
+.option.wrong .letter{background:#DC2626;color:white}
+@keyframes correctPop{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.04)}
+  100%{transform:scale(1)}
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-8px)}
+  75%{transform:translateX(8px)}
+}
+
+/* ========== 慶祝彈出 ========== */
+.steal-overlay{
+  position:fixed;inset:0;
+  background:rgba(255,255,255,.92);
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  animation:overlayIn .3s;
+}
+.steal-overlay.show{display:flex}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+.steal-text{
+  font-size:2.4rem;
+  font-weight:900;
+  background:linear-gradient(90deg,var(--pink-3),var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:10px;
+  letter-spacing:2px;
+  animation:textPop .5s;
+}
+@keyframes textPop{
+  0%{transform:scale(.3)}
+  60%{transform:scale(1.2)}
+  100%{transform:scale(1)}
+}
+.steal-emoji{
+  font-size:6rem;
+  animation:stealBounce .8s infinite;
+}
+@keyframes stealBounce{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-15px) scale(1.1)}
+}
+.steal-sub{
+  margin-top:14px;
+  font-size:1.1rem;
+  color:var(--pink-3);
+  font-weight:700;
+}
+
+/* ========== 下一題按鈕 ========== */
+.next-btn{
+  width:100%;
+  margin-top:14px;
+  background:linear-gradient(135deg,var(--purple),var(--pink-3));
+  color:white;
+  border:none;
+  padding:18px;
+  font-size:1.3rem;
+  font-weight:900;
+  border-radius:50px;
+  cursor:pointer;
+  font-family:inherit;
+  display:none;
+  box-shadow:0 5px 14px rgba(165,105,229,.4);
+}
+.next-btn.show{display:block;animation:slideIn .4s}
+.next-btn:active{transform:scale(.97)}
+
+/* ========== 通關 ========== */
+.victory{
+  text-align:center;
+  padding:24px 14px;
+  background:white;
+  border:3px solid var(--purple);
+  border-radius:24px;
+  animation:bounceIn .8s;
+}
+.victory .crown{
+  font-size:5rem;
+  display:block;
+  margin-bottom:8px;
+  animation:floatUp 2s infinite ease-in-out;
+}
+.victory h1{
+  font-size:2rem;
+  font-weight:900;
+  background:linear-gradient(90deg,var(--pink-3),var(--purple),var(--pink-2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:8px;
+  animation:rainbow 3s infinite;
+}
+@keyframes rainbow{
+  0%,100%{filter:hue-rotate(0deg)}
+  50%{filter:hue-rotate(40deg)}
+}
+.brainrot-collection{
+  background:linear-gradient(135deg,#FFE0F0,#E0D4FF);
+  border-radius:20px;
+  padding:14px;
+  margin:14px 0;
+  border:2px dashed var(--pink-2);
+}
+.brainrot-collection .title{
+  font-size:.95rem;
+  color:var(--pink-3);
+  font-weight:800;
+  margin-bottom:10px;
+  letter-spacing:1px;
+}
+.brainrot-collection .pets{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:8px;
+}
+.brainrot-collection .pet{
+  font-size:2.2rem;
+  background:white;
+  padding:8px 4px;
+  border-radius:12px;
+  border:2px solid #FFD0E5;
+}
+.brainrot-collection .pet.got{
+  border-color:#16A34A;
+  background:#F0FDF4;
+  animation:starPop .5s;
+}
+.brainrot-collection .pet.miss{
+  filter:grayscale(1) opacity(.3);
+}
+
+.upload-status{
+  background:#F0FDF4;
+  border:2px solid #16A34A;
+  border-radius:16px;
+  padding:14px 18px;
+  margin-top:14px;
+  font-size:1rem;
+  font-weight:700;
+  color:#15803D;
+}
+.upload-status.warn{
+  background:#FEF3C7;
+  border-color:#F59E0B;
+  color:#92400E;
+}
+
+.victory .restart{
+  margin-top:14px;
+  background:white;
+  color:var(--pink-3);
+  border:2px solid var(--pink-2);
+  padding:12px 24px;
+  font-size:.95rem;
+  font-weight:700;
+  border-radius:50px;
+  cursor:pointer;
+  font-family:inherit;
+}
+
+#fireworks{position:fixed;inset:0;pointer-events:none;z-index:9998;display:none}
+
+/* ========== 響應式 ========== */
+@media (max-width:500px){
+  body{padding:10px 8px}
+  .cover h1{font-size:1.8rem}
+  .cover .kirby-icon{font-size:4.4rem}
+  .start-btn{padding:16px 36px;font-size:1.3rem}
+  .q-title{font-size:1.2rem}
+  .option{font-size:1.15rem;padding:14px 14px;min-height:60px}
+  .option .letter{width:36px;height:36px;font-size:1.05rem}
+  .victory h1{font-size:1.65rem}
+  .brainrot-collection .pet{font-size:1.8rem}
+  .steal-text{font-size:1.85rem}
+  .steal-emoji{font-size:4.5rem}
+}
+@media (hover:none){
+  .option:hover{background:linear-gradient(135deg,#FFF,#FFF0F8)}
+}
+
+/* SVG 樣式 */
+.tri-pink{fill:#FFE0F0;stroke:#E64A9F;stroke-width:3}
+.tri-purple{fill:#E0D4FF;stroke:#A569E5;stroke-width:3}
+.tri-blue{fill:#DBEAFE;stroke:#3B82F6;stroke-width:3}
+</style>
+</head>
+<body>
+<canvas id="fireworks"></canvas>
+<div class="steal-overlay" id="stealOverlay">
+  <div class="steal-emoji" id="stealEmoji">🌸</div>
+  <div class="steal-text" id="stealText">偷到 Brainrot！</div>
+  <div class="steal-sub" id="stealSub">+1 隻收藏</div>
+</div>
+
+<div class="wrap" id="app"></div>
+
+<script>
+/* ===== 音效 ===== */
+let actx=null;
+function ctx(){if(!actx){try{actx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}return actx}
+function tone(f,d,t='sine',v=0.1){const c=ctx();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+d);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d)}
+function sndCorrect(){tone(800,0.1,'sine',0.15);setTimeout(()=>tone(1200,0.15,'sine',0.13),100);setTimeout(()=>tone(1600,0.2,'sine',0.12),250)}
+function sndSteal(){const ns=[523,659,784,1046,1318];ns.forEach((n,i)=>setTimeout(()=>tone(n,0.12,'square',0.13),i*80))}
+function sndWrong(){tone(220,0.18,'square',0.12)}
+function sndStart(){tone(660,0.08,'sine',0.12);setTimeout(()=>tone(990,0.12,'sine',0.12),80)}
+function sndVictory(){const ns=[523,523,523,415,659,523,415,523];ns.forEach((n,i)=>setTimeout(()=>tone(n,0.18,'square',0.14),i*150))}
+
+/* ===== 題庫（6 題，全選擇題，全有圖）===== */
+const QUESTIONS=[
+{
+  banner:'🍰 蛋糕三角形',
+  emoji:'📐',
+  title:'三角形 ∠A = 90°，∠B = 50°，求 ∠C',
+  tip:'三個角加起來 = 180°',
+  brainrot:'🌸',
+  brainrotName:'粉紅卡比',
+  fig:`<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="40,40 40,170 220,170" class="tri-pink"/>
+    <rect x="40" y="148" width="22" height="22" fill="none" stroke="#E64A9F" stroke-width="3"/>
+    <text x="32" y="32" font-size="20" font-weight="900" fill="#333">A</text>
+    <text x="20" y="184" font-size="20" font-weight="900" fill="#333">B</text>
+    <text x="226" y="184" font-size="20" font-weight="900" fill="#333">C</text>
+    <text x="50" y="32" font-size="14" font-weight="900" fill="#E64A9F">90°</text>
+    <text x="50" y="142" font-size="16" font-weight="900" fill="#3B82F6">50°</text>
+    <text x="170" y="160" font-size="20" font-weight="900" fill="#A569E5">?°</text>
+  </svg>`,
+  options:[
+    {text:'40°',correct:true},
+    {text:'50°'},
+    {text:'90°'}
+  ]
+},
+{
+  banner:'🌟 星星屋頂',
+  emoji:'⭐',
+  title:'三角形 ∠A = 60°，∠B = 70°，求 ∠C',
+  tip:'三個角加起來 = 180°，把兩個加起來再用 180° 減',
+  brainrot:'🍡',
+  brainrotName:'糰子卡比',
+  fig:`<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="140,30 60,170 220,170" class="tri-purple"/>
+    <text x="140" y="22" font-size="20" font-weight="900" fill="#333" text-anchor="middle">A</text>
+    <text x="48" y="186" font-size="20" font-weight="900" fill="#333">B</text>
+    <text x="226" y="186" font-size="20" font-weight="900" fill="#333">C</text>
+    <text x="120" y="60" font-size="16" font-weight="900" fill="#E64A9F">60°</text>
+    <text x="76" y="158" font-size="16" font-weight="900" fill="#3B82F6">70°</text>
+    <text x="184" y="158" font-size="20" font-weight="900" fill="#A569E5">?°</text>
+  </svg>`,
+  options:[
+    {text:'30°'},
+    {text:'50°',correct:true},
+    {text:'130°'}
+  ]
+},
+{
+  banner:'👯 雙胞胎兄弟',
+  emoji:'🦄',
+  title:'等腰三角形 AB = AC，∠B = 70°，求 ∠C',
+  tip:'AB 跟 AC 一樣長 → 兩個底角（∠B 和 ∠C）會「一樣大」',
+  brainrot:'🌟',
+  brainrotName:'星星卡比',
+  fig:`<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="140,30 50,170 230,170" class="tri-pink"/>
+    <line x1="92" y1="98" x2="103" y2="108" stroke="#FFD700" stroke-width="3.5"/>
+    <line x1="178" y1="108" x2="189" y2="98" stroke="#FFD700" stroke-width="3.5"/>
+    <text x="140" y="22" font-size="20" font-weight="900" fill="#333" text-anchor="middle">A</text>
+    <text x="38" y="186" font-size="20" font-weight="900" fill="#333">B</text>
+    <text x="236" y="186" font-size="20" font-weight="900" fill="#333">C</text>
+    <text x="68" y="158" font-size="18" font-weight="900" fill="#3B82F6">70°</text>
+    <text x="190" y="158" font-size="22" font-weight="900" fill="#A569E5">?°</text>
+  </svg>`,
+  options:[
+    {text:'40°'},
+    {text:'70°',correct:true},
+    {text:'140°'}
+  ]
+},
+{
+  banner:'🌉 中間的橋',
+  emoji:'📏',
+  title:'P 站在 AB 的「中垂線」上，PA = 5，那 PB = ?',
+  tip:'中垂線上的點 → 到 A 和 B 的距離「一樣」',
+  brainrot:'🍦',
+  brainrotName:'冰淇淋卡比',
+  fig:`<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+    <line x1="40" y1="160" x2="240" y2="160" stroke="#333" stroke-width="3"/>
+    <line x1="140" y1="40" x2="140" y2="180" stroke="#A569E5" stroke-width="2.5" stroke-dasharray="6 4"/>
+    <line x1="40" y1="160" x2="140" y2="60" stroke="#E64A9F" stroke-width="2.5"/>
+    <line x1="240" y1="160" x2="140" y2="60" stroke="#E64A9F" stroke-width="2.5"/>
+    <rect x="140" y="146" width="14" height="14" fill="none" stroke="#333" stroke-width="2"/>
+    <circle cx="140" cy="60" r="6" fill="#A569E5"/>
+    <text x="32" y="180" font-size="20" font-weight="900" fill="#333">A</text>
+    <text x="244" y="180" font-size="20" font-weight="900" fill="#333">B</text>
+    <text x="146" y="56" font-size="20" font-weight="900" fill="#A569E5">P</text>
+    <text x="80" y="125" font-size="20" font-weight="900" fill="#E64A9F">5</text>
+    <text x="180" y="125" font-size="22" font-weight="900" fill="#A569E5">?</text>
+  </svg>`,
+  options:[
+    {text:'2'},
+    {text:'5',correct:true},
+    {text:'10'}
+  ]
+},
+{
+  banner:'🏠 公平的牆角',
+  emoji:'🔱',
+  title:'Q 在角平分線上，到 BA 的距離 = 4，那到 BC 的距離 = ?',
+  tip:'角平分線上的點 → 到「兩邊牆」的距離「一樣」',
+  brainrot:'🍰',
+  brainrotName:'蛋糕卡比',
+  fig:`<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+    <line x1="40" y1="170" x2="240" y2="40" stroke="#333" stroke-width="3"/>
+    <line x1="40" y1="170" x2="240" y2="170" stroke="#333" stroke-width="3"/>
+    <line x1="40" y1="170" x2="240" y2="110" stroke="#A569E5" stroke-width="2.5" stroke-dasharray="6 4"/>
+    <circle cx="180" cy="125" r="6" fill="#A569E5"/>
+    <line x1="180" y1="125" x2="148" y2="80" stroke="#E64A9F" stroke-width="2"/>
+    <line x1="180" y1="125" x2="180" y2="170" stroke="#3B82F6" stroke-width="2"/>
+    <rect x="167" y="156" width="13" height="13" fill="none" stroke="#333" stroke-width="2"/>
+    <text x="20" y="185" font-size="20" font-weight="900" fill="#333">B</text>
+    <text x="244" y="40" font-size="20" font-weight="900" fill="#333">A</text>
+    <text x="244" y="180" font-size="20" font-weight="900" fill="#333">C</text>
+    <text x="186" y="124" font-size="20" font-weight="900" fill="#A569E5">Q</text>
+    <text x="135" y="120" font-size="20" font-weight="900" fill="#E64A9F">4</text>
+    <text x="184" y="160" font-size="22" font-weight="900" fill="#3B82F6">?</text>
+  </svg>`,
+  options:[
+    {text:'2'},
+    {text:'4',correct:true},
+    {text:'8'}
+  ]
+},
+{
+  banner:'🎂 三邊一樣的蛋糕',
+  emoji:'🧁',
+  title:'正三角形（三邊都一樣長）的「兩個底角」一樣大嗎？',
+  tip:'三邊都一樣長 → 三個角也都一樣 → 都是 60°',
+  brainrot:'👑',
+  brainrotName:'王冠卡比',
+  fig:`<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="140,30 60,170 220,170" class="tri-purple"/>
+    <line x1="92" y1="98" x2="102" y2="108" stroke="#FFD700" stroke-width="3.5"/>
+    <line x1="178" y1="108" x2="188" y2="98" stroke="#FFD700" stroke-width="3.5"/>
+    <line x1="135" y1="164" x2="145" y2="176" stroke="#FFD700" stroke-width="3.5"/>
+    <text x="140" y="22" font-size="20" font-weight="900" fill="#333" text-anchor="middle">A</text>
+    <text x="48" y="186" font-size="20" font-weight="900" fill="#333">B</text>
+    <text x="226" y="186" font-size="20" font-weight="900" fill="#333">C</text>
+    <text x="124" y="58" font-size="16" font-weight="900" fill="#A569E5">60°</text>
+    <text x="76" y="158" font-size="16" font-weight="900" fill="#A569E5">60°</text>
+    <text x="180" y="158" font-size="16" font-weight="900" fill="#A569E5">60°</text>
+  </svg>`,
+  options:[
+    {text:'是！都是 60°',correct:true},
+    {text:'不一定'},
+    {text:'不一樣大'}
+  ]
+}
+];
+
+/* ===== Firebase ===== */
+const FB_URL='https://classtools1019-default-rtdb.firebaseio.com';
+const FB_PATH='8a-quest-records';
+
+/* ===== 狀態 ===== */
+const state={
+  current:0,
+  correct:0,
+  attempts:0,
+  startTime:null,
+  studentName:'',
+  brainrots:[]  // 收集到的 brainrot
+};
+const TOTAL=QUESTIONS.length;
+const app=document.getElementById('app');
+
+/* ===== 渲染 ===== */
+function renderCover(){
+  const brsHtml=QUESTIONS.map(q=>`<span class="br">${q.brainrot}</span>`).join('');
+  app.innerHTML=`
+    <div class="cover">
+      <span class="kirby-icon">⭐</span>
+      <h1>偷走 Brainrot！</h1>
+      <div class="sub">卡比段考冒險 · 6 隻 Brainrot 等你來收集</div>
+
+      <div class="brainrot-row">${brsHtml}</div>
+      <div class="label">↑ 答對一題就偷到一隻 ↑</div>
+
+      <div class="name-input-cover">
+        <label>👤 你的名字</label>
+        <input id="coverNameInput" type="text" placeholder="輸入名字" autocomplete="off" maxlength="15" value="${state.studentName}">
+        <div class="name-hint" id="nameHint">⚠️ 老師才知道是誰玩的喔</div>
+      </div>
+
+      <button class="start-btn" onclick="startGame()">開始冒險 ▶</button>
+    </div>
+  `;
+  setTimeout(()=>{
+    const inp=document.getElementById('coverNameInput');
+    if(inp&&!state.studentName)inp.focus();
+  },200);
+}
+
+function startGame(){
+  const inp=document.getElementById('coverNameInput');
+  const name=(inp?inp.value:state.studentName).trim();
+  if(!name){
+    document.getElementById('nameHint').classList.add('show');
+    if(inp){inp.style.borderColor='#E64A9F';inp.focus()}
+    return;
+  }
+  state.studentName=name;
+  state.current=0;
+  state.correct=0;
+  state.attempts=0;
+  state.startTime=Date.now();
+  state.brainrots=[];
+  sndStart();
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q=QUESTIONS[state.current];
+  const starsHtml=QUESTIONS.map((qq,i)=>{
+    const got=i<state.brainrots.length?'got':'';
+    return `<span class="star ${got}">${got?qq.brainrot:'⭕'}</span>`;
+  }).join('');
+
+  const optsHtml=q.options.map((opt,i)=>`
+    <button class="option" onclick="pick(${i})">
+      <div class="letter">${String.fromCharCode(65+i)}</div>
+      <div style="flex:1">${opt.text}</div>
+    </button>
+  `).join('');
+
+  app.innerHTML=`
+    <div class="hud-bar">
+      <div class="row">
+        <div class="stage">⚔️ 第 ${state.current+1} 關 / ${TOTAL}</div>
+        <div class="stars">${starsHtml}</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-banner">${q.banner}</span>
+      <div class="q-emoji">${q.emoji}</div>
+      <div class="q-title">${q.title}</div>
+      <div class="q-figure">${q.fig}</div>
+      <div class="q-tip">${q.tip}</div>
+      <div class="options">${optsHtml}</div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">${state.current===TOTAL-1?'看通關證 🏆':'下一題 →'}</button>
+    </div>
+  `;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function pick(idx){
+  const q=QUESTIONS[state.current];
+  const opts=document.querySelectorAll('.option');
+  if(opts[0].classList.contains('correct')||opts[0].classList.contains('wrong'))return;
+
+  state.attempts++;
+  const ok=q.options[idx].correct;
+
+  if(ok){
+    opts[idx].classList.add('correct');
+    state.correct++;
+    state.brainrots.push(q.brainrot);
+    sndCorrect();
+    setTimeout(()=>{
+      sndSteal();
+      showStealOverlay(q.brainrot,q.brainrotName);
+    },300);
+    document.querySelectorAll('.option').forEach(o=>o.style.pointerEvents='none');
+    setTimeout(()=>{
+      document.getElementById('nextBtn').classList.add('show');
+    },1400);
+  }else{
+    opts[idx].classList.add('wrong');
+    sndWrong();
+    setTimeout(()=>opts[idx].classList.remove('wrong'),800);
+  }
+}
+
+function showStealOverlay(emoji,name){
+  document.getElementById('stealEmoji').textContent=emoji;
+  document.getElementById('stealText').textContent=`偷到「${name}」！`;
+  document.getElementById('stealSub').textContent=`+1 隻 Brainrot 收藏`;
+  const ov=document.getElementById('stealOverlay');
+  ov.classList.add('show');
+  setTimeout(()=>ov.classList.remove('show'),1200);
+}
+
+function nextQ(){
+  state.current++;
+  if(state.current>=TOTAL){
+    renderVictory();
+  }else{
+    sndStart();
+    renderQuestion();
+  }
+}
+
+function renderVictory(){
+  const elapsed=Math.floor((Date.now()-state.startTime)/1000);
+  const min=Math.floor(elapsed/60);
+  const sec=elapsed%60;
+  const timeStr=`${min}:${String(sec).padStart(2,'0')}`;
+
+  const petsHtml=QUESTIONS.map((q,i)=>{
+    const got=i<state.brainrots.length;
+    return `<div class="pet ${got?'got':'miss'}">${q.brainrot}</div>`;
+  }).join('');
+
+  // 訊息（真實的，不空泛）
+  let mainMsg, encourageMsg;
+  if(state.correct===TOTAL){
+    mainMsg='6 隻全收集！';
+    encourageMsg='你今天願意坐下來把 6 題都做完，這就是了不起 ⭐';
+  }else if(state.correct>=4){
+    mainMsg=`收集到 ${state.correct} 隻！`;
+    encourageMsg='不會的也沒關係，明天我們一起看看那幾題 💗';
+  }else{
+    mainMsg=`收集到 ${state.correct} 隻！`;
+    encourageMsg='你願意動筆做完，老師看到了。明天慢慢一起看 💗';
+  }
+
+  const record={
+    name:state.studentName,
+    correct:state.correct,
+    total:TOTAL,
+    rank:`🌸 卡比冒險（${state.correct}/${TOTAL}）`,
+    time:timeStr,
+    coins:state.correct*10,
+    combo:0,
+    quest:'kirby',
+    ts:Date.now()
+  };
+  uploadToFirebase(record);
+
+  app.innerHTML=`
+    <div class="victory">
+      <span class="crown">🌸</span>
+      <h1>${mainMsg}</h1>
+      <div style="color:#7B5A8E;font-weight:700;font-size:1rem;margin-bottom:10px;">⏱ 用時 ${timeStr}</div>
+
+      <div class="brainrot-collection">
+        <div class="title">✨ 你的 BRAINROT 收藏 ✨</div>
+        <div class="pets">${petsHtml}</div>
+      </div>
+
+      <div style="background:#F8F5FF;border:2px solid #C4B5FD;border-radius:14px;padding:14px;margin:14px 0;color:#5B21B6;font-size:1rem;font-weight:600;line-height:1.6;">
+        ${encourageMsg}
+      </div>
+
+      <div class="upload-status" id="uploadStatus">⏳ 正在上傳給老師...</div>
+
+      <button class="restart" onclick="renderCover()">🔄 再玩一次</button>
+    </div>
+  `;
+  sndVictory();
+  if(state.correct>=4)bigFireworks();
+}
+
+function uploadToFirebase(r){
+  // localStorage 備份
+  try{
+    const arr=JSON.parse(localStorage.getItem('8a-3-4-records')||'[]');
+    arr.push(r);
+    localStorage.setItem('8a-3-4-records',JSON.stringify(arr));
+  }catch(e){}
+  // 上傳
+  fetch(`${FB_URL}/${FB_PATH}.json`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(r)
+  }).then(res=>{
+    const tag=document.getElementById('uploadStatus');
+    if(!tag)return;
+    if(res.ok){
+      tag.innerHTML='✅ 老師看到你的成績了！';
+    }else{
+      tag.innerHTML='⚠️ 上傳失敗，截圖給老師也可以';
+      tag.classList.add('warn');
+    }
+  }).catch(()=>{
+    const tag=document.getElementById('uploadStatus');
+    if(tag){tag.innerHTML='⚠️ 上傳失敗，截圖給老師也可以';tag.classList.add('warn')}
+  });
+}
+
+/* ===== 煙火 ===== */
+const fwc=document.getElementById('fireworks');
+const fwx=fwc.getContext('2d');
+let fwp=[];
+function rsz(){fwc.width=innerWidth;fwc.height=innerHeight}
+rsz();addEventListener('resize',rsz);
+function bigFireworks(){
+  fwc.style.display='block';
+  for(let i=0;i<5;i++)setTimeout(()=>burst(Math.random()*innerWidth,Math.random()*innerHeight*0.6+50),i*350);
+  fwLoop();
+  setTimeout(()=>{fwc.style.display='none';fwp=[]},4500);
+}
+function burst(x,y){
+  const cs=['#FFB6D9','#FF90C4','#E64A9F','#A569E5','#FFE066','#86EFAC'];
+  for(let i=0;i<32;i++){
+    const a=(i/32)*Math.PI*2;
+    fwp.push({x,y,vx:Math.cos(a)*(Math.random()*5+2),vy:Math.sin(a)*(Math.random()*5+2),life:70,c:cs[Math.floor(Math.random()*cs.length)]})
+  }
+}
+function fwLoop(){
+  fwx.fillStyle='rgba(255,255,255,0.18)';
+  fwx.fillRect(0,0,fwc.width,fwc.height);
+  fwp.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.1;p.life--;fwx.fillStyle=p.c;fwx.globalAlpha=p.life/70;fwx.fillRect(p.x,p.y,5,5)});
+  fwx.globalAlpha=1;
+  fwp=fwp.filter(p=>p.life>0);
+  if(fwp.length>0)requestAnimationFrame(fwLoop);
+  else if(fwc.style.display==='block')fwc.style.display='none';
+}
+
+renderCover();
+</script>
+</body>
+</html>
