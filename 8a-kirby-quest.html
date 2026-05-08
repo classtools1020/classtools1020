@@ -536,21 +536,21 @@ function sndVictory(){const ns=[523,523,523,415,659,523,415,523];ns.forEach((n,i
 /* ===== 題庫（6 題，全選擇題，全有圖）===== */
 const QUESTIONS=[
 {
-  banner:'🍰 蛋糕三角形',
+  banner:'🍰 直角蛋糕三角形',
   emoji:'📐',
   title:'三角形 ∠A = 90°，∠B = 50°，求 ∠C',
-  tip:'三個角加起來 = 180°',
+  tip:'三個角加起來 = 180°；90° + 50° + ∠C = 180°',
   brainrot:'🌸',
   brainrotName:'粉紅卡比',
-  fig:`<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg">
-    <polygon points="40,40 40,170 220,170" class="tri-pink"/>
-    <rect x="40" y="148" width="22" height="22" fill="none" stroke="#E64A9F" stroke-width="3"/>
-    <text x="32" y="32" font-size="20" font-weight="900" fill="#333">A</text>
-    <text x="20" y="184" font-size="20" font-weight="900" fill="#333">B</text>
-    <text x="226" y="184" font-size="20" font-weight="900" fill="#333">C</text>
-    <text x="50" y="32" font-size="14" font-weight="900" fill="#E64A9F">90°</text>
-    <text x="50" y="142" font-size="16" font-weight="900" fill="#3B82F6">50°</text>
-    <text x="170" y="160" font-size="20" font-weight="900" fill="#A569E5">?°</text>
+  fig:`<svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="60,50 60,180 230,180" class="tri-pink"/>
+    <rect x="60" y="158" width="22" height="22" fill="none" stroke="#E64A9F" stroke-width="3"/>
+    <text x="42" y="200" font-size="22" font-weight="900" fill="#333">A</text>
+    <text x="42" y="42" font-size="22" font-weight="900" fill="#333">B</text>
+    <text x="238" y="200" font-size="22" font-weight="900" fill="#333">C</text>
+    <text x="86" y="172" font-size="16" font-weight="900" fill="#E64A9F">90°</text>
+    <text x="74" y="78" font-size="18" font-weight="900" fill="#3B82F6">50°</text>
+    <text x="194" y="172" font-size="22" font-weight="900" fill="#A569E5">?°</text>
   </svg>`,
   options:[
     {text:'40°',correct:true},
