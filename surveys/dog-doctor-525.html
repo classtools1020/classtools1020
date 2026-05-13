@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5/25 狗醫生互動教學調查</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #fef5e7 0%, #ffe4c4 100%);
+    min-height: 100vh;
+    color: #4a3625;
+  }
+  h1 { text-align: center; color: #8b4513; margin-bottom: 8px; font-size: 28px; }
+  .subtitle { text-align: center; color: #a0826d; margin-bottom: 24px; }
+  .info-card {
+    background: #fff; border-radius: 16px; padding: 20px; margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1); border-left: 6px solid #d2691e;
+  }
+  .info-card p { margin: 8px 0; font-size: 16px; line-height: 1.6; }
+  form {
+    background: #fff; border-radius: 16px; padding: 24px;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.1);
+  }
+  label { display: block; margin-top: 18px; font-weight: 600; color: #5a3a22; font-size: 15px; }
+  input[type="text"], textarea {
+    width: 100%; padding: 12px; margin-top: 8px;
+    border: 2px solid #f4d4a8; border-radius: 10px;
+    font-size: 16px; font-family: inherit; background: #fffaf0;
+  }
+  input[type="text"]:focus, textarea:focus { outline: none; border-color: #d2691e; }
+  .radio-group { display: flex; gap: 12px; margin-top: 10px; }
+  .radio-option {
+    flex: 1; text-align: center; padding: 16px;
+    border: 2px solid #f4d4a8; border-radius: 10px;
+    cursor: pointer; background: #fffaf0; font-weight: 600; margin-top: 0 !important;
+  }
+  .radio-option:has(input:checked) { background: #ffe8cc; border-color: #d2691e; }
+  .radio-option input { margin-right: 8px; transform: scale(1.2); }
+  button {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #d2691e 0%, #a0522d 100%);
+    color: white; border: none; border-radius: 10px;
+    font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 24px;
+  }
+  button:disabled { background: #ccc; cursor: not-allowed; }
+  .message {
+    text-align: center; padding: 24px; margin-top: 20px;
+    border-radius: 12px; display: none; font-size: 18px; font-weight: 600;
+  }
+  .message.success { background: #d4edda; color: #155724; display: block; }
+  .message.error { background: #f8d7da; color: #721c24; display: block; }
+</style>
+</head>
+<body>
+  <h1>🐕 狗醫生來了！</h1>
+  <p class="subtitle">5 月 25 日 第三節 互動教學</p>
+  
+  <div class="info-card">
+    <p>📅 <strong>日期</strong>：5 月 25 日（一）</p>
+    <p>🕐 <strong>時間</strong>：第三節 10:25–11:10</p>
+    <p>📍 <strong>地點</strong>：圖書館</p>
+    <p>🐾 <strong>內容</strong>：狗醫生互動體驗、認識動物治療</p>
+  </div>
+  
+  <form id="surveyForm">
+    <label for="name">你的姓名</label>
+    <input type="text" id="name" required placeholder="例：王小明">
+    
+    <label for="classNumber">班級座號</label>
+    <input type="text" id="classNumber" required placeholder="例：八甲 15 號">
+    
+    <label>你要不要參加？</label>
+    <div class="radio-group">
+      <label class="radio-option">
+        <input type="radio" name="willAttend" value="要參加" required> 要參加 🐶
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="willAttend" value="不參加"> 不參加
+      </label>
+    </div>
+    
+    <label for="note">想跟老師說的話（可不填）</label>
+    <textarea id="note" rows="3" placeholder="有沒有怕狗、想問什麼..."></textarea>
+    
+    <button type="submit" id="submitBtn">送出回覆</button>
+  </form>
+  
+  <div id="message" class="message"></div>
+  
+  <script>
+    // 👇 這一行的網址就是 Step 4-4 要改的地方 👇
+   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxP6XlKE4KOx6F_qob7w6zI8SuRVL-suHK-qasxLiZqDKAU-jDjCehGcpa_QwecD0XR/exec';
+    
+    document.getElementById('surveyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const msg = document.getElementById('message');
+      btn.disabled = true;
+      btn.textContent = '送出中...';
+      msg.style.display = 'none';
+      
+      const data = {
+        name: document.getElementById('name').value.trim(),
+        classNumber: document.getElementById('classNumber').value.trim(),
+        willAttend: document.querySelector('input[name="willAttend"]:checked').value,
+        note: document.getElementById('note').value.trim()
+      };
+      
+      try {
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+        msg.className = 'message success';
+        msg.innerHTML = '✅ 已收到你的回覆，謝謝！<br>老師會在 5/25 那天看到你。';
+        document.getElementById('surveyForm').reset();
+      } catch (error) {
+        msg.className = 'message error';
+        msg.innerHTML = '❌ 送出失敗，請重新整理頁面再試';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '送出回覆';
+      }
+    });
+  </script>
+</body>
+</html>
