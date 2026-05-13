@@ -6,141 +6,267 @@
 <title>IEP 期末檢討會議邀請｜芎林國中特教團隊</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
+  /* ============================================
+   * 色票與基礎變數
+   * ============================================ */
   :root {
-    --bg: #fdf7ee;
-    --bg-grad-end: #f5e6d3;
-    --card: #ffffff;
-    --ink: #3a2e2a;
-    --ink-soft: #6b5b51;
-    --line: #ead9c4;
-    --primary: #c97b5e;
-    --primary-dark: #a85f44;
+    --bg-base: #fbf6ec;
+    --bg-warm: #f5ebd9;
+    --paper: #fffdf7;
+    --paper-soft: #fbf3e3;
+
+    --ink: #2a221b;
+    --ink-mid: #5d4e40;
+    --ink-soft: #8a7867;
+    --ink-faint: #b8a896;
+
+    --line: #ead9c1;
+    --line-soft: #f2e6d2;
+    --divider: #d4bf9d;
+
+    --primary: #c9684e;
+    --primary-deep: #a35138;
     --primary-soft: #fae5dc;
-    --sage: #7a9461;
-    --sage-soft: #e6efdb;
-    --taken: #d6cbbf;
-    --taken-bg: #f0e9df;
-    --warn: #b85450;
-    --shadow: 0 4px 20px rgba(120, 85, 60, 0.08);
-    --shadow-hover: 0 6px 28px rgba(120, 85, 60, 0.14);
-    --radius: 18px;
-    --radius-sm: 12px;
+    --primary-tint: #fff3ec;
+
+    --sage: #6d8763;
+    --sage-soft: #d9e3cf;
+    --sage-tint: #eef3e6;
+
+    --gold: #b88a3b;
+    --gold-soft: #f3e6c5;
+
+    --warn: #b84a3a;
+    --warn-soft: #fbe7e3;
+
+    --taken: #c5b7a4;
+    --taken-bg: #f0e7d5;
+
+    --shadow-sm: 0 2px 8px rgba(82, 58, 36, 0.06);
+    --shadow-md: 0 6px 20px rgba(82, 58, 36, 0.08);
+    --shadow-lg: 0 12px 36px rgba(82, 58, 36, 0.10);
+    --shadow-glow: 0 8px 28px rgba(201, 104, 78, 0.20);
+
+    --r-lg: 22px;
+    --r-md: 14px;
+    --r-sm: 10px;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; padding: 0; }
   body {
     font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-grad-end) 100%);
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201, 104, 78, 0.06), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(109, 135, 99, 0.06), transparent 60%),
+      linear-gradient(180deg, var(--bg-base) 0%, var(--bg-warm) 100%);
     background-attachment: fixed;
     color: var(--ink);
     font-size: 16px;
-    line-height: 1.7;
+    line-height: 1.75;
     min-height: 100vh;
-    padding: 20px 16px 60px;
+    padding: 0 16px 80px;
   }
 
-  .wrap { max-width: 680px; margin: 0 auto; }
+  ::selection { background: var(--primary-soft); color: var(--primary-deep); }
 
-  /* Header */
+  .wrap { max-width: 720px; margin: 0 auto; }
+
+  /* ============================================
+   * Header
+   * ============================================ */
   .header {
     text-align: center;
-    padding: 28px 16px 32px;
+    padding: 48px 16px 36px;
+    position: relative;
   }
-  .header .badge {
-    display: inline-block;
-    background: var(--primary-soft);
-    color: var(--primary-dark);
-    padding: 6px 16px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    margin-bottom: 14px;
-  }
-  .header h1 {
-    margin: 0 0 8px;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--ink);
-    letter-spacing: 0.02em;
-  }
-  .header .subtitle {
-    color: var(--ink-soft);
-    font-size: 14px;
-    margin: 0;
-  }
-
-  /* Intro */
-  .intro {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 24px 22px;
-    box-shadow: var(--shadow);
-    margin-bottom: 24px;
-    border: 1px solid var(--line);
-  }
-  .intro p { margin: 0 0 10px; }
-  .intro p:last-child { margin-bottom: 0; }
-  .intro .lead {
-    font-size: 17px;
-    color: var(--ink);
-    font-weight: 500;
-  }
-  .intro .info-grid {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px dashed var(--line);
-    display: grid;
-    gap: 8px;
-    font-size: 14.5px;
-  }
-  .intro .info-grid div { display: flex; gap: 8px; }
-  .intro .info-grid .label {
-    color: var(--ink-soft);
-    min-width: 56px;
-    flex-shrink: 0;
-  }
-
-  /* Section */
-  .section {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 22px;
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
-    border: 1px solid var(--line);
-  }
-  .section-title {
-    display: flex;
+  .header .school-mark {
+    display: inline-flex;
     align-items: center;
     gap: 10px;
-    margin: 0 0 16px;
-    font-size: 17px;
+    color: var(--ink-mid);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    margin-bottom: 24px;
+  }
+  .header .school-mark::before,
+  .header .school-mark::after {
+    content: "";
+    width: 28px;
+    height: 1px;
+    background: var(--divider);
+  }
+  .header h1 {
+    font-family: "Noto Serif TC", serif;
+    margin: 0 0 6px;
+    font-size: 32px;
     font-weight: 700;
     color: var(--ink);
+    letter-spacing: 0.04em;
+    line-height: 1.3;
   }
-  .section-title .step-num {
+  .header h1 .accent {
+    color: var(--primary-deep);
+  }
+  .header .subtitle {
+    font-family: "Noto Serif TC", serif;
+    color: var(--ink-mid);
+    font-size: 15px;
+    margin: 4px 0 0;
+    letter-spacing: 0.15em;
+  }
+  .header .ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .header .ornament .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .header .ornament .line {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+  .header .ornament .diamond {
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+  }
+
+  /* ============================================
+   * Letter (intro)
+   * ============================================ */
+  .letter {
+    background: var(--paper);
+    border-radius: var(--r-lg);
+    padding: 32px 30px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--line-soft);
+    position: relative;
+  }
+  .letter::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--gold) 50%, var(--sage) 100%);
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    opacity: 0.6;
+  }
+  .letter .greeting {
+    font-family: "Noto Serif TC", serif;
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 14px;
+    letter-spacing: 0.02em;
+  }
+  .letter p {
+    margin: 0 0 14px;
+    color: var(--ink-mid);
+    font-size: 15px;
+    line-height: 1.9;
+  }
+  .letter p:last-of-type { margin-bottom: 0; }
+  .letter strong { color: var(--ink); font-weight: 700; }
+  .letter .info-cards {
+    margin-top: 22px;
+    padding-top: 22px;
+    border-top: 1px dashed var(--line);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .letter .info-cards .item {
+    background: var(--bg-base);
+    padding: 12px 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line-soft);
+  }
+  .letter .info-cards .item .key {
+    display: block;
+    color: var(--ink-soft);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .letter .info-cards .item .val {
+    color: var(--ink);
+    font-weight: 500;
+    font-size: 14.5px;
+  }
+
+  /* ============================================
+   * Section
+   * ============================================ */
+  .section {
+    background: var(--paper);
+    border-radius: var(--r-lg);
+    padding: 28px 28px 26px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--line-soft);
+  }
+
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 6px;
+  }
+  .step-head .step-badge {
+    flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
     color: white;
-    font-size: 14px;
+    font-family: "Noto Serif TC", serif;
     font-weight: 700;
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(201, 104, 78, 0.30);
   }
-  .section-hint {
+  .step-head .step-text {
+    flex: 1;
+  }
+  .step-head .step-title {
+    display: block;
+    font-family: "Noto Serif TC", serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+  }
+  .step-head .step-hint {
+    display: block;
     color: var(--ink-soft);
-    font-size: 13.5px;
-    margin: -8px 0 14px;
+    font-size: 13px;
+    margin-top: 2px;
+  }
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--line) 30%, var(--line) 70%, transparent 100%);
+    margin: 18px 0 18px;
   }
 
-  /* Student picker */
+  /* ============================================
+   * Step 1 — student picker
+   * ============================================ */
   .student-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -148,85 +274,193 @@
   }
   .student-card {
     position: relative;
-    padding: 14px 8px;
-    background: var(--bg);
+    padding: 18px 8px 14px;
+    background: var(--bg-base);
     border: 2px solid var(--line);
-    border-radius: var(--radius-sm);
+    border-radius: var(--r-md);
     cursor: pointer;
     text-align: center;
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--ink);
-    transition: all 0.18s;
+    transition: all 0.22s cubic-bezier(.4,.0,.2,1);
     user-select: none;
   }
-  .student-card:hover { border-color: var(--primary); background: var(--primary-soft); }
-  .student-card.selected {
-    background: var(--primary);
+  .student-card .avatar {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 8px;
+    border-radius: 50%;
+    background: var(--paper-soft);
+    border: 1.5px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Noto Serif TC", serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--primary-deep);
+    transition: all 0.22s;
+  }
+  .student-card .name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: 0.04em;
+  }
+  .student-card:hover:not(.selected) {
     border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  .student-card:hover:not(.selected) .avatar {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+  }
+  .student-card.selected {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
+    border-color: var(--primary-deep);
     color: white;
-    box-shadow: 0 4px 12px rgba(201, 123, 94, 0.3);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+  .student-card.selected .avatar {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.3);
+    color: white;
+  }
+  .student-card.selected .name { color: white; }
+  .student-card.selected::after {
+    content: "✓";
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    color: var(--primary-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
   }
   .student-card input { position: absolute; opacity: 0; pointer-events: none; }
 
-  /* Date cards */
-  .date-list {
-    display: grid;
-    gap: 12px;
-  }
-  .date-card {
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    padding: 14px 14px 12px;
-  }
-  .date-card-head {
+  /* ============================================
+   * Step 2 — date / slot picker
+   * ============================================ */
+  .month-group { margin-bottom: 18px; }
+  .month-group:last-child { margin-bottom: 0; }
+  .month-label {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    padding: 0 2px;
   }
-  .date-card-head .date {
-    font-size: 18px;
+  .month-label .num {
+    font-family: "Noto Serif TC", serif;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--primary-deep);
+    line-height: 1;
+  }
+  .month-label .text {
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.2em;
+    font-weight: 500;
+  }
+  .month-label .bar {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--divider), transparent);
+    margin-left: 6px;
+  }
+  .date-row {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 14px;
+    background: var(--bg-base);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-md);
+    margin-bottom: 8px;
+    transition: all 0.18s;
+  }
+  .date-row:has(.slot-chip.selected) {
+    border-color: var(--sage);
+    background: var(--sage-tint);
+  }
+  .date-row.fully-booked {
+    opacity: 0.55;
+  }
+  .date-info {
+    text-align: center;
+    padding-right: 12px;
+    border-right: 1px dashed var(--line);
+  }
+  .date-info .date-num {
+    font-family: "Noto Serif TC", serif;
+    font-size: 22px;
     font-weight: 700;
     color: var(--ink);
+    line-height: 1.1;
+    letter-spacing: 0;
   }
-  .date-card-head .weekday {
-    font-size: 14px;
+  .date-info .weekday {
+    font-size: 12px;
     color: var(--ink-soft);
-    background: white;
-    padding: 2px 10px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
+    margin-top: 2px;
+    letter-spacing: 0.1em;
   }
   .slot-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 6px;
   }
   .slot-chip {
     position: relative;
-    padding: 10px 6px;
-    background: white;
+    padding: 10px 4px;
+    background: var(--paper);
     border: 1.5px solid var(--line);
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     text-align: center;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--ink);
-    transition: all 0.15s;
+    transition: all 0.16s;
     user-select: none;
+    font-variant-numeric: tabular-nums;
   }
   .slot-chip:hover:not(.taken):not(.selected) {
     border-color: var(--sage);
-    background: var(--sage-soft);
+    background: var(--sage-tint);
+    color: var(--sage);
   }
   .slot-chip.selected {
-    background: var(--sage);
-    border-color: var(--sage);
+    background: linear-gradient(135deg, var(--sage) 0%, #5a7350 100%);
+    border-color: #5a7350;
     color: white;
-    box-shadow: 0 3px 10px rgba(122, 148, 97, 0.3);
     font-weight: 500;
+    box-shadow: 0 4px 12px rgba(109, 135, 99, 0.30);
+  }
+  .slot-chip.selected::after {
+    content: "✓";
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    color: var(--sage);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
   .slot-chip.taken {
     background: var(--taken-bg);
@@ -234,203 +468,365 @@
     color: var(--taken);
     cursor: not-allowed;
     text-decoration: line-through;
+    text-decoration-color: var(--taken);
   }
   .slot-chip.taken::after {
     content: "已預約";
     display: block;
-    font-size: 11px;
+    font-size: 10px;
     text-decoration: none;
-    margin-top: 2px;
-    opacity: 0.8;
+    margin-top: 1px;
+    opacity: 0.7;
   }
   .slot-chip input { position: absolute; opacity: 0; pointer-events: none; }
 
   /* Phone visit option */
   .phone-option {
-    margin-top: 14px;
-    padding: 14px 16px;
-    background: var(--primary-soft);
+    margin-top: 18px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, var(--primary-tint) 0%, var(--primary-soft) 100%);
     border: 2px dashed var(--primary);
-    border-radius: var(--radius-sm);
+    border-radius: var(--r-md);
     cursor: pointer;
-    text-align: center;
-    font-size: 15px;
-    color: var(--primary-dark);
-    font-weight: 500;
-    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.2s;
     user-select: none;
   }
-  .phone-option:hover { background: #f5d6c7; }
-  .phone-option.selected {
-    background: var(--primary);
+  .phone-option:hover:not(.selected) {
+    background: var(--primary-soft);
     border-style: solid;
-    color: white;
   }
+  .phone-option.selected {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
+    border-style: solid;
+    border-color: var(--primary-deep);
+    color: white;
+    box-shadow: var(--shadow-glow);
+  }
+  .phone-option .icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: white;
+    color: var(--primary-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    border: 1px solid var(--primary-soft);
+  }
+  .phone-option.selected .icon {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border-color: rgba(255,255,255,0.25);
+  }
+  .phone-option .text {
+    flex: 1;
+  }
+  .phone-option .text .title {
+    display: block;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--primary-deep);
+    margin-bottom: 2px;
+  }
+  .phone-option.selected .text .title { color: white; }
+  .phone-option .text .desc {
+    font-size: 13px;
+    color: var(--ink-mid);
+  }
+  .phone-option.selected .text .desc { color: rgba(255,255,255,0.85); }
   .phone-option input { position: absolute; opacity: 0; pointer-events: none; }
 
-  /* Form fields */
-  .field { margin-bottom: 14px; }
-  .field:last-child { margin-bottom: 0; }
+  /* ============================================
+   * Step 3 — form
+   * ============================================ */
+  .field-group { display: grid; gap: 14px; }
+  .field { position: relative; }
   .field label {
     display: block;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-    color: var(--ink);
+    color: var(--ink-mid);
     margin-bottom: 6px;
+    letter-spacing: 0.04em;
   }
   .field label .req {
-    color: var(--warn);
+    color: var(--primary);
     font-weight: 700;
-    margin-left: 3px;
+    margin-left: 4px;
+  }
+  .field label .opt {
+    color: var(--ink-faint);
+    font-weight: 400;
+    margin-left: 4px;
+    font-size: 12px;
   }
   .field input, .field textarea {
     width: 100%;
-    padding: 11px 14px;
+    padding: 12px 16px;
     border: 1.5px solid var(--line);
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: var(--r-sm);
+    font-size: 15.5px;
     font-family: inherit;
     color: var(--ink);
-    background: var(--bg);
-    transition: border-color 0.15s, background 0.15s;
+    background: var(--bg-base);
+    transition: all 0.18s;
+  }
+  .field input::placeholder, .field textarea::placeholder {
+    color: var(--ink-faint);
   }
   .field input:focus, .field textarea:focus {
     outline: none;
     border-color: var(--primary);
-    background: white;
+    background: var(--paper);
+    box-shadow: 0 0 0 4px var(--primary-tint);
   }
-  .field textarea { resize: vertical; min-height: 70px; }
+  .field textarea { resize: vertical; min-height: 76px; }
 
-  /* Submit */
-  .submit-wrap { margin-top: 10px; }
+  /* ============================================
+   * Submit
+   * ============================================ */
+  .submit-section {
+    margin-top: 4px;
+  }
   .submit-btn {
     width: 100%;
-    padding: 16px;
-    background: var(--primary);
+    padding: 18px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
     color: white;
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--r-md);
     font-size: 17px;
     font-weight: 700;
     font-family: inherit;
     cursor: pointer;
-    transition: all 0.18s;
-    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    letter-spacing: 0.1em;
+    box-shadow: var(--shadow-glow);
   }
   .submit-btn:hover:not(:disabled) {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(201, 104, 78, 0.32);
+  }
+  .submit-btn:active:not(:disabled) {
+    transform: translateY(0);
   }
   .submit-btn:disabled {
     background: var(--taken);
     cursor: not-allowed;
+    box-shadow: none;
+  }
+  .submit-note {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    margin-top: 12px;
+    letter-spacing: 0.05em;
   }
 
-  /* Message */
   .msg {
     margin-top: 14px;
-    padding: 12px 16px;
-    border-radius: 10px;
-    font-size: 14.5px;
+    padding: 12px 18px;
+    border-radius: var(--r-sm);
+    font-size: 14px;
     text-align: center;
     display: none;
   }
   .msg.show { display: block; }
-  .msg.error { background: #fde8e6; color: var(--warn); border: 1px solid #f5c4c0; }
-  .msg.loading { background: var(--primary-soft); color: var(--primary-dark); }
+  .msg.error {
+    background: var(--warn-soft);
+    color: var(--warn);
+    border: 1px solid #f0c8c0;
+  }
 
-  /* Success */
+  /* ============================================
+   * Success screen
+   * ============================================ */
   .success-screen {
     display: none;
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 36px 24px;
-    box-shadow: var(--shadow);
+    background: var(--paper);
+    border-radius: var(--r-lg);
+    padding: 48px 32px;
+    margin-top: 30px;
+    box-shadow: var(--shadow-lg);
     text-align: center;
-    border: 1px solid var(--line);
+    border: 1px solid var(--line-soft);
+    position: relative;
+    overflow: hidden;
   }
-  .success-screen.show { display: block; }
-  .success-screen .icon {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 20px;
-    background: var(--sage-soft);
+  .success-screen.show { display: block; animation: slideUp 0.5s cubic-bezier(.2,.8,.2,1); }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .success-screen::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--sage) 0%, var(--gold) 50%, var(--primary) 100%);
+    opacity: 0.7;
+  }
+  .success-screen .icon-wrap {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, var(--sage-soft) 0%, var(--sage-tint) 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 36px;
+    position: relative;
+    animation: pop 0.6s cubic-bezier(.2,1.4,.5,1);
+  }
+  @keyframes pop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+  }
+  .success-screen .icon-wrap::after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border: 2px dashed var(--sage);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: spin 20s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .success-screen .check {
+    font-size: 42px;
     color: var(--sage);
+    font-weight: 700;
   }
   .success-screen h2 {
-    margin: 0 0 12px;
-    font-size: 22px;
+    font-family: "Noto Serif TC", serif;
+    margin: 0 0 8px;
+    font-size: 24px;
     color: var(--ink);
+    letter-spacing: 0.04em;
+  }
+  .success-screen .sub {
+    color: var(--ink-mid);
+    margin: 0 0 24px;
+    font-size: 14.5px;
   }
   .success-screen .summary {
-    background: var(--bg);
-    border-radius: var(--radius-sm);
-    padding: 18px;
-    margin: 20px 0;
+    background: var(--paper-soft);
+    border-radius: var(--r-md);
+    padding: 20px 22px;
+    margin: 0 auto;
+    max-width: 420px;
     text-align: left;
     border: 1px solid var(--line);
   }
-  .success-screen .summary div {
-    display: flex;
-    gap: 10px;
-    padding: 4px 0;
+  .success-screen .summary .row {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 12px;
+    padding: 6px 0;
     font-size: 14.5px;
+    align-items: baseline;
+  }
+  .success-screen .summary .row + .row {
+    border-top: 1px dashed var(--line-soft);
   }
   .success-screen .summary .label {
     color: var(--ink-soft);
-    min-width: 70px;
-    flex-shrink: 0;
+    font-size: 12.5px;
+    letter-spacing: 0.1em;
   }
   .success-screen .summary .value {
     color: var(--ink);
     font-weight: 500;
   }
   .success-screen .closing {
-    color: var(--ink-soft);
-    font-size: 14.5px;
-    margin-top: 16px;
+    color: var(--ink-mid);
+    font-size: 14px;
+    margin-top: 26px;
+    line-height: 1.9;
+  }
+  .success-screen .closing .ornament-mini {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    color: var(--gold);
+    font-size: 12px;
+  }
+  .success-screen .closing .ornament-mini::before,
+  .success-screen .closing .ornament-mini::after {
+    content: "";
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
   }
 
-  /* Footer */
+  /* ============================================
+   * Footer
+   * ============================================ */
   .footer {
     text-align: center;
-    padding: 24px 16px;
+    padding: 36px 16px 0;
     color: var(--ink-soft);
-    font-size: 13px;
+    font-size: 12.5px;
+    letter-spacing: 0.1em;
+  }
+  .footer .line {
+    display: inline-block;
+    width: 30px;
+    height: 1px;
+    background: var(--divider);
+    vertical-align: middle;
+    margin: 0 10px;
   }
 
-  /* Loading state */
+  /* ============================================
+   * Loading overlay
+   * ============================================ */
   .loading-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(253, 247, 238, 0.85);
+    background: rgba(251, 246, 236, 0.88);
     z-index: 100;
     align-items: center;
     justify-content: center;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(3px);
   }
   .loading-overlay.show { display: flex; }
   .loading-overlay .spinner {
-    width: 48px; height: 48px;
+    width: 52px; height: 52px;
     border: 4px solid var(--primary-soft);
     border-top-color: var(--primary);
     border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+    animation: spinner 0.8s linear infinite;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes spinner { to { transform: rotate(360deg); } }
 
-  @media (max-width: 480px) {
-    body { padding: 12px 12px 40px; font-size: 15px; }
-    .header h1 { font-size: 22px; }
-    .student-grid { grid-template-columns: repeat(2, 1fr); }
-    .slot-chip { font-size: 13px; padding: 9px 4px; }
+  /* ============================================
+   * Responsive
+   * ============================================ */
+  @media (max-width: 540px) {
+    body { padding: 0 12px 60px; font-size: 15px; }
+    .header { padding: 32px 8px 24px; }
+    .header h1 { font-size: 26px; }
+    .header .subtitle { font-size: 14px; }
+    .letter, .section { padding: 22px 20px; border-radius: 18px; }
+    .letter .info-cards { grid-template-columns: 1fr; }
+    .student-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .date-row { grid-template-columns: 70px 1fr; padding: 10px 12px; gap: 10px; }
+    .date-info { padding-right: 8px; }
+    .date-info .date-num { font-size: 19px; }
+    .slot-chip { font-size: 12.5px; padding: 9px 2px; }
+    .step-head .step-badge { width: 32px; height: 32px; font-size: 16px; }
+    .step-head .step-title { font-size: 17px; }
+    .success-screen { padding: 36px 22px; }
+    .success-screen h2 { font-size: 21px; }
   }
 </style>
 </head>
@@ -440,169 +836,243 @@
 
 <div class="wrap">
 
+  <!-- ============ Header ============ -->
   <header class="header">
-    <span class="badge">芎林國中 · 輔導室 特教團隊</span>
-    <h1>IEP 期末檢討會議邀請</h1>
-    <p class="subtitle">114 學年度 第二學期</p>
+    <div class="school-mark">芎林國中 · 輔導室 特教團隊</div>
+    <h1>IEP <span class="accent">期末檢討</span>會議邀請</h1>
+    <p class="subtitle">114 學年度 · 第二學期</p>
+    <div class="ornament">
+      <span class="dot"></span>
+      <span class="line"></span>
+      <span class="diamond"></span>
+      <span class="line"></span>
+      <span class="dot"></span>
+    </div>
   </header>
 
-  <!-- Form view -->
+  <!-- ============ Main form ============ -->
   <div id="formView">
 
-    <div class="intro">
-      <p class="lead">親愛的家長：您好 ✨</p>
-      <p>學期即將進入尾聲，誠摯邀請您撥冗參與孩子的<strong>個別化教育計畫（IEP）期末檢討會議</strong>，一同回顧本學期的學習與適應情形，並討論未來的支持方向。</p>
-      <div class="info-grid">
-        <div><span class="label">🗓️ 日期</span><span>5/22（五）～ 6/12（五）</span></div>
-        <div><span class="label">🕒 時段</span><span>每場約 30 分鐘</span></div>
-        <div><span class="label">📍 地點</span><span>芎林國中圖書館</span></div>
-        <div><span class="label">📞 替代</span><span>不便到校可改為電訪</span></div>
+    <!-- ============ Letter ============ -->
+    <div class="letter">
+      <p class="greeting">親愛的家長 — 您好</p>
+      <p>學期即將進入尾聲，誠摯邀請您撥冗參與孩子的<strong>個別化教育計畫（IEP）期末檢討會議</strong>，與我們一同回顧本學期的學習與適應情形，並討論未來的支持方向。</p>
+      <p>請從下方挑選方便的時段；若當日不便到校，亦可選擇電話聯繫。我們會在收到您的回覆後儘速確認時間。</p>
+      <div class="info-cards">
+        <div class="item"><span class="key">📅 日 期</span><span class="val">5/22（五）～ 6/12（五）</span></div>
+        <div class="item"><span class="key">🕒 時 段</span><span class="val">每場約 30 分鐘</span></div>
+        <div class="item"><span class="key">📍 地 點</span><span class="val">芎林國中圖書館</span></div>
+        <div class="item"><span class="key">📞 替 代</span><span class="val">不便到校改電訪</span></div>
       </div>
     </div>
 
+    <!-- ============ Step 1 ============ -->
     <div class="section">
-      <h2 class="section-title"><span class="step-num">1</span>請選擇您的孩子</h2>
+      <div class="step-head">
+        <div class="step-badge">1</div>
+        <div class="step-text">
+          <span class="step-title">請選擇您的孩子</span>
+          <span class="step-hint">點選孩子的姓名</span>
+        </div>
+      </div>
+      <div class="section-divider"></div>
       <div class="student-grid" id="studentGrid"></div>
     </div>
 
+    <!-- ============ Step 2 ============ -->
     <div class="section">
-      <h2 class="section-title"><span class="step-num">2</span>請選擇方便的時段</h2>
-      <p class="section-hint">已被預約的時段會以灰色顯示。可選一個時段，或選擇電訪。</p>
-      <div class="date-list" id="dateList"></div>
+      <div class="step-head">
+        <div class="step-badge">2</div>
+        <div class="step-text">
+          <span class="step-title">請選擇方便的時段</span>
+          <span class="step-hint">已被預約的時段以灰色顯示，可任選一格</span>
+        </div>
+      </div>
+      <div class="section-divider"></div>
+      <div id="dateList"></div>
       <label class="phone-option" id="phoneOption">
         <input type="radio" name="slot" value="phone">
-        📞 不便到校，請以電話聯繫（請於下方備註可通話的時間）
+        <span class="icon">📞</span>
+        <span class="text">
+          <span class="title">不便到校，請以電話聯繫</span>
+          <span class="desc">請於下方備註欄填寫您方便通話的時段</span>
+        </span>
       </label>
     </div>
 
+    <!-- ============ Step 3 ============ -->
     <div class="section">
-      <h2 class="section-title"><span class="step-num">3</span>您的聯絡資訊</h2>
-      <div class="field">
-        <label>家長姓名<span class="req">*</span></label>
-        <input type="text" id="parentName" placeholder="例：王小明的媽媽 / 王媽媽" autocomplete="name">
+      <div class="step-head">
+        <div class="step-badge">3</div>
+        <div class="step-text">
+          <span class="step-title">您的聯絡資訊</span>
+          <span class="step-hint">收到回覆後我們會儘速與您確認</span>
+        </div>
       </div>
-      <div class="field">
-        <label>聯絡電話<span class="req">*</span></label>
-        <input type="tel" id="parentPhone" placeholder="例：0912-345-678" autocomplete="tel">
-      </div>
-      <div class="field">
-        <label>備註（選填）</label>
-        <textarea id="notes" placeholder="想討論的事項、電訪方便的時段、其他需要老師留意的事..."></textarea>
+      <div class="section-divider"></div>
+      <div class="field-group">
+        <div class="field">
+          <label>家長姓名<span class="req">*</span></label>
+          <input type="text" id="parentName" placeholder="例：王小明的媽媽 / 王媽媽" autocomplete="name">
+        </div>
+        <div class="field">
+          <label>聯絡電話<span class="req">*</span></label>
+          <input type="tel" id="parentPhone" placeholder="例：0912-345-678" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label>備註<span class="opt">（選填）</span></label>
+          <textarea id="notes" placeholder="想討論的事項、電訪方便的時段、其他需要老師留意的事..."></textarea>
+        </div>
       </div>
     </div>
 
-    <div class="submit-wrap">
-      <button class="submit-btn" id="submitBtn">送出回覆</button>
+    <!-- ============ Submit ============ -->
+    <div class="submit-section">
+      <button class="submit-btn" id="submitBtn">送 出 回 覆</button>
+      <p class="submit-note">送出後將自動通知特教組老師</p>
       <div class="msg" id="msg"></div>
     </div>
 
   </div>
 
-  <!-- Success view -->
+  <!-- ============ Success ============ -->
   <div class="success-screen" id="successView">
-    <div class="icon">✓</div>
+    <div class="icon-wrap"><span class="check">✓</span></div>
     <h2>已收到您的回覆</h2>
-    <p style="color: var(--ink-soft); margin: 0;">感謝您撥空回覆，我們將儘速與您確認會議時間。</p>
+    <p class="sub">感謝您撥空回覆，我們將儘速與您確認會議時間</p>
     <div class="summary" id="successSummary"></div>
-    <p class="closing">如有疑問，歡迎與導師或特教組聯繫。<br>祝 闔家平安順心 🌿</p>
+    <p class="closing">
+      如有疑問，歡迎與導師或特教組聯繫。<br>
+      祝 闔家平安順心
+      <span class="ornament-mini">芎林國中 · 特教團隊</span>
+    </p>
   </div>
 
+  <!-- ============ Footer ============ -->
   <div class="footer">
-    芎林國中 輔導室 特教團隊 · 敬上
+    <span class="line"></span>芎林國中 輔導室 特教團隊 敬上<span class="line"></span>
   </div>
 
 </div>
 
 <script>
   /* ============================================
-   * 設定區（部署前請貼上你的 Apps Script 網址）
+   * 設定區
    * ============================================ */
   const CONFIG = {
     APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxLV9c1tkHUU5YFSrmK64i0iEjJP553QJQHpWj4Rpz2yPWFvSOT9Lh4Omi8YQk0ZqvW/exec',
     STUDENTS: ['翁o鈞', '孟o誠', '簡o桀', '劉o煊', '徐o嘉', '鄭o萁'],
     DATES: [
-      { date: '5/22', weekday: '五', iso: '2026-05-22' },
-      { date: '5/26', weekday: '二', iso: '2026-05-26' },
-      { date: '5/27', weekday: '三', iso: '2026-05-27' },
-      { date: '5/29', weekday: '五', iso: '2026-05-29' },
-      { date: '6/2',  weekday: '二', iso: '2026-06-02' },
-      { date: '6/3',  weekday: '三', iso: '2026-06-03' },
-      { date: '6/5',  weekday: '五', iso: '2026-06-05' },
-      { date: '6/9',  weekday: '二', iso: '2026-06-09' },
-      { date: '6/10', weekday: '三', iso: '2026-06-10' },
-      { date: '6/12', weekday: '五', iso: '2026-06-12' },
+      { date: '5/22', weekday: '五', month: 5 },
+      { date: '5/26', weekday: '二', month: 5 },
+      { date: '5/27', weekday: '三', month: 5 },
+      { date: '5/29', weekday: '五', month: 5 },
+      { date: '6/2',  weekday: '二', month: 6 },
+      { date: '6/3',  weekday: '三', month: 6 },
+      { date: '6/5',  weekday: '五', month: 6 },
+      { date: '6/9',  weekday: '二', month: 6 },
+      { date: '6/10', weekday: '三', month: 6 },
+      { date: '6/12', weekday: '五', month: 6 },
     ],
     TIMES: ['15:00-15:30', '15:30-16:00', '16:00-16:30'],
   };
 
-  /* ============================================
-   * 狀態
-   * ============================================ */
   const state = {
     student: null,
-    slot: null,        // { date, time } 或 { phone: true }
+    slot: null,
     bookings: [],
   };
 
   /* ============================================
-   * 渲染
+   * 渲染學生
    * ============================================ */
   function renderStudents() {
     const grid = document.getElementById('studentGrid');
-    grid.innerHTML = CONFIG.STUDENTS.map(name => `
-      <label class="student-card" data-name="${name}">
-        <input type="radio" name="student" value="${name}">
-        ${name}
-      </label>
-    `).join('');
+    grid.innerHTML = CONFIG.STUDENTS.map(name => {
+      const initial = name.charAt(0);
+      return `
+        <label class="student-card" data-name="${name}">
+          <input type="radio" name="student" value="${name}">
+          <div class="avatar">${initial}</div>
+          <div class="name">${name}</div>
+        </label>
+      `;
+    }).join('');
     grid.querySelectorAll('.student-card').forEach(card => {
       card.addEventListener('click', () => {
         grid.querySelectorAll('.student-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         state.student = card.dataset.name;
+        smoothScrollToNext(card);
       });
     });
   }
 
+  /* ============================================
+   * 渲染日期（依月份分組）
+   * ============================================ */
   function renderDates() {
     const list = document.getElementById('dateList');
-    list.innerHTML = CONFIG.DATES.map(d => `
-      <div class="date-card">
-        <div class="date-card-head">
-          <span class="date">${d.date}</span>
-          <span class="weekday">星期${d.weekday}</span>
+    const months = {};
+    CONFIG.DATES.forEach(d => {
+      if (!months[d.month]) months[d.month] = [];
+      months[d.month].push(d);
+    });
+
+    list.innerHTML = Object.keys(months).map(m => `
+      <div class="month-group">
+        <div class="month-label">
+          <span class="num">${m}</span>
+          <span class="text">月</span>
+          <span class="bar"></span>
         </div>
-        <div class="slot-row">
-          ${CONFIG.TIMES.map(t => `
-            <label class="slot-chip" data-date="${d.date}" data-time="${t}">
-              <input type="radio" name="slot" value="${d.date}_${t}">
-              ${t}
-            </label>
-          `).join('')}
-        </div>
+        ${months[m].map(d => `
+          <div class="date-row" data-date="${d.date}">
+            <div class="date-info">
+              <div class="date-num">${d.date}</div>
+              <div class="weekday">星期${d.weekday}</div>
+            </div>
+            <div class="slot-row">
+              ${CONFIG.TIMES.map(t => `
+                <label class="slot-chip" data-date="${d.date}" data-time="${t}">
+                  <input type="radio" name="slot" value="${d.date}_${t}">
+                  ${t}
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        `).join('')}
       </div>
     `).join('');
 
-    // 套用已預約狀態
     applyBookings();
 
-    // 綁定事件
     list.querySelectorAll('.slot-chip').forEach(chip => {
       chip.addEventListener('click', (e) => {
         if (chip.classList.contains('taken')) { e.preventDefault(); return; }
         document.querySelectorAll('.slot-chip, .phone-option').forEach(c => c.classList.remove('selected'));
         chip.classList.add('selected');
         state.slot = { date: chip.dataset.date, time: chip.dataset.time, phone: false };
+        smoothScrollToNext(chip.closest('.section'));
       });
     });
 
-    // 電訪選項
     const phoneOpt = document.getElementById('phoneOption');
     phoneOpt.addEventListener('click', () => {
       document.querySelectorAll('.slot-chip, .phone-option').forEach(c => c.classList.remove('selected'));
       phoneOpt.classList.add('selected');
       state.slot = { phone: true };
+      smoothScrollToNext(phoneOpt.closest('.section'));
     });
+  }
+
+  function smoothScrollToNext(currentEl) {
+    const nextSection = currentEl.closest('.section')?.nextElementSibling;
+    if (nextSection && nextSection.classList.contains('section')) {
+      setTimeout(() => {
+        nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 280);
+    }
   }
 
   function applyBookings() {
@@ -614,10 +1084,15 @@
         if (input) input.disabled = true;
       }
     });
+    document.querySelectorAll('.date-row').forEach(row => {
+      const chips = row.querySelectorAll('.slot-chip');
+      const allTaken = [...chips].every(c => c.classList.contains('taken'));
+      row.classList.toggle('fully-booked', allTaken);
+    });
   }
 
   /* ============================================
-   * 與後台通訊
+   * 後台
    * ============================================ */
   async function loadBookings() {
     if (!CONFIG.APPS_SCRIPT_URL || CONFIG.APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
@@ -638,9 +1113,8 @@
 
   async function submitBooking() {
     const msg = document.getElementById('msg');
-    msg.classList.remove('show', 'error', 'loading');
+    msg.classList.remove('show', 'error');
 
-    // 驗證
     if (!state.student) return showMsg('請選擇您的孩子', 'error');
     if (!state.slot)    return showMsg('請選擇方便的時段或選擇電訪', 'error');
     const parent = document.getElementById('parentName').value.trim();
@@ -649,7 +1123,6 @@
     if (!parent) return showMsg('請填寫家長姓名', 'error');
     if (!phone)  return showMsg('請填寫聯絡電話', 'error');
 
-    // 沒設定後台網址 → fallback 用 mailto
     if (!CONFIG.APPS_SCRIPT_URL || CONFIG.APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
       return showMsg('系統設定中，請稍後再試或致電輔導室', 'error');
     }
@@ -677,7 +1150,6 @@
       } else if (data.error === 'CONFLICT') {
         showMsg('抱歉，該時段剛被預約走了，請重新挑選', 'error');
         await loadBookings();
-        // 清空時段選擇
         document.querySelectorAll('.slot-chip, .phone-option').forEach(c => c.classList.remove('selected'));
         state.slot = null;
       } else {
@@ -708,14 +1180,14 @@
 
     const slotText = payload.isPhoneVisit
       ? '電訪（不便到校）'
-      : `${payload.date}（${weekdayOf(payload.date)}）${payload.time}`;
+      : `${payload.date}（${weekdayOf(payload.date)}） ${payload.time}`;
 
     document.getElementById('successSummary').innerHTML = `
-      <div><span class="label">學生</span><span class="value">${payload.student}</span></div>
-      <div><span class="label">家長</span><span class="value">${escapeHTML(payload.parent)}</span></div>
-      <div><span class="label">電話</span><span class="value">${escapeHTML(payload.phone)}</span></div>
-      <div><span class="label">時段</span><span class="value">${slotText}</span></div>
-      ${payload.notes ? `<div><span class="label">備註</span><span class="value">${escapeHTML(payload.notes)}</span></div>` : ''}
+      <div class="row"><span class="label">學 生</span><span class="value">${payload.student}</span></div>
+      <div class="row"><span class="label">家 長</span><span class="value">${escapeHTML(payload.parent)}</span></div>
+      <div class="row"><span class="label">電 話</span><span class="value">${escapeHTML(payload.phone)}</span></div>
+      <div class="row"><span class="label">時 段</span><span class="value">${slotText}</span></div>
+      ${payload.notes ? `<div class="row"><span class="label">備 註</span><span class="value">${escapeHTML(payload.notes)}</span></div>` : ''}
     `;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -729,9 +1201,6 @@
     return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
 
-  /* ============================================
-   * 啟動
-   * ============================================ */
   document.getElementById('submitBtn').addEventListener('click', submitBooking);
   renderStudents();
   renderDates();
