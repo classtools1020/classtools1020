@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IEP 期末檢討會議邀請｜芎林國中特教團隊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf7ee;
+    --bg-grad-end: #f5e6d3;
+    --card: #ffffff;
+    --ink: #3a2e2a;
+    --ink-soft: #6b5b51;
+    --line: #ead9c4;
+    --primary: #c97b5e;
+    --primary-dark: #a85f44;
+    --primary-soft: #fae5dc;
+    --sage: #7a9461;
+    --sage-soft: #e6efdb;
+    --taken: #d6cbbf;
+    --taken-bg: #f0e9df;
+    --warn: #b85450;
+    --shadow: 0 4px 20px rgba(120, 85, 60, 0.08);
+    --shadow-hover: 0 6px 28px rgba(120, 85, 60, 0.14);
+    --radius: 18px;
+    --radius-sm: 12px;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-grad-end) 100%);
+    background-attachment: fixed;
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+    padding: 20px 16px 60px;
+  }
+
+  .wrap { max-width: 680px; margin: 0 auto; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 28px 16px 32px;
+  }
+  .header .badge {
+    display: inline-block;
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    margin: 0 0 8px;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin: 0;
+  }
+
+  /* Intro */
+  .intro {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 24px 22px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+    border: 1px solid var(--line);
+  }
+  .intro p { margin: 0 0 10px; }
+  .intro p:last-child { margin-bottom: 0; }
+  .intro .lead {
+    font-size: 17px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .intro .info-grid {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--line);
+    display: grid;
+    gap: 8px;
+    font-size: 14.5px;
+  }
+  .intro .info-grid div { display: flex; gap: 8px; }
+  .intro .info-grid .label {
+    color: var(--ink-soft);
+    min-width: 56px;
+    flex-shrink: 0;
+  }
+
+  /* Section */
+  .section {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+    border: 1px solid var(--line);
+  }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 16px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .section-title .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .section-hint {
+    color: var(--ink-soft);
+    font-size: 13.5px;
+    margin: -8px 0 14px;
+  }
+
+  /* Student picker */
+  .student-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .student-card {
+    position: relative;
+    padding: 14px 8px;
+    background: var(--bg);
+    border: 2px solid var(--line);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink);
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .student-card:hover { border-color: var(--primary); background: var(--primary-soft); }
+  .student-card.selected {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(201, 123, 94, 0.3);
+  }
+  .student-card input { position: absolute; opacity: 0; pointer-events: none; }
+
+  /* Date cards */
+  .date-list {
+    display: grid;
+    gap: 12px;
+  }
+  .date-card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 14px 14px 12px;
+  }
+  .date-card-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .date-card-head .date {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .date-card-head .weekday {
+    font-size: 14px;
+    color: var(--ink-soft);
+    background: white;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+  }
+  .slot-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .slot-chip {
+    position: relative;
+    padding: 10px 6px;
+    background: white;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+    color: var(--ink);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .slot-chip:hover:not(.taken):not(.selected) {
+    border-color: var(--sage);
+    background: var(--sage-soft);
+  }
+  .slot-chip.selected {
+    background: var(--sage);
+    border-color: var(--sage);
+    color: white;
+    box-shadow: 0 3px 10px rgba(122, 148, 97, 0.3);
+    font-weight: 500;
+  }
+  .slot-chip.taken {
+    background: var(--taken-bg);
+    border-color: var(--taken-bg);
+    color: var(--taken);
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+  .slot-chip.taken::after {
+    content: "已預約";
+    display: block;
+    font-size: 11px;
+    text-decoration: none;
+    margin-top: 2px;
+    opacity: 0.8;
+  }
+  .slot-chip input { position: absolute; opacity: 0; pointer-events: none; }
+
+  /* Phone visit option */
+  .phone-option {
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: var(--primary-soft);
+    border: 2px dashed var(--primary);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    text-align: center;
+    font-size: 15px;
+    color: var(--primary-dark);
+    font-weight: 500;
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .phone-option:hover { background: #f5d6c7; }
+  .phone-option.selected {
+    background: var(--primary);
+    border-style: solid;
+    color: white;
+  }
+  .phone-option input { position: absolute; opacity: 0; pointer-events: none; }
+
+  /* Form fields */
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .field label .req {
+    color: var(--warn);
+    font-weight: 700;
+    margin-left: 3px;
+  }
+  .field input, .field textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--ink);
+    background: var(--bg);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+  }
+  .field textarea { resize: vertical; min-height: 70px; }
+
+  /* Submit */
+  .submit-wrap { margin-top: 10px; }
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 17px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.18s;
+    letter-spacing: 0.05em;
+  }
+  .submit-btn:hover:not(:disabled) {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
+  }
+  .submit-btn:disabled {
+    background: var(--taken);
+    cursor: not-allowed;
+  }
+
+  /* Message */
+  .msg {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 14.5px;
+    text-align: center;
+    display: none;
+  }
+  .msg.show { display: block; }
+  .msg.error { background: #fde8e6; color: var(--warn); border: 1px solid #f5c4c0; }
+  .msg.loading { background: var(--primary-soft); color: var(--primary-dark); }
+
+  /* Success */
+  .success-screen {
+    display: none;
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 36px 24px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    border: 1px solid var(--line);
+  }
+  .success-screen.show { display: block; }
+  .success-screen .icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 20px;
+    background: var(--sage-soft);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: var(--sage);
+  }
+  .success-screen h2 {
+    margin: 0 0 12px;
+    font-size: 22px;
+    color: var(--ink);
+  }
+  .success-screen .summary {
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    margin: 20px 0;
+    text-align: left;
+    border: 1px solid var(--line);
+  }
+  .success-screen .summary div {
+    display: flex;
+    gap: 10px;
+    padding: 4px 0;
+    font-size: 14.5px;
+  }
+  .success-screen .summary .label {
+    color: var(--ink-soft);
+    min-width: 70px;
+    flex-shrink: 0;
+  }
+  .success-screen .summary .value {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .success-screen .closing {
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    margin-top: 16px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  /* Loading state */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(253, 247, 238, 0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+  }
+  .loading-overlay.show { display: flex; }
+  .loading-overlay .spinner {
+    width: 48px; height: 48px;
+    border: 4px solid var(--primary-soft);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 480px) {
+    body { padding: 12px 12px 40px; font-size: 15px; }
+    .header h1 { font-size: 22px; }
+    .student-grid { grid-template-columns: repeat(2, 1fr); }
+    .slot-chip { font-size: 13px; padding: 9px 4px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+
+<div class="wrap">
+
+  <header class="header">
+    <span class="badge">芎林國中 · 輔導室 特教團隊</span>
+    <h1>IEP 期末檢討會議邀請</h1>
+    <p class="subtitle">114 學年度 第二學期</p>
+  </header>
+
+  <!-- Form view -->
+  <div id="formView">
+
+    <div class="intro">
+      <p class="lead">親愛的家長：您好 ✨</p>
+      <p>學期即將進入尾聲，誠摯邀請您撥冗參與孩子的<strong>個別化教育計畫（IEP）期末檢討會議</strong>，一同回顧本學期的學習與適應情形，並討論未來的支持方向。</p>
+      <div class="info-grid">
+        <div><span class="label">🗓️ 日期</span><span>5/22（五）～ 6/12（五）</span></div>
+        <div><span class="label">🕒 時段</span><span>每場約 30 分鐘</span></div>
+        <div><span class="label">📍 地點</span><span>芎林國中圖書館</span></div>
+        <div><span class="label">📞 替代</span><span>不便到校可改為電訪</span></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title"><span class="step-num">1</span>請選擇您的孩子</h2>
+      <div class="student-grid" id="studentGrid"></div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title"><span class="step-num">2</span>請選擇方便的時段</h2>
+      <p class="section-hint">已被預約的時段會以灰色顯示。可選一個時段，或選擇電訪。</p>
+      <div class="date-list" id="dateList"></div>
+      <label class="phone-option" id="phoneOption">
+        <input type="radio" name="slot" value="phone">
+        📞 不便到校，請以電話聯繫（請於下方備註可通話的時間）
+      </label>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title"><span class="step-num">3</span>您的聯絡資訊</h2>
+      <div class="field">
+        <label>家長姓名<span class="req">*</span></label>
+        <input type="text" id="parentName" placeholder="例：王小明的媽媽 / 王媽媽" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>聯絡電話<span class="req">*</span></label>
+        <input type="tel" id="parentPhone" placeholder="例：0912-345-678" autocomplete="tel">
+      </div>
+      <div class="field">
+        <label>備註（選填）</label>
+        <textarea id="notes" placeholder="想討論的事項、電訪方便的時段、其他需要老師留意的事..."></textarea>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="submit-btn" id="submitBtn">送出回覆</button>
+      <div class="msg" id="msg"></div>
+    </div>
+
+  </div>
+
+  <!-- Success view -->
+  <div class="success-screen" id="successView">
+    <div class="icon">✓</div>
+    <h2>已收到您的回覆</h2>
+    <p style="color: var(--ink-soft); margin: 0;">感謝您撥空回覆，我們將儘速與您確認會議時間。</p>
+    <div class="summary" id="successSummary"></div>
+    <p class="closing">如有疑問，歡迎與導師或特教組聯繫。<br>祝 闔家平安順心 🌿</p>
+  </div>
+
+  <div class="footer">
+    芎林國中 輔導室 特教團隊 · 敬上
+  </div>
+
+</div>
+
+<script>
+  /* ============================================
+   * 設定區（部署前請貼上你的 Apps Script 網址）
+   * ============================================ */
+  const CONFIG = {
+    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxLV9c1tkHUU5YFSrmK64i0iEjJP553QJQHpWj4Rpz2yPWFvSOT9Lh4Omi8YQk0ZqvW/exec',
+    STUDENTS: ['翁o鈞', '孟o誠', '簡o桀', '劉o煊', '徐o嘉', '鄭o萁'],
+    DATES: [
+      { date: '5/22', weekday: '五', iso: '2026-05-22' },
+      { date: '5/26', weekday: '二', iso: '2026-05-26' },
+      { date: '5/27', weekday: '三', iso: '2026-05-27' },
+      { date: '5/29', weekday: '五', iso: '2026-05-29' },
+      { date: '6/2',  weekday: '二', iso: '2026-06-02' },
+      { date: '6/3',  weekday: '三', iso: '2026-06-03' },
+      { date: '6/5',  weekday: '五', iso: '2026-06-05' },
+      { date: '6/9',  weekday: '二', iso: '2026-06-09' },
+      { date: '6/10', weekday: '三', iso: '2026-06-10' },
+      { date: '6/12', weekday: '五', iso: '2026-06-12' },
+    ],
+    TIMES: ['15:00-15:30', '15:30-16:00', '16:00-16:30'],
+  };
+
+  /* ============================================
+   * 狀態
+   * ============================================ */
+  const state = {
+    student: null,
+    slot: null,        // { date, time } 或 { phone: true }
+    bookings: [],
+  };
+
+  /* ============================================
+   * 渲染
+   * ============================================ */
+  function renderStudents() {
+    const grid = document.getElementById('studentGrid');
+    grid.innerHTML = CONFIG.STUDENTS.map(name => `
+      <label class="student-card" data-name="${name}">
+        <input type="radio" name="student" value="${name}">
+        ${name}
+      </label>
+    `).join('');
+    grid.querySelectorAll('.student-card').forEach(card => {
+      card.addEventListener('click', () => {
+        grid.querySelectorAll('.student-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        state.student = card.dataset.name;
+      });
+    });
+  }
+
+  function renderDates() {
+    const list = document.getElementById('dateList');
+    list.innerHTML = CONFIG.DATES.map(d => `
+      <div class="date-card">
+        <div class="date-card-head">
+          <span class="date">${d.date}</span>
+          <span class="weekday">星期${d.weekday}</span>
+        </div>
+        <div class="slot-row">
+          ${CONFIG.TIMES.map(t => `
+            <label class="slot-chip" data-date="${d.date}" data-time="${t}">
+              <input type="radio" name="slot" value="${d.date}_${t}">
+              ${t}
+            </label>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+
+    // 套用已預約狀態
+    applyBookings();
+
+    // 綁定事件
+    list.querySelectorAll('.slot-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        if (chip.classList.contains('taken')) { e.preventDefault(); return; }
+        document.querySelectorAll('.slot-chip, .phone-option').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        state.slot = { date: chip.dataset.date, time: chip.dataset.time, phone: false };
+      });
+    });
+
+    // 電訪選項
+    const phoneOpt = document.getElementById('phoneOption');
+    phoneOpt.addEventListener('click', () => {
+      document.querySelectorAll('.slot-chip, .phone-option').forEach(c => c.classList.remove('selected'));
+      phoneOpt.classList.add('selected');
+      state.slot = { phone: true };
+    });
+  }
+
+  function applyBookings() {
+    document.querySelectorAll('.slot-chip').forEach(chip => {
+      const isTaken = state.bookings.some(b => b.date === chip.dataset.date && b.time === chip.dataset.time);
+      chip.classList.toggle('taken', isTaken);
+      if (isTaken) {
+        const input = chip.querySelector('input');
+        if (input) input.disabled = true;
+      }
+    });
+  }
+
+  /* ============================================
+   * 與後台通訊
+   * ============================================ */
+  async function loadBookings() {
+    if (!CONFIG.APPS_SCRIPT_URL || CONFIG.APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+      console.warn('Apps Script URL 尚未設定');
+      return;
+    }
+    try {
+      const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=list&t=${Date.now()}`);
+      const data = await res.json();
+      if (data.ok && Array.isArray(data.bookings)) {
+        state.bookings = data.bookings;
+        applyBookings();
+      }
+    } catch (err) {
+      console.error('讀取預約資料失敗', err);
+    }
+  }
+
+  async function submitBooking() {
+    const msg = document.getElementById('msg');
+    msg.classList.remove('show', 'error', 'loading');
+
+    // 驗證
+    if (!state.student) return showMsg('請選擇您的孩子', 'error');
+    if (!state.slot)    return showMsg('請選擇方便的時段或選擇電訪', 'error');
+    const parent = document.getElementById('parentName').value.trim();
+    const phone  = document.getElementById('parentPhone').value.trim();
+    const notes  = document.getElementById('notes').value.trim();
+    if (!parent) return showMsg('請填寫家長姓名', 'error');
+    if (!phone)  return showMsg('請填寫聯絡電話', 'error');
+
+    // 沒設定後台網址 → fallback 用 mailto
+    if (!CONFIG.APPS_SCRIPT_URL || CONFIG.APPS_SCRIPT_URL.includes('PASTE_YOUR')) {
+      return showMsg('系統設定中，請稍後再試或致電輔導室', 'error');
+    }
+
+    const payload = {
+      student: state.student,
+      parent, phone, notes,
+      isPhoneVisit: !!state.slot.phone,
+      date: state.slot.phone ? null : state.slot.date,
+      time: state.slot.phone ? null : state.slot.time,
+    };
+
+    showLoading(true);
+    try {
+      const res = await fetch(CONFIG.APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      });
+      const data = await res.json();
+      showLoading(false);
+
+      if (data.ok) {
+        showSuccess(payload);
+      } else if (data.error === 'CONFLICT') {
+        showMsg('抱歉，該時段剛被預約走了，請重新挑選', 'error');
+        await loadBookings();
+        // 清空時段選擇
+        document.querySelectorAll('.slot-chip, .phone-option').forEach(c => c.classList.remove('selected'));
+        state.slot = null;
+      } else {
+        showMsg(data.error || '送出失敗，請稍後再試', 'error');
+      }
+    } catch (err) {
+      showLoading(false);
+      showMsg('網路連線異常，請稍後再試', 'error');
+      console.error(err);
+    }
+  }
+
+  function showMsg(text, type) {
+    const msg = document.getElementById('msg');
+    msg.textContent = text;
+    msg.className = `msg show ${type || ''}`;
+  }
+
+  function showLoading(yes) {
+    document.getElementById('loadingOverlay').classList.toggle('show', yes);
+    document.getElementById('submitBtn').disabled = yes;
+  }
+
+  function showSuccess(payload) {
+    document.getElementById('formView').style.display = 'none';
+    const successView = document.getElementById('successView');
+    successView.classList.add('show');
+
+    const slotText = payload.isPhoneVisit
+      ? '電訪（不便到校）'
+      : `${payload.date}（${weekdayOf(payload.date)}）${payload.time}`;
+
+    document.getElementById('successSummary').innerHTML = `
+      <div><span class="label">學生</span><span class="value">${payload.student}</span></div>
+      <div><span class="label">家長</span><span class="value">${escapeHTML(payload.parent)}</span></div>
+      <div><span class="label">電話</span><span class="value">${escapeHTML(payload.phone)}</span></div>
+      <div><span class="label">時段</span><span class="value">${slotText}</span></div>
+      ${payload.notes ? `<div><span class="label">備註</span><span class="value">${escapeHTML(payload.notes)}</span></div>` : ''}
+    `;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function weekdayOf(dateStr) {
+    const d = CONFIG.DATES.find(x => x.date === dateStr);
+    return d ? `星期${d.weekday}` : '';
+  }
+
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  /* ============================================
+   * 啟動
+   * ============================================ */
+  document.getElementById('submitBtn').addEventListener('click', submitBooking);
+  renderStudents();
+  renderDates();
+  loadBookings();
+</script>
+
+</body>
+</html>
