@@ -413,6 +413,45 @@ body {
   max-width: 360px;
 }
 .q-figure svg { display: block; margin: 0 auto; width: 100%; max-width: 320px; height: auto; }
+
+/* === 互動三角形 builder === */
+.tri-builder { text-align: center; }
+.tri-builder .tb-svg { width: 100%; max-width: 320px; height: auto; }
+.tri-builder .tb-hint {
+  font-size: .82rem;
+  color: rgba(255,255,255,.55);
+  margin: 4px 0 6px;
+  letter-spacing: .5px;
+}
+.tb-btn {
+  display: inline-block;
+  margin: 8px auto 4px;
+  padding: 10px 22px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #fff;
+  background: linear-gradient(135deg, #FF1B6B, #B100E8);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(255,27,107,.55);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.tb-btn:hover { transform: scale(1.05); box-shadow: 0 0 26px rgba(255,27,107,.8); }
+.tb-btn:active { transform: scale(.96); }
+.tb-svg .tb-pulse-ok { animation: tbPulseOk .6s ease 1; }
+.tb-svg .tb-pulse-bad { animation: tbPulseBad .6s ease 1; }
+@keyframes tbPulseOk {
+  0% { filter: drop-shadow(0 0 0 #00FF88); }
+  50% { filter: drop-shadow(0 0 18px #00FF88); }
+  100% { filter: drop-shadow(0 0 0 #00FF88); }
+}
+@keyframes tbPulseBad {
+  0% { filter: drop-shadow(0 0 0 #FF1B6B); }
+  50% { filter: drop-shadow(0 0 14px #FF1B6B); }
+  100% { filter: drop-shadow(0 0 0 #FF1B6B); }
+}
 .q-hint {
   background: rgba(255,215,0,.1);
   border-left: 4px solid var(--neon-yellow);
@@ -698,6 +737,196 @@ const HEROES=[
   {id:'crown',emoji:'👑',name:'王者領主'}
 ];
 
+/* ===== 互動三角形 builder ===== */
+/* 兩根短邊從最長邊兩端折上來，能組 → 收在頂點 ✓；不能組 → 停在 80° 露紅色間距 ✗ */
+function triBuild(a,b,c,id){
+  const arr=[a,b,c].slice().sort((x,y)=>x-y);
+  const s1=arr[0], s2=arr[1], base=arr[2];
+  const canForm = (s1+s2) > base;
+  const equal = (s1+s2) === base; // 剛好等於：也不能組
+  const SCALE = Math.min(20, 200/base);
+  const baseW = base*SCALE;
+  const cx = 140;
+  const baseY = 130;
+  const Bx = cx - baseW/2, Cx = cx + baseW/2;
+  // 起始：兩短邊平躺在最長邊「上方一點」分開放著
+  const startY = baseY - 38;
+  const lStartX1 = Bx, lStartY1 = startY;
+  const lStartX2 = Bx + s1*SCALE, lStartY2 = startY;
+  const rStartX1 = Cx, rStartY1 = startY;
+  const rStartX2 = Cx - s2*SCALE, rStartY2 = startY;
+  // 終止位置
+  let lEndX2, lEndY2, rEndX2, rEndY2;
+  if(canForm){
+    // 三角形 apex（以 B=(0,0), C=(base,0)）
+    const ax = (s1*s1 - s2*s2 + base*base) / (2*base);
+    const ay = Math.sqrt(Math.max(0, s1*s1 - ax*ax));
+    lEndX2 = Bx + ax*SCALE;
+    lEndY2 = baseY - ay*SCALE;
+    rEndX2 = lEndX2;
+    rEndY2 = lEndY2;
+  } else {
+    // 兩根都抬到 80°，露出紅色間距
+    const ang = Math.PI/180 * 80;
+    lEndX2 = Bx + s1*SCALE*Math.cos(ang);
+    lEndY2 = baseY - s1*SCALE*Math.sin(ang);
+    rEndX2 = Cx - s2*SCALE*Math.cos(ang);
+    rEndY2 = baseY - s2*SCALE*Math.sin(ang);
+  }
+  const lblOffset = 14;
+  // pivot 動畫：起始橫躺 → 終止對應 apex 角度
+  const lPivotX1 = Bx, lPivotY1 = baseY;
+  const lPivotX2 = Bx + s1*SCALE, lPivotY2 = baseY;
+  const rPivotX1 = Cx, rPivotY1 = baseY;
+  const rPivotX2 = Cx - s2*SCALE, rPivotY2 = baseY;
+  return `
+  <div class="tri-builder" data-id="${id}" data-can="${canForm?1:0}" data-state="0">
+    <svg viewBox="0 0 280 170" class="tb-svg">
+      <!-- 最長邊（紫） -->
+      <line x1="${Bx}" y1="${baseY}" x2="${Cx}" y2="${baseY}"
+            stroke="#B100E8" stroke-width="6" stroke-linecap="round"/>
+      <text x="${cx}" y="${baseY+22}" fill="#B100E8" font-size="14"
+            font-weight="900" text-anchor="middle">${base}（最長）</text>
+      <circle cx="${Bx}" cy="${baseY}" r="4" fill="#fff"/>
+      <circle cx="${Cx}" cy="${baseY}" r="4" fill="#fff"/>
+      <text x="${Bx-10}" y="${baseY+5}" fill="#fff" font-size="13" font-weight="900" text-anchor="end">B</text>
+      <text x="${Cx+10}" y="${baseY+5}" fill="#fff" font-size="13" font-weight="900">C</text>
+      <!-- 左短邊（粉，起始橫躺在上方） -->
+      <line class="tb-stick" data-role="left"
+            data-px1="${lPivotX1}" data-py1="${lPivotY1}" data-px2="${lPivotX2}" data-py2="${lPivotY2}"
+            data-fx="${lEndX2}" data-fy="${lEndY2}"
+            x1="${lStartX1}" y1="${lStartY1}" x2="${lStartX2}" y2="${lStartY2}"
+            stroke="#FF1B6B" stroke-width="6" stroke-linecap="round"/>
+      <text class="tb-lbl" data-role="leftLbl"
+            data-sx="${(lStartX1+lStartX2)/2}" data-sy="${(lStartY1+lStartY2)/2-lblOffset}"
+            data-fx="${(Bx+lEndX2)/2 - 12}" data-fy="${(baseY+lEndY2)/2}"
+            x="${(lStartX1+lStartX2)/2}" y="${(lStartY1+lStartY2)/2-lblOffset}"
+            fill="#FF1B6B" font-size="14" font-weight="900" text-anchor="middle">${s1}</text>
+      <!-- 右短邊（青） -->
+      <line class="tb-stick" data-role="right"
+            data-px1="${rPivotX1}" data-py1="${rPivotY1}" data-px2="${rPivotX2}" data-py2="${rPivotY2}"
+            data-fx="${rEndX2}" data-fy="${rEndY2}"
+            x1="${rStartX1}" y1="${rStartY1}" x2="${rStartX2}" y2="${rStartY2}"
+            stroke="#00F0FF" stroke-width="6" stroke-linecap="round"/>
+      <text class="tb-lbl" data-role="rightLbl"
+            data-sx="${(rStartX1+rStartX2)/2}" data-sy="${(rStartY1+rStartY2)/2-lblOffset}"
+            data-fx="${(Cx+rEndX2)/2 + 12}" data-fy="${(baseY+rEndY2)/2}"
+            x="${(rStartX1+rStartX2)/2}" y="${(rStartY1+rStartY2)/2-lblOffset}"
+            fill="#00F0FF" font-size="14" font-weight="900" text-anchor="middle">${s2}</text>
+      <!-- 間距虛線（不能組才會顯示） -->
+      <line class="tb-gap" x1="0" y1="0" x2="0" y2="0"
+            stroke="#FF1B6B" stroke-width="2.5" stroke-dasharray="5 4" opacity="0"/>
+      <!-- 結果文字 -->
+      <text class="tb-result" x="${cx}" y="28" font-size="22" font-weight="900"
+            text-anchor="middle" fill="${canForm?'#00FF88':'#FF1B6B'}" opacity="0">
+        ${canForm?'✓ 兜起來啦！':'✗ 兜不起來！'}
+      </text>
+    </svg>
+    <div class="tb-hint">↓ 按下去看兩根短邊能不能對到 ↓</div>
+    <button class="tb-btn" onclick="animateTri('${id}')">▶ 組組看！</button>
+  </div>`;
+}
+
+window.animateTri = function(id){
+  const root = document.querySelector('.tri-builder[data-id="'+id+'"]');
+  if(!root) return;
+  const btn = root.querySelector('.tb-btn');
+  const sticks = root.querySelectorAll('.tb-stick');
+  const lbls = root.querySelectorAll('.tb-lbl');
+  const result = root.querySelector('.tb-result');
+  const gap = root.querySelector('.tb-gap');
+  const can = root.dataset.can === '1';
+  const state = root.dataset.state;
+  // Toggle: 0=未播 1=已播
+  if(state === '0'){
+    // 第一段：兩短邊「貼到」最長邊兩端（pivot 位置），300ms
+    animatePhase(sticks, lbls, 'start->pivot', 300, ()=>{
+      // 第二段：往上折，1200ms
+      animatePhase(sticks, lbls, 'pivot->final', 1200, ()=>{
+        result.setAttribute('opacity', 1);
+        if(can){
+          sticks.forEach(s=>s.classList.add('tb-pulse-ok'));
+          try{ if(typeof sndCorrect==='function') sndCorrect(); }catch(e){}
+        } else {
+          // 顯示紅色間距虛線
+          const L = root.querySelector('.tb-stick[data-role="left"]');
+          const R = root.querySelector('.tb-stick[data-role="right"]');
+          gap.setAttribute('x1', +L.getAttribute('x2'));
+          gap.setAttribute('y1', +L.getAttribute('y2'));
+          gap.setAttribute('x2', +R.getAttribute('x2'));
+          gap.setAttribute('y2', +R.getAttribute('y2'));
+          gap.setAttribute('opacity', 1);
+          sticks.forEach(s=>s.classList.add('tb-pulse-bad'));
+          try{ if(typeof sndWrong==='function') sndWrong(); }catch(e){}
+        }
+      });
+    });
+    root.dataset.state = '1';
+    btn.textContent = '↻ 再來一次';
+  } else {
+    // reset
+    sticks.forEach(s=>{
+      s.setAttribute('x1', s.dataset.px1);
+      s.setAttribute('y1', s.dataset.py1);
+      s.setAttribute('x2', s.dataset.px2);
+      s.setAttribute('y2', s.dataset.py2);
+      s.classList.remove('tb-pulse-ok','tb-pulse-bad');
+    });
+    // 再回到起始（startY=92） — 用 reverse animatePhase
+    // 簡化：直接重新渲染父節點的 outerHTML（保留 dataset 不變太麻煩） — 改用立即回放
+    location.reload();
+  }
+};
+
+function animatePhase(sticks, lbls, mode, dur, done){
+  const start = performance.now();
+  const reads = [];
+  sticks.forEach(s=>{
+    const cur = {x1:+s.getAttribute('x1'), y1:+s.getAttribute('y1'),
+                 x2:+s.getAttribute('x2'), y2:+s.getAttribute('y2')};
+    let tgt;
+    if(mode === 'start->pivot'){
+      tgt = {x1:+s.dataset.px1, y1:+s.dataset.py1, x2:+s.dataset.px2, y2:+s.dataset.py2};
+    } else {
+      tgt = {x1:cur.x1, y1:cur.y1, x2:+s.dataset.fx, y2:+s.dataset.fy};
+    }
+    reads.push({el:s, cur, tgt});
+  });
+  const lblReads = [];
+  lbls.forEach(l=>{
+    const cur = {x:+l.getAttribute('x'), y:+l.getAttribute('y')};
+    let tgt;
+    if(mode === 'start->pivot'){
+      // 標籤中點：pivot 的中點
+      const role = l.dataset.role;
+      const stick = role === 'leftLbl' ? sticks[0] : sticks[1];
+      const mx = (+stick.dataset.px1 + +stick.dataset.px2)/2;
+      const my = (+stick.dataset.py1 + +stick.dataset.py2)/2 - 14;
+      tgt = {x:mx, y:my};
+    } else {
+      tgt = {x:+l.dataset.fx, y:+l.dataset.fy};
+    }
+    lblReads.push({el:l, cur, tgt});
+  });
+  function frame(now){
+    const t = Math.min(1, (now-start)/dur);
+    const e = mode === 'start->pivot' ? t : (1 - Math.pow(1-t, 3));
+    reads.forEach(r=>{
+      r.el.setAttribute('x1', r.cur.x1+(r.tgt.x1-r.cur.x1)*e);
+      r.el.setAttribute('y1', r.cur.y1+(r.tgt.y1-r.cur.y1)*e);
+      r.el.setAttribute('x2', r.cur.x2+(r.tgt.x2-r.cur.x2)*e);
+      r.el.setAttribute('y2', r.cur.y2+(r.tgt.y2-r.cur.y2)*e);
+    });
+    lblReads.forEach(r=>{
+      r.el.setAttribute('x', r.cur.x+(r.tgt.x-r.cur.x)*e);
+      r.el.setAttribute('y', r.cur.y+(r.tgt.y-r.cur.y)*e);
+    });
+    if(t<1) requestAnimationFrame(frame);
+    else done && done();
+  }
+  requestAnimationFrame(frame);
+}
+
 /* ===== 5 個城堡 ===== */
 const CASTLES_R1=[
   {ic:'🏰',nm:'短劍城'},
@@ -720,16 +949,7 @@ const ROUND1=[
   banner:'🏰 短劍城',
   title:'三邊長度 3、4、7，可以組成三角形嗎？',
   hint:'最短兩邊和 > 最長邊才行（不能等於！）',
-  fig:`<svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
-    <line x1="20" y1="40" x2="80" y2="40" stroke="#FF1B6B" stroke-width="6" stroke-linecap="round"/>
-    <line x1="100" y1="40" x2="180" y2="40" stroke="#00F0FF" stroke-width="6" stroke-linecap="round"/>
-    <line x1="20" y1="80" x2="160" y2="80" stroke="#B100E8" stroke-width="6" stroke-linecap="round"/>
-    <text x="50" y="32" fill="#FF1B6B" font-size="14" font-weight="900" text-anchor="middle">3</text>
-    <text x="140" y="32" fill="#00F0FF" font-size="14" font-weight="900" text-anchor="middle">4</text>
-    <text x="90" y="100" fill="#B100E8" font-size="16" font-weight="900" text-anchor="middle">7（最長）</text>
-    <text x="200" y="50" fill="#FFD700" font-size="12" font-weight="700">3+4 = 7</text>
-    <text x="200" y="68" fill="#FFD700" font-size="12" font-weight="700">剛好等於</text>
-  </svg>`,
+  fig: triBuild(3,4,7,'r1q1'),
   options:[
     {text:'能組成'},
     {text:'不能組成',correct:true},
@@ -740,15 +960,7 @@ const ROUND1=[
   banner:'🛡️ 盾牌堡',
   title:'三邊長度 5、6、8，可以組成三角形嗎？',
   hint:'最短兩邊和 = 5+6 = 11，跟最長邊 8 比看看',
-  fig:`<svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
-    <line x1="20" y1="40" x2="120" y2="40" stroke="#FF1B6B" stroke-width="6" stroke-linecap="round"/>
-    <line x1="140" y1="40" x2="260" y2="40" stroke="#00F0FF" stroke-width="6" stroke-linecap="round"/>
-    <line x1="20" y1="80" x2="180" y2="80" stroke="#B100E8" stroke-width="6" stroke-linecap="round"/>
-    <text x="70" y="32" fill="#FF1B6B" font-size="14" font-weight="900" text-anchor="middle">5</text>
-    <text x="200" y="32" fill="#00F0FF" font-size="14" font-weight="900" text-anchor="middle">6</text>
-    <text x="100" y="100" fill="#B100E8" font-size="16" font-weight="900" text-anchor="middle">8（最長）</text>
-    <text x="200" y="98" fill="#FFD700" font-size="12" font-weight="700">5+6 = 11 &gt; 8 ✓</text>
-  </svg>`,
+  fig: triBuild(5,6,8,'r1q2'),
   options:[
     {text:'能組成',correct:true},
     {text:'不能組成'},
