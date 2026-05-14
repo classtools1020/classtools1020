@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>三角王國攻略戰 · 8A 數學 3-5</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --neon-pink: #FF1B6B;
+  --neon-cyan: #00F0FF;
+  --neon-purple: #B100E8;
+  --neon-yellow: #FFD700;
+  --neon-green: #00FF88;
+  --bg-1: #0A0E27;
+  --bg-2: #1A1A3E;
+  --bg-3: #2D1B69;
+}
+html, body {
+  font-family: 'Noto Sans TC','Microsoft JhengHei',sans-serif;
+  background: linear-gradient(135deg,var(--bg-1) 0%,var(--bg-3) 100%);
+  color: #fff;
+  min-height: 100vh;
+  min-height: 100dvh;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(177,0,232,0.25), transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255,27,107,0.2), transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(0,240,255,0.1), transparent 50%),
+    linear-gradient(135deg,var(--bg-1) 0%,var(--bg-3) 100%);
+  background-attachment: fixed;
+}
+.wrap { max-width: 720px; width: 100%; }
+
+/* ========== 首頁 ========== */
+.cover {
+  text-align: center;
+  padding: 24px 12px;
+  animation: zoomIn .6s;
+}
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+.cover .game-icon {
+  font-size: 5rem;
+  display: block;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 24px var(--neon-pink));
+  animation: glow 2s infinite alternate;
+}
+@keyframes glow {
+  from { filter: drop-shadow(0 0 14px var(--neon-pink)); }
+  to { filter: drop-shadow(0 0 32px var(--neon-cyan)); }
+}
+.cover h1 {
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(90deg,var(--neon-pink),var(--neon-cyan),var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+  text-shadow: 0 0 40px rgba(255,27,107,.3);
+}
+.cover .sub {
+  font-size: 1.05rem;
+  color: #C4B5FD;
+  margin-bottom: 18px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+.cover .tag {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(255,27,107,.15);
+  border: 1px solid var(--neon-pink);
+  border-radius: 50px;
+  font-size: .85rem;
+  color: var(--neon-pink);
+  font-weight: 800;
+  margin-bottom: 18px;
+  letter-spacing: 2px;
+}
+
+/* 名字輸入 */
+.name-input{
+  background: rgba(0,0,0,.5);
+  border: 2px solid var(--neon-cyan);
+  border-radius: 20px;
+  padding: 14px 18px;
+  margin: 0 auto 18px;
+  max-width: 380px;
+  box-shadow: 0 0 30px rgba(0,240,255,.2);
+}
+.name-input label {
+  display: block;
+  color: var(--neon-cyan);
+  font-weight: 800;
+  font-size: .92rem;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+.name-input input {
+  width: 100%;
+  background: rgba(255,255,255,.08);
+  border: 2px solid rgba(0,240,255,.4);
+  color: white;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-family: inherit;
+  text-align: center;
+  font-weight: 700;
+  min-height: 48px;
+}
+.name-input input:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  background: rgba(0,240,255,.08);
+  box-shadow: 0 0 20px rgba(0,240,255,.3);
+}
+.name-hint {
+  margin-top: 6px;
+  color: var(--neon-pink);
+  font-size: .85rem;
+  text-align: center;
+  font-weight: 700;
+  display: none;
+}
+.name-hint.show { display: block; }
+
+/* 英雄選擇 */
+.hero-select {
+  margin: 14px 0;
+}
+.hero-select .title {
+  color: var(--neon-yellow);
+  font-weight: 800;
+  font-size: .92rem;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+.heroes {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+@media (max-width: 500px) {
+  .heroes { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+}
+.hero {
+  background: rgba(255,255,255,.04);
+  border: 2px solid rgba(255,255,255,.15);
+  border-radius: 14px;
+  padding: 10px 4px;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+}
+.hero:active { transform: scale(.95); }
+.hero.selected {
+  border-color: var(--neon-pink);
+  background: rgba(255,27,107,.2);
+  box-shadow: 0 0 20px rgba(255,27,107,.5);
+  transform: scale(1.05);
+}
+.hero .emoji { font-size: 2rem; display: block; }
+.hero .name { font-size: .72rem; color: #ccd; margin-top: 4px; font-weight: 700; }
+.hero.selected .name { color: white; }
+
+.start-btn {
+  background: linear-gradient(135deg,var(--neon-pink),var(--neon-purple));
+  color: white;
+  border: none;
+  padding: 18px 44px;
+  font-size: 1.4rem;
+  font-weight: 900;
+  font-family: inherit;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 0 30px rgba(255,27,107,.5), inset 0 -4px 0 rgba(0,0,0,.2);
+  letter-spacing: 4px;
+  margin-top: 8px;
+  text-shadow: 0 0 8px rgba(255,255,255,.5);
+}
+.start-btn:active { transform: scale(.95); }
+
+/* ========== Round 選單 ========== */
+.round-menu {
+  text-align: center;
+  padding: 16px 8px;
+  animation: zoomIn .6s;
+}
+.round-menu h2 {
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg,var(--neon-cyan),var(--neon-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.round-menu .player-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,.06);
+  border: 2px solid rgba(255,255,255,.15);
+  border-radius: 50px;
+  padding: 8px 18px;
+  margin-bottom: 18px;
+}
+.round-menu .player-info .emoji { font-size: 1.6rem; }
+.round-menu .player-info .name { font-weight: 800; color: white; letter-spacing: 1px; }
+
+.round-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+@media (max-width: 540px) {
+  .round-cards { grid-template-columns: 1fr; }
+}
+.round-card {
+  background: rgba(0,0,0,.4);
+  border: 2px solid rgba(255,255,255,.15);
+  border-radius: 18px;
+  padding: 18px 14px;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+}
+.round-card.locked {
+  opacity: .5;
+  cursor: not-allowed;
+}
+.round-card:not(.locked):hover, .round-card:not(.locked):active {
+  border-color: var(--neon-pink);
+  background: rgba(255,27,107,.1);
+  box-shadow: 0 0 24px rgba(255,27,107,.3);
+}
+.round-card .badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+}
+.round-card.r1 .badge { background: rgba(0,240,255,.2); color: var(--neon-cyan); border: 1px solid var(--neon-cyan); }
+.round-card.r2 .badge { background: rgba(255,27,107,.2); color: var(--neon-pink); border: 1px solid var(--neon-pink); }
+.round-card .icon { font-size: 2.6rem; display: block; margin: 4px 0; }
+.round-card .name { font-size: 1.2rem; font-weight: 900; color: white; margin-bottom: 4px; }
+.round-card .desc { font-size: .85rem; color: #aab; }
+.round-card .status {
+  margin-top: 8px;
+  font-size: .82rem;
+  font-weight: 700;
+}
+.round-card.cleared .status { color: var(--neon-green); }
+.round-card.locked .status { color: #888; }
+
+/* ========== 戰役畫面 ========== */
+.battle-hud {
+  position: sticky; top: 0;
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid var(--neon-purple);
+  border-radius: 18px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  z-index: 50;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.battle-hud .left { display: flex; gap: 8px; align-items: center; }
+.battle-hud .hero-emoji { font-size: 1.6rem; }
+.battle-hud .stage { font-weight: 800; color: var(--neon-cyan); font-size: .95rem; }
+.battle-hud .stats { display: flex; gap: 6px; font-size: .92rem; font-weight: 800; }
+.battle-hud .kills { color: var(--neon-green); }
+.battle-hud .misses { color: #888; }
+
+/* 地圖 */
+.map-board {
+  background: rgba(0,0,0,.3);
+  border: 2px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 14px 12px;
+  margin-bottom: 14px;
+}
+.map-title {
+  font-size: .85rem;
+  color: var(--neon-yellow);
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.castles {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.castle {
+  background: rgba(255,255,255,.05);
+  border: 2px solid rgba(255,255,255,.2);
+  border-radius: 12px;
+  padding: 10px 4px;
+  text-align: center;
+  font-size: .72rem;
+  color: #aab;
+  position: relative;
+  transition: all .4s;
+  min-height: 84px;
+}
+.castle .ic { font-size: 1.8rem; display: block; line-height: 1; }
+.castle .nm { margin-top: 4px; font-weight: 700; }
+.castle.active {
+  border-color: var(--neon-yellow);
+  box-shadow: 0 0 14px rgba(255,215,0,.4);
+  animation: activePulse 1s infinite;
+}
+@keyframes activePulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.castle.captured {
+  background: linear-gradient(135deg,rgba(0,255,136,.35),rgba(0,240,255,.2));
+  border-color: var(--neon-green);
+  color: white;
+  animation: captureAnim 1.2s;
+}
+@keyframes captureAnim {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.15) rotate(8deg); }
+  60% { transform: scale(1.15) rotate(-8deg); }
+  100% { transform: scale(1.05) rotate(0); }
+}
+.castle.captured::after {
+  content: "🚩";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 1.4rem;
+  animation: flagWave 1.6s infinite;
+}
+@keyframes flagWave {
+  0%,100% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+}
+.castle.failed {
+  background: rgba(60,60,80,.4);
+  border-color: rgba(255,255,255,.1);
+  opacity: .6;
+}
+
+/* 題目卡 */
+.q-card {
+  background: rgba(255,255,255,.05);
+  border: 2px solid var(--neon-purple);
+  border-radius: 22px;
+  padding: 20px 16px;
+  box-shadow: 0 0 40px rgba(177,0,232,.2);
+  animation: slideUp .4s;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.q-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg,var(--neon-pink),var(--neon-purple));
+  color: white;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-weight: 900;
+  font-size: .95rem;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+  box-shadow: 0 0 14px rgba(255,27,107,.4);
+}
+.q-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.q-figure {
+  background: rgba(0,0,0,.25);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  padding: 10px;
+  margin: 8px auto;
+  max-width: 360px;
+}
+.q-figure svg { display: block; margin: 0 auto; width: 100%; max-width: 320px; height: auto; }
+.q-hint {
+  background: rgba(255,215,0,.1);
+  border-left: 4px solid var(--neon-yellow);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: .92rem;
+  color: var(--neon-yellow);
+  font-weight: 600;
+  margin: 10px 0;
+}
+.q-hint::before { content: "💡 "; }
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+.option {
+  background: rgba(255,255,255,.05);
+  border: 2px solid rgba(255,255,255,.2);
+  padding: 16px 18px;
+  border-radius: 14px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  min-height: 60px;
+  transition: all .15s;
+}
+.option:active { transform: scale(.98); }
+.option .letter {
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,.15);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.option.correct {
+  background: linear-gradient(135deg,rgba(0,255,136,.3),rgba(0,240,255,.2));
+  border-color: var(--neon-green);
+  animation: correctPop .5s;
+  box-shadow: 0 0 20px rgba(0,255,136,.4);
+}
+.option.correct .letter { background: var(--neon-green); color: black; }
+.option.wrong {
+  background: rgba(255,27,107,.2);
+  border-color: var(--neon-pink);
+  animation: shake .4s;
+}
+.option.wrong .letter { background: var(--neon-pink); color: white; }
+@keyframes correctPop {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.next-btn {
+  width: 100%;
+  margin-top: 12px;
+  background: linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));
+  color: white;
+  border: none;
+  padding: 16px;
+  font-size: 1.2rem;
+  font-weight: 900;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: inherit;
+  display: none;
+  box-shadow: 0 0 24px rgba(0,240,255,.4);
+  letter-spacing: 2px;
+}
+.next-btn.show { display: block; }
+.next-btn:active { transform: scale(.97); }
+
+/* ========== 攻佔彈窗 ========== */
+.capture-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.85);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.capture-overlay.show { display: flex; animation: overlayIn .3s; }
+@keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+.capture-overlay .big {
+  font-size: 4rem;
+  animation: captureBounce .8s infinite;
+}
+@keyframes captureBounce {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.1); }
+}
+.capture-overlay .text {
+  font-size: 2.2rem;
+  font-weight: 900;
+  background: linear-gradient(90deg,var(--neon-green),var(--neon-yellow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-top: 8px;
+  letter-spacing: 4px;
+}
+.capture-overlay .castle-name {
+  margin-top: 8px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* ========== 通關／段位 ========== */
+.victory {
+  text-align: center;
+  padding: 24px 14px;
+  background: rgba(255,255,255,.04);
+  border: 2px solid var(--neon-yellow);
+  border-radius: 24px;
+  box-shadow: 0 0 60px rgba(255,215,0,.25);
+  animation: zoomIn .8s;
+}
+.victory h1 {
+  font-size: 2rem;
+  font-weight: 900;
+  background: linear-gradient(90deg,var(--neon-yellow),var(--neon-pink),var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+.rank-medal {
+  font-size: 6rem;
+  display: block;
+  margin: 8px 0;
+  animation: medalSpin 3s infinite;
+  filter: drop-shadow(0 0 24px rgba(255,215,0,.7));
+}
+@keyframes medalSpin {
+  0%,100% { transform: rotate(0); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+.rank-name {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--neon-yellow);
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+.rank-desc {
+  font-size: .95rem;
+  color: #ccd;
+  margin-bottom: 14px;
+}
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+.stat {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 12px;
+  padding: 10px 14px;
+  min-width: 90px;
+}
+.stat .num { font-size: 1.4rem; font-weight: 900; color: var(--neon-cyan); }
+.stat .lab { font-size: .78rem; color: #aab; margin-top: 2px; }
+.upload-status {
+  background: rgba(0,255,136,.1);
+  border: 1px solid var(--neon-green);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-top: 14px;
+  color: var(--neon-green);
+  font-weight: 700;
+  font-size: .95rem;
+}
+.upload-status.warn {
+  background: rgba(255,215,0,.1);
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+}
+.victory .btn-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.victory .btn-row button {
+  flex: 1; min-width: 130px;
+  background: rgba(255,255,255,.06);
+  border: 2px solid rgba(255,255,255,.2);
+  color: white;
+  padding: 12px 18px;
+  font-weight: 700;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: .95rem;
+}
+.victory .btn-row button.primary {
+  background: linear-gradient(135deg,var(--neon-pink),var(--neon-purple));
+  border-color: transparent;
+}
+.victory .btn-row button:active { transform: scale(.97); }
+
+#fireworks { position: fixed; inset: 0; pointer-events: none; z-index: 9998; display: none; }
+
+/* SVG 樣式 */
+.tri-pink { fill: rgba(255,27,107,.2); stroke: var(--neon-pink); stroke-width: 2.5; }
+.tri-cyan { fill: rgba(0,240,255,.18); stroke: var(--neon-cyan); stroke-width: 2.5; }
+.tri-purple { fill: rgba(177,0,232,.2); stroke: var(--neon-purple); stroke-width: 2.5; }
+
+/* RWD */
+@media (max-width: 500px) {
+  body { padding: 10px 6px; }
+  .cover h1 { font-size: 1.85rem; }
+  .cover .game-icon { font-size: 4rem; }
+  .start-btn { padding: 16px 36px; font-size: 1.2rem; letter-spacing: 2px; }
+  .hero .emoji { font-size: 1.6rem; }
+  .hero .name { font-size: .65rem; }
+  .castle { padding: 8px 2px; min-height: 72px; }
+  .castle .ic { font-size: 1.5rem; }
+  .castle .nm { font-size: .65rem; }
+  .q-title { font-size: 1.15rem; }
+  .option { font-size: 1.02rem; padding: 13px 12px; min-height: 56px; }
+  .option .letter { width: 32px; height: 32px; font-size: 1rem; }
+  .capture-overlay .text { font-size: 1.65rem; }
+  .victory h1 { font-size: 1.55rem; }
+  .rank-medal { font-size: 4.5rem; }
+  .rank-name { font-size: 1.4rem; }
+}
+@media (hover: none) {
+  .option:hover { background: rgba(255,255,255,.05); }
+}
+</style>
+</head>
+<body>
+<canvas id="fireworks"></canvas>
+<div class="capture-overlay" id="captureOverlay">
+  <div class="big" id="captureBig">🏰</div>
+  <div class="text">城堡攻佔！</div>
+  <div class="castle-name" id="captureName"></div>
+</div>
+
+<div class="wrap" id="app"></div>
+
+<script>
+/* ===== 音效 ===== */
+let actx=null;
+function ctx(){if(!actx){try{actx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}return actx}
+function tone(f,d,t='square',v=0.1){const c=ctx();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+d);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+d)}
+function sndStart(){tone(523,0.08,'square',0.12);setTimeout(()=>tone(784,0.12,'square',0.12),80)}
+function sndCorrect(){tone(880,0.08,'sine',0.13);setTimeout(()=>tone(1318,0.15,'sine',0.13),80)}
+function sndCapture(){const ns=[523,659,784,1046,1318,1568];ns.forEach((n,i)=>setTimeout(()=>tone(n,0.1,'square',0.13),i*70))}
+function sndWrong(){tone(220,0.15,'square',0.12);setTimeout(()=>tone(110,0.2,'square',0.12),120)}
+function sndVictory(){const ns=[523,659,784,1046,1318,1568,1318,1046,1318,1568,1900];ns.forEach((n,i)=>setTimeout(()=>tone(n,0.16,'square',0.13),i*120))}
+function sndRankUp(){const ns=[392,523,659,784,1046,1318,1568];ns.forEach((n,i)=>setTimeout(()=>tone(n,0.1,'triangle',0.13),i*90))}
+
+/* ===== Firebase ===== */
+const FB_URL='https://classtools1019-default-rtdb.firebaseio.com';
+const FB_PATH='8a-quest-records';
+
+/* ===== 5 個英雄 ===== */
+const HEROES=[
+  {id:'fire',emoji:'🔥',name:'火焰戰士'},
+  {id:'diamond',emoji:'💎',name:'鑽石守護'},
+  {id:'thunder',emoji:'⚡',name:'閃電刺客'},
+  {id:'sakura',emoji:'🌸',name:'櫻花戰姬'},
+  {id:'crown',emoji:'👑',name:'王者領主'}
+];
+
+/* ===== 5 個城堡 ===== */
+const CASTLES_R1=[
+  {ic:'🏰',nm:'短劍城'},
+  {ic:'🛡️',nm:'盾牌堡'},
+  {ic:'🏯',nm:'公主之塔'},
+  {ic:'⛩️',nm:'智慧之井'},
+  {ic:'👑',nm:'王者宮殿'}
+];
+const CASTLES_R2=[
+  {ic:'🗼',nm:'外角崗哨'},
+  {ic:'⚖️',nm:'角度法庭'},
+  {ic:'🏛️',nm:'複合圖塔'},
+  {ic:'🎯',nm:'等腰延伸場'},
+  {ic:'🏆',nm:'征服皇宮'}
+];
+
+/* ===== 題庫 ===== */
+const ROUND1=[
+{
+  banner:'🏰 短劍城',
+  title:'三邊長度 3、4、7，可以組成三角形嗎？',
+  hint:'最短兩邊和 > 最長邊才行（不能等於！）',
+  fig:`<svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
+    <line x1="20" y1="40" x2="80" y2="40" stroke="#FF1B6B" stroke-width="6" stroke-linecap="round"/>
+    <line x1="100" y1="40" x2="180" y2="40" stroke="#00F0FF" stroke-width="6" stroke-linecap="round"/>
+    <line x1="20" y1="80" x2="160" y2="80" stroke="#B100E8" stroke-width="6" stroke-linecap="round"/>
+    <text x="50" y="32" fill="#FF1B6B" font-size="14" font-weight="900" text-anchor="middle">3</text>
+    <text x="140" y="32" fill="#00F0FF" font-size="14" font-weight="900" text-anchor="middle">4</text>
+    <text x="90" y="100" fill="#B100E8" font-size="16" font-weight="900" text-anchor="middle">7（最長）</text>
+    <text x="200" y="50" fill="#FFD700" font-size="12" font-weight="700">3+4 = 7</text>
+    <text x="200" y="68" fill="#FFD700" font-size="12" font-weight="700">剛好等於</text>
+  </svg>`,
+  options:[
+    {text:'能組成'},
+    {text:'不能組成',correct:true},
+    {text:'不一定'}
+  ]
+},
+{
+  banner:'🛡️ 盾牌堡',
+  title:'三邊長度 5、6、8，可以組成三角形嗎？',
+  hint:'最短兩邊和 = 5+6 = 11，跟最長邊 8 比看看',
+  fig:`<svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg">
+    <line x1="20" y1="40" x2="120" y2="40" stroke="#FF1B6B" stroke-width="6" stroke-linecap="round"/>
+    <line x1="140" y1="40" x2="260" y2="40" stroke="#00F0FF" stroke-width="6" stroke-linecap="round"/>
+    <line x1="20" y1="80" x2="180" y2="80" stroke="#B100E8" stroke-width="6" stroke-linecap="round"/>
+    <text x="70" y="32" fill="#FF1B6B" font-size="14" font-weight="900" text-anchor="middle">5</text>
+    <text x="200" y="32" fill="#00F0FF" font-size="14" font-weight="900" text-anchor="middle">6</text>
+    <text x="100" y="100" fill="#B100E8" font-size="16" font-weight="900" text-anchor="middle">8（最長）</text>
+    <text x="200" y="98" fill="#FFD700" font-size="12" font-weight="700">5+6 = 11 &gt; 8 ✓</text>
+  </svg>`,
+  options:[
+    {text:'能組成',correct:true},
+    {text:'不能組成'},
+    {text:'不一定'}
+  ]
+},
+{
+  banner:'🏯 公主之塔',
+  title:'兩邊 = 4 和 9，第三邊 x 的範圍是？',
+  hint:'公式：兩邊「差」< x < 兩邊「和」。9−4=5，9+4=13',
+  fig:`<svg viewBox="0 0 280 140" xmlns="http://www.w3.org/2000/svg">
+    <line x1="20" y1="60" x2="100" y2="60" stroke="#FF1B6B" stroke-width="6" stroke-linecap="round"/>
+    <line x1="120" y1="60" x2="260" y2="60" stroke="#00F0FF" stroke-width="6" stroke-linecap="round"/>
+    <text x="60" y="50" fill="#FF1B6B" font-size="14" font-weight="900" text-anchor="middle">4</text>
+    <text x="190" y="50" fill="#00F0FF" font-size="14" font-weight="900" text-anchor="middle">9</text>
+    <text x="140" y="100" fill="#FFD700" font-size="18" font-weight="900" text-anchor="middle">? &lt; x &lt; ?</text>
+    <text x="140" y="120" fill="#aab" font-size="11" font-weight="700" text-anchor="middle">（第三邊 x）</text>
+  </svg>`,
+  options:[
+    {text:'4 < x < 9'},
+    {text:'5 < x < 13',correct:true},
+    {text:'9 < x < 13'}
+  ]
+},
+{
+  banner:'⛩️ 智慧之井',
+  title:'兩邊 = 3 和 10。第三邊是「整數」，可以是幾個？',
+  hint:'範圍：10-3 < x < 10+3，即 7 < x < 13。算範圍內整數有幾個',
+  fig:`<svg viewBox="0 0 280 140" xmlns="http://www.w3.org/2000/svg">
+    <line x1="20" y1="60" x2="260" y2="60" stroke="#aab" stroke-width="2"/>
+    <g fill="#FFD700" font-size="13" font-weight="900" text-anchor="middle">
+      <text x="40" y="80">7</text>
+      <text x="76" y="80">8</text>
+      <text x="112" y="80">9</text>
+      <text x="148" y="80">10</text>
+      <text x="184" y="80">11</text>
+      <text x="220" y="80">12</text>
+      <text x="256" y="80">13</text>
+    </g>
+    <circle cx="40" cy="60" r="6" fill="rgba(255,255,255,0.2)" stroke="#aab" stroke-width="2"/>
+    <circle cx="76" cy="60" r="6" fill="#00FF88"/>
+    <circle cx="112" cy="60" r="6" fill="#00FF88"/>
+    <circle cx="148" cy="60" r="6" fill="#00FF88"/>
+    <circle cx="184" cy="60" r="6" fill="#00FF88"/>
+    <circle cx="220" cy="60" r="6" fill="#00FF88"/>
+    <circle cx="256" cy="60" r="6" fill="rgba(255,255,255,0.2)" stroke="#aab" stroke-width="2"/>
+    <text x="140" y="115" fill="#00FF88" font-size="14" font-weight="900" text-anchor="middle">綠色 = 可以的整數</text>
+  </svg>`,
+  options:[
+    {text:'3 個'},
+    {text:'5 個',correct:true},
+    {text:'7 個'}
+  ]
+},
+{
+  banner:'👑 王者宮殿',
+  title:'下面哪一組，可以組成三角形？',
+  hint:'判別法：最短兩邊「和」必須大於最長邊',
+  fig:`<svg viewBox="0 0 280 140" xmlns="http://www.w3.org/2000/svg">
+    <text x="20" y="30" fill="#FF1B6B" font-size="14" font-weight="900">A. 1、1、3</text>
+    <text x="160" y="30" fill="#aab" font-size="11">→ 1+1 = 2 &lt; 3 ✗</text>
+    <text x="20" y="65" fill="#00F0FF" font-size="14" font-weight="900">B. 2、5、10</text>
+    <text x="160" y="65" fill="#aab" font-size="11">→ 2+5 = 7 &lt; 10 ✗</text>
+    <text x="20" y="100" fill="#B100E8" font-size="14" font-weight="900">C. 5、5、5</text>
+    <text x="160" y="100" fill="#00FF88" font-size="11">→ 5+5 = 10 &gt; 5 ✓</text>
+  </svg>`,
+  options:[
+    {text:'A · 1、1、3'},
+    {text:'B · 2、5、10'},
+    {text:'C · 5、5、5',correct:true}
+  ]
+}
+];
+
+const ROUND2=[
+{
+  banner:'🗼 外角崗哨',
+  title:'三角形的「外角」等於不相鄰兩個內角的…？',
+  hint:'外角定理 — 把另外兩個沒挨著的內角加起來',
+  fig:`<svg viewBox="0 0 280 180" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="140,30 60,150 200,150" class="tri-cyan"/>
+    <line x1="200" y1="150" x2="270" y2="150" stroke="#fff" stroke-width="2"/>
+    <path d="M 210 142 A 16 16 0 0 0 206 130" fill="none" stroke="#FF1B6B" stroke-width="3"/>
+    <text x="140" y="22" fill="#fff" font-size="18" font-weight="900" text-anchor="middle">A</text>
+    <text x="50" y="166" fill="#fff" font-size="18" font-weight="900">B</text>
+    <text x="206" y="166" fill="#fff" font-size="18" font-weight="900">C</text>
+    <text x="218" y="138" fill="#FF1B6B" font-size="14" font-weight="900">∠1</text>
+    <text x="130" y="60" fill="#FFD700" font-size="13" font-weight="900">∠A</text>
+    <text x="80" y="142" fill="#FFD700" font-size="13" font-weight="900">∠B</text>
+    <text x="50" y="40" fill="#00F0FF" font-size="13" font-weight="700">∠1 = ∠A + ∠B</text>
+  </svg>`,
+  options:[
+    {text:'和',correct:true},
+    {text:'差'},
+    {text:'乘積'}
+  ]
+},
+{
+  banner:'⚖️ 角度法庭',
+  title:'三角形的「外角」，跟「任一內對角」誰比較大？',
+  hint:'∠1 = ∠A + ∠B，∠B 是正數，所以 ∠1 > ∠A',
+  fig:`<svg viewBox="0 0 280 180" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="140,30 60,150 200,150" class="tri-pink"/>
+    <line x1="200" y1="150" x2="270" y2="150" stroke="#fff" stroke-width="2"/>
+    <path d="M 210 142 A 16 16 0 0 0 206 130" fill="none" stroke="#FFD700" stroke-width="4"/>
+    <text x="140" y="22" fill="#fff" font-size="18" font-weight="900" text-anchor="middle">A</text>
+    <text x="50" y="166" fill="#fff" font-size="18" font-weight="900">B</text>
+    <text x="206" y="166" fill="#fff" font-size="18" font-weight="900">C</text>
+    <text x="218" y="138" fill="#FFD700" font-size="14" font-weight="900">∠1</text>
+    <text x="130" y="60" fill="#00F0FF" font-size="13" font-weight="900">∠A</text>
+    <text x="80" y="142" fill="#00F0FF" font-size="13" font-weight="900">∠B</text>
+    <text x="20" y="40" fill="#FFD700" font-size="12" font-weight="700">∠1 vs ∠A、∠B</text>
+  </svg>`,
+  options:[
+    {text:'外角比較大',correct:true},
+    {text:'內對角比較大'},
+    {text:'一樣大'}
+  ]
+},
+{
+  banner:'🏛️ 複合圖塔',
+  title:'已知 ∠A = 30°、∠B = 40°。∠1 是 C 的外角。∠1 = ?',
+  hint:'外角定理：∠1 = ∠A + ∠B = 30° + 40°',
+  fig:`<svg viewBox="0 0 280 180" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="140,30 60,150 200,150" class="tri-purple"/>
+    <line x1="200" y1="150" x2="270" y2="150" stroke="#fff" stroke-width="2"/>
+    <path d="M 210 142 A 16 16 0 0 0 206 130" fill="none" stroke="#FF1B6B" stroke-width="3"/>
+    <text x="140" y="22" fill="#fff" font-size="18" font-weight="900" text-anchor="middle">A</text>
+    <text x="50" y="166" fill="#fff" font-size="18" font-weight="900">B</text>
+    <text x="206" y="166" fill="#fff" font-size="18" font-weight="900">C</text>
+    <text x="130" y="60" fill="#FFD700" font-size="14" font-weight="900">30°</text>
+    <text x="80" y="142" fill="#FFD700" font-size="14" font-weight="900">40°</text>
+    <text x="220" y="135" fill="#FF1B6B" font-size="16" font-weight="900">?°</text>
+  </svg>`,
+  options:[
+    {text:'60°'},
+    {text:'70°',correct:true},
+    {text:'110°'}
+  ]
+},
+{
+  banner:'🎯 等腰延伸場',
+  title:'等腰 △ABC，AB = AC，∠B = 70°。D 在 BC 的延長線上，∠ACD = ?',
+  hint:'AB=AC → ∠B = ∠ACB = 70°。∠ACD 是 ∠ACB 的補角：180°−70°',
+  fig:`<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="140,30 60,150 220,150" class="tri-cyan"/>
+    <line x1="220" y1="150" x2="290" y2="150" stroke="#fff" stroke-width="2"/>
+    <line x1="92" y1="98" x2="103" y2="108" stroke="#FFD700" stroke-width="3"/>
+    <line x1="178" y1="108" x2="189" y2="98" stroke="#FFD700" stroke-width="3"/>
+    <path d="M 230 142 A 16 16 0 0 0 226 128" fill="none" stroke="#FF1B6B" stroke-width="3"/>
+    <text x="140" y="22" fill="#fff" font-size="18" font-weight="900" text-anchor="middle">A</text>
+    <text x="50" y="166" fill="#fff" font-size="18" font-weight="900">B</text>
+    <text x="222" y="166" fill="#fff" font-size="18" font-weight="900">C</text>
+    <text x="294" y="166" fill="#fff" font-size="14" font-weight="900">D</text>
+    <text x="78" y="142" fill="#00F0FF" font-size="13" font-weight="900">70°</text>
+    <text x="240" y="135" fill="#FF1B6B" font-size="14" font-weight="900">?°</text>
+  </svg>`,
+  options:[
+    {text:'70°'},
+    {text:'110°',correct:true},
+    {text:'140°'}
+  ]
+},
+{
+  banner:'🏆 征服皇宮',
+  title:'從 A 到 D，走「A→B→D」跟「A→D」（直線）哪條近？',
+  hint:'兩點間「直線」最短！繞路一定比直線長',
+  fig:`<svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="40" cy="120" r="8" fill="#00F0FF"/>
+    <circle cx="240" cy="120" r="8" fill="#FFD700"/>
+    <circle cx="140" cy="40" r="6" fill="#FF1B6B"/>
+    <path d="M 40 120 L 140 40 L 240 120" stroke="#FF1B6B" stroke-width="3" fill="none" stroke-dasharray="6 4"/>
+    <line x1="40" y1="120" x2="240" y2="120" stroke="#00FF88" stroke-width="3"/>
+    <text x="26" y="142" fill="#00F0FF" font-size="15" font-weight="900">A</text>
+    <text x="244" y="142" fill="#FFD700" font-size="15" font-weight="900">D</text>
+    <text x="148" y="32" fill="#FF1B6B" font-size="14" font-weight="900">B</text>
+    <text x="55" y="74" fill="#FF1B6B" font-size="11" font-weight="700">繞 B（虛線）</text>
+    <text x="100" y="140" fill="#00FF88" font-size="11" font-weight="700">直線（綠線）</text>
+  </svg>`,
+  options:[
+    {text:'A→D 直線',correct:true},
+    {text:'A→B→D 繞路'},
+    {text:'一樣近'}
+  ]
+}
+];
+
+/* ===== 段位 ===== */
+function getRank(totalCorrect){
+  if(totalCorrect===10)return{medal:'👑',name:'三角王者',desc:'10 城全攻佔！稱霸三角王國！',cls:'r-king'};
+  if(totalCorrect>=8)return{medal:'💎',name:'白金菁英',desc:'快要稱王了！',cls:'r-platinum'};
+  if(totalCorrect>=6)return{medal:'🥇',name:'金牌勇者',desc:'戰績不凡！',cls:'r-gold'};
+  if(totalCorrect>=4)return{medal:'🥈',name:'銀牌戰士',desc:'繼續努力！',cls:'r-silver'};
+  return{medal:'🥉',name:'銅牌新兵',desc:'你做到最後一題了！',cls:'r-bronze'};
+}
+
+/* ===== 狀態 ===== */
+const state={
+  studentName:'',
+  hero:null,
+  round:1,
+  currentQ:0,
+  correct:0,
+  attempts:0,
+  startTime:null,
+  cleared:{r1:false,r2:false},
+  r1Correct:0,
+  r2Correct:0,
+  picked:[]
+};
+const app=document.getElementById('app');
+
+/* ===== 首頁 ===== */
+function renderCover(){
+  const heroesHtml=HEROES.map(h=>`
+    <div class="hero ${state.hero===h.id?'selected':''}" onclick="pickHero('${h.id}')">
+      <span class="emoji">${h.emoji}</span>
+      <div class="name">${h.name}</div>
+    </div>
+  `).join('');
+  app.innerHTML=`
+    <div class="cover">
+      <span class="game-icon">⚔️</span>
+      <h1>三角王國攻略戰</h1>
+      <div class="sub">8A 數學 3-5 · 邊角戰場</div>
+      <div class="tag">⚔ 10 城堡 · 5 英雄 · 段位戰 ⚔</div>
+
+      <div class="name-input">
+        <label>👤 戰士代號</label>
+        <input id="coverNameInput" type="text" placeholder="輸入名字" autocomplete="off" maxlength="15" value="${state.studentName}">
+        <div class="name-hint" id="nameHint">⚠️ 老師才知道誰玩的</div>
+      </div>
+
+      <div class="hero-select">
+        <div class="title">⚔ 選擇你的英雄 ⚔</div>
+        <div class="heroes">${heroesHtml}</div>
+      </div>
+
+      <button class="start-btn" onclick="enterRoundMenu()">進入戰場 ▶</button>
+    </div>
+  `;
+  setTimeout(()=>{const inp=document.getElementById('coverNameInput');if(inp&&!state.studentName)inp.focus()},200);
+}
+
+function pickHero(id){
+  state.hero=id;
+  sndStart();
+  renderCover();
+}
+
+function enterRoundMenu(){
+  const inp=document.getElementById('coverNameInput');
+  const name=(inp?inp.value:state.studentName).trim();
+  if(!name){
+    document.getElementById('nameHint').classList.add('show');
+    if(inp){inp.style.borderColor='#FF1B6B';inp.focus()}
+    return;
+  }
+  if(!state.hero){
+    alert('請選一個英雄！');
+    return;
+  }
+  state.studentName=name;
+  sndStart();
+  renderRoundMenu();
+}
+
+/* ===== 戰役選單 ===== */
+function renderRoundMenu(){
+  const hero=HEROES.find(h=>h.id===state.hero);
+  const r1Locked=false;
+  const r2Locked=!state.cleared.r1;
+  app.innerHTML=`
+    <div class="round-menu">
+      <h2>選擇戰役</h2>
+      <div class="player-info">
+        <span class="emoji">${hero.emoji}</span>
+        <span class="name">${hero.name} · ${state.studentName}</span>
+      </div>
+
+      <div class="round-cards">
+        <div class="round-card r1 ${state.cleared.r1?'cleared':''}" onclick="startRound(1)">
+          <div class="badge">ROUND 1</div>
+          <span class="icon">🏰</span>
+          <div class="name">三邊王國</div>
+          <div class="desc">5 個城堡 · 三邊長關係</div>
+          <div class="status">${state.cleared.r1?`✅ 已通關（${state.r1Correct}/5）`:'⚔️ 等待你來攻略'}</div>
+        </div>
+        <div class="round-card r2 ${r2Locked?'locked':''} ${state.cleared.r2?'cleared':''}" onclick="${r2Locked?'showLockedMsg()':'startRound(2)'}">
+          <div class="badge">ROUND 2</div>
+          <span class="icon">🗼</span>
+          <div class="name">外角王國</div>
+          <div class="desc">5 個城堡 · 外角應用</div>
+          <div class="status">${r2Locked?'🔒 完成 Round 1 解鎖':state.cleared.r2?`✅ 已通關（${state.r2Correct}/5）`:'⚔️ 等待你來攻略'}</div>
+        </div>
+      </div>
+
+      ${state.cleared.r1&&state.cleared.r2?`
+        <button class="start-btn" style="margin-top:18px;font-size:1.1rem;letter-spacing:2px;padding:14px 28px;" onclick="renderVictory()">📜 看通關證</button>
+      `:''}
+      <button class="start-btn" style="margin-top:14px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.2);font-size:.95rem;padding:10px 24px;letter-spacing:1px;box-shadow:none;" onclick="renderCover()">← 換英雄</button>
+    </div>
+  `;
+}
+
+function showLockedMsg(){
+  alert('🔒 先完成 Round 1 才能解鎖 Round 2 喔！');
+}
+
+function startRound(r){
+  state.round=r;
+  state.currentQ=0;
+  state.correct=0;
+  state.attempts=0;
+  state.startTime=Date.now();
+  state.picked=[];
+  sndStart();
+  renderBattle();
+}
+
+/* ===== 戰役畫面 ===== */
+function renderBattle(){
+  const questions=state.round===1?ROUND1:ROUND2;
+  const castles=state.round===1?CASTLES_R1:CASTLES_R2;
+  const q=questions[state.currentQ];
+  const hero=HEROES.find(h=>h.id===state.hero);
+
+  const castlesHtml=castles.map((c,i)=>{
+    let cls='';
+    if(i<state.currentQ){
+      // 之前的城堡：看 picked 是對是錯
+      const pickedRec=state.picked[i];
+      if(pickedRec&&pickedRec.correct)cls='captured';
+      else cls='failed';
+    }else if(i===state.currentQ){
+      cls='active';
+    }
+    return `<div class="castle ${cls}">
+      <span class="ic">${c.ic}</span>
+      <div class="nm">${c.nm}</div>
+    </div>`;
+  }).join('');
+
+  const optsHtml=q.options.map((opt,i)=>`
+    <button class="option" onclick="pick(${i})">
+      <div class="letter">${String.fromCharCode(65+i)}</div>
+      <div style="flex:1">${opt.text}</div>
+    </button>
+  `).join('');
+
+  app.innerHTML=`
+    <div class="battle-hud">
+      <div class="left">
+        <span class="hero-emoji">${hero.emoji}</span>
+        <div>
+          <div class="stage">ROUND ${state.round} · 第 ${state.currentQ+1} 城 / 5</div>
+        </div>
+      </div>
+      <div class="stats">
+        <span class="kills">🚩 ${state.correct}</span>
+      </div>
+    </div>
+
+    <div class="map-board">
+      <div class="map-title">⚔ 戰場地圖 ⚔</div>
+      <div class="castles">${castlesHtml}</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-banner">${q.banner}</span>
+      <div class="q-title">${q.title}</div>
+      <div class="q-figure">${q.fig}</div>
+      <div class="q-hint">${q.hint}</div>
+      <div class="options">${optsHtml}</div>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">${state.currentQ===4?'⚔ 結算戰績 ⚔':'下一城 →'}</button>
+    </div>
+  `;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function pick(idx){
+  const questions=state.round===1?ROUND1:ROUND2;
+  const castles=state.round===1?CASTLES_R1:CASTLES_R2;
+  const q=questions[state.currentQ];
+  const opts=document.querySelectorAll('.option');
+  if(opts[0].classList.contains('correct')||opts[0].classList.contains('wrong'))return;
+  state.attempts++;
+  const ok=q.options[idx].correct;
+  state.picked.push({q:state.currentQ+1,picked:idx,correct:ok});
+  if(ok){
+    opts[idx].classList.add('correct');
+    state.correct++;
+    sndCorrect();
+    setTimeout(()=>{
+      sndCapture();
+      showCaptureOverlay(castles[state.currentQ]);
+    },300);
+    document.querySelectorAll('.option').forEach(o=>o.style.pointerEvents='none');
+    setTimeout(()=>{
+      document.getElementById('nextBtn').classList.add('show');
+    },1400);
+  }else{
+    opts[idx].classList.add('wrong');
+    sndWrong();
+    // 答錯也算過了這一城（不能無限重試）
+    document.querySelectorAll('.option').forEach(o=>o.style.pointerEvents='none');
+    // 找出正解標出來
+    q.options.forEach((o,i)=>{
+      if(o.correct)opts[i].classList.add('correct');
+    });
+    setTimeout(()=>{
+      document.getElementById('nextBtn').classList.add('show');
+    },1600);
+  }
+}
+
+function showCaptureOverlay(c){
+  document.getElementById('captureBig').textContent=c.ic;
+  document.getElementById('captureName').textContent=`✨ ${c.nm} ✨`;
+  const ov=document.getElementById('captureOverlay');
+  ov.classList.add('show');
+  setTimeout(()=>ov.classList.remove('show'),1200);
+}
+
+function nextQ(){
+  state.currentQ++;
+  if(state.currentQ>=5){
+    finishRound();
+  }else{
+    sndStart();
+    renderBattle();
+  }
+}
+
+function finishRound(){
+  // 更新狀態
+  if(state.round===1){
+    state.cleared.r1=true;
+    state.r1Correct=state.correct;
+  }else{
+    state.cleared.r2=true;
+    state.r2Correct=state.correct;
+  }
+  // 上傳 Firebase
+  uploadRoundResult();
+  // 顯示結算
+  renderRoundResult();
+}
+
+function renderRoundResult(){
+  const elapsed=Math.floor((Date.now()-state.startTime)/1000);
+  const min=Math.floor(elapsed/60);
+  const sec=elapsed%60;
+  const timeStr=`${min}:${String(sec).padStart(2,'0')}`;
+  const hero=HEROES.find(h=>h.id===state.hero);
+  const allKings=state.correct===5;
+
+  app.innerHTML=`
+    <div class="victory">
+      <span class="rank-medal">${allKings?'🏆':'⚔️'}</span>
+      <h1>Round ${state.round} 結算！</h1>
+      <div style="color:#ccd;font-size:1rem;margin-bottom:8px;">${hero.emoji} ${state.studentName}</div>
+      <div class="rank-name" style="font-size:1.4rem;">${allKings?'⚔️ 五城全攻佔！':'戰役完成'}</div>
+      <div class="rank-desc">${allKings?'你拿下了整個王國！':'部分城堡已成功攻略，繼續加油 ⚔'}</div>
+
+      <div class="stats">
+        <div class="stat"><div class="num">${state.correct}/5</div><div class="lab">🚩 攻佔城堡</div></div>
+        <div class="stat"><div class="num">${timeStr}</div><div class="lab">⏱ 戰役時間</div></div>
+      </div>
+
+      <div class="upload-status" id="uploadStatus">⏳ 上傳戰績到指揮中心...</div>
+
+      <div class="btn-row">
+        ${state.round===1&&!state.cleared.r2?`<button class="primary" onclick="renderRoundMenu()">⚔ 前進 Round 2</button>`:''}
+        ${state.round===2?`<button class="primary" onclick="renderVictory()">📜 查看通關證</button>`:''}
+        <button onclick="renderRoundMenu()">📋 戰役選單</button>
+      </div>
+    </div>
+  `;
+  sndVictory();
+  if(state.correct===5)bigFireworks();
+}
+
+function renderVictory(){
+  const totalCorrect=state.r1Correct+state.r2Correct;
+  const rank=getRank(totalCorrect);
+  const hero=HEROES.find(h=>h.id===state.hero);
+
+  // 上傳總結算（最終段位）
+  uploadFinalResult(totalCorrect,rank);
+
+  app.innerHTML=`
+    <div class="victory">
+      <span class="rank-medal">${rank.medal}</span>
+      <h1>戰役全部完成！</h1>
+      <div style="color:#ccd;font-size:1rem;margin-bottom:6px;">${hero.emoji} ${state.studentName}</div>
+      <div class="rank-name">${rank.name}</div>
+      <div class="rank-desc">${rank.desc}</div>
+
+      <div class="stats">
+        <div class="stat"><div class="num">${totalCorrect}/10</div><div class="lab">🚩 總攻佔</div></div>
+        <div class="stat"><div class="num">${state.r1Correct}/5</div><div class="lab">Round 1</div></div>
+        <div class="stat"><div class="num">${state.r2Correct}/5</div><div class="lab">Round 2</div></div>
+      </div>
+
+      <div style="background:rgba(177,0,232,.1);border:2px solid var(--neon-purple);border-radius:14px;padding:14px 16px;margin:14px 0;color:#E5D4FF;font-size:.95rem;line-height:1.65;">
+        你今天走進戰場、攻略 10 座城堡，<br>不管攻佔幾座，這份「願意挑戰」就值得記下 ⚔<br>
+        老師會在後台看到你的戰績，明天我們一起再過一次 💗
+      </div>
+
+      <div class="upload-status" id="uploadStatus">⏳ 上傳總戰績...</div>
+
+      <button class="start-btn" style="margin-top:12px;font-size:1rem;padding:12px 28px;letter-spacing:1px;" onclick="resetAll()">🔄 換英雄重玩</button>
+    </div>
+  `;
+  sndRankUp();
+  bigFireworks();
+}
+
+function resetAll(){
+  state.hero=null;
+  state.round=1;
+  state.currentQ=0;
+  state.correct=0;
+  state.attempts=0;
+  state.cleared={r1:false,r2:false};
+  state.r1Correct=0;
+  state.r2Correct=0;
+  state.picked=[];
+  renderCover();
+}
+
+/* ===== Firebase ===== */
+function uploadRoundResult(){
+  const hero=HEROES.find(h=>h.id===state.hero);
+  const record={
+    name:state.studentName,
+    correct:state.correct,
+    total:5,
+    rank:`⚔️ ${hero.name} · Round ${state.round}（${state.correct}/5）`,
+    time:'',
+    coins:state.correct*20,
+    combo:0,
+    quest:'3-5-conquest',
+    round:state.round,
+    picked:state.picked,
+    hero:state.hero,
+    ts:Date.now()
+  };
+  fetch(`${FB_URL}/${FB_PATH}.json`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(record)
+  }).then(res=>{
+    const tag=document.getElementById('uploadStatus');
+    if(!tag)return;
+    if(res.ok){tag.innerHTML='✅ 戰績已送達指揮中心！'}
+    else{tag.innerHTML='⚠️ 上傳失敗，告訴老師你的成績';tag.classList.add('warn')}
+  }).catch(()=>{
+    const tag=document.getElementById('uploadStatus');
+    if(tag){tag.innerHTML='⚠️ 上傳失敗，告訴老師你的成績';tag.classList.add('warn')}
+  });
+}
+
+function uploadFinalResult(totalCorrect,rank){
+  const hero=HEROES.find(h=>h.id===state.hero);
+  const record={
+    name:state.studentName,
+    correct:totalCorrect,
+    total:10,
+    rank:`${rank.medal} ${rank.name}（${totalCorrect}/10）`,
+    time:'',
+    coins:totalCorrect*30,
+    combo:0,
+    quest:'3-5-conquest-final',
+    r1:state.r1Correct,
+    r2:state.r2Correct,
+    hero:state.hero,
+    ts:Date.now()
+  };
+  fetch(`${FB_URL}/${FB_PATH}.json`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(record)
+  }).then(res=>{
+    const tag=document.getElementById('uploadStatus');
+    if(!tag)return;
+    if(res.ok){tag.innerHTML=`✅ ${rank.name} 段位已封存！`}
+    else{tag.innerHTML='⚠️ 上傳失敗';tag.classList.add('warn')}
+  });
+}
+
+/* ===== 煙火 ===== */
+const fwc=document.getElementById('fireworks');
+const fwx=fwc.getContext('2d');
+let fwp=[];
+function rsz(){fwc.width=innerWidth;fwc.height=innerHeight}
+rsz();addEventListener('resize',rsz);
+function bigFireworks(){
+  fwc.style.display='block';
+  for(let i=0;i<6;i++)setTimeout(()=>burst(Math.random()*innerWidth,Math.random()*innerHeight*0.6+50),i*300);
+  fwLoop();
+  setTimeout(()=>{fwc.style.display='none';fwp=[]},5000);
+}
+function burst(x,y){
+  const cs=['#FF1B6B','#00F0FF','#B100E8','#FFD700','#00FF88'];
+  for(let i=0;i<40;i++){
+    const a=(i/40)*Math.PI*2;
+    fwp.push({x,y,vx:Math.cos(a)*(Math.random()*5+2),vy:Math.sin(a)*(Math.random()*5+2),life:75,c:cs[Math.floor(Math.random()*cs.length)]})
+  }
+}
+function fwLoop(){
+  fwx.fillStyle='rgba(0,0,0,0.15)';
+  fwx.fillRect(0,0,fwc.width,fwc.height);
+  fwp.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.1;p.life--;fwx.fillStyle=p.c;fwx.globalAlpha=p.life/75;fwx.fillRect(p.x,p.y,5,5)});
+  fwx.globalAlpha=1;
+  fwp=fwp.filter(p=>p.life>0);
+  if(fwp.length>0)requestAnimationFrame(fwLoop);
+  else if(fwc.style.display==='block')fwc.style.display='none';
+}
+
+renderCover();
+</script>
+</body>
+</html>
