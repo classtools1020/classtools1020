@@ -1,282 +1,598 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>樂學教室 — 互動學習總入口</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:#0a0e27;font-family:'Noto Sans TC',sans-serif;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,107,53,.1),transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.08),transparent 50%);pointer-events:none}
-.container{position:relative;z-index:1;width:100%;max-width:560px;padding:20px 16px;text-align:center}
-.hero{margin:24px 0 16px}
-.hero-icon{font-size:3.5em;animation:float 3s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.hero h1{font-size:1.8em;font-weight:900;background:linear-gradient(135deg,#FFD700,#FF6B35,#FF2D95);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:8px 0 4px}
-.hero p{color:rgba(255,255,255,.5);font-size:.85em}
-
-/* Section */
-.section{margin:20px 0 8px;text-align:left;}
-.section-title{display:flex;align-items:center;gap:8px;font-size:1.1em;font-weight:900;margin-bottom:12px;padding-left:4px;}
-.section-icon{font-size:1.3em;}
-.section-text{background:linear-gradient(90deg,#FFD700,#FF6B35);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.section-eng .section-text{background:linear-gradient(90deg,#4FC3F7,#00BCD4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.section-math .section-text{background:linear-gradient(90deg,#FF6B35,#FF2D95);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.section-teacher .section-text{background:linear-gradient(90deg,#8BC34A,#4CAF50);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-
-/* Cards */
-.cards{display:flex;flex-direction:column;gap:10px;}
-.card{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.1);border-radius:16px;padding:16px;text-decoration:none;color:#fff;transition:all .25s;position:relative;overflow:hidden;text-align:left;}
-.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.02));pointer-events:none}
-.card:active{transform:scale(.97)}
-.card:hover{border-color:rgba(255,215,0,.4);box-shadow:0 4px 20px rgba(255,107,53,.12)}
-.card-icon{font-size:2.2em;flex-shrink:0;width:52px;text-align:center;}
-.card-body{flex:1;min-width:0;}
-.card-title{font-size:1em;font-weight:900;line-height:1.3;}
-.card-desc{font-size:.78em;color:rgba(255,255,255,.5);margin-top:3px;line-height:1.5;}
-.card-tag{display:inline-block;border-radius:20px;padding:2px 10px;font-size:.65em;font-weight:700;margin-top:5px;}
-.card-arrow{color:rgba(255,255,255,.2);font-size:1.2em;flex-shrink:0;}
-
-/* Color themes */
-.c-blue .card-title{color:#4FC3F7}
-.c-blue:hover{border-color:rgba(79,195,247,.4);box-shadow:0 4px 20px rgba(79,195,247,.12)}
-.c-blue .card-tag{background:rgba(79,195,247,.12);border:1px solid rgba(79,195,247,.25);color:#4FC3F7}
-
-.c-gold .card-title{color:#ffc107}
-.c-gold:hover{border-color:rgba(255,193,7,.4);box-shadow:0 4px 20px rgba(255,193,7,.12)}
-.c-gold .card-tag{background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.25);color:#ffc107}
-
-.c-orange .card-title{color:#FF8A65}
-.c-orange:hover{border-color:rgba(255,107,53,.4);box-shadow:0 4px 20px rgba(255,107,53,.12)}
-.c-orange .card-tag{background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.25);color:#FF8F60}
-
-.c-purple .card-title{color:#CE93D8}
-.c-purple:hover{border-color:rgba(206,147,216,.4);box-shadow:0 4px 20px rgba(206,147,216,.12)}
-.c-purple .card-tag{background:rgba(206,147,216,.12);border:1px solid rgba(206,147,216,.25);color:#CE93D8}
-
-.c-pink .card-title{color:#F48FB1}
-.c-pink:hover{border-color:rgba(244,143,177,.4);box-shadow:0 4px 20px rgba(244,143,177,.12)}
-.c-pink .card-tag{background:rgba(244,143,177,.12);border:1px solid rgba(244,143,177,.25);color:#F48FB1}
-
-.c-green .card-title{color:#81C784}
-.c-green:hover{border-color:rgba(129,199,132,.4);box-shadow:0 4px 20px rgba(129,199,132,.12)}
-.c-green .card-tag{background:rgba(129,199,132,.12);border:1px solid rgba(129,199,132,.25);color:#81C784}
-
-.c-red .card-title{color:#ef5350}
-.c-red:hover{border-color:rgba(239,83,80,.4);box-shadow:0 4px 20px rgba(239,83,80,.12)}
-.c-red .card-tag{background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.25);color:#ef5350}
-
-/* NEW badge */
-.badge-new{display:inline-block;background:linear-gradient(135deg,#FF2D95,#FF6B35);color:#fff;
-  border-radius:4px;padding:1px 6px;font-size:.6em;font-weight:900;margin-left:6px;vertical-align:middle;
-  animation:pulse 2s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-
-/* HOT badge */
-.badge-hot{display:inline-block;background:linear-gradient(135deg,#FF6B35,#ffc107);color:#000;
-  border-radius:4px;padding:1px 6px;font-size:.6em;font-weight:900;margin-left:6px;vertical-align:middle;}
-
-.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);margin:8px 0;}
-
-.footer{margin:24px 0 16px;color:rgba(255,255,255,.2);font-size:.7em;line-height:1.6;}
-
-/* particles */
-.particle{position:fixed;pointer-events:none;opacity:.25;animation:drift linear infinite}
-@keyframes drift{0%{transform:translateY(100vh) rotate(0deg)}100%{transform:translateY(-20vh) rotate(360deg)}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>傳說戰場：幾何特訓</title>
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 FontAwesome 圖示庫 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 載入 React 與 Babel (讓瀏覽器能直接跑 React) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #020617; }
+    </style>
 </head>
 <body>
+    <div id="root"></div>
 
-<div class="container">
-  <div class="hero">
-    <div class="hero-icon">🏫</div>
-    <h1>樂學教室</h1>
-    <p>芎林國中 · 互動學習總入口</p>
-  </div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-  <!-- ═══ 九年級英文 ═══ -->
-  <div class="section section-eng">
-    <div class="section-title">
-      <span class="section-icon">🇺🇸</span>
-      <span class="section-text">九年級英文 — 會考特訓</span>
-    </div>
-  </div>
+        // --- 遊戲關卡腳本 ---
+        const STAGES = [
+          {
+            type: 'intro',
+            title: '歡迎來到幾何戰場',
+            dialog: (
+              <React.Fragment>
+                特戰隊員你好！<br/><br/>
+                今天我們要解鎖 <span className="text-cyan-400 font-black text-2xl sm:text-3xl">3 招</span> 觀察敵人位置的超能力。<br/>
+                學會這 3 招，你就能看破敵人的陣型！<br/><br/>
+                準備好開始特訓了嗎？
+              </React.Fragment>
+            ),
+            button: '開始特訓',
+            icon: <i className="fa-solid fa-crosshairs text-cyan-400 animate-pulse text-4xl sm:text-5xl"></i>
+          },
+          // --- 第一招：同位角 ---
+          {
+            type: 'tutorial',
+            title: '第一招：同位角 (影分身)',
+            dialog: (
+              <React.Fragment>
+                請看閃爍的 <strong>∠1</strong> 和 <strong>∠5</strong>。<br/><br/>
+                它們都在十字路口的 <span className="text-cyan-400 font-black text-2xl sm:text-3xl">「左上角」</span>。<br/>
+                位置一模一樣，這叫做「同位角」。<br/><br/>
+                👉 只要位置一樣，它們的數字就會 <span className="text-cyan-400 font-black text-2xl sm:text-3xl">「完全相同」</span>！
+              </React.Fragment>
+            ),
+            highlights: [1, 5],
+            knownValues: {1: '120°', 5: '120°'},
+            button: '我懂了！',
+            icon: <i className="fa-solid fa-bolt text-cyan-400 text-3xl sm:text-4xl"></i>,
+            color: 'cyan'
+          },
+          {
+            type: 'task_click',
+            title: '實戰：尋找影分身',
+            dialog: (
+              <React.Fragment>
+                換你試試看！<br/>
+                敵人在上面路口的 <span className="text-cyan-400 font-black text-2xl sm:text-3xl">「右下角」</span> (∠4)。<br/><br/>
+                👉 請點擊找出：下面路口的「右下角」在哪裡？
+              </React.Fragment>
+            ),
+            knownValues: {4: '60°'},
+            targetAngle: 8,
+            errorMsg: (
+              <React.Fragment>
+                <span className="text-red-400 font-bold">哎呀，點錯位置囉！</span><br/>
+                請找找看下面路口的「右下角」是哪一個圓圈？
+              </React.Fragment>
+            ),
+            successMsg: (
+              <React.Fragment>
+                <span className="text-green-400 font-black text-2xl sm:text-3xl">太棒了！精準鎖定！</span><br/>
+                ∠4 和 ∠8 都在右下角，它們是同位角(影分身)。
+              </React.Fragment>
+            ),
+            color: 'cyan'
+          },
+          {
+            type: 'task_choice',
+            title: '實戰：確認數字',
+            dialog: (
+              <React.Fragment>
+                既然 ∠4 和 ∠8 是同位角(影分身)。<br/><br/>
+                如果 ∠4 是 <strong>60度</strong>，那 ∠8 應該是幾度呢？<br/>
+                <span className="text-slate-400 text-base sm:text-lg">(提示：影分身的數字會「一模一樣」喔！)</span>
+              </React.Fragment>
+            ),
+            knownValues: {4: '60°'},
+            highlights: [4, 8],
+            choices: [60, 120, 180],
+            correctChoice: 60,
+            errorMsg: (
+              <React.Fragment>
+                <span className="text-red-400 font-bold">不對喔！</span><br/>
+                影分身的數字要跟 60 「一模一樣」才行！
+              </React.Fragment>
+            ),
+            successMsg: (
+              <React.Fragment>
+                <span className="text-green-400 font-black text-2xl sm:text-3xl">完全正確！</span><br/>
+                同位角的數字一樣大！
+              </React.Fragment>
+            ),
+            color: 'cyan'
+          },
+          // --- 第二招：內錯角 ---
+          {
+            type: 'tutorial',
+            title: '第二招：內錯角 (交叉走位)',
+            dialog: (
+              <React.Fragment>
+                請看閃爍的 <strong>∠3</strong> 和 <strong>∠6</strong>。<br/><br/>
+                它們躲在兩條兵線的 <span className="text-pink-400 font-black text-2xl sm:text-3xl">「裡面」</span>，而且 <span className="text-pink-400 font-black text-2xl sm:text-3xl">「左右交叉」</span>。<br/>
+                這叫做「內錯角」。<br/><br/>
+                👉 交叉走位的數字，也會 <span className="text-pink-400 font-black text-2xl sm:text-3xl">「完全相同」</span>！
+              </React.Fragment>
+            ),
+            highlights: [3, 6],
+            knownValues: {3: '110°', 6: '110°'},
+            button: '記住了！',
+            icon: <i className="fa-solid fa-bolt text-pink-400 text-3xl sm:text-4xl"></i>,
+            color: 'pink'
+          },
+          {
+            type: 'task_click',
+            title: '實戰：尋找交叉走位',
+            dialog: (
+              <React.Fragment>
+                敵方躲在「裡面」的 <span className="text-pink-400 font-black text-2xl sm:text-3xl">「右邊」</span> (∠4)。<br/><br/>
+                👉 請點擊找出：在「裡面」，而且交叉跑到「左邊」的是哪一個？
+              </React.Fragment>
+            ),
+            knownValues: {4: '70°'},
+            targetAngle: 5,
+            errorMsg: (
+              <React.Fragment>
+                <span className="text-red-400 font-bold">走錯位置囉！</span><br/>
+                要找躲在「裡面」，而且跑到「左邊」的那一個圓圈！
+              </React.Fragment>
+            ),
+            successMsg: (
+              <React.Fragment>
+                <span className="text-green-400 font-black text-2xl sm:text-3xl">漂亮！抓到了！</span><br/>
+                ∠4 和 ∠5 是內錯角。
+              </React.Fragment>
+            ),
+            color: 'pink'
+          },
+          {
+            type: 'task_choice',
+            title: '實戰：確認數字',
+            dialog: (
+              <React.Fragment>
+                既然 ∠4 和 ∠5 是交叉走位(內錯角)。<br/><br/>
+                如果 ∠4 是 <strong>70度</strong>，那 ∠5 應該是幾度呢？<br/>
+                <span className="text-slate-400 text-base sm:text-lg">(提示：交叉走位的數字也會「一模一樣」！)</span>
+              </React.Fragment>
+            ),
+            knownValues: {4: '70°'},
+            highlights: [4, 5],
+            choices: [70, 110, 180],
+            correctChoice: 70,
+            errorMsg: (
+              <React.Fragment>
+                <span className="text-red-400 font-bold">想想看！</span><br/>
+                內錯角的數字，戰鬥力「一樣大」喔！
+              </React.Fragment>
+            ),
+            successMsg: (
+              <React.Fragment>
+                <span className="text-green-400 font-black text-2xl sm:text-3xl">沒錯！</span><br/>
+                內錯角數字一樣大！
+              </React.Fragment>
+            ),
+            color: 'pink'
+          },
+          // --- 第三招：同側內角 ---
+          {
+            type: 'tutorial',
+            title: '第三招：同側內角 (好隊友)',
+            dialog: (
+              <React.Fragment>
+                最後一招！看 <strong>∠3</strong> 和 <strong>∠5</strong>。<br/><br/>
+                它們都在兵線的「裡面」，而且在 <span className="text-yellow-400 font-black text-2xl sm:text-3xl">「同一邊」</span>。<br/>
+                它們是好隊友，叫做「同側內角」。<br/><br/>
+                👉 好隊友合作，數字加起來 <span className="text-yellow-400 font-black text-2xl sm:text-3xl">「剛好 180 度」</span>！
+              </React.Fragment>
+            ),
+            highlights: [3, 5],
+            knownValues: {3: '110°', 5: '70°'},
+            button: '準備實戰！',
+            icon: <i className="fa-solid fa-shield-halved text-yellow-400 text-3xl sm:text-4xl"></i>,
+            color: 'yellow'
+          },
+          {
+            type: 'task_click',
+            title: '實戰：尋找好隊友',
+            dialog: (
+              <React.Fragment>
+                隊友在「裡面」的 <span className="text-yellow-400 font-black text-2xl sm:text-3xl">「右邊」</span> (∠4)。<br/><br/>
+                👉 請點擊找出：跟他同樣在「右邊」，一起防守的好隊友是誰？
+              </React.Fragment>
+            ),
+            knownValues: {4: '70°'},
+            targetAngle: 6,
+            errorMsg: (
+              <React.Fragment>
+                <span className="text-red-400 font-bold">找錯隊友囉！</span><br/>
+                同側內角要在「裡面」，而且跟他在「同一邊 (右邊)」喔！
+              </React.Fragment>
+            ),
+            successMsg: (
+              <React.Fragment>
+                <span className="text-green-400 font-black text-2xl sm:text-3xl">找到了！集結完畢！</span><br/>
+                ∠4 和 ∠6 是好隊友。
+              </React.Fragment>
+            ),
+            color: 'yellow'
+          },
+          {
+            type: 'task_choice',
+            title: '實戰：啟動防護罩',
+            dialog: (
+              <React.Fragment>
+                ∠4 是 <strong>70度</strong>。<br/><br/>
+                隊友 ∠6 需要出多少力氣，兩個人加起來才會 <span className="text-yellow-400 font-black text-2xl sm:text-3xl">「剛好 180度」</span> 呢？<br/>
+                <span className="text-slate-400 text-base sm:text-lg">(提示： 180 - 70 = ? )</span>
+              </React.Fragment>
+            ),
+            knownValues: {4: '70°'},
+            highlights: [4, 6],
+            choices: [70, 110, 180],
+            correctChoice: 110,
+            errorMsg: (
+              <React.Fragment>
+                <span className="text-red-400 font-bold">算錯囉！</span><br/>
+                你可以用手指算算看： 180 減掉 70 是多少？
+              </React.Fragment>
+            ),
+            successMsg: (
+              <React.Fragment>
+                <span className="text-green-400 font-black text-2xl sm:text-3xl">完美！</span><br/>
+                70 + 110 = 180！同側內角加起來 180度！
+              </React.Fragment>
+            ),
+            color: 'yellow'
+          },
+          // --- 魔王關 ---
+          {
+            type: 'tutorial',
+            title: '⚠️ 魔王降臨 ⚠️',
+            dialog: (
+              <React.Fragment>
+                敵方派出大魔王！<br/><br/>
+                現在畫面只剩下一個數字，你必須連續使用剛才學會的 3 招，<br/>
+                把所有的位置都破解掉！準備好了嗎？
+              </React.Fragment>
+            ),
+            highlights: [],
+            knownValues: {},
+            button: '迎擊魔王！',
+            icon: <i className="fa-solid fa-crosshairs text-red-500 animate-bounce text-3xl sm:text-4xl"></i>,
+            color: 'red'
+          },
+          {
+            type: 'task_choice',
+            title: '魔王戰 (1/3)：同位角',
+            dialog: (
+              <React.Fragment>
+                已知 ∠2 是 <strong>130度</strong>。<br/><br/>
+                它和 ∠6 都在「右上角」(同位角)。<br/>
+                請問影分身 ∠6 是幾度？
+              </React.Fragment>
+            ),
+            knownValues: {2: '130°'},
+            highlights: [2, 6],
+            choices: [50, 130, 180],
+            correctChoice: 130,
+            errorMsg: (
+              <React.Fragment>
+                <span className="text-red-400 font-bold">回想一下第一招！</span><br/>
+                同位角(影分身)的數字會「一模一樣」喔！
+              </React.Fragment>
+            ),
+            successMsg: (
+              <React.Fragment>
+                <span className="text-green-400 font-black text-2xl sm:text-3xl">正確！</span><br/>
+                ∠6 也是 130度。
+              </React.Fragment>
+            ),
+            color: 'cyan'
+          },
+          {
+            type: 'task_choice',
+            title: '魔王戰 (2/3)：內錯角',
+            dialog: (
+              <React.Fragment>
+                現在已知 ∠6 是 <strong>130度</strong>。<br/><br/>
+                它和 ∠3 在裡面「交叉走位」(內錯角)。<br/>
+                請問交叉走位的 ∠3 是幾度？
+              </React.Fragment>
+            ),
+            knownValues: {2: '130°', 6: '130°'},
+            highlights: [6, 3],
+            choices: [50, 130, 180],
+            correctChoice: 130,
+            errorMsg: (
+              <React.Fragment>
+                <span className="text-red-400 font-bold">回想一下第二招！</span><br/>
+                交叉走位(內錯角)的數字也會「一模一樣」喔！
+              </React.Fragment>
+            ),
+            successMsg: (
+              <React.Fragment>
+                <span className="text-green-400 font-black text-2xl sm:text-3xl">正確！</span><br/>
+                ∠3 也是 130度。
+              </React.Fragment>
+            ),
+            color: 'pink'
+          },
+          {
+            type: 'task_choice',
+            title: '魔王戰 (3/3)：同側內角',
+            dialog: (
+              <React.Fragment>
+                最後一擊！已知 ∠3 是 <strong>130度</strong>。<br/><br/>
+                它和 ∠5 在裡面「同一邊」(同隊好隊友)。<br/>
+                加起來要 <strong>180度</strong>！請問 ∠5 是幾度？<br/>
+                <span className="text-slate-400 text-base sm:text-lg">(提示： 180 - 130 = ? )</span>
+              </React.Fragment>
+            ),
+            knownValues: {2: '130°', 6: '130°', 3: '130°'},
+            highlights: [3, 5],
+            choices: [50, 130, 180],
+            correctChoice: 50,
+            errorMsg: (
+              <React.Fragment>
+                <span className="text-red-400 font-bold">再算一次！</span><br/>
+                180 減掉 130 是多少呢？
+              </React.Fragment>
+            ),
+            successMsg: (
+              <React.Fragment>
+                <span className="text-green-400 font-black text-2xl sm:text-3xl">太強了！</span><br/>
+                你完全破解了魔王關卡！
+              </React.Fragment>
+            ),
+            color: 'yellow'
+          },
+          {
+            type: 'victory',
+          }
+        ];
 
-  <div class="cards">
-    <a class="card c-purple" href="listening-battle-pass.html">
-      <div class="card-icon">⚔️</div>
-      <div class="card-body">
-        <div class="card-title">聽力特訓 — 戰令版<span class="badge-new">NEW</span></div>
-        <div class="card-desc">29天 Battle Pass · 金幣收集 · 造型解鎖 · Combo 連擊</div>
-        <div class="card-tag">🎧 聽力 · 每天 14 題 · 15-20 分鐘</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
+        function App() {
+          const [stageIndex, setStageIndex] = useState(0);
+          const [currentMessage, setCurrentMessage] = useState(null);
+          const [isError, setIsError] = useState(false);
+          const [isSuccess, setIsSuccess] = useState(false);
+          const [showConfetti, setShowConfetti] = useState(false);
 
-    <a class="card c-orange" href="vocab-adventure.html">
-      <div class="card-icon">🎮</div>
-      <div class="card-body">
-        <div class="card-title">英文冒險 RPG<span class="badge-hot">HOT</span></div>
-        <div class="card-desc">200 個會考高頻單字 · 聽力闖關 · 配對挑戰 · BOSS 戰</div>
-        <div class="card-tag">⭐ 單字 · 每天 10 分鐘</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
+          const stage = STAGES[stageIndex];
 
-    <a class="card c-blue" href="grammar-practice.html">
-      <div class="card-icon">📝</div>
-      <div class="card-body">
-        <div class="card-title">句型口訣特訓</div>
-        <div class="card-desc">8 大必考句型 · 背口訣 → 練題目 → 直覺答對</div>
-        <div class="card-tag">🧠 句型 · 每天 5 分鐘</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
+          const colorMap = {
+            cyan: 'text-cyan-400 border-cyan-400 bg-cyan-400/20',
+            pink: 'text-pink-400 border-pink-400 bg-pink-400/20',
+            yellow: 'text-yellow-400 border-yellow-400 bg-yellow-400/20',
+            red: 'text-red-500 border-red-500 bg-red-500/20',
+            default: 'text-white border-slate-600 bg-slate-800'
+          };
 
-    <a class="card c-gold" href="listening-practice.html">
-      <div class="card-icon">🍄</div>
-      <div class="card-body">
-        <div class="card-title">聽力金幣大冒險</div>
-        <div class="card-desc">聽單字 → 聽問句 → 聽對話 · 收集金幣、逐步升級</div>
-        <div class="card-tag">🎧 聽力 · 每次 5 題</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
+          const getThemeColor = (color) => colorMap[color] || colorMap.default;
 
-    <a class="card c-green" href="vocab-practice.html">
-      <div class="card-icon">📚</div>
-      <div class="card-body">
-        <div class="card-title">單字練習</div>
-        <div class="card-desc">基礎單字反覆練習 · 適合每天暖身</div>
-        <div class="card-tag">📖 單字 · 快速練習</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
-  </div>
+          const nextStage = () => {
+            setIsError(false);
+            setIsSuccess(false);
+            setCurrentMessage(null);
+            if (stageIndex < STAGES.length - 1) {
+              setStageIndex(stageIndex + 1);
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          };
 
-  <div class="divider"></div>
+          useEffect(() => {
+            if (stage?.type === 'victory') {
+              setShowConfetti(true);
+            }
+          }, [stage]);
 
-  <!-- ═══ 八年級數學 ═══ -->
-  <div class="section section-math">
-    <div class="section-title">
-      <span class="section-icon">📐</span>
-      <span class="section-text">八年級數學 — 多邊形的內角與外角</span>
-    </div>
-  </div>
+          const handleAngleClick = (angleId) => {
+            if (stage.type !== 'task_click' || isSuccess) return;
 
-  <div class="cards">
-    <a class="card c-pink" href="triangle-angle-sum.html">
-      <div class="card-icon">🔺</div>
-      <div class="card-body">
-        <div class="card-title">三角形內角和 = 180°</div>
-        <div class="card-desc">拖動三角形的角 · 驗證三個角加起來永遠 = 180°</div>
-        <div class="card-tag">🌕 月球站第2站</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
+            if (angleId === stage.targetAngle) {
+              setIsError(false);
+              setIsSuccess(true);
+              setCurrentMessage(stage.successMsg);
+            } else {
+              setIsError(true);
+              setCurrentMessage(stage.errorMsg);
+            }
+          };
 
-    <a class="card c-blue" href="quadrilateral-angle-sum.html">
-      <div class="card-icon">⬜</div>
-      <div class="card-body">
-        <div class="card-title">四邊形內角和 = 360°</div>
-        <div class="card-desc">切成 2 個三角形 · 2 × 180 = 360°</div>
-        <div class="card-tag">🔴 火星站第1站</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
+          const handleChoice = (choice) => {
+            if (stage.type !== 'task_choice' || isSuccess) return;
 
-    <a class="card c-orange" href="pentagon-angle-sum.html">
-      <div class="card-icon">⬠</div>
-      <div class="card-body">
-        <div class="card-title">五邊形內角和 = 540°</div>
-        <div class="card-desc">切成 3 個三角形 · 3 × 180 = 540°</div>
-        <div class="card-tag">🔴 火星站第2站</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
+            if (choice === stage.correctChoice) {
+              setIsError(false);
+              setIsSuccess(true);
+              setCurrentMessage(stage.successMsg);
+            } else {
+              setIsError(true);
+              setCurrentMessage(stage.errorMsg);
+            }
+          };
 
-    <a class="card c-red" href="exterior-angles.html">
-      <div class="card-icon">🔄</div>
-      <div class="card-body">
-        <div class="card-title">外角和探險：走一圈 = 360°</div>
-        <div class="card-desc">太空人繞正多邊形走一圈 · 外角和永遠 = 360°</div>
-        <div class="card-tag">🌟 外角和探險</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
-  </div>
+          const renderGeometryBoard = () => {
+            const anglePositions = {
+              1: { x: 320, y: 70 }, 2: { x: 430, y: 70 },
+              3: { x: 320, y: 170 }, 4: { x: 430, y: 170 },
+              5: { x: 170, y: 230 }, 6: { x: 280, y: 230 },
+              7: { x: 170, y: 330 }, 8: { x: 280, y: 330 },
+            };
 
-  <div class="divider"></div>
+            const isClickable = stage.type === 'task_click' && !isSuccess;
 
-  <!-- ═══ 教師專區 ═══ -->
-  <div class="section section-teacher">
-    <div class="section-title">
-      <span class="section-icon">👩‍🏫</span>
-      <span class="section-text">教師專區</span>
-    </div>
-  </div>
+            return (
+              <div className="relative w-full max-w-2xl aspect-[3/2] sm:aspect-[16/9] mx-auto bg-slate-900 rounded-xl border-2 border-slate-700 shadow-xl overflow-hidden flex-shrink-0">
+                <svg viewBox="0 0 600 400" className="absolute inset-0 w-full h-full pointer-events-none">
+                  <line x1="50" y1="120" x2="550" y2="120" stroke="#4bc0c8" strokeWidth="6" strokeLinecap="round" className="animate-pulse"/>
+                  <line x1="50" y1="280" x2="550" y2="280" stroke="#4bc0c8" strokeWidth="6" strokeLinecap="round" className="animate-pulse"/>
+                  <line x1="450" y1="40" x2="150" y2="360" stroke="#ff007f" strokeWidth="6" strokeLinecap="round" className="drop-shadow-lg"/>
+                </svg>
+                
+                {Object.entries(anglePositions).map(([id, pos]) => {
+                  const numId = parseInt(id);
+                  const isHighlighted = stage.highlights?.includes(numId);
+                  const isKnown = stage.knownValues && stage.knownValues[numId];
+                  const isTargeted = isSuccess && stage.targetAngle === numId;
+                  
+                  let btnClass = "absolute transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 sm:w-16 sm:h-16 rounded-full flex items-center justify-center font-black text-lg sm:text-2xl transition-all duration-300 border-2 sm:border-4 select-none ";
+                  
+                  if (isKnown) {
+                    btnClass += "bg-white text-slate-900 border-white shadow-[0_0_15px_rgba(255,255,255,0.8)] z-20";
+                  } else if (isHighlighted || isTargeted) {
+                    btnClass += `bg-slate-800 border-yellow-400 text-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.8)] scale-110 sm:scale-125 z-20 animate-pulse`;
+                  } else if (isClickable) {
+                    btnClass += "bg-slate-800/80 border-slate-500 text-slate-400 hover:border-cyan-400 hover:text-cyan-400 hover:scale-110 cursor-pointer z-10 hover:z-30";
+                  } else {
+                    btnClass += "bg-slate-800/50 border-slate-600 text-slate-500 z-10 pointer-events-none";
+                  }
 
-  <div class="cards">
-    <a class="card c-green" href="polygon-teaching-script.html">
-      <div class="card-icon">📋</div>
-      <div class="card-body">
-        <div class="card-title">多邊形教案台詞（完整版）</div>
-        <div class="card-desc">49 張投影片逐字教案 · 情感節奏 · 互動提示 · 可列印</div>
-        <div class="card-tag">📝 八年級數學 · 3-4 節課</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
+                  return (
+                    <div 
+                      key={id}
+                      style={{ left: `${(pos.x / 600) * 100}%`, top: `${(pos.y / 400) * 100}%` }}
+                      className={btnClass}
+                      onClick={() => handleAngleClick(numId)}
+                    >
+                      {isKnown ? stage.knownValues[numId] : `∠${id}`}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          };
 
-    <a class="card c-green" href="teacher-guide.html">
-      <div class="card-icon">📖</div>
-      <div class="card-body">
-        <div class="card-title">聽力特訓教學指引</div>
-        <div class="card-desc">教師使用說明 · 班級經營建議</div>
-        <div class="card-tag">📋 九年級英文</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
+          if (stage.type === 'victory') {
+            return (
+              <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center font-sans overflow-y-auto relative text-slate-200">
+                {showConfetti && (
+                  <div className="absolute inset-0 pointer-events-none flex justify-center">
+                    <div className="animate-bounce mt-10 sm:mt-20">
+                      <i className="fa-solid fa-trophy text-[6rem] sm:text-[8rem] text-yellow-400 drop-shadow-[0_0_30px_rgba(250,204,21,0.8)]"></i>
+                    </div>
+                  </div>
+                )}
+                <h1 className="text-4xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-500 mb-6 z-10 mt-32 sm:mt-40">
+                  特訓完美通關！
+                </h1>
+                <p className="text-xl sm:text-3xl text-slate-300 mb-12 max-w-2xl z-10 font-bold leading-relaxed">
+                  你太厲害了！<br/>
+                  同位角、內錯角、同側內角都難不倒你！<br/>
+                  給自己一個大大的掌聲！👏👏👏
+                </p>
+                <button 
+                  onClick={() => { setStageIndex(0); setShowConfetti(false); }}
+                  className="z-10 flex items-center gap-2 sm:gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-900 rounded-full font-black text-xl sm:text-2xl transition-all active:scale-95"
+                >
+                  <i className="fa-solid fa-rotate-right"></i> 再挑戰一次
+                </button>
+              </div>
+            );
+          }
 
-    <a class="card c-gold" href="teacher-dashboard.html">
-      <div class="card-icon">📊</div>
-      <div class="card-body">
-        <div class="card-title">學生進度儀表板<span class="badge-new">NEW</span></div>
-        <div class="card-desc">即時查看全班練習紀錄 · 自動統計 · Google Sheet 同步</div>
-        <div class="card-tag">📈 進度追蹤 · 自動更新</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
+          return (
+            <div className="min-h-screen bg-slate-950 text-slate-200 flex flex-col font-sans select-none overflow-x-hidden overflow-y-auto">
+              
+              <header className="p-3 sm:p-4 border-b border-slate-800 bg-slate-900/50 flex items-center justify-between sticky top-0 z-50 backdrop-blur-sm">
+                <h1 className="text-base sm:text-xl font-bold flex items-center gap-2">
+                  <i className="fa-solid fa-shield-halved text-cyan-400"></i>
+                  <span className="truncate">傳說戰場：幾何特訓</span>
+                </h1>
+                <div className="text-xs sm:text-sm font-bold text-slate-400 bg-slate-800 px-3 py-1 rounded-full whitespace-nowrap">
+                  進度 {stageIndex} / {STAGES.length - 1}
+                </div>
+              </header>
 
-    <a class="card c-green" href="setup-report.html">
-      <div class="card-icon">⚙️</div>
-      <div class="card-body">
-        <div class="card-title">回報系統設定</div>
-        <div class="card-desc">3 步驟完成設定 · 學生練完自動回報到 Google Sheet</div>
-        <div class="card-tag">🔧 一次設定 · 永久使用</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
-  </div>
+              <main className="flex-grow flex flex-col items-center justify-start sm:justify-center p-4 sm:p-6 gap-4 sm:gap-6 max-w-5xl mx-auto w-full pb-10">
+                
+                {stage.type === 'intro' ? (
+                  <div className="text-center flex flex-col items-center gap-6 sm:gap-8 mt-4 sm:mt-0">
+                    {stage.icon}
+                    <h2 className="text-3xl sm:text-5xl font-black text-white">{stage.title}</h2>
+                    <div className="text-lg sm:text-2xl text-slate-200 max-w-2xl leading-relaxed font-bold bg-slate-800 p-6 sm:p-8 rounded-2xl border border-slate-700 shadow-xl w-full">
+                      {stage.dialog}
+                    </div>
+                    <button 
+                      onClick={nextStage}
+                      className="mt-2 flex items-center gap-2 sm:gap-3 px-8 py-4 sm:px-10 sm:py-5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white rounded-full font-black text-2xl sm:text-3xl transition-all active:scale-95 shadow-[0_0_20px_rgba(6,182,212,0.5)]"
+                    >
+                      <i className="fa-solid fa-play"></i> {stage.button}
+                    </button>
+                  </div>
+                ) : (
+                  <React.Fragment>
+                    <div className="w-full flex flex-col items-center gap-2 sm:gap-3">
+                      <div className={`inline-flex items-center gap-2 sm:gap-3 px-4 py-2 sm:px-6 sm:py-2 rounded-full border-2 font-black text-lg sm:text-2xl ${getThemeColor(stage.color)}`}>
+                        {stage.icon}
+                        {stage.title}
+                      </div>
+                    </div>
 
-  <div class="footer">
-    <p>📱 用 Chrome 瀏覽器開啟效果最好 🔊 記得打開聲音</p>
-    <p>芎林國中 · 樂學教室 · 2025-2026</p>
-  </div>
-</div>
+                    {renderGeometryBoard()}
 
-<script>
-const emojis=['✨','⭐','🌟','💫','🔥','📐','🎧','🎮'];
-for(let i=0;i<8;i++){
-  const p=document.createElement('div');
-  p.className='particle';
-  p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-  p.style.left=Math.random()*100+'%';
-  p.style.fontSize=(12+Math.random()*14)+'px';
-  p.style.animationDuration=(8+Math.random()*12)+'s';
-  p.style.animationDelay=(-Math.random()*15)+'s';
-  document.body.appendChild(p);
-}
-</script>
+                    {stage.type === 'task_choice' && (
+                      <div className="flex flex-wrap gap-3 sm:gap-6 mt-1 sm:mt-2 w-full justify-center">
+                        {stage.choices.map((choice, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handleChoice(choice)}
+                            disabled={isSuccess}
+                            className={`px-6 py-3 sm:px-10 sm:py-5 rounded-xl font-black text-2xl sm:text-4xl border-b-4 transition-all flex-1 min-w-[80px] max-w-[120px] sm:max-w-[160px] text-center justify-center
+                              ${isSuccess 
+                                ? choice === stage.correctChoice 
+                                  ? 'bg-green-500 border-green-700 text-white shadow-[0_0_15px_rgba(34,197,94,0.6)]' 
+                                  : 'bg-slate-800 border-slate-900 text-slate-500 opacity-50'
+                                : 'bg-slate-700 border-slate-900 active:bg-slate-600 active:border-b-0 active:translate-y-1 text-white'
+                              }`}
+                          >
+                            {choice}°
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className={`w-full max-w-3xl mt-auto rounded-xl p-5 sm:p-8 border-2 transition-colors duration-300 shadow-2xl flex flex-col gap-4 relative
+                      ${isError ? 'bg-red-950/90 border-red-500' : isSuccess ? 'bg-green-950/90 border-green-500' : 'bg-slate-800 border-slate-600'}`}
+                    >
+                      <div className="absolute -top-4 -left-2 sm:-top-6 sm:-left-6 bg-slate-900 rounded-full p-1 sm:p-2 border-2 border-slate-700 flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16">
+                        {isError ? <i className="fa-solid fa-circle-xmark text-3xl sm:text-4xl text-red-500"></i> : 
+                         isSuccess ? <i className="fa-solid fa-circle-check text-3xl sm:text-4xl text-green-500"></i> : 
+                         <i className="fa-solid fa-shield-halved text-2xl sm:text-3xl text-cyan-400"></i>}
+                      </div>
+
+                      <div className="text-lg sm:text-2xl font-bold text-white leading-relaxed pl-6 sm:pl-10 pt-2 sm:pt-0">
+                        {currentMessage || stage.dialog}
+                      </div>
+
+                      {(stage.type === 'tutorial' || isSuccess) && (
+                        <div className="flex justify-end mt-2">
+                          <button 
+                            onClick={nextStage}
+                            className="flex items-center gap-2 px-6 py-2 sm:px-8 sm:py-4 bg-cyan-500 text-slate-900 rounded-full font-black text-lg sm:text-2xl transition-all active:scale-95 shadow-lg border-2 border-slate-900"
+                          >
+                            {isSuccess ? '下一關' : (stage.button || '繼續')} <i className="fa-solid fa-arrow-right"></i>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </React.Fragment>
+                )}
+              </main>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
 </body>
 </html>
