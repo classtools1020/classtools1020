@@ -276,11 +276,13 @@ function svgArc(cx, cy, fromDeg, toDeg, r, color = '#FFC93C', sw = 2.8) {
   const sweep = delta < 0 ? 1 : 0;
   return `<path d="M ${sx.toFixed(2)} ${sy.toFixed(2)} A ${r} ${r} 0 0 ${sweep} ${ex.toFixed(2)} ${ey.toFixed(2)}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>`;
 }
-// 角度數字標籤（自動放在弧中間外側）
+// 角度數字標籤（自動放在弧中間外側，處理 wrap-around）
 function svgAngleLabel(cx, cy, fromDeg, toDeg, r, text, color = '#FFC93C', size = 16) {
   const PI = Math.PI;
-  let midDeg = (fromDeg + toDeg) / 2;
-  // 用較大半徑放標籤（在弧外側）
+  let _from = fromDeg, _to = toDeg;
+  while (_to - _from > 180) _to -= 360;
+  while (_to - _from < -180) _to += 360;
+  const midDeg = (_from + _to) / 2;
   const lr = r + 14;
   const lx = cx + lr * Math.cos(midDeg * PI / 180);
   const ly = cy - lr * Math.sin(midDeg * PI / 180);
@@ -289,7 +291,10 @@ function svgAngleLabel(cx, cy, fromDeg, toDeg, r, text, color = '#FFC93C', size 
 // 角度名稱標籤（∠1、∠2 等，放在更外側）
 function svgAngleName(cx, cy, fromDeg, toDeg, r, text, color = '#FFD970', size = 18) {
   const PI = Math.PI;
-  let midDeg = (fromDeg + toDeg) / 2;
+  let _from = fromDeg, _to = toDeg;
+  while (_to - _from > 180) _to -= 360;
+  while (_to - _from < -180) _to += 360;
+  const midDeg = (_from + _to) / 2;
   const lr = r + 32;
   const lx = cx + lr * Math.cos(midDeg * PI / 180);
   const ly = cy - lr * Math.sin(midDeg * PI / 180);
@@ -525,38 +530,63 @@ const QUESTIONS = [
     hint: '提示：用「同側內角互補」想 — 算算 AB、CD 跟 PQ 的夾角各是多少',
     buildSvg() {
       // 籃板 RS 在上 (y=80)，地板 PQ 在下 (y=220)
-      // A (120, 220), B (240, 80), C (360, 220), D (480, 80)
-      const A = [120, 220], B = [240, 80], C = [360, 220], D = [480, 80];
+      // 點：A (120, 220), B (260, 80), C (400, 220), D (540, 80)
+      // AB 線斜率 (-140/140) = -1，BC 線 (140/140) = 1，CD 線 -1（AB // CD）
+      const Ax=120, Ay=220, Bx=260, By=80, Cx=400, Cy=220, Dx=540, Dy=80;
+      // 角度方向（標準視覺角度：0°=右、90°=上、180°=左、270°=下）
+      // 在 B 點：BA 方向 (左下) = atan2(140,-140) → 視覺 = 225°
+      //         BC 方向 (右下) = atan2(140,140) → 視覺 = 315° (即 -45°)
+      // 在 C 點：CB 方向 (左上) = atan2(-140,-140) → 視覺 = 135°
+      //         CD 方向 (右上) = atan2(-140,140) → 視覺 = 45°
+      const COL_AB='#FFC93C', COL_BC='#7BC4A8', COL_CD='#FFC93C';
+      const ARC_R = 26;
       return `
-      <svg class="stage" viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+      <svg class="stage" viewBox="0 0 660 300" xmlns="http://www.w3.org/2000/svg">
         <!-- 籃板與地板 -->
-        <line x1="30" y1="80" x2="570" y2="80" stroke="var(--L1-color)" stroke-width="6" stroke-linecap="round"/>
-        <line x1="30" y1="220" x2="570" y2="220" stroke="var(--L1-color)" stroke-width="6" stroke-linecap="round"/>
-        <!-- 球路徑 -->
-        <line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" stroke="#FFC93C" stroke-width="3.5"/>
-        <line x1="${B[0]}" y1="${B[1]}" x2="${C[0]}" y2="${C[1]}" stroke="#7BC4A8" stroke-width="3.5"/>
-        <line x1="${C[0]}" y1="${C[1]}" x2="${D[0]}" y2="${D[1]}" stroke="#FFC93C" stroke-width="3.5"/>
-        <!-- 標籤 -->
-        <text x="40" y="70" fill="var(--L1-color)" font-size="18" font-weight="800">RS</text>
-        <text x="74" y="70" fill="#8AC4F0" font-size="13">籃板</text>
-        <text x="40" y="240" fill="var(--L1-color)" font-size="18" font-weight="800">PQ</text>
-        <text x="74" y="240" fill="#8AC4F0" font-size="13">地板</text>
-        <!-- 球 + 字母 -->
-        ${svgPoint(A[0], A[1], 'A', 'white', 0, 24, 16)}
-        ${svgPoint(B[0], B[1], 'B', 'white', 0, -12, 16)}
-        ${svgPoint(C[0], C[1], 'C', 'white', 0, 24, 16)}
-        ${svgPoint(D[0], D[1], 'D', 'white', 0, -12, 16)}
-        <!-- 角度標籤（只標數字，不畫弧因為太擠） -->
-        <text x="225" y="100" fill="#FFD970" font-size="15" font-weight="800">∠1</text>
-        <text x="248" y="100" fill="#FFD970" font-size="15" font-weight="800">∠2</text>
-        <text x="345" y="208" fill="#FFD970" font-size="15" font-weight="800">∠3</text>
-        <text x="370" y="208" fill="#FFD970" font-size="15" font-weight="800">∠4</text>
-        <!-- 標籤：球的方向 -->
-        <text x="158" y="170" font-size="14" fill="#FFC93C">AB</text>
-        <text x="290" y="170" font-size="14" fill="#7BC4A8">BC</text>
-        <text x="408" y="170" font-size="14" fill="#FFC93C">CD</text>
-        <text x="480" y="265" font-size="22">🏀</text>
-        <text x="504" y="265" font-size="13" fill="#94A3B8">兩津打球</text>
+        <line x1="30" y1="80" x2="630" y2="80" stroke="var(--L1-color)" stroke-width="6" stroke-linecap="round"/>
+        <line x1="30" y1="220" x2="630" y2="220" stroke="var(--L1-color)" stroke-width="6" stroke-linecap="round"/>
+        <!-- 球路徑（橘=AB+CD，綠=BC） -->
+        <line x1="${Ax}" y1="${Ay}" x2="${Bx}" y2="${By}" stroke="${COL_AB}" stroke-width="4"/>
+        <line x1="${Bx}" y1="${By}" x2="${Cx}" y2="${Cy}" stroke="${COL_BC}" stroke-width="4"/>
+        <line x1="${Cx}" y1="${Cy}" x2="${Dx}" y2="${Dy}" stroke="${COL_CD}" stroke-width="4"/>
+
+        <!-- 線標籤 -->
+        <text x="38" y="70" fill="var(--L1-color)" font-size="19" font-weight="800">RS</text>
+        <text x="74" y="70" fill="#8AC4F0" font-size="14">籃板</text>
+        <text x="38" y="240" fill="var(--L1-color)" font-size="19" font-weight="800">PQ</text>
+        <text x="74" y="240" fill="#8AC4F0" font-size="14">地板</text>
+
+        <!-- AB / BC / CD 路徑文字（放在線段中間遠離角度的位置） -->
+        <text x="155" y="158" font-size="14" fill="${COL_AB}" font-weight="700">AB</text>
+        <text x="320" y="158" font-size="14" fill="${COL_BC}" font-weight="700">BC</text>
+        <text x="475" y="158" font-size="14" fill="${COL_CD}" font-weight="700">CD</text>
+
+        <!-- ===== B 點：∠1 (左下，AB 跟 RS 內角) + ∠2 (右下，BC 跟 RS 內角) ===== -->
+        <!-- ∠1: 從 RS 向左 (180°) → BA 方向 (225°)，delta=45 -->
+        ${svgArc(Bx, By, 180, 225, ARC_R, COL_AB, 3)}
+        ${svgAngleLabel(Bx, By, 180, 225, ARC_R, '∠1', COL_AB, 17)}
+        <!-- ∠2: 從 BC 方向 (315°) → RS 向右 (360°)，delta=45 -->
+        ${svgArc(Bx, By, 315, 360, ARC_R, COL_BC, 3)}
+        ${svgAngleLabel(Bx, By, 315, 360, ARC_R, '∠2', COL_BC, 17)}
+
+        <!-- ===== C 點：∠3 (左上，BC 跟 PQ 內角) + ∠4 (右上，CD 跟 PQ 內角) ===== -->
+        <!-- ∠3: 從 CB 方向 (135°) → PQ 向左 (180°)，delta=45 -->
+        ${svgArc(Cx, Cy, 135, 180, ARC_R, COL_BC, 3)}
+        ${svgAngleLabel(Cx, Cy, 135, 180, ARC_R, '∠3', COL_BC, 17)}
+        <!-- ∠4: 從 PQ 向右 (0°) → CD 方向 (45°)，delta=45 -->
+        ${svgArc(Cx, Cy, 0, 45, ARC_R, COL_CD, 3)}
+        ${svgAngleLabel(Cx, Cy, 0, 45, ARC_R, '∠4', COL_CD, 17)}
+
+        <!-- 球（白色，最後畫蓋住線條） -->
+        ${svgPoint(Ax, Ay, 'A', 'white', 0, 28, 18)}
+        ${svgPoint(Bx, By, 'B', 'white', 0, -14, 18)}
+        ${svgPoint(Cx, Cy, 'C', 'white', 0, 28, 18)}
+        ${svgPoint(Dx, Dy, 'D', 'white', 0, -14, 18)}
+
+        <!-- 反射規律提示文字 -->
+        <text x="240" y="280" font-size="13" fill="#94A3B8" font-style="italic">⚡ ∠1 = ∠2 (B 點反射)　∠3 = ∠4 (C 點反射)</text>
+
+        <text x="555" y="285" font-size="22">🏀</text>
       </svg>`;
     },
     options: [
