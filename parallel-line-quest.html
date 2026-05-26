@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>平行線王國大冒險 ⚔️</title>
+<style>
+  :root {
+    --bg-dark: #0F1729;
+    --bg-mid: #1B2745;
+    --primary: #5B6FE8;
+    --primary-soft: #A8B5E8;
+    --gold: #FFC93C;
+    --gold-soft: #FFE066;
+    --accent: #FF6B9D;
+    --success: #4ADE80;
+    --success-soft: #BBF7D0;
+    --warning: #FB923C;
+    --danger: #EF4444;
+    --text: #F5F7FA;
+    --text-dim: #94A3B8;
+    --L1-color: #5B9DD9;
+    --L2-color: #FF8FA3;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+  html,body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;background:var(--bg-dark);color:var(--text);min-height:100vh;overflow-x:hidden}
+  body{background:radial-gradient(ellipse at top,#1B2745 0%,#0F1729 80%);background-attachment:fixed}
+
+  .app{max-width:780px;margin:0 auto;padding:16px;min-height:100vh}
+
+  /* HUD */
+  .hud{display:flex;justify-content:space-between;align-items:center;background:rgba(91,111,232,0.15);border:2px solid var(--primary);border-radius:14px;padding:10px 16px;margin-bottom:14px;backdrop-filter:blur(6px)}
+  .hud-left{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .hud-nick{font-weight:700;color:var(--gold-soft);font-size:15px}
+  .hud-stat{display:flex;align-items:center;gap:4px;font-size:14px;color:var(--primary-soft)}
+  .hud-stat .icon{font-size:18px}
+  .hud-coins{color:var(--gold)}
+
+  /* Progress dots */
+  .progress{display:flex;gap:6px}
+  .pdot{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.1);border:2px solid var(--primary-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary-soft)}
+  .pdot.done{background:var(--success);border-color:var(--success);color:white}
+  .pdot.active{background:var(--gold);border-color:var(--gold);color:#222;transform:scale(1.15);box-shadow:0 0 14px var(--gold)}
+
+  /* Card */
+  .card{background:linear-gradient(180deg,rgba(91,111,232,0.12) 0%,rgba(27,39,69,0.6) 100%);border:2px solid var(--primary);border-radius:20px;padding:22px;backdrop-filter:blur(8px);box-shadow:0 8px 32px rgba(91,111,232,0.2);animation:cardIn 0.4s ease}
+  @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  h1{font-size:clamp(22px,5.5vw,30px);color:var(--gold);text-align:center;letter-spacing:1.5px;margin-bottom:6px;text-shadow:0 0 16px rgba(255,201,60,0.4)}
+  h2{font-size:clamp(18px,4.6vw,22px);color:var(--gold-soft);margin-bottom:10px}
+  h3{font-size:clamp(16px,4vw,19px);color:var(--primary-soft);margin-bottom:8px}
+  .subtitle{text-align:center;color:var(--text-dim);font-size:14px;margin-bottom:14px}
+
+  /* Buttons */
+  .btn{min-height:52px;padding:12px 22px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--primary) 0%,#7B8DFF 100%);color:white;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;box-shadow:0 4px 14px rgba(91,111,232,0.4);min-width:120px}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(91,111,232,0.6)}
+  .btn:active{transform:translateY(0)}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+  .btn-gold{background:linear-gradient(135deg,var(--gold) 0%,#FFD970 100%);color:#222;box-shadow:0 4px 14px rgba(255,201,60,0.5)}
+  .btn-gold:hover{box-shadow:0 6px 20px rgba(255,201,60,0.8)}
+  .btn-ghost{background:transparent;border:2px solid var(--primary-soft);color:var(--primary-soft);box-shadow:none}
+  .btn-ghost:hover{background:rgba(91,111,232,0.15);color:white}
+  .btn-warning{background:linear-gradient(135deg,var(--warning) 0%,#FBBF24 100%);color:#222}
+
+  /* Input */
+  .input{width:100%;padding:14px 18px;background:rgba(255,255,255,0.08);border:2px solid var(--primary-soft);border-radius:12px;font-size:18px;color:var(--text);font-family:inherit;text-align:center}
+  .input:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,0.12)}
+  .input::placeholder{color:var(--text-dim)}
+
+  /* Quiz Q + options */
+  .qtitle{font-size:clamp(17px,4.4vw,21px);font-weight:700;line-height:1.5;color:var(--gold-soft);margin:18px 0 8px;text-align:center}
+  .qhint{font-size:14px;color:var(--text-dim);text-align:center;margin-bottom:14px}
+
+  .stage-wrap{background:rgba(255,255,255,0.05);border:1px dashed rgba(168,181,232,0.3);border-radius:14px;padding:14px;margin:14px 0;overflow:hidden}
+  .stage{width:100%;height:auto;display:block}
+
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px}
+  .opt{min-height:60px;padding:14px 14px;background:rgba(91,111,232,0.18);border:2px solid var(--primary-soft);border-radius:12px;color:var(--text);font-size:16px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;text-align:center;line-height:1.4}
+  .opt:hover{background:rgba(91,111,232,0.35);border-color:var(--gold-soft)}
+  .opt.correct{background:rgba(74,222,128,0.3);border-color:var(--success);color:var(--success-soft);font-weight:800;animation:pulse 0.5s}
+  .opt.wrong{background:rgba(239,68,68,0.2);border-color:var(--danger);opacity:0.7}
+  .opt.show-correct{background:rgba(74,222,128,0.3);border-color:var(--success);color:var(--success-soft);font-weight:800}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+  /* Feedback */
+  .fb{margin-top:14px;padding:14px 18px;border-radius:12px;font-size:15px;line-height:1.6;display:none;animation:cardIn 0.3s}
+  .fb.show{display:block}
+  .fb.win{background:rgba(74,222,128,0.15);color:var(--success-soft);border:1px solid var(--success)}
+  .fb.gentle{background:rgba(251,146,60,0.15);color:#FED7AA;border:1px solid var(--warning)}
+
+  /* Hint cards */
+  .hints{display:none;margin-top:12px}
+  .hints.show{display:block;animation:cardIn 0.3s}
+  .hint{background:rgba(251,146,60,0.12);border-left:4px solid var(--warning);border-radius:10px;padding:12px 14px;margin-bottom:8px;color:#FED7AA;font-size:14px;line-height:1.6}
+  .hint strong{color:var(--gold)}
+
+  /* SVG defaults */
+  .stage text{user-select:none}
+
+  /* Nav row */
+  .nav{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .nav .btn{flex:1;min-width:120px}
+
+  /* Coin animation */
+  @keyframes coinPop{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-50px) scale(1.5);opacity:0}}
+  .coin-pop{position:fixed;font-size:32px;pointer-events:none;animation:coinPop 1s ease-out forwards;z-index:9999}
+
+  /* Victory screen */
+  .victory{text-align:center;padding:24px}
+  .victory .emoji{font-size:72px;margin-bottom:8px;animation:bounce 1.5s infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .victory h1{font-size:32px;color:var(--gold);margin-bottom:14px}
+  .score-display{background:rgba(255,201,60,0.15);border:2px solid var(--gold);border-radius:16px;padding:20px;margin:18px 0}
+  .score-display .num{font-size:54px;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(255,201,60,0.5)}
+  .score-display .label{font-size:14px;color:var(--gold-soft);margin-top:4px}
+
+  /* Status banner (submitting/success) */
+  .submit-status{padding:14px 18px;border-radius:12px;text-align:center;font-weight:700;margin:14px 0}
+  .submit-status.pending{background:rgba(91,111,232,0.2);color:var(--primary-soft)}
+  .submit-status.success{background:rgba(74,222,128,0.2);color:var(--success-soft);border:1px solid var(--success)}
+  .submit-status.error{background:rgba(239,68,68,0.2);color:#FECACA;border:1px solid var(--danger)}
+
+  /* Loading spinner */
+  .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Decorations */
+  .deco-stars{position:fixed;top:0;left:0;right:0;height:200px;pointer-events:none;overflow:hidden;z-index:0}
+  .star{position:absolute;color:white;opacity:0.15;font-size:14px;animation:twinkle 3s infinite}
+  @keyframes twinkle{0%,100%{opacity:0.05}50%{opacity:0.25}}
+
+  /* Modal-ish dialog */
+  .start-screen{text-align:center;padding:30px 18px}
+  .start-screen .crown{font-size:64px;margin-bottom:10px}
+  .start-screen h1{font-size:36px;margin-bottom:6px;color:var(--gold)}
+  .start-screen .tagline{color:var(--primary-soft);font-size:16px;margin-bottom:24px;line-height:1.6}
+  .stage-info{background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin:18px 0;font-size:14px;color:var(--text-dim);line-height:1.6}
+
+  /* Q level badge */
+  .lvl-badge{display:inline-block;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:8px}
+  .lvl-base{background:rgba(74,222,128,0.2);color:var(--success-soft)}
+  .lvl-mid{background:rgba(251,146,60,0.2);color:#FED7AA}
+  .lvl-boss{background:rgba(239,68,68,0.2);color:#FECACA}
+
+  /* Tiny badges */
+  .crystal{font-size:22px;animation:float 2s infinite ease-in-out}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+</style>
+</head>
+<body>
+
+<div class="deco-stars" id="stars"></div>
+
+<div class="app" id="app">
+
+  <!-- Start Screen -->
+  <section id="screen-start" class="card start-screen">
+    <div class="crown">👑</div>
+    <h1>平行線王國大冒險</h1>
+    <p class="tagline">⚔️ 5 關卡 · 闖過去就是<strong style="color:var(--gold)">平行王者</strong> ⚔️</p>
+
+    <div style="margin:20px 0">
+      <label style="display:block;margin-bottom:8px;color:var(--gold-soft);font-weight:600">請輸入你的召喚師暱稱</label>
+      <input id="nick-input" class="input" type="text" placeholder="例：小新、艾妲、神槍手" maxlength="12" autocomplete="off">
+    </div>
+
+    <div class="stage-info">
+      📜 任務內容：5 題平行線挑戰<br>
+      ⏱️ 預計時間：10-15 分鐘<br>
+      💎 過關有金幣，全破得王者徽章<br>
+      🛡️ 答錯不扣分！可以看提示
+    </div>
+
+    <button id="start-btn" class="btn btn-gold" style="width:100%;font-size:18px;min-height:60px">
+      🚀 出發！進入王國
+    </button>
+  </section>
+
+  <!-- Quest Screen (HUD + Q) -->
+  <section id="screen-quest" style="display:none">
+    <div class="hud">
+      <div class="hud-left">
+        <span class="hud-nick">👑 <span id="hud-name">召喚師</span></span>
+        <span class="hud-stat hud-coins"><span class="icon">💰</span><span id="hud-coins">0</span></span>
+      </div>
+      <div class="progress" id="hud-progress"></div>
+    </div>
+
+    <div class="card" id="quest-card">
+      <!-- 動態填入題目 -->
+    </div>
+  </section>
+
+  <!-- Victory Screen -->
+  <section id="screen-victory" style="display:none">
+    <div class="card victory">
+      <div class="emoji">🏆</div>
+      <h1>王國大冒險完成！</h1>
+      <p style="color:var(--primary-soft);margin-bottom:18px">召喚師 <strong style="color:var(--gold-soft)" id="vic-name">XXX</strong> 通過全部關卡！</p>
+
+      <div class="score-display">
+        <div class="num"><span id="vic-correct">0</span>/5</div>
+        <div class="label">答對題數</div>
+      </div>
+
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:14px 0">
+        <div style="background:rgba(91,111,232,0.15);border-radius:12px;padding:12px 18px">
+          <div style="font-size:24px;font-weight:700;color:var(--gold)">💰 <span id="vic-coins">0</span></div>
+          <div style="font-size:12px;color:var(--text-dim)">金幣</div>
+        </div>
+        <div style="background:rgba(91,111,232,0.15);border-radius:12px;padding:12px 18px">
+          <div style="font-size:24px;font-weight:700;color:var(--gold)">⏱️ <span id="vic-time">0:00</span></div>
+          <div style="font-size:12px;color:var(--text-dim)">用時</div>
+        </div>
+      </div>
+
+      <div id="vic-status" class="submit-status pending"><span class="spinner"></span>正在送出成績給老師...</div>
+
+      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin:18px 0;font-size:13px;color:var(--text-dim);line-height:1.7">
+        💝 不管答對幾題，<strong style="color:var(--gold)">願意挑戰就是了不起</strong>。<br>
+        明天上課，老師會在後台看到你的成績喔！
+      </div>
+
+      <button class="btn btn-ghost" style="width:100%" onclick="restartGame()">🔄 再玩一次</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+'use strict';
+
+/* =============== Config =============== */
+const BIN_URL = 'https://jsonblob.com/api/jsonBlob/019e62a4-4aef-7ebe-8a45-f7d51f694e28';
+const HOMEWORK_ID = '8a_parallel_4_1_2026_05_26';
+
+/* =============== Stars =============== */
+(() => {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 25; i++) {
+    const s = document.createElement('span');
+    s.className = 'star';
+    s.textContent = '✦';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = Math.random() * 3 + 's';
+    s.style.fontSize = (Math.random() * 16 + 8) + 'px';
+    c.appendChild(s);
+  }
+})();
+
+/* =============== Game State =============== */
+const state = {
+  nick: '',
+  startTime: 0,
+  currentQ: 0,
+  coins: 0,
+  correct: 0,
+  answers: [],
+  hintsUsed: [],
+};
+
+/* =============== Questions =============== */
+const QUESTIONS = [
+  {
+    level: 1,
+    levelLabel: '基礎 · 內錯角判定',
+    title: '兩條直線 L₁、L₂ 被截線 M 截過，∠1 = ∠2。L₁ 跟 L₂ 平行嗎？',
+    hint: '提示：∠1 和 ∠2 是「內錯角」的位置關係',
+    svg: `
+      <svg class="stage" viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+        <line x1="40" y1="80" x2="560" y2="80" stroke="var(--L1-color)" stroke-width="4" stroke-linecap="round"/>
+        <line x1="40" y1="200" x2="560" y2="200" stroke="var(--L1-color)" stroke-width="4" stroke-linecap="round"/>
+        <line x1="180" y1="40" x2="420" y2="240" stroke="var(--accent)" stroke-width="3"/>
+        <text x="48" y="68" fill="var(--L1-color)" font-size="20" font-weight="700">L₁</text>
+        <text x="48" y="222" fill="var(--L1-color)" font-size="20" font-weight="700">L₂</text>
+        <text x="430" y="240" fill="var(--accent)" font-size="20" font-weight="700">M</text>
+        <!-- ∠1 in upper between L1 and M, below L1 (內角) -->
+        <path d="M 290,80 A 25,25 0 0 1 305,103" fill="none" stroke="var(--gold)" stroke-width="3"/>
+        <text x="315" y="106" fill="var(--gold)" font-size="20" font-weight="700">1</text>
+        <!-- ∠2 in lower between L2 and M, above L2 (內角，alternate side) -->
+        <path d="M 310,200 A 25,25 0 0 1 295,177" fill="none" stroke="var(--gold)" stroke-width="3"/>
+        <text x="282" y="174" fill="var(--gold)" font-size="20" font-weight="700">2</text>
+      </svg>
+    `,
+    options: [
+      { text: '✗ 不平行', correct: false },
+      { text: '✓ 平行（因為內錯角相等）', correct: true },
+      { text: '? 不能判斷', correct: false },
+    ],
+    explainCorrect: '答對！✨ 內錯角相等 → 兩條直線一定平行！記住「內錯角相等 → 平行」這條鐵則。',
+    explainWrong: '再想一下～ ∠1 和 ∠2 在截線兩側、L₁ 和 L₂ 之間，這叫「內錯角」。內錯角相等 → 平行！',
+    hints: [
+      '看 ∠1 和 ∠2 的位置：它們在 L₁ 和 L₂ 中間，且在截線 M 的「兩側」（一左一右）。',
+      '這種角叫「內錯角」。兩條線被一條截線截，內錯角相等 → 線一定平行。',
+      '所以答案是「平行」！條件：內錯角相等 = 平行。',
+    ],
+  },
+
+  {
+    level: 1,
+    levelLabel: '基礎 · 同位角判定',
+    title: '截線 M 截過 L₁ 和 L₂，∠1 = ∠2 = 60°。L₁ // L₂ 嗎？',
+    hint: '∠1 和 ∠2 都在截線右側、線上方 — 這是「同位角」',
+    svg: `
+      <svg class="stage" viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+        <line x1="40" y1="80" x2="560" y2="80" stroke="var(--L1-color)" stroke-width="4"/>
+        <line x1="40" y1="200" x2="560" y2="200" stroke="var(--L1-color)" stroke-width="4"/>
+        <line x1="180" y1="40" x2="420" y2="240" stroke="var(--accent)" stroke-width="3"/>
+        <text x="48" y="68" fill="var(--L1-color)" font-size="20" font-weight="700">L₁</text>
+        <text x="48" y="222" fill="var(--L1-color)" font-size="20" font-weight="700">L₂</text>
+        <text x="430" y="240" fill="var(--accent)" font-size="20" font-weight="700">M</text>
+        <!-- ∠1 above L1 right of M -->
+        <path d="M 295,80 A 22,22 0 0 0 311,60" fill="none" stroke="var(--gold)" stroke-width="3"/>
+        <text x="312" y="58" fill="var(--gold)" font-size="20" font-weight="700">1</text>
+        <text x="270" y="74" fill="var(--gold-soft)" font-size="14">60°</text>
+        <!-- ∠2 above L2 right of M (same side, same position) -->
+        <path d="M 343,200 A 22,22 0 0 0 359,180" fill="none" stroke="var(--gold)" stroke-width="3"/>
+        <text x="360" y="178" fill="var(--gold)" font-size="20" font-weight="700">2</text>
+        <text x="318" y="194" fill="var(--gold-soft)" font-size="14">60°</text>
+      </svg>
+    `,
+    options: [
+      { text: '✓ 平行', correct: true },
+      { text: '✗ 不平行', correct: false },
+      { text: '需要更多資訊', correct: false },
+    ],
+    explainCorrect: '答對！🎉 同位角相等 → 平行！這是平行線判定的第一條規則。',
+    explainWrong: '∠1 和 ∠2 都在截線右側、線上方，這叫「同位角」。同位角相等 → 一定平行！',
+    hints: [
+      '∠1 和 ∠2 在截線 M 的「同一側」（都在右上），且分別在 L₁ 和 L₂ 上 → 這是「同位角」。',
+      '兩條線被截線截，同位角相等 → 線一定平行。',
+      '所以答案是「平行」！',
+    ],
+  },
+
+  {
+    level: 2,
+    levelLabel: '中階 · 截角性質計算',
+    title: 'L₁ // L₂，M₁ // M₂，∠1 = 52°，求 ∠2 = ?',
+    hint: '提示：用「同位角相等」或「內錯角相等」一步步推',
+    svg: `
+      <svg class="stage" viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+        <line x1="40" y1="70" x2="560" y2="70" stroke="var(--L1-color)" stroke-width="4"/>
+        <line x1="40" y1="170" x2="560" y2="170" stroke="var(--L1-color)" stroke-width="4"/>
+        <line x1="200" y1="20" x2="380" y2="260" stroke="var(--L2-color)" stroke-width="3"/>
+        <line x1="300" y1="20" x2="480" y2="260" stroke="var(--L2-color)" stroke-width="3"/>
+        <text x="48" y="60" fill="var(--L1-color)" font-size="18" font-weight="700">L₁</text>
+        <text x="48" y="192" fill="var(--L1-color)" font-size="18" font-weight="700">L₂</text>
+        <text x="186" y="20" fill="var(--L2-color)" font-size="18" font-weight="700">M₁</text>
+        <text x="288" y="20" fill="var(--L2-color)" font-size="18" font-weight="700">M₂</text>
+        <!-- ∠1 between L1 and M1, lower-right -->
+        <path d="M 248,70 A 20,20 0 0 1 256,89" fill="none" stroke="var(--gold)" stroke-width="3"/>
+        <text x="268" y="92" fill="var(--gold)" font-size="20" font-weight="700">1</text>
+        <text x="258" y="62" fill="var(--gold-soft)" font-size="13">52°</text>
+        <!-- ∠2 between L2 and M2, lower-right of intersection -->
+        <path d="M 422,170 A 20,20 0 0 1 430,189" fill="none" stroke="var(--gold)" stroke-width="3"/>
+        <text x="438" y="194" fill="var(--gold)" font-size="20" font-weight="700">2</text>
+        <text x="436" y="166" fill="var(--gold-soft)" font-size="13">?</text>
+      </svg>
+    `,
+    options: [
+      { text: '52°', correct: true },
+      { text: '128°', correct: false },
+      { text: '38°', correct: false },
+      { text: '90°', correct: false },
+    ],
+    explainCorrect: '答對！💎 ∠1 = ∠2 = 52°。因為 L₁//L₂ + M₁//M₂，∠1 跟 ∠2 是「對應位置」的角，所以一定相等！',
+    explainWrong: '再想一下～兩組平行線「對應位置」的角會相等。∠1 = ∠2 = 52° 才對。',
+    hints: [
+      '因為 L₁ // L₂，先找一個中介角：在 M₁ 和 L₂ 交點處，∠1 的「同位角」也是 52°。',
+      '再因為 M₁ // M₂，這個中介角和 ∠2 又是「同位角」，所以 ∠2 也 = 52°。',
+      '結論：兩組平行線時，同位置的角永遠相等。∠2 = 52°。',
+    ],
+  },
+
+  {
+    level: 2,
+    levelLabel: '中階 · 摺疊購物車',
+    title: '宥均工作室的摺疊購物車設計圖：AB // CD // GE，∠ABC = 40°，∠BED = 100°，求 ∠CDE = ?',
+    hint: '提示：過 E 點作 EF // AB（也就是 // CD），把 ∠BED 拆成兩塊',
+    svg: `
+      <svg class="stage" viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+        <!-- 3 parallel lines: AB(top), CD(mid), GE(bottom) -->
+        <line x1="80" y1="50" x2="500" y2="50" stroke="var(--L1-color)" stroke-width="4"/>
+        <line x1="80" y1="140" x2="500" y2="140" stroke="var(--L1-color)" stroke-width="4"/>
+        <line x1="80" y1="230" x2="500" y2="230" stroke="var(--L1-color)" stroke-width="4"/>
+        <!-- B is on top, E on mid, connecting via slanted lines -->
+        <line x1="180" y1="50" x2="320" y2="140" stroke="var(--accent)" stroke-width="3"/>
+        <line x1="320" y1="140" x2="200" y2="230" stroke="var(--accent)" stroke-width="3"/>
+        <!-- A on top-left -->
+        <circle cx="80" cy="50" r="6" fill="var(--gold)"/>
+        <text x="62" y="44" fill="var(--gold)" font-size="18" font-weight="700">A</text>
+        <!-- B on top -->
+        <circle cx="180" cy="50" r="6" fill="var(--gold)"/>
+        <text x="170" y="40" fill="var(--gold)" font-size="18" font-weight="700">B</text>
+        <!-- C on mid-left -->
+        <circle cx="80" cy="140" r="6" fill="var(--gold)"/>
+        <text x="60" y="160" fill="var(--gold)" font-size="18" font-weight="700">C</text>
+        <!-- D right on mid -->
+        <circle cx="500" cy="140" r="6" fill="var(--gold)"/>
+        <text x="508" y="148" fill="var(--gold)" font-size="18" font-weight="700">D</text>
+        <!-- E on mid -->
+        <circle cx="320" cy="140" r="6" fill="var(--gold)"/>
+        <text x="316" y="130" fill="var(--gold)" font-size="18" font-weight="700">E</text>
+        <!-- G on bottom-left -->
+        <circle cx="80" cy="230" r="6" fill="var(--gold)"/>
+        <text x="60" y="252" fill="var(--gold)" font-size="18" font-weight="700">G</text>
+        <!-- ∠ABC at B -->
+        <path d="M 168,68 A 18,18 0 0 0 192,68" fill="none" stroke="var(--gold)" stroke-width="2.5"/>
+        <text x="160" y="84" fill="var(--gold-soft)" font-size="13">40°</text>
+        <!-- ∠BED at E (between EB and ED) -->
+        <path d="M 312,128 A 14,14 0 0 0 334,131" fill="none" stroke="var(--gold)" stroke-width="2.5"/>
+        <text x="312" y="118" fill="var(--gold-soft)" font-size="13">100°</text>
+        <!-- ∠CDE at D -->
+        <path d="M 488,154 A 16,16 0 0 1 487,170" fill="none" stroke="var(--gold)" stroke-width="2.5"/>
+        <text x="468" y="172" fill="var(--gold-soft)" font-size="13">?</text>
+      </svg>
+    `,
+    options: [
+      { text: '60°', correct: true },
+      { text: '40°', correct: false },
+      { text: '100°', correct: false },
+      { text: '140°', correct: false },
+    ],
+    explainCorrect: '答對！🛒 過 E 作輔助線 // CD，∠BED 被拆成 40°（內錯角 = ∠ABE）+ 60°。所以 ∠CDE = 60°（內錯角）！',
+    explainWrong: '再想一下～提示：∠BED 可以被拆成兩塊。一塊 = ∠ABC = 40°（內錯角），另一塊 = ∠CDE = ?',
+    hints: [
+      '想像在 E 點畫一條虛線 EF // AB // CD（變成 3 條平行線都過 E 點的方向）。',
+      '∠BED = 100° 被這條輔助線拆成兩塊：上半 = ∠ABE = 40°（內錯角），下半 = ∠EDC = ?',
+      '上半 + 下半 = 100° → 下半 = 100° - 40° = 60°。所以 ∠CDE = 60°！',
+    ],
+  },
+
+  {
+    level: 3,
+    levelLabel: '☀️ BOSS · 撞球桌路徑',
+    title: '撞球桌：PQ // RS（桌邊平行）。母球從 A 連續碰撞 B、C，最後擊中 D。已知 ∠1 = ∠2，∠3 = ∠4。請問路徑 AB 和 CD 是否平行？',
+    hint: '提示：算算看 ∠1+∠2 跟 ∠3+∠4，再用「同側內角」判斷',
+    svg: `
+      <svg class="stage" viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg">
+        <!-- Pool table: top PQ and bottom RS (parallel) -->
+        <line x1="40" y1="50" x2="560" y2="50" stroke="var(--L1-color)" stroke-width="5"/>
+        <line x1="40" y1="270" x2="560" y2="270" stroke="var(--L1-color)" stroke-width="5"/>
+        <text x="46" y="42" fill="var(--L1-color)" font-size="16" font-weight="700">P</text>
+        <text x="546" y="42" fill="var(--L1-color)" font-size="16" font-weight="700">Q</text>
+        <text x="46" y="290" fill="var(--L1-color)" font-size="16" font-weight="700">R</text>
+        <text x="546" y="290" fill="var(--L1-color)" font-size="16" font-weight="700">S</text>
+
+        <!-- A bottom-left, B top, C top, D bottom -->
+        <line x1="100" y1="270" x2="230" y2="50" stroke="var(--accent)" stroke-width="3"/>
+        <line x1="230" y1="50" x2="370" y2="270" stroke="var(--gold)" stroke-width="3"/>
+        <line x1="370" y1="270" x2="500" y2="50" stroke="var(--accent)" stroke-width="3"/>
+        <line x1="500" y1="50" x2="540" y2="160" stroke="var(--gold)" stroke-width="3"/>
+
+        <!-- Balls -->
+        <circle cx="100" cy="270" r="9" fill="white" stroke="#333" stroke-width="2"/>
+        <text x="92" y="296" fill="white" font-size="14" font-weight="700">A</text>
+        <circle cx="230" cy="50" r="9" fill="var(--gold)" stroke="#333" stroke-width="2"/>
+        <text x="222" y="36" fill="white" font-size="14" font-weight="700">B</text>
+        <circle cx="500" cy="50" r="9" fill="var(--gold)" stroke="#333" stroke-width="2"/>
+        <text x="492" y="36" fill="white" font-size="14" font-weight="700">C</text>
+        <circle cx="540" cy="160" r="10" fill="var(--accent)" stroke="#333" stroke-width="2"/>
+        <text x="514" y="166" fill="white" font-size="14" font-weight="700">D</text>
+
+        <!-- Angle labels -->
+        <text x="222" y="74" fill="var(--gold-soft)" font-size="13" font-weight="700">1</text>
+        <text x="244" y="74" fill="var(--gold-soft)" font-size="13" font-weight="700">2</text>
+        <text x="488" y="74" fill="var(--gold-soft)" font-size="13" font-weight="700">3</text>
+        <text x="510" y="74" fill="var(--gold-soft)" font-size="13" font-weight="700">4</text>
+      </svg>
+    `,
+    options: [
+      { text: '✓ 平行（同側內角互補）', correct: true },
+      { text: '✗ 不平行', correct: false },
+      { text: '看不出來', correct: false },
+    ],
+    explainCorrect: '答對！🎱 BOSS 破解！B 點：∠1+∠2 + 旁邊兩個角 = 180°，C 點同理。因為 ∠1=∠2、∠3=∠4，可以推出 AB 跟 CD 的同側內角互補 → 平行！',
+    explainWrong: 'BOSS 題比較難～提示：B 點的 ∠1、∠2 和 C 點的 ∠3、∠4 跟 AB、CD 各形成內角。它們互補的話就平行。',
+    hints: [
+      'B 點在桌邊 PQ 上，B 點周圍的四個角加起來 = 180°（平角）。所以 ∠1+∠2+其他兩個 = 180°。',
+      '因為 ∠1=∠2，所以「AB 跟桌邊 PQ 的夾角 = ∠1」、「CD 跟桌邊 RS 的夾角 = ∠4」。',
+      '經過推導，AB 跟 CD 的「同側內角」加起來 = 180°（互補）→ 由判定條件，AB // CD！平行 ✅',
+    ],
+  },
+];
+
+/* =============== UI rendering =============== */
+function showScreen(id) {
+  document.querySelectorAll('section[id^="screen-"]').forEach(s => s.style.display = 'none');
+  document.getElementById('screen-' + id).style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderProgress() {
+  const c = document.getElementById('hud-progress');
+  c.innerHTML = '';
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    const d = document.createElement('div');
+    d.className = 'pdot';
+    if (i < state.currentQ) d.classList.add('done');
+    else if (i === state.currentQ) d.classList.add('active');
+    d.textContent = i + 1;
+    c.appendChild(d);
+  }
+}
+
+function renderQuest() {
+  document.getElementById('hud-name').textContent = state.nick;
+  document.getElementById('hud-coins').textContent = state.coins;
+  renderProgress();
+
+  const q = QUESTIONS[state.currentQ];
+  const lvlClass = q.level === 1 ? 'lvl-base' : q.level === 2 ? 'lvl-mid' : 'lvl-boss';
+  const lvlIcon = q.level === 1 ? '⭐' : q.level === 2 ? '🌙' : '☀️';
+
+  const card = document.getElementById('quest-card');
+  card.innerHTML = `
+    <div style="text-align:center">
+      <span class="lvl-badge ${lvlClass}">${lvlIcon} ${q.levelLabel}</span>
+    </div>
+    <div class="qtitle">${q.title}</div>
+    <div class="qhint">${q.hint}</div>
+    <div class="stage-wrap">${q.svg}</div>
+    <div class="opts" id="q-opts">
+      ${q.options.map((o, i) => `<button class="opt" data-i="${i}">${o.text}</button>`).join('')}
+    </div>
+    <div class="fb" id="q-fb"></div>
+    <div class="hints" id="q-hints">
+      ${q.hints.map((h, i) => `<div class="hint"><strong>提示 ${i+1}：</strong> ${h}</div>`).join('')}
+    </div>
+    <div class="nav">
+      <button class="btn btn-warning" id="hint-btn" onclick="toggleHints()">💡 看提示</button>
+      <button class="btn btn-gold" id="next-btn" onclick="nextQuestion()" disabled>下一關 →</button>
+    </div>
+  `;
+
+  // Attach option clicks
+  card.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', () => answerOption(parseInt(btn.dataset.i), btn));
+  });
+
+  state.hintsUsed[state.currentQ] = state.hintsUsed[state.currentQ] || 0;
+}
+
+function toggleHints() {
+  const h = document.getElementById('q-hints');
+  h.classList.toggle('show');
+  state.hintsUsed[state.currentQ] = (state.hintsUsed[state.currentQ] || 0) + 1;
+}
+
+let answered = false;
+function answerOption(idx, btnEl) {
+  if (answered) return;
+  answered = true;
+  const q = QUESTIONS[state.currentQ];
+  const opt = q.options[idx];
+  const fb = document.getElementById('q-fb');
+  const optsContainer = document.getElementById('q-opts');
+
+  state.answers[state.currentQ] = {
+    pickedIndex: idx,
+    pickedText: opt.text,
+    correct: opt.correct,
+  };
+
+  if (opt.correct) {
+    btnEl.classList.add('correct');
+    fb.className = 'fb win show';
+    fb.innerHTML = q.explainCorrect;
+    state.correct++;
+    state.coins += (q.level === 3 ? 30 : q.level === 2 ? 20 : 10);
+    popCoin(btnEl);
+    playSound('correct');
+  } else {
+    btnEl.classList.add('wrong');
+    // Highlight correct
+    optsContainer.querySelectorAll('.opt').forEach((b, i) => {
+      if (q.options[i].correct) b.classList.add('show-correct');
+    });
+    fb.className = 'fb gentle show';
+    fb.innerHTML = q.explainWrong;
+    playSound('wrong');
+  }
+
+  document.getElementById('next-btn').disabled = false;
+  document.getElementById('hud-coins').textContent = state.coins;
+}
+
+function nextQuestion() {
+  state.currentQ++;
+  answered = false;
+  if (state.currentQ >= QUESTIONS.length) {
+    finishGame();
+  } else {
+    renderQuest();
+  }
+}
+
+/* =============== Sound (8-bit) =============== */
+let audioCtx;
+function playSound(type) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    if (type === 'correct') {
+      o.type = 'square';
+      o.frequency.setValueAtTime(523, audioCtx.currentTime); // C5
+      o.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1); // E5
+      o.frequency.setValueAtTime(784, audioCtx.currentTime + 0.2); // G5
+      g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+      o.start(); o.stop(audioCtx.currentTime + 0.4);
+    } else if (type === 'wrong') {
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(220, audioCtx.currentTime);
+      o.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.3);
+      g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      o.start(); o.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'victory') {
+      [523, 659, 784, 1047].forEach((f, i) => {
+        const oo = audioCtx.createOscillator();
+        const gg = audioCtx.createGain();
+        oo.connect(gg); gg.connect(audioCtx.destination);
+        oo.type = 'square';
+        oo.frequency.value = f;
+        gg.gain.setValueAtTime(0.12, audioCtx.currentTime + i * 0.15);
+        gg.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.15 + 0.3);
+        oo.start(audioCtx.currentTime + i * 0.15);
+        oo.stop(audioCtx.currentTime + i * 0.15 + 0.3);
+      });
+    }
+  } catch (e) {}
+}
+
+function popCoin(refEl) {
+  const r = refEl.getBoundingClientRect();
+  const coin = document.createElement('div');
+  coin.className = 'coin-pop';
+  coin.textContent = '💰';
+  coin.style.left = (r.left + r.width / 2 - 16) + 'px';
+  coin.style.top = (r.top - 10) + 'px';
+  document.body.appendChild(coin);
+  setTimeout(() => coin.remove(), 1100);
+}
+
+/* =============== Finish + Submit =============== */
+function finishGame() {
+  const elapsed = Math.round((Date.now() - state.startTime) / 1000);
+  document.getElementById('vic-name').textContent = state.nick;
+  document.getElementById('vic-correct').textContent = state.correct;
+  document.getElementById('vic-coins').textContent = state.coins;
+  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+  document.getElementById('vic-time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  showScreen('victory');
+  playSound('victory');
+
+  submitToServer(elapsed);
+}
+
+async function submitToServer(elapsed) {
+  const status = document.getElementById('vic-status');
+  const payload = {
+    nick: state.nick,
+    hwId: HOMEWORK_ID,
+    correctCount: state.correct,
+    totalQuestions: QUESTIONS.length,
+    coins: state.coins,
+    elapsedSec: elapsed,
+    submittedAt: new Date().toISOString(),
+    answers: state.answers.map((a, i) => ({
+      q: i + 1,
+      level: QUESTIONS[i].levelLabel,
+      pickedText: a ? a.pickedText : null,
+      correct: a ? a.correct : false,
+      hintsUsed: state.hintsUsed[i] || 0,
+    })),
+  };
+
+  // Retry loop with optimistic concurrency: GET → modify → PUT
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const res = await fetch(BIN_URL, { headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error('GET ' + res.status);
+      const data = await res.json();
+      data.submissions = data.submissions || [];
+      data.submissions.push(payload);
+
+      const putRes = await fetch(BIN_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!putRes.ok) throw new Error('PUT ' + putRes.status);
+
+      status.className = 'submit-status success';
+      status.innerHTML = '✅ 成績已送達老師後台！';
+      return;
+    } catch (err) {
+      if (attempt === 4) {
+        status.className = 'submit-status error';
+        status.innerHTML = '⚠️ 送出失敗，請告訴老師你的暱稱和成績：<br><strong>' + state.nick + ' — ' + state.correct + '/' + QUESTIONS.length + ' 分</strong>';
+        return;
+      }
+      await new Promise(r => setTimeout(r, 500 + Math.random() * 800));
+    }
+  }
+}
+
+/* =============== Restart =============== */
+function restartGame() {
+  state.nick = '';
+  state.startTime = 0;
+  state.currentQ = 0;
+  state.coins = 0;
+  state.correct = 0;
+  state.answers = [];
+  state.hintsUsed = [];
+  answered = false;
+  document.getElementById('nick-input').value = '';
+  showScreen('start');
+}
+
+/* =============== Start =============== */
+document.getElementById('start-btn').addEventListener('click', () => {
+  const input = document.getElementById('nick-input');
+  const nick = input.value.trim();
+  if (!nick) {
+    input.focus();
+    input.style.borderColor = 'var(--danger)';
+    setTimeout(() => input.style.borderColor = '', 1500);
+    return;
+  }
+  state.nick = nick;
+  state.startTime = Date.now();
+  state.currentQ = 0;
+  state.coins = 0;
+  state.correct = 0;
+  state.answers = [];
+  showScreen('quest');
+  renderQuest();
+});
+
+// Enter key in nick input
+document.getElementById('nick-input').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') document.getElementById('start-btn').click();
+});
+
+// Expose for inline onclick
+window.toggleHints = toggleHints;
+window.nextQuestion = nextQuestion;
+window.restartGame = restartGame;
+</script>
+
+</body>
+</html>

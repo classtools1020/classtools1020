@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教師後台 · 平行線王國 ⚔️</title>
+<style>
+  :root {
+    --bg: #F8FAFC;
+    --surface: #FFFFFF;
+    --primary: #5B6FE8;
+    --primary-soft: #DDE4FB;
+    --primary-pale: #EEF1FE;
+    --success: #16A34A;
+    --success-soft: #DCFCE7;
+    --warning: #EA580C;
+    --warning-soft: #FED7AA;
+    --danger: #DC2626;
+    --danger-soft: #FECACA;
+    --text: #0F172A;
+    --text-dim: #64748B;
+    --border: #E2E8F0;
+    --gold: #D97706;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  body{padding:0}
+
+  /* Login */
+  .login{max-width:420px;margin:80px auto;background:var(--surface);border-radius:20px;padding:36px 30px;box-shadow:0 8px 32px rgba(0,0,0,0.08);text-align:center}
+  .login .crown{font-size:48px;margin-bottom:8px}
+  .login h1{font-size:24px;color:var(--primary);margin-bottom:6px}
+  .login p{color:var(--text-dim);margin-bottom:24px;font-size:14px}
+  .login input{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;font-size:16px;font-family:inherit;margin-bottom:14px;text-align:center}
+  .login input:focus{outline:none;border-color:var(--primary)}
+  .login button{width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+  .login button:hover{background:#4A5DD0}
+  .login .err{color:var(--danger);font-size:14px;margin-top:10px;min-height:20px}
+
+  /* Dashboard */
+  .dashboard{max-width:1380px;margin:0 auto;padding:18px}
+  .header{background:var(--surface);border-radius:16px;padding:18px 22px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  .header h1{font-size:22px;color:var(--primary)}
+  .header .meta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--text-dim)}
+  .pill{padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600}
+  .pill.live{background:var(--success-soft);color:var(--success)}
+  .pill.live::before{content:'●';animation:blink 1.4s infinite;margin-right:4px}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+  /* Stats */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .stat{background:var(--surface);border-radius:14px;padding:16px 18px;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+  .stat .label{font-size:12px;color:var(--text-dim);margin-bottom:4px}
+  .stat .val{font-size:28px;font-weight:800;color:var(--primary)}
+  .stat.success .val{color:var(--success)}
+  .stat.warning .val{color:var(--warning)}
+
+  /* Controls */
+  .controls{background:var(--surface);border-radius:14px;padding:14px 18px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.04)}
+  .btn{padding:9px 16px;border:1px solid var(--border);background:white;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text);transition:all 0.15s}
+  .btn:hover{background:var(--primary-pale);border-color:var(--primary)}
+  .btn-primary{background:var(--primary);color:white;border-color:var(--primary)}
+  .btn-primary:hover{background:#4A5DD0}
+  .btn-danger{color:var(--danger);border-color:var(--danger-soft)}
+  .btn-danger:hover{background:var(--danger-soft)}
+  .search{flex:1;min-width:180px;padding:9px 14px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit}
+  .search:focus{outline:none;border-color:var(--primary)}
+
+  /* Table */
+  .table-wrap{background:var(--surface);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04);overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:920px}
+  th{background:var(--primary-pale);color:var(--primary);padding:12px 14px;text-align:left;font-size:13px;font-weight:700;white-space:nowrap;border-bottom:2px solid var(--primary-soft)}
+  td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:top}
+  tr:hover{background:var(--primary-pale)}
+  .nick-cell{font-weight:700;color:var(--primary);font-size:15px}
+  .score-cell{font-weight:700;font-size:16px}
+  .score-perfect{color:var(--success)}
+  .score-good{color:var(--gold)}
+  .score-low{color:var(--warning)}
+  .time-cell{color:var(--text-dim);font-family:'SF Mono',Consolas,monospace;font-size:13px}
+  .answers-cell{display:flex;gap:4px;flex-wrap:wrap}
+  .ans-dot{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;font-size:11px;font-weight:700;color:white}
+  .ans-correct{background:var(--success)}
+  .ans-wrong{background:var(--danger)}
+  .ans-none{background:#CBD5E1}
+  .hint-badge{display:inline-block;background:var(--warning-soft);color:var(--warning);font-size:10px;padding:1px 5px;border-radius:4px;margin-left:3px}
+  .submitted-cell{color:var(--text-dim);font-size:12px}
+
+  .empty{text-align:center;padding:60px 20px;color:var(--text-dim)}
+  .empty .emoji{font-size:48px;margin-bottom:10px}
+
+  /* Detail modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;padding:18px;z-index:100}
+  .modal.show{display:flex}
+  .modal-card{background:white;border-radius:16px;max-width:640px;width:100%;max-height:88vh;overflow:auto;padding:24px}
+  .modal-card h2{margin-bottom:12px;color:var(--primary)}
+  .modal-card .q-detail{background:var(--primary-pale);border-radius:10px;padding:14px;margin-bottom:10px}
+  .modal-card .q-detail .q-head{font-weight:700;margin-bottom:6px}
+  .modal-card .q-detail .q-ans{font-size:14px;color:var(--text-dim)}
+  .modal-card .close-btn{float:right;background:none;border:none;font-size:24px;cursor:pointer;color:var(--text-dim);padding:0;margin:-8px -8px 0 0}
+
+  @media (max-width:640px) {
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .header{flex-direction:column;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<section id="login" class="login">
+  <div class="crown">👑</div>
+  <h1>教師後台</h1>
+  <p>平行線王國大冒險 · 8A 數學回家作業</p>
+  <input id="pwd-input" type="password" placeholder="輸入密碼" autocomplete="off">
+  <button onclick="tryLogin()">登入</button>
+  <div class="err" id="pwd-err"></div>
+</section>
+
+<!-- Dashboard -->
+<section id="dashboard" class="dashboard" style="display:none">
+
+  <div class="header">
+    <h1>👑 平行線王國 · 教師後台</h1>
+    <div class="meta">
+      <span>作業：<strong>4-1 平行線與截角性質</strong></span>
+      <span class="pill live">即時連線</span>
+      <span id="last-update">尚未刷新</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="label">📊 提交人數</div>
+      <div class="val" id="stat-count">0</div>
+    </div>
+    <div class="stat success">
+      <div class="label">✨ 平均得分</div>
+      <div class="val" id="stat-avg">—</div>
+    </div>
+    <div class="stat success">
+      <div class="label">💯 全對人數</div>
+      <div class="val" id="stat-perfect">0</div>
+    </div>
+    <div class="stat warning">
+      <div class="label">⏱️ 平均用時</div>
+      <div class="val" id="stat-time">—</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input class="search" id="search-input" placeholder="🔍 搜尋暱稱…" oninput="renderTable()">
+    <select class="btn" id="sort-select" onchange="renderTable()">
+      <option value="time-desc">最新提交</option>
+      <option value="time-asc">最早提交</option>
+      <option value="score-desc">得分高到低</option>
+      <option value="score-asc">得分低到高</option>
+      <option value="nick">依暱稱排序</option>
+    </select>
+    <button class="btn btn-primary" onclick="fetchData()">🔄 立即刷新</button>
+    <button class="btn" onclick="downloadCSV()">📥 匯出 CSV</button>
+    <button class="btn btn-danger" onclick="confirmReset()">🗑️ 清空全部</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>召喚師暱稱</th>
+          <th>得分</th>
+          <th>金幣</th>
+          <th>用時</th>
+          <th>各題答對 (Q1-Q5)</th>
+          <th>提交時間</th>
+          <th>動作</th>
+        </tr>
+      </thead>
+      <tbody id="rows">
+        <tr><td colspan="8" class="empty"><div class="emoji">⏳</div>正在載入學生資料…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <button class="close-btn" onclick="closeModal()">✕</button>
+    <h2 id="modal-title">學生答題詳情</h2>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const BIN_URL = 'https://jsonblob.com/api/jsonBlob/019e62a4-4aef-7ebe-8a45-f7d51f694e28';
+const HOMEWORK_ID = '8a_parallel_4_1_2026_05_26';
+const PASSWORD = 'stacey2026';
+const POLL_INTERVAL = 6000; // 6 sec
+
+let submissions = [];
+let pollTimer = null;
+
+function tryLogin() {
+  const input = document.getElementById('pwd-input');
+  const val = input.value;
+  if (val === PASSWORD) {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('dashboard').style.display = '';
+    fetchData();
+    pollTimer = setInterval(fetchData, POLL_INTERVAL);
+  } else {
+    document.getElementById('pwd-err').textContent = '密碼錯誤，再試一次';
+    input.focus();
+    input.select();
+  }
+}
+
+document.getElementById('pwd-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter') tryLogin();
+});
+
+async function fetchData() {
+  try {
+    const res = await fetch(BIN_URL + '?_=' + Date.now(), { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error('GET ' + res.status);
+    const data = await res.json();
+    submissions = (data.submissions || []).filter(s => s.hwId === HOMEWORK_ID);
+    document.getElementById('last-update').textContent = '剛剛更新（' + new Date().toLocaleTimeString('zh-TW', { hour12: false }) + '）';
+    renderStats();
+    renderTable();
+  } catch (err) {
+    document.getElementById('last-update').textContent = '⚠️ 連線失敗 — ' + err.message;
+  }
+}
+
+function renderStats() {
+  const n = submissions.length;
+  document.getElementById('stat-count').textContent = n;
+  if (n === 0) {
+    document.getElementById('stat-avg').textContent = '—';
+    document.getElementById('stat-perfect').textContent = '0';
+    document.getElementById('stat-time').textContent = '—';
+    return;
+  }
+  const avg = submissions.reduce((a, s) => a + s.correctCount, 0) / n;
+  const perfect = submissions.filter(s => s.correctCount === s.totalQuestions).length;
+  const avgTime = submissions.reduce((a, s) => a + s.elapsedSec, 0) / n;
+  document.getElementById('stat-avg').textContent = avg.toFixed(1) + '/5';
+  document.getElementById('stat-perfect').textContent = perfect;
+  const m = Math.floor(avgTime / 60), sec = Math.round(avgTime % 60);
+  document.getElementById('stat-time').textContent = m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function renderTable() {
+  const search = document.getElementById('search-input').value.trim().toLowerCase();
+  const sortBy = document.getElementById('sort-select').value;
+  let list = submissions.slice();
+  if (search) list = list.filter(s => (s.nick || '').toLowerCase().includes(search));
+  list.sort((a, b) => {
+    if (sortBy === 'time-desc') return new Date(b.submittedAt) - new Date(a.submittedAt);
+    if (sortBy === 'time-asc') return new Date(a.submittedAt) - new Date(b.submittedAt);
+    if (sortBy === 'score-desc') return b.correctCount - a.correctCount;
+    if (sortBy === 'score-asc') return a.correctCount - b.correctCount;
+    if (sortBy === 'nick') return (a.nick || '').localeCompare(b.nick || '');
+    return 0;
+  });
+
+  const tbody = document.getElementById('rows');
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" class="empty"><div class="emoji">📭</div>${submissions.length === 0 ? '還沒有學生提交' : '找不到符合條件的學生'}</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map((s, idx) => {
+    const scoreClass = s.correctCount === s.totalQuestions ? 'score-perfect' : s.correctCount >= 3 ? 'score-good' : 'score-low';
+    const m = Math.floor(s.elapsedSec / 60), sec = s.elapsedSec % 60;
+    const timeStr = m + ':' + (sec < 10 ? '0' : '') + sec;
+    const dots = (s.answers || []).map(a => {
+      const cls = a.correct ? 'ans-correct' : 'ans-wrong';
+      const txt = a.correct ? '✓' : '✗';
+      const hintBadge = (a.hintsUsed > 0) ? `<span class="hint-badge">💡${a.hintsUsed}</span>` : '';
+      return `<span class="ans-dot ${cls}" title="Q${a.q}: ${a.pickedText || '未答'}">${txt}</span>${hintBadge}`;
+    }).join('');
+    const submitTime = new Date(s.submittedAt);
+    const submittedStr = submitTime.toLocaleString('zh-TW', { hour12: false, month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const safeNick = (s.nick || '?').replace(/</g, '&lt;');
+    return `
+      <tr>
+        <td>${idx + 1}</td>
+        <td class="nick-cell">${safeNick}</td>
+        <td class="score-cell ${scoreClass}">${s.correctCount}/${s.totalQuestions}</td>
+        <td>💰 ${s.coins || 0}</td>
+        <td class="time-cell">${timeStr}</td>
+        <td><div class="answers-cell">${dots}</div></td>
+        <td class="submitted-cell">${submittedStr}</td>
+        <td><button class="btn" onclick="showDetail(${submissions.indexOf(s)})">📋 詳情</button></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function showDetail(idx) {
+  const s = submissions[idx];
+  if (!s) return;
+  document.getElementById('modal-title').textContent = `📋 ${s.nick} 的答題詳情`;
+  const body = document.getElementById('modal-body');
+  body.innerHTML = `
+    <div style="margin-bottom:16px;display:flex;gap:18px;flex-wrap:wrap">
+      <div><strong>得分：</strong> ${s.correctCount}/${s.totalQuestions}</div>
+      <div><strong>金幣：</strong> 💰 ${s.coins}</div>
+      <div><strong>用時：</strong> ${Math.floor(s.elapsedSec/60)}:${(s.elapsedSec%60).toString().padStart(2,'0')}</div>
+      <div><strong>提交：</strong> ${new Date(s.submittedAt).toLocaleString('zh-TW', { hour12: false })}</div>
+    </div>
+    ${(s.answers || []).map(a => `
+      <div class="q-detail">
+        <div class="q-head">Q${a.q} · ${a.level} ${a.correct ? '<span style="color:var(--success)">✓ 答對</span>' : '<span style="color:var(--danger)">✗ 答錯</span>'}</div>
+        <div class="q-ans">學生選：${(a.pickedText || '未答').replace(/</g, '&lt;')}</div>
+        ${a.hintsUsed > 0 ? `<div class="q-ans" style="margin-top:4px;color:var(--warning)">💡 用了 ${a.hintsUsed} 次提示</div>` : ''}
+      </div>
+    `).join('')}
+  `;
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target.id === 'modal') closeModal();
+});
+
+function downloadCSV() {
+  if (submissions.length === 0) {
+    alert('還沒有資料可以匯出');
+    return;
+  }
+  const headers = ['暱稱', '得分', '總題數', '金幣', '用時(秒)', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', '提交時間'];
+  const rows = submissions.map(s => {
+    const ans = (s.answers || []).map(a => a.correct ? '✓' : '✗').concat(['', '', '', '', '']).slice(0, 5);
+    return [
+      s.nick || '',
+      s.correctCount,
+      s.totalQuestions,
+      s.coins || 0,
+      s.elapsedSec,
+      ...ans,
+      new Date(s.submittedAt).toLocaleString('zh-TW', { hour12: false }),
+    ].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',');
+  });
+  const csv = '﻿' + headers.join(',') + '\n' + rows.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `平行線王國成績_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function confirmReset() {
+  if (!confirm('⚠️ 確定要清空全部提交資料嗎？（此動作不可恢復）')) return;
+  if (!confirm('真的真的確定？這會清掉全班所有學生的成績紀錄。')) return;
+  try {
+    await fetch(BIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ meta: { name: '8A_parallel_line_homework_2026', cleared: new Date().toISOString() }, submissions: [] }),
+    });
+    submissions = [];
+    renderStats();
+    renderTable();
+    alert('✅ 已清空');
+  } catch (err) {
+    alert('❌ 清空失敗：' + err.message);
+  }
+}
+
+window.tryLogin = tryLogin;
+window.showDetail = showDetail;
+window.closeModal = closeModal;
+window.downloadCSV = downloadCSV;
+window.confirmReset = confirmReset;
+</script>
+
+</body>
+</html>
