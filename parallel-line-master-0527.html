@@ -659,39 +659,45 @@ const QUESTIONS = [
   {
     level: 3,
     levelLabel: '☀️ 挑戰 · Z 字摺紙',
-    title: '📄 摺紙摺出 Z 字形：L₁ // L₂，A 在 L₁、C 在 L₂、B 是中間轉折點。已知 ∠A = 30° (AB 跟 L₁ 夾角)，∠C = 50° (BC 跟 L₂ 夾角)。求轉折角 ∠B (AB 跟 BC 的夾角) = ?',
-    hint: '提示：過 B 點畫一條虛線 // L₁ // L₂，把 ∠B 拆成兩塊（內錯角）',
+    title: '📄 摺紙摺出 Z 字形（B 點向右凸出）：L₁ // L₂，A 在 L₁、C 在 L₂、B 是中間轉折點。已知 ∠A = 30° (AB 跟 L₁ 夾角)、∠C = 50° (BC 跟 L₂ 夾角)。求轉折角 ∠B = ?',
+    hint: '提示：過 B 點畫一條輔助線 // L₁ // L₂（圖中灰色虛線），把 ∠B 拆成上下兩半',
     buildSvg() {
-      const Ax=120, Ay=60, Bx=300, By=160, Cx=480, Cy=260, r=20;
+      // Z 字形：B 點明顯往右凸出
+      // 用實際角度對應座標：∠A=30°(AB 跟 L₁) + ∠C=50°(BC 跟 L₂) → ∠B=80°
+      // L₁ y=60, L₂ y=300。 B=(400,180)
+      // A: 從 B 朝「左上 30°」方向，距 240 → A=(192,60)
+      // C: 從 B 朝「左下 50°」方向，距 157 → C=(299,300)
+      const Ax=192, Ay=60, Bx=400, By=180, Cx=299, Cy=300, r=22;
       return `
-      <svg class="stage" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+      <svg class="stage" viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
         <!-- L1, L2 平行線 -->
         <line x1="30" y1="60" x2="570" y2="60" stroke="var(--L1-color)" stroke-width="5" stroke-linecap="round"/>
-        <line x1="30" y1="260" x2="570" y2="260" stroke="var(--L1-color)" stroke-width="5" stroke-linecap="round"/>
-        <!-- Z 字摺線 A → B → C -->
-        <line x1="${Ax}" y1="${Ay}" x2="${Bx}" y2="${By}" stroke="var(--accent)" stroke-width="3.5"/>
-        <line x1="${Bx}" y1="${By}" x2="${Cx}" y2="${Cy}" stroke="var(--accent)" stroke-width="3.5"/>
-        <!-- 輔助線 (虛線) 從 B 水平 -->
-        <line x1="200" y1="${By}" x2="430" y2="${By}" stroke="#888" stroke-width="2" stroke-dasharray="5 5" opacity="0.5"/>
-        <text x="40" y="50" fill="var(--L1-color)" font-size="18" font-weight="800">L₁</text>
-        <text x="40" y="282" fill="var(--L1-color)" font-size="18" font-weight="800">L₂</text>
-        <text x="436" y="${By + 4}" fill="#888" font-size="13" opacity="0.7">輔助線 //</text>
-        <!-- 點 -->
-        ${svgPoint(Ax, Ay, 'A', '#FFC93C', 0, -12, 16)}
-        ${svgPoint(Bx, By, 'B', '#FFC93C', 16, -8, 16)}
-        ${svgPoint(Cx, Cy, 'C', '#FFC93C', 0, 24, 16)}
-        <!-- ∠A: A 點，AB 跟 L1 夾角，在 A 下右 -->
+        <line x1="30" y1="300" x2="570" y2="300" stroke="var(--L1-color)" stroke-width="5" stroke-linecap="round"/>
+        <!-- Z 字摺線 A → B → C（清楚的兩段，B 向右凸） -->
+        <line x1="${Ax}" y1="${Ay}" x2="${Bx}" y2="${By}" stroke="var(--accent)" stroke-width="4"/>
+        <line x1="${Bx}" y1="${By}" x2="${Cx}" y2="${Cy}" stroke="var(--accent)" stroke-width="4"/>
+        <!-- 輔助線 (虛線) 過 B 水平，伸到 B 兩側讓內錯角看得到 -->
+        <line x1="240" y1="${By}" x2="540" y2="${By}" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 4" opacity="0.7"/>
+        <!-- 線標籤 -->
+        <text x="40" y="50" fill="var(--L1-color)" font-size="19" font-weight="800">L₁</text>
+        <text x="40" y="322" fill="var(--L1-color)" font-size="19" font-weight="800">L₂</text>
+        <text x="548" y="${By + 5}" fill="#94A3B8" font-size="13">輔助線 //</text>
+        <!-- ∠A: A=(192,60), AB 朝右下 30°（標準角 -30°）。∠A 在 A 下右：弧 from 0° to -30° -->
         ${svgArc(Ax, Ay, 0, -30, r)}
         ${svgAngleLabel(Ax, Ay, 0, -30, r, '30°')}
         ${svgAngleName(Ax, Ay, 0, -30, r, '∠A')}
-        <!-- ∠C: C 點，BC 跟 L2 夾角，在 C 上左 -->
-        ${svgArc(Cx, Cy, 150, 180, r)}
-        ${svgAngleLabel(Cx, Cy, 150, 180, r, '50°')}
-        ${svgAngleName(Cx, Cy, 150, 180, r, '∠C')}
-        <!-- ∠B 在 B 點，整個 Z 角 -->
-        ${svgArc(Bx, By, 210, 330, r-2)}
-        ${svgAngleLabel(Bx, By, 210, 330, r-2, '?')}
-        ${svgAngleName(Bx, By, 210, 330, r-2, '∠B')}
+        <!-- ∠C: C=(299,300), CB 朝右上 50°（標準角 +50°）。∠C 在 C 上右：弧 from 0° to 50° -->
+        ${svgArc(Cx, Cy, 0, 50, r)}
+        ${svgAngleLabel(Cx, Cy, 0, 50, r, '50°')}
+        ${svgAngleName(Cx, Cy, 0, 50, r, '∠C')}
+        <!-- ∠B 在 B 點：BA 方向 150°、BC 方向 230°。弧 from 150° to 230° (順時針 80°) -->
+        ${svgArc(Bx, By, 150, 230, r-2, '#FFD970', 3)}
+        ${svgAngleLabel(Bx, By, 150, 230, r-2, '?', '#FFD970', 18)}
+        ${svgAngleName(Bx, By, 150, 230, r-2, '∠B', '#FFD970', 19)}
+        <!-- 點（最後畫蓋住線條） -->
+        ${svgPoint(Ax, Ay, 'A', '#FFC93C', -14, -10, 17)}
+        ${svgPoint(Bx, By, 'B', '#FFC93C', 18, -8, 17)}
+        ${svgPoint(Cx, Cy, 'C', '#FFC93C', 14, 26, 17)}
       </svg>`;
     },
     options: [
