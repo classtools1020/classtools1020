@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>115 學年度 新竹區 升學兩條路｜給家長的指引</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1a1a;line-height:1.65;padding:20px 16px;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto}
+
+header{background:linear-gradient(135deg,#0d47a1,#1976d2);color:#fff;padding:28px;border-radius:14px;margin-bottom:18px;box-shadow:0 4px 14px rgba(0,0,0,.08);text-align:center}
+h1{font-size:1.7em;font-weight:900;margin-bottom:6px;letter-spacing:-.5px}
+.subtitle{font-size:1em;opacity:.92;margin-bottom:8px}
+.meta{font-size:.85em;opacity:.85}
+
+h2{font-size:1.3em;font-weight:900;margin:24px 0 14px;color:#0d47a1;display:flex;align-items:center;gap:8px}
+h2::before{content:'';width:4px;height:20px;background:#1976d2;border-radius:2px}
+
+/* 兩條路對照 */
+.two-paths{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+.path{background:#fff;border-radius:14px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,.06);position:relative;overflow:hidden}
+.path-a{border-top:5px solid #4caf50}
+.path-b{border-top:5px solid #ff9800}
+.path-badge{display:inline-block;padding:4px 12px;border-radius:14px;font-size:.78em;font-weight:800;margin-bottom:8px}
+.path-a .path-badge{background:#e8f5e9;color:#2e7d32}
+.path-b .path-badge{background:#fff3e0;color:#e65100}
+.path-title{font-size:1.25em;font-weight:900;margin-bottom:4px}
+.path-subtitle{color:#666;font-size:.92em;margin-bottom:14px}
+.path-row{display:flex;padding:8px 0;border-bottom:1px dotted #eee;font-size:.92em}
+.path-row:last-child{border-bottom:none}
+.path-row .label{font-weight:700;color:#666;flex:0 0 80px}
+.path-row .val{flex:1;color:#222}
+.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.78em;font-weight:700;margin-right:4px}
+.tag-good{background:#e8f5e9;color:#2e7d32}
+.tag-warn{background:#fff3e0;color:#e65100}
+
+@media(max-width:700px){.two-paths{grid-template-columns:1fr}}
+
+/* 決策建議 */
+.decision{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:18px}
+.q{border-left:4px solid #1976d2;padding:10px 14px;background:#f5f7fa;margin-bottom:10px;border-radius:0 8px 8px 0}
+.q-text{font-weight:700;color:#0d47a1;margin-bottom:4px}
+.q-ans{color:#444;font-size:.92em}
+.q-ans b{color:#2e7d32}
+
+/* 時間軸 */
+.timeline{background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:18px;overflow-x:auto}
+.tl-row{display:grid;grid-template-columns:90px 1fr 1fr;gap:8px;padding:10px 0;border-bottom:1px solid #f0f0f0;align-items:center}
+.tl-row.header{background:#f5f7fa;font-weight:800;font-size:.85em;color:#666;border-radius:6px;padding:8px 8px}
+.tl-row:last-child{border-bottom:none}
+.tl-date{font-weight:800;color:#1976d2;font-size:.9em}
+.tl-a{padding:6px 10px;background:#e8f5e9;border-radius:6px;font-size:.88em;color:#1b5e20;min-height:34px;display:flex;align-items:center}
+.tl-b{padding:6px 10px;background:#fff3e0;border-radius:6px;font-size:.88em;color:#bf360c;min-height:34px;display:flex;align-items:center}
+.tl-empty{color:#ccc;text-align:center}
+
+/* 學校列表（會考管道）*/
+.school-section{background:#fff;border-radius:14px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:14px}
+.school-section h3{font-size:1.05em;font-weight:800;margin-bottom:10px;color:#0d47a1;padding-bottom:6px;border-bottom:2px solid #e3f2fd}
+.school-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.school-pill{padding:8px 12px;background:#f5f7fa;border-radius:8px;border-left:3px solid #1976d2;font-size:.92em;font-weight:600}
+.school-pill .small{display:block;font-size:.75em;color:#666;font-weight:500;margin-top:2px}
+
+/* 篩選 */
+.type-filter{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.type-chip{padding:5px 12px;border:1.5px solid #e0e0e0;border-radius:18px;background:#fff;font-size:.85em;font-weight:600;cursor:pointer;color:#444}
+.type-chip.active{background:#1976d2;color:#fff;border-color:#1976d2}
+
+.school-pill.hide{display:none}
+
+/* 連結卡 */
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:18px}
+.link-card{background:#fff;padding:14px 16px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.04);text-decoration:none;color:#222;border-left:4px solid #1976d2;transition:all .15s}
+.link-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.link-card .lc-title{font-weight:800;color:#0d47a1;margin-bottom:2px}
+.link-card .lc-desc{font-size:.85em;color:#666}
+
+footer{text-align:center;color:#999;font-size:.82em;margin-top:24px;padding-top:14px;border-top:1px solid #e0e0e0;line-height:1.8}
+.footer-link{color:#1976d2;text-decoration:none;font-weight:700}
+
+/* 提示 */
+.note-box{background:#fff8e1;border-left:4px solid #ffa726;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:14px;font-size:.92em}
+.note-box b{color:#e65100}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>📚 給家長的升學指引</h1>
+  <div class="subtitle">115 學年度 · 新竹區 · 身心障礙學生兩條升學路徑</div>
+  <div class="meta">資料整理：曾老師 ｜ 芎林國中／竹東國中特教團隊</div>
+</header>
+
+<!-- 提示 -->
+<div class="note-box">
+  💡 <b>重點：</b>您的孩子有<b>兩條升學路徑</b>可以選擇，可以單選、可以雙線並行。下面把兩條路講清楚，您再決定哪條最適合孩子。
+</div>
+
+<!-- 兩條路對照 -->
+<h2>🛤️ 兩條路：一眼看懂</h2>
+<div class="two-paths">
+
+  <div class="path path-a">
+    <div class="path-badge">路徑 A · 安置路線</div>
+    <div class="path-title">適性輔導安置</div>
+    <div class="path-subtitle">由特教委員會評估安置 · 無需考試</div>
+
+    <div class="path-row"><div class="label">適合誰</div><div class="val">領有身心障礙鑑定證明（不含智能障礙）</div></div>
+    <div class="path-row"><div class="label">怎麼進</div><div class="val">選填志願 → 委員會晤談 → 分發</div></div>
+    <div class="path-row"><div class="label">需考試？</div><div class="val"><span class="tag tag-good">✓ 不需要</span></div></div>
+    <div class="path-row"><div class="label">優點</div><div class="val">沒考試壓力 · 委員會了解孩子需求</div></div>
+    <div class="path-row"><div class="label">學校選擇</div><div class="val">新竹區 22 所、577 名額、12 個群別</div></div>
+    <div class="path-row"><div class="label">關鍵時間</div><div class="val">2 月底報名 / 6 月放榜</div></div>
+    <div class="path-row"><div class="label">查詢網址</div><div class="val"><a href="placement-2026-hsinchu.html" style="color:#2e7d32;font-weight:700">學校科系一覽 →</a></div></div>
+  </div>
+
+  <div class="path path-b">
+    <div class="path-badge">路徑 B · 會考路線</div>
+    <div class="path-title">國中教育會考</div>
+    <div class="path-subtitle">與一般學生一同考試入學</div>
+
+    <div class="path-row"><div class="label">適合誰</div><div class="val">學業表現中上 · 想念心儀普通高中</div></div>
+    <div class="path-row"><div class="label">怎麼進</div><div class="val">考會考 → 免試入學（比序）/ 特色招生</div></div>
+    <div class="path-row"><div class="label">需考試？</div><div class="val"><span class="tag tag-warn">✓ 需要</span> 5 月考會考</div></div>
+    <div class="path-row"><div class="label">優點</div><div class="val">學校選擇最多 · 普通高中為主</div></div>
+    <div class="path-row"><div class="label">學校選擇</div><div class="val">新竹區所有公私立高中職 + 五專</div></div>
+    <div class="path-row"><div class="label">關鍵時間</div><div class="val">5 月考試 / 7 月放榜</div></div>
+    <div class="path-row"><div class="label">查詢網址</div><div class="val"><a href="https://www.cap.rcpet.edu.tw/" target="_blank" style="color:#e65100;font-weight:700">教育會考全國網 →</a></div></div>
+  </div>
+
+</div>
+
+<div class="note-box">
+  ⚠️ <b>重要規定：</b>不能同時報名「適性輔導安置 - 國立特殊教育學校」+「適性輔導安置 - 高級中等學校」+「直轄市自辦安置」三者。但<b>會考管道與安置管道可以雙線並行</b>——錄取後擇一報到。
+</div>
+
+<!-- 怎麼選 -->
+<h2>🤔 哪條路適合我的孩子？</h2>
+<div class="decision">
+
+  <div class="q">
+    <div class="q-text">Q1. 孩子的學業成績如何？</div>
+    <div class="q-ans">
+      • 中上、可應付會考壓力 → <b>建議路徑 B（會考）為主，A 為保險</b><br>
+      • 學業吃力、考試焦慮 → <b>建議路徑 A（安置）為主</b>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">Q2. 孩子已經有想念的學校了嗎？</div>
+    <div class="q-ans">
+      • 想念<b>普通高中</b>（如新竹中學、竹東高中）→ <b>路徑 B 較有機會</b><br>
+      • 想念<b>技職科系</b>（如餐飲、設計、汽車）→ <b>兩條路都有，路徑 A 名額較友善</b>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">Q3. 孩子的特殊需求嚴重程度？</div>
+    <div class="q-ans">
+      • 在普通班需要密集支持 → <b>路徑 A 安置至有資源班的學校較有保障</b><br>
+      • 在普通班可獨立學習 → <b>路徑 B 選擇較多元</b>
+    </div>
+  </div>
+
+  <div class="q">
+    <div class="q-text">Q4. 不確定怎麼選？</div>
+    <div class="q-ans">
+      <b>建議雙線並行：</b>同時報名安置（路徑 A），同時準備會考（路徑 B）。安置 6 月放榜，會考 7 月放榜——可看結果擇優。
+    </div>
+  </div>
+
+</div>
+
+<!-- 時間軸對照 -->
+<h2>📅 兩條路的時間對照</h2>
+<div class="timeline">
+  <div class="tl-row header">
+    <div>月份</div>
+    <div>路徑 A · 安置</div>
+    <div>路徑 B · 會考</div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-date">114/12</div>
+    <div class="tl-a">公告開缺名額</div>
+    <div class="tl-empty">—</div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-date">115/1</div>
+    <div class="tl-a">志願試探（模擬選填）</div>
+    <div class="tl-b">會考報名（學校統一辦理）</div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-date">115/2-3</div>
+    <div class="tl-a"><b>網路報名 2/23-3/3</b></div>
+    <div class="tl-empty">—</div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-date">115/4</div>
+    <div class="tl-a">晤談作業（4/18 前）</div>
+    <div class="tl-empty">—</div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-date">115/5</div>
+    <div class="tl-empty">—</div>
+    <div class="tl-b"><b>會考考試（5/17-18）</b></div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-date">115/6</div>
+    <div class="tl-a"><b>公告安置結果（6/1）</b></div>
+    <div class="tl-b">成績公布、選填志願</div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-date">115/7</div>
+    <div class="tl-a">餘額安置（7/6-10）</div>
+    <div class="tl-b"><b>免試入學放榜、報到</b></div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-date">115/8</div>
+    <div class="tl-a">餘額放榜（7/31 前）</div>
+    <div class="tl-b">特色招生（部分學校）</div>
+  </div>
+</div>
+
+<!-- 新竹區學校 -->
+<h2>🏫 新竹區可以選的學校（會考管道）</h2>
+<p style="color:#666;margin-bottom:12px;font-size:.92em">透過會考管道，新竹區幾乎<b>所有公私立高中職</b>都可以選填。下面依學校類型分類列出。</p>
+
+<div class="type-filter" id="typeFilter">
+  <button class="type-chip active" data-type="all">全部</button>
+  <button class="type-chip" data-type="國立普通">國立普通高中</button>
+  <button class="type-chip" data-type="國立技職">國立高職</button>
+  <button class="type-chip" data-type="縣市立">縣市立高中</button>
+  <button class="type-chip" data-type="私立">私立高中職</button>
+  <button class="type-chip" data-type="五專">五專</button>
+</div>
+
+<div id="schoolList">
+  <div class="school-section" data-cat="國立普通">
+    <h3>🎓 國立普通高中</h3>
+    <div class="school-grid">
+      <div class="school-pill">國立新竹高中<span class="small">男校・學術頂尖</span></div>
+      <div class="school-pill">國立新竹女中<span class="small">女校・學術頂尖</span></div>
+      <div class="school-pill">國立陽明交大附中<span class="small">學術型・科學園區</span></div>
+      <div class="school-pill">國立竹東高中<span class="small">學術型・竹東</span></div>
+      <div class="school-pill">國立竹科實中<span class="small">實驗中學・園區</span></div>
+      <div class="school-pill">國立關西高中<span class="small">綜合・關西</span></div>
+    </div>
+  </div>
+
+  <div class="school-section" data-cat="國立技職">
+    <h3>🛠 國立高職 / 技職</h3>
+    <div class="school-grid">
+      <div class="school-pill">國立新竹高工<span class="small">工科・電機機械</span></div>
+      <div class="school-pill">國立新竹高商<span class="small">商科・綜合</span></div>
+      <div class="school-pill">國立新竹特殊教育學校<span class="small">特教專科</span></div>
+    </div>
+  </div>
+
+  <div class="school-section" data-cat="縣市立">
+    <h3>🏛 縣市立高中</h3>
+    <div class="school-grid">
+      <div class="school-pill">縣立六家高中<span class="small">竹北・學術</span></div>
+      <div class="school-pill">縣立湖口高中<span class="small">湖口・綜合</span></div>
+      <div class="school-pill">縣立自強高工<span class="small">湖口・工科</span></div>
+      <div class="school-pill">市立成德高中<span class="small">新竹市・學術</span></div>
+      <div class="school-pill">市立建功高中<span class="small">新竹市・學術</span></div>
+      <div class="school-pill">市立香山高中<span class="small">新竹市・綜合</span></div>
+    </div>
+  </div>
+
+  <div class="school-section" data-cat="私立">
+    <h3>🏫 私立高中 / 高職</h3>
+    <div class="school-grid">
+      <div class="school-pill">私立義民高中<span class="small">綜合・新埔</span></div>
+      <div class="school-pill">私立光復高中<span class="small">綜合・新竹市</span></div>
+      <div class="school-pill">私立忠信高中<span class="small">綜合・新埔</span></div>
+      <div class="school-pill">私立磐石高中<span class="small">綜合・湖口</span></div>
+      <div class="school-pill">私立內思高中<span class="small">綜合・新埔</span></div>
+      <div class="school-pill">私立仰德高中<span class="small">家商・新竹市</span></div>
+      <div class="school-pill">私立東泰高中<span class="small">綜合・竹東</span></div>
+      <div class="school-pill">私立曙光女中<span class="small">女校・新竹市</span></div>
+      <div class="school-pill">私立世界高中<span class="small">高職・新竹市</span></div>
+      <div class="school-pill">私立培英國中<span class="small">補校・新竹市</span></div>
+    </div>
+  </div>
+
+  <div class="school-section" data-cat="五專">
+    <h3>🎯 五年制專科（五專）</h3>
+    <div class="school-grid">
+      <div class="school-pill">明新科技大學附設專科部<span class="small">新豐</span></div>
+      <div class="school-pill">元培醫事科技大學<span class="small">新竹市</span></div>
+      <div class="school-pill">中華科技大學<span class="small">竹北分部</span></div>
+      <div class="school-pill">國立聯合大學附設<span class="small">苗栗（鄰近）</span></div>
+    </div>
+    <p style="margin-top:8px;font-size:.85em;color:#666">💡 五專可透過<b>「五專優先免試」</b>或會考成績申請。</p>
+  </div>
+</div>
+
+<!-- 重要連結 -->
+<h2>🔗 重要官方連結</h2>
+<div class="links">
+  <a href="https://adapt.set.edu.tw/" target="_blank" class="link-card">
+    <div class="lc-title">適性輔導安置官網</div>
+    <div class="lc-desc">路徑 A 完整簡章 / 開缺查詢</div>
+  </a>
+  <a href="https://www.cap.rcpet.edu.tw/" target="_blank" class="link-card">
+    <div class="lc-title">國中教育會考</div>
+    <div class="lc-desc">路徑 B 報名 / 成績查詢</div>
+  </a>
+  <a href="https://12basic.k12ea.gov.tw/" target="_blank" class="link-card">
+    <div class="lc-title">12 年國教資訊網</div>
+    <div class="lc-desc">免試入學完整制度</div>
+  </a>
+  <a href="placement-2026-hsinchu.html" class="link-card">
+    <div class="lc-title">新竹區安置學校清單</div>
+    <div class="lc-desc">22 校 577 名額完整資訊</div>
+  </a>
+</div>
+
+<footer>
+  整理：曾老師 Stacey · <a href="https://classtools1020.github.io/classtools1020/" class="footer-link">回首頁</a><br>
+  本表為協助家長理解的彙整版本，<b>正式報名與招生資訊以官方簡章為準</b>。<br>
+  最後更新：115 年初 · 如有疑問請洽孩子就讀國中之輔導室／特教組
+</footer>
+
+</div>
+
+<script>
+document.getElementById('typeFilter').addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#typeFilter .type-chip').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  const cat = e.target.dataset.type;
+  document.querySelectorAll('.school-section').forEach(s => {
+    s.style.display = (cat === 'all' || s.dataset.cat === cat) ? '' : 'none';
+  });
+});
+</script>
+</body>
+</html>
