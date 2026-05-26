@@ -6,8 +6,24 @@
 <title>115 學年度 新竹區 適性輔導安置 高中科系一覽</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1a1a;line-height:1.6;padding:20px 16px;min-height:100vh}
-.wrap{max-width:1100px;margin:0 auto}
+body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:#f5f7fa;color:#1a1a1a;line-height:1.6;min-height:100vh}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px}
+
+/* ===== 頂部導覽列 ===== */
+.topnav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,.06);padding:10px 16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.topnav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;text-decoration:none;color:#5a6c7d;font-size:.92em;font-weight:700;transition:all .15s}
+.nav-link:hover{background:#e3f2fd;color:#1565c0}
+.nav-link.active{background:#1565c0;color:#fff}
+.nav-link.active:hover{background:#0d47a1;color:#fff}
+.nav-divider{color:#cbd5e0;font-size:.85em}
+.nav-spacer{flex:1}
+.nav-ext{font-size:.85em;color:#94a3b8;text-decoration:none}
+.nav-ext:hover{color:#1565c0}
+@media(max-width:520px){
+  .nav-link{padding:6px 12px;font-size:.85em}
+  .nav-divider{display:none}
+}
 
 header{background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;padding:24px 28px;border-radius:14px;margin-bottom:18px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
 h1{font-size:1.6em;font-weight:900;margin-bottom:4px;letter-spacing:-.5px}
@@ -85,6 +101,18 @@ footer{text-align:center;color:#999;font-size:.82em;margin-top:24px;padding-top:
 </style>
 </head>
 <body>
+
+<!-- ===== 頂部導覽 ===== -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="paths-2026-hsinchu.html" class="nav-link">🏠 升學指引主頁</a>
+    <span class="nav-divider">|</span>
+    <a href="placement-2026-hsinchu.html" class="nav-link active">📋 安置學校清單</a>
+    <span class="nav-spacer"></span>
+    <a href="https://adapt.set.edu.tw/" target="_blank" class="nav-ext">官方網站 ↗</a>
+  </div>
+</nav>
+
 <div class="wrap">
 
 <header>
