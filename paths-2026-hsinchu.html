@@ -139,9 +139,24 @@ section{padding:64px 0}
 footer{padding:40px 24px;text-align:center;color:var(--soft);font-size:.88em;line-height:2;border-top:1px solid var(--line);background:#fff}
 footer a{color:var(--primary);text-decoration:none}
 
-/* ========== HIGHLIGHT BOX ========== */
-.highlight{max-width:680px;margin:0 auto 28px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:14px;padding:18px 24px;color:#92400e;font-size:.98em;text-align:center;line-height:1.7}
-.highlight b{color:#b45309}
+/* ========== 頁面切換大按鈕 ========== */
+.page-nav-wrap{padding:40px 0 80px;background:linear-gradient(180deg,var(--bg) 0%,#e3f2fd 100%)}
+.page-nav{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:760px;margin:0 auto}
+.pn-card{display:flex;align-items:center;gap:16px;padding:24px 28px;background:#fff;border-radius:22px;box-shadow:0 4px 20px rgba(0,0,0,.06);text-decoration:none;color:var(--ink);transition:all .25s;border:2px solid transparent;position:relative;overflow:hidden}
+.pn-card:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(21,101,192,.15);border-color:var(--primary)}
+.pn-card.pn-current{background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;border-color:transparent;cursor:default}
+.pn-card.pn-current:hover{transform:none;box-shadow:0 4px 20px rgba(21,101,192,.3)}
+.pn-emoji{font-size:2.6em;flex-shrink:0;line-height:1}
+.pn-text{flex:1;line-height:1.4}
+.pn-text strong{display:block;font-size:1.2em;font-weight:900;margin-bottom:2px}
+.pn-text small{display:block;font-size:.88em;opacity:.78;font-weight:500}
+.pn-arrow{font-size:1.5em;color:var(--primary);font-weight:300;transition:transform .25s}
+.pn-card:hover .pn-arrow{transform:translateX(6px)}
+@media(max-width:640px){
+  .page-nav{grid-template-columns:1fr}
+  .pn-card{padding:20px 22px}
+  .pn-emoji{font-size:2.2em}
+}
 </style>
 </head>
 <body>
@@ -411,8 +426,28 @@ footer a{color:var(--primary);text-decoration:none}
       </a>
     </div>
 
-    <div class="highlight" style="margin-top:40px">
-      💬 有疑問？請聯絡孩子就讀國中的<b>輔導室</b>或<b>特教組</b>，他們會親自協助您。
+  </div>
+</section>
+
+<!-- ============ 頁面切換 大按鈕 ============ -->
+<section class="page-nav-wrap">
+  <div class="container">
+    <div class="page-nav">
+      <a href="paths-2026-hsinchu.html" class="pn-card pn-current">
+        <span class="pn-emoji">🏠</span>
+        <span class="pn-text">
+          <strong>升學指引主頁</strong>
+          <small>您正在這頁</small>
+        </span>
+      </a>
+      <a href="placement-2026-hsinchu.html" class="pn-card">
+        <span class="pn-emoji">📋</span>
+        <span class="pn-text">
+          <strong>安置學校清單</strong>
+          <small>22 校 · 577 個名額</small>
+        </span>
+        <span class="pn-arrow">→</span>
+      </a>
     </div>
   </div>
 </section>
