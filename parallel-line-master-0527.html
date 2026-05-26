@@ -303,6 +303,19 @@ function svgAngleName(cx, cy, fromDeg, toDeg, r, text, color = '#FFD970', size =
   const ly = cy - lr * Math.sin(midDeg * PI / 180);
   return `<text x="${lx.toFixed(1)}" y="${(ly + size/3).toFixed(1)}" text-anchor="middle" fill="${color}" font-size="${size}" font-weight="800">${text}</text>`;
 }
+// 整合標籤：把 "∠A" + "30°" 合併成單一文字 "∠A=30°"（避免兩個標籤擠在同方向）
+function svgAngleFull(cx, cy, fromDeg, toDeg, r, name, value, color = '#FFD970', size = 17) {
+  const PI = Math.PI;
+  let _from = fromDeg, _to = toDeg;
+  while (_to - _from > 180) _to -= 360;
+  while (_to - _from < -180) _to += 360;
+  const midDeg = (_from + _to) / 2;
+  const lr = r + 22;
+  const lx = cx + lr * Math.cos(midDeg * PI / 180);
+  const ly = cy - lr * Math.sin(midDeg * PI / 180);
+  const text = value ? `${name}=${value}` : name;
+  return `<text x="${lx.toFixed(1)}" y="${(ly + size/3).toFixed(1)}" text-anchor="middle" fill="${color}" font-size="${size}" font-weight="800">${text}</text>`;
+}
 // 點圓 + 標籤
 function svgPoint(cx, cy, label, color = '#FFC93C', labelOffsetX = 0, labelOffsetY = -14, size = 16) {
   return `<circle cx="${cx}" cy="${cy}" r="7" fill="${color}" stroke="#1B2745" stroke-width="2"/>` +
@@ -455,11 +468,9 @@ const QUESTIONS = [
         ${svgPoint(P1x, P1y, 'P', '#FFC93C', 0, -12, 15)}
         ${svgPoint(P2x, P2y, 'Q', '#FFC93C', 0, 26, 15)}
         ${svgArc(P1x, P1y, 0, -60, r)}
-        ${svgAngleLabel(P1x, P1y, 0, -60, r, '65°')}
-        ${svgAngleName(P1x, P1y, 0, -60, r, '∠1')}
+        ${svgAngleFull(P1x, P1y, 0, -60, r, '∠1', '65°', '#FFD970', 17)}
         ${svgArc(P2x, P2y, 0, -60, r)}
-        ${svgAngleLabel(P2x, P2y, 0, -60, r, '?')}
-        ${svgAngleName(P2x, P2y, 0, -60, r, '∠2')}
+        ${svgAngleFull(P2x, P2y, 0, -60, r, '∠2', '?', '#FFD970', 17)}
         <text x="460" y="48" font-size="22">⚔️</text>
       </svg>`;
     },
@@ -497,11 +508,9 @@ const QUESTIONS = [
         ${svgPoint(P1x, P1y, 'P', '#FFC93C', 0, -12, 15)}
         ${svgPoint(P2x, P2y, 'Q', '#FFC93C', 0, 26, 15)}
         ${svgArc(P1x, P1y, 0, -60, r)}
-        ${svgAngleLabel(P1x, P1y, 0, -60, r, '75°')}
-        ${svgAngleName(P1x, P1y, 0, -60, r, '∠1')}
+        ${svgAngleFull(P1x, P1y, 0, -60, r, '∠1', '75°', '#FFD970', 17)}
         ${svgArc(P2x, P2y, 120, 180, r)}
-        ${svgAngleLabel(P2x, P2y, 120, 180, r, '?')}
-        ${svgAngleName(P2x, P2y, 120, 180, r, '∠2')}
+        ${svgAngleFull(P2x, P2y, 120, 180, r, '∠2', '?', '#FFD970', 17)}
         <text x="460" y="48" font-size="22">🏀</text>
       </svg>`;
     },
@@ -539,11 +548,9 @@ const QUESTIONS = [
         ${svgPoint(P1x, P1y, 'P', '#FFC93C', 0, -12, 15)}
         ${svgPoint(P2x, P2y, 'Q', '#FFC93C', 0, 26, 15)}
         ${svgArc(P1x, P1y, 0, -60, r)}
-        ${svgAngleLabel(P1x, P1y, 0, -60, r, '80°')}
-        ${svgAngleName(P1x, P1y, 0, -60, r, '∠1')}
+        ${svgAngleFull(P1x, P1y, 0, -60, r, '∠1', '80°', '#FFD970', 17)}
         ${svgArc(P2x, P2y, 0, 120, r)}
-        ${svgAngleLabel(P2x, P2y, 0, 120, r, '?')}
-        ${svgAngleName(P2x, P2y, 0, 120, r, '∠2')}
+        ${svgAngleFull(P2x, P2y, 0, 120, r, '∠2', '?', '#FFD970', 17)}
         <text x="460" y="48" font-size="22">🐻</text>
       </svg>`;
     },
@@ -582,16 +589,13 @@ const QUESTIONS = [
         ${svgPoint(P2x, P2y, 'Q', '#FFC93C', 0, 26, 15)}
         <!-- ∠1: P 下右 -->
         ${svgArc(P1x, P1y, 0, -60, r)}
-        ${svgAngleLabel(P1x, P1y, 0, -60, r, '55°')}
-        ${svgAngleName(P1x, P1y, 0, -60, r, '∠1')}
+        ${svgAngleFull(P1x, P1y, 0, -60, r, '∠1', '55°', '#FFD970', 17)}
         <!-- ∠2: P 上左 (∠1 的對頂角) = 180° → 120° -->
         ${svgArc(P1x, P1y, 180, 120, r)}
-        ${svgAngleLabel(P1x, P1y, 180, 120, r, '?')}
-        ${svgAngleName(P1x, P1y, 180, 120, r, '∠2')}
+        ${svgAngleFull(P1x, P1y, 180, 120, r, '∠2', '?', '#FFD970', 17)}
         <!-- ∠3: Q 下右 (∠1 的同位角) -->
         ${svgArc(P2x, P2y, 0, -60, r)}
-        ${svgAngleLabel(P2x, P2y, 0, -60, r, '?')}
-        ${svgAngleName(P2x, P2y, 0, -60, r, '∠3')}
+        ${svgAngleFull(P2x, P2y, 0, -60, r, '∠3', '?', '#FFD970', 17)}
         <text x="460" y="48" font-size="22">🎱</text>
       </svg>`;
     },
@@ -632,11 +636,9 @@ const QUESTIONS = [
         ${svgPoint(P2x, P2y, '', '#FFC93C')}
         ${svgPoint(P3x, P3y, 'R', '#FFC93C', 0, 24, 13)}
         ${svgArc(P1x, P1y, 0, -60, r)}
-        ${svgAngleLabel(P1x, P1y, 0, -60, r, '40°')}
-        ${svgAngleName(P1x, P1y, 0, -60, r, '∠1')}
+        ${svgAngleFull(P1x, P1y, 0, -60, r, '∠1', '40°', '#FFD970', 17)}
         ${svgArc(P3x, P3y, 0, -60, r)}
-        ${svgAngleLabel(P3x, P3y, 0, -60, r, '?')}
-        ${svgAngleName(P3x, P3y, 0, -60, r, '∠4')}
+        ${svgAngleFull(P3x, P3y, 0, -60, r, '∠4', '?', '#FFD970', 17)}
         <text x="490" y="48" font-size="22">🪟</text>
       </svg>`;
     },
@@ -684,16 +686,13 @@ const QUESTIONS = [
         <text x="548" y="${By + 5}" fill="#94A3B8" font-size="13">輔助線 //</text>
         <!-- ∠A: A=(192,60), AB 朝右下 30°（標準角 -30°）。∠A 在 A 下右：弧 from 0° to -30° -->
         ${svgArc(Ax, Ay, 0, -30, r)}
-        ${svgAngleLabel(Ax, Ay, 0, -30, r, '30°')}
-        ${svgAngleName(Ax, Ay, 0, -30, r, '∠A')}
+        ${svgAngleFull(Ax, Ay, 0, -30, r, '∠A', '30°', '#FFD970', 17)}
         <!-- ∠C: C=(299,300), CB 朝右上 50°（標準角 +50°）。∠C 在 C 上右：弧 from 0° to 50° -->
         ${svgArc(Cx, Cy, 0, 50, r)}
-        ${svgAngleLabel(Cx, Cy, 0, 50, r, '50°')}
-        ${svgAngleName(Cx, Cy, 0, 50, r, '∠C')}
+        ${svgAngleFull(Cx, Cy, 0, 50, r, '∠C', '50°', '#FFD970', 17)}
         <!-- ∠B 在 B 點：BA 方向 150°、BC 方向 230°。弧 from 150° to 230° (順時針 80°) -->
         ${svgArc(Bx, By, 150, 230, r-2, '#FFD970', 3)}
-        ${svgAngleLabel(Bx, By, 150, 230, r-2, '?', '#FFD970', 18)}
-        ${svgAngleName(Bx, By, 150, 230, r-2, '∠B', '#FFD970', 19)}
+        ${svgAngleFull(Bx, By, 150, 230, r-2, '∠B', '?', '#FFD970', 19)}
         <!-- 點（最後畫蓋住線條） -->
         ${svgPoint(Ax, Ay, 'A', '#FFC93C', -14, -10, 17)}
         ${svgPoint(Bx, By, 'B', '#FFC93C', 18, -8, 17)}
@@ -735,15 +734,13 @@ const QUESTIONS = [
         ${svgPoint(P2x, P2y, 'Q', '#FFC93C', 0, 26, 15)}
         <!-- ∠1: P 下右 (內角) -->
         ${svgArc(P1x, P1y, 0, -60, r)}
-        ${svgAngleLabel(P1x, P1y, 0, -60, r, '50°')}
-        ${svgAngleName(P1x, P1y, 0, -60, r, '∠1')}
+        ${svgAngleFull(P1x, P1y, 0, -60, r, '∠1', '50°', '#FFD970', 17)}
         <!-- ∠2: Q 上右 (同側內角): 0° → 120° -->
         ${svgArc(P2x, P2y, 0, 120, r)}
         ${svgAngleName(P2x, P2y, 0, 120, r, '∠2', '#A8B5E8')}
         <!-- ∠3: Q 下左 (∠2 對頂角): 180° → 300° -->
         ${svgArc(P2x, P2y, 180, 300, r)}
-        ${svgAngleLabel(P2x, P2y, 180, 300, r, '?')}
-        ${svgAngleName(P2x, P2y, 180, 300, r, '∠3')}
+        ${svgAngleFull(P2x, P2y, 180, 300, r, '∠3', '?', '#FFD970', 17)}
         <text x="450" y="48" font-size="22">🚂</text>
       </svg>`;
     },
