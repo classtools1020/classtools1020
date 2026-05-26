@@ -40,11 +40,12 @@ section{padding:64px 0}
 .path.a .label{background:#e8f5e9;color:#2e7d32}
 .path.b .label{background:#fff3e0;color:#ef6c00}
 .path h3{font-size:1.45em;font-weight:900;margin-bottom:6px}
-.path .one-line{color:var(--soft);font-size:.95em;margin-bottom:24px;min-height:48px}
-.path ul{list-style:none;text-align:left;display:inline-block;margin:0 auto 24px}
-.path li{padding:8px 0;font-size:1em;line-height:1.6}
-.path li::before{content:'✓';color:var(--green);font-weight:900;margin-right:10px}
-.path.b li::before{color:var(--orange)}
+.path .one-line{color:var(--soft);font-size:1em;margin-bottom:28px;min-height:32px}
+.path .features{display:flex;flex-direction:column;gap:14px;margin:28px 0;align-items:center}
+.path .feat{display:flex;align-items:center;gap:12px;font-size:1.02em;font-weight:600;color:var(--ink);background:#f8fafc;padding:12px 22px;border-radius:14px;min-width:240px}
+.path.a .feat{background:#f1f8f3}
+.path.b .feat{background:#fff7ec}
+.path .feat-ico{font-size:1.3em;flex-shrink:0}
 .path .btn{display:inline-block;padding:12px 28px;border-radius:30px;text-decoration:none;font-weight:700;font-size:.95em;transition:all .15s}
 .path.a .btn{background:var(--green);color:#fff}
 .path.b .btn{background:var(--orange);color:#fff}
@@ -134,13 +135,12 @@ footer a{color:var(--primary);text-decoration:none}
         <span class="icon">🟢</span>
         <span class="label">路徑 A</span>
         <h3>適性輔導安置</h3>
-        <p class="one-line">由特教委員會評估安置<br>不用考試</p>
-        <ul>
-          <li>持身障鑑定證明可申請</li>
-          <li>選填志願 → 委員會審議</li>
-          <li>新竹區 22 校 · 577 名額</li>
-          <li>2 月報名 / 6 月放榜</li>
-        </ul>
+        <p class="one-line">委員會評估安置 · 不用考試</p>
+        <div class="features">
+          <div class="feat"><span class="feat-ico">✓</span>不用考試</div>
+          <div class="feat"><span class="feat-ico">🏫</span>22 校 · 577 個名額</div>
+          <div class="feat"><span class="feat-ico">📅</span>2 月報名 · 6 月放榜</div>
+        </div>
         <a href="placement-2026-hsinchu.html" class="btn">看安置學校 →</a>
       </div>
 
@@ -148,13 +148,12 @@ footer a{color:var(--primary);text-decoration:none}
         <span class="icon">🟡</span>
         <span class="label">路徑 B</span>
         <h3>國中教育會考</h3>
-        <p class="one-line">與一般學生一起考試<br>選擇最多元</p>
-        <ul>
-          <li>5 月考會考</li>
-          <li>用成績選擇學校</li>
-          <li>所有公私立高中職皆可選</li>
-          <li>5 月考試 / 7 月放榜</li>
-        </ul>
+        <p class="one-line">和一般學生一起考試 · 選擇最多</p>
+        <div class="features">
+          <div class="feat"><span class="feat-ico">📝</span>5 月考會考</div>
+          <div class="feat"><span class="feat-ico">🎓</span>普通高中為主</div>
+          <div class="feat"><span class="feat-ico">📅</span>5 月考試 · 7 月放榜</div>
+        </div>
         <a href="#schools" class="btn">看會考學校 →</a>
       </div>
     </div>
