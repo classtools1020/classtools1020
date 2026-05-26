@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>仙草大解密！學習單（紙本印刷版）</title>
+<style>
+  @page { size: A4; margin: 10mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    background: #FFFCF5;
+    color: #4A2C12;
+    padding: 18px 22px;
+    line-height: 1.55;
+  }
+  .sheet { max-width: 800px; margin: 0 auto; }
+
+  .head {
+    border: 3px solid #5D4037;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #FFF8E7 0%, #F5E6D3 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .head h1 { font-size: 1.6rem; color: #5D4037; font-weight: 900; }
+  .head .meta { font-size: 0.95rem; color: #6B3A1F; }
+
+  .name {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 12px;
+    font-size: 1.05rem;
+    align-items: center;
+  }
+  .name .field { flex: 1; border-bottom: 2px solid #8B4513; padding: 8px 4px; min-height: 38px; }
+  .name b { color: #5D4037; min-width: 80px; }
+
+  .q {
+    border: 2px solid #D4A574;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    background: #FFFFFF;
+    page-break-inside: avoid;
+  }
+  .q-title {
+    font-size: 1.05rem;
+    color: #4A2C12;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .q-num {
+    background: #5D4037;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 6px;
+  }
+  .opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .opt {
+    flex: 1 1 30%;
+    min-width: 130px;
+    padding: 8px 12px;
+    border: 2px solid #D4A574;
+    border-radius: 50px;
+    text-align: center;
+    font-size: 1.05rem;
+    color: #5D4037;
+    background: #FFF8E7;
+  }
+  .circle {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #5D4037;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .match-box { margin-top: 4px; }
+  .match-table { width: 100%; border-collapse: collapse; }
+  .match-table td {
+    padding: 8px 10px;
+    border: 2px solid #D4A574;
+    background: #FFF8E7;
+    text-align: center;
+    font-size: 1.05rem;
+    width: 50%;
+  }
+  .match-table td.connector { border: 0; background: transparent; width: 1.4em; padding: 0 4px; color: #888; font-size: 1.2rem; }
+
+  .formula {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #FFD700 0%, #D4A574 100%);
+    color: white;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+
+  .stamp-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .stamp-box {
+    width: 70px;
+    height: 70px;
+    border: 2.5px dashed #5D4037;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #FFF8E7;
+    text-align: center;
+    font-size: 0.78rem;
+    color: #6B3A1F;
+    line-height: 1.2;
+  }
+  .stamp-box .icon { font-size: 1.4rem; }
+  .stamp-box.done {
+    background: linear-gradient(135deg, #FFD700 0%, #D4A574 100%);
+    color: white;
+    font-weight: bold;
+  }
+  .stamp-box.today {
+    background: #FFF;
+    border: 3px solid #D32F2F;
+    color: #D32F2F;
+  }
+
+  .footer-note {
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: #888;
+    text-align: center;
+    border-top: 1px dashed #D4A574;
+    padding-top: 6px;
+  }
+
+  /* 印刷時 */
+  @media print {
+    body { background: white; padding: 0; }
+    .head { background: white; }
+    .opt { background: white; }
+    .formula { background: #FFD700 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #5D4037 !important; }
+    .stamp-box.done { background: #FFD700 !important; -webkit-print-color-adjust: exact; }
+    .no-print { display: none; }
+  }
+
+  .no-print {
+    text-align: center;
+    margin: 20px 0 30px;
+  }
+  .no-print button {
+    background: #5D4037;
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .no-print button:hover { background: #8B4513; }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+<div class="head">
+  <div>
+    <h1>🌿 仙草大解密！學習單</h1>
+    <div class="meta">客家飲食文化 · 集中式特教班 A 組 · 5/4</div>
+  </div>
+  <div style="font-size:.85rem;color:#666;">全部圈選不用寫字</div>
+</div>
+
+<div class="name">
+  <div class="field"><b>名字：</b></div>
+  <div class="field"><b>日期：</b>5/4（一）</div>
+</div>
+
+<!-- Q1 -->
+<div class="q">
+  <div class="q-title"><span class="q-num">1</span>仙草茶是什麼顏色？</div>
+  <div class="opts">
+    <div class="opt"><span class="circle"></span>🔴 紅色</div>
+    <div class="opt"><span class="circle"></span>⚫ 黑色</div>
+    <div class="opt"><span class="circle"></span>🔵 藍色</div>
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="q">
+  <div class="q-title"><span class="q-num">2</span>仙草種在田裡是什麼顏色？</div>
+  <div class="opts">
+    <div class="opt"><span class="circle"></span>⚫ 黑色</div>
+    <div class="opt"><span class="circle"></span>🟢 綠色</div>
+    <div class="opt"><span class="circle"></span>🟡 黃色</div>
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="q">
+  <div class="q-title"><span class="q-num">3</span>全台灣 80% 的仙草種在哪裡？</div>
+  <div class="opts">
+    <div class="opt"><span class="circle"></span>🏙️ 台北</div>
+    <div class="opt"><span class="circle"></span>⭐ 關西</div>
+    <div class="opt"><span class="circle"></span>🌊 高雄</div>
+  </div>
+</div>
+
+<!-- Q4 -->
+<div class="q">
+  <div class="q-title"><span class="q-num">4</span>關西在我們學校（芎林）的哪裡？</div>
+  <div class="opts">
+    <div class="opt"><span class="circle"></span>🚗 很遠</div>
+    <div class="opt"><span class="circle"></span>📍 就在隔壁</div>
+    <div class="opt"><span class="circle"></span>✈️ 要坐飛機</div>
+  </div>
+</div>
+
+<!-- Q5 -->
+<div class="q">
+  <div class="q-title"><span class="q-num">5</span>關西和芎林是什麼地形？</div>
+  <div class="opts">
+    <div class="opt"><span class="circle"></span>🏟️ 平地</div>
+    <div class="opt"><span class="circle"></span>⛰️ 丘陵</div>
+    <div class="opt"><span class="circle"></span>🏔️ 高山</div>
+  </div>
+</div>
+
+<!-- Q6 -->
+<div class="q">
+  <div class="q-title"><span class="q-num">6</span>為什麼丘陵適合種仙草？</div>
+  <div class="opts">
+    <div class="opt"><span class="circle"></span>💧 水很多</div>
+    <div class="opt"><span class="circle"></span>🏔️ 排水好不積水</div>
+    <div class="opt"><span class="circle"></span>🥵 很熱</div>
+  </div>
+</div>
+
+<!-- Q7 -->
+<div class="q">
+  <div class="q-title"><span class="q-num">7</span>新竹秋天的強風叫什麼？</div>
+  <div class="opts">
+    <div class="opt"><span class="circle"></span>🌬️ 九降風</div>
+    <div class="opt"><span class="circle"></span>🌊 海風</div>
+    <div class="opt"><span class="circle"></span>❄️ 寒流</div>
+  </div>
+</div>
+
+<!-- Q8 -->
+<div class="q">
+  <div class="q-title"><span class="q-num">8</span>九降風對仙草有什麼幫助？</div>
+  <div class="opts">
+    <div class="opt"><span class="circle"></span>🌬️ 天然風乾</div>
+    <div class="opt"><span class="circle"></span>💧 幫忙澆水</div>
+    <div class="opt"><span class="circle"></span>❄️ 結冰</div>
+  </div>
+</div>
+
+<!-- Q9 -->
+<div class="q">
+  <div class="q-title"><span class="q-num">9</span>仙草是哪個族群的食物？</div>
+  <div class="opts">
+    <div class="opt"><span class="circle"></span>🏹 原住民族</div>
+    <div class="opt"><span class="circle"></span>🏘️ 客家人</div>
+    <div class="opt"><span class="circle"></span>🍣 日本人</div>
+  </div>
+</div>
+
+<!-- Q10 連連看 -->
+<div class="q">
+  <div class="q-title"><span class="q-num">10</span>連連看：住的地方 → 吃的食物（用線連）</div>
+  <table class="match-table">
+    <tr><td>🏔️ 山上缺水</td><td class="connector">●　　　　　　●</td><td>🌾 小米</td></tr>
+    <tr><td>🌾 平地有水</td><td class="connector">●　　　　　　●</td><td>🍚 白飯</td></tr>
+    <tr><td>❄️ 北方寒冷</td><td class="connector">●　　　　　　●</td><td>🥞 蔥油餅</td></tr>
+    <tr><td>⛰️ 丘陵有風有霧</td><td class="connector">●　　　　　　●</td><td>🌿 仙草</td></tr>
+  </table>
+</div>
+
+<!-- 公式 -->
+<div class="formula">🌟 公式又成立了：住的地方 ＋ 規矩 ＝ 食物！🌟</div>
+
+<!-- 食物護照 -->
+<div class="q" style="margin-top:10px">
+  <div class="q-title">🎫 食物護照（請老師蓋章）</div>
+  <div class="stamp-row">
+    <div class="stamp-box done"><span class="icon">🌾</span>小米<br>原住民</div>
+    <div class="stamp-box done"><span class="icon">🍛</span>咖哩<br>印度</div>
+    <div class="stamp-box done"><span class="icon">🥞</span>蔥油餅<br>北方</div>
+    <div class="stamp-box today"><span class="icon">🌿</span>仙草<br>客家！</div>
+    <div class="stamp-box"><span class="icon">❓</span>下次<br>揭曉</div>
+  </div>
+</div>
+
+<div class="footer-note">芎林國中 · 集中式特教班 A 組 · 社會科 · 老師：曾瓊瑩</div>
+
+<div class="no-print">
+  <button onclick="window.print()">🖨️ 列印</button>
+  <button onclick="location.href='may4.html'" style="background:#FFF8E7;color:#5D4037;border:2px solid #5D4037;margin-left:8px;">← 回代課頁</button>
+</div>
+
+</div>
+</body>
+</html>

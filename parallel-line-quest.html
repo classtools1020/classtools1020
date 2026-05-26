@@ -231,7 +231,10 @@
 'use strict';
 
 /* =============== Config =============== */
-const BIN_URL = 'https://jsonblob.com/api/jsonBlob/019e62a4-4aef-7ebe-8a45-f7d51f694e28';
+// ntfy.sh：免費即時推送服務、完整支援 CORS、不需註冊
+// topic 取隨機字串避免被別人偷看
+const NTFY_TOPIC = 'stacey-classtools-pll-quest-8a-2026-7f3k9d2x';
+const NTFY_URL = `https://ntfy.sh/${NTFY_TOPIC}`;
 const HOMEWORK_ID = '8a_parallel_4_1_2026_05_26';
 
 /* =============== Stars =============== */
@@ -799,21 +802,15 @@ async function submitToServer(elapsed) {
     })),
   };
 
-  // Retry loop with optimistic concurrency: GET → modify → PUT
+  // 用 ntfy.sh 即時推送：POST body 為 JSON payload
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
-      const res = await fetch(BIN_URL, { headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error('GET ' + res.status);
-      const data = await res.json();
-      data.submissions = data.submissions || [];
-      data.submissions.push(payload);
-
-      const putRes = await fetch(BIN_URL, {
-        method: 'PUT',
+      const res = await fetch(NTFY_URL, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
-      if (!putRes.ok) throw new Error('PUT ' + putRes.status);
+      if (!res.ok) throw new Error('POST ' + res.status);
 
       status.className = 'submit-status success';
       status.innerHTML = '✅ 成績已送達老師後台！';

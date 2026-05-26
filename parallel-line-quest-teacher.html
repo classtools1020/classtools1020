@@ -195,13 +195,28 @@
 <script>
 'use strict';
 
-const BIN_URL = 'https://jsonblob.com/api/jsonBlob/019e62a4-4aef-7ebe-8a45-f7d51f694e28';
+// ntfy.sh：即時推送服務、CORS 完整支援、不需註冊
+const NTFY_TOPIC = 'stacey-classtools-pll-quest-8a-2026-7f3k9d2x';
+const NTFY_JSON_URL = `https://ntfy.sh/${NTFY_TOPIC}/json?poll=1&since=all`;
 const HOMEWORK_ID = '8a_parallel_4_1_2026_05_26';
 const PASSWORD = 'stacey2026';
 const POLL_INTERVAL = 6000; // 6 sec
+const STORAGE_KEY = 'plls_submissions_' + HOMEWORK_ID;
 
 let submissions = [];
 let pollTimer = null;
+
+// 載入本地累積資料（永久保留，不受 ntfy 12 小時 cache 限制）
+function loadFromStorage() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch { return []; }
+}
+function saveToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
+  } catch (e) { console.warn('LS save failed', e); }
+}
 
 function tryLogin() {
   const input = document.getElementById('pwd-input');
@@ -209,7 +224,10 @@ function tryLogin() {
   if (val === PASSWORD) {
     document.getElementById('login').style.display = 'none';
     document.getElementById('dashboard').style.display = '';
-    fetchData();
+    submissions = loadFromStorage();  // 先載入永久累積
+    renderStats();
+    renderTable();
+    fetchData();  // 再從 ntfy 拉新的
     pollTimer = setInterval(fetchData, POLL_INTERVAL);
   } else {
     document.getElementById('pwd-err').textContent = '密碼錯誤，再試一次';
@@ -224,11 +242,36 @@ document.getElementById('pwd-input').addEventListener('keypress', e => {
 
 async function fetchData() {
   try {
-    const res = await fetch(BIN_URL + '?_=' + Date.now(), { headers: { Accept: 'application/json' } });
+    // 從 ntfy.sh 拉取所有歷史訊息（最近 12 小時內）
+    const res = await fetch(NTFY_JSON_URL + '&_=' + Date.now());
     if (!res.ok) throw new Error('GET ' + res.status);
-    const data = await res.json();
-    submissions = (data.submissions || []).filter(s => s.hwId === HOMEWORK_ID);
-    document.getElementById('last-update').textContent = '剛剛更新（' + new Date().toLocaleTimeString('zh-TW', { hour12: false }) + '）';
+    const text = await res.text();
+    // ntfy 回傳 newline-delimited JSON（每行一則訊息）
+    const messages = text.trim().split('\n').filter(Boolean).map(l => {
+      try { return JSON.parse(l); } catch { return null; }
+    }).filter(Boolean);
+
+    // 已知的 ntfy 訊息 ID（避免重複加入）
+    const knownIds = new Set(submissions.map(s => s._ntfyId).filter(Boolean));
+    const newOnes = [];
+    for (const m of messages) {
+      if (!m.id || knownIds.has(m.id)) continue;
+      try {
+        const data = JSON.parse(m.message);
+        if (data.hwId !== HOMEWORK_ID) continue;
+        data._ntfyId = m.id;
+        data._receivedAt = new Date(m.time * 1000).toISOString();
+        newOnes.push(data);
+      } catch { /* ignore invalid */ }
+    }
+
+    if (newOnes.length > 0) {
+      submissions = submissions.concat(newOnes);
+      saveToStorage();
+    }
+
+    const fresh = newOnes.length > 0 ? `（新增 ${newOnes.length} 筆）` : '';
+    document.getElementById('last-update').textContent = `剛剛更新（${new Date().toLocaleTimeString('zh-TW', { hour12: false })}）${fresh}`;
     renderStats();
     renderTable();
   } catch (err) {
@@ -361,22 +404,14 @@ function downloadCSV() {
   URL.revokeObjectURL(url);
 }
 
-async function confirmReset() {
-  if (!confirm('⚠️ 確定要清空全部提交資料嗎？（此動作不可恢復）')) return;
+function confirmReset() {
+  if (!confirm('⚠️ 確定要清空本機累積的全部提交資料嗎？（此動作不可恢復）\n\n注意：這只清除「本機後台」的累積紀錄。如果 12 小時內有學生剛交，下次刷新可能會從 ntfy 重新拉回。')) return;
   if (!confirm('真的真的確定？這會清掉全班所有學生的成績紀錄。')) return;
-  try {
-    await fetch(BIN_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ meta: { name: '8A_parallel_line_homework_2026', cleared: new Date().toISOString() }, submissions: [] }),
-    });
-    submissions = [];
-    renderStats();
-    renderTable();
-    alert('✅ 已清空');
-  } catch (err) {
-    alert('❌ 清空失敗：' + err.message);
-  }
+  submissions = [];
+  saveToStorage();
+  renderStats();
+  renderTable();
+  alert('✅ 本機已清空。提醒：建議先按「匯出 CSV」備份再清。');
 }
 
 window.tryLogin = tryLogin;

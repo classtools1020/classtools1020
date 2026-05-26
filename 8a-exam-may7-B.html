@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>8A 數學段考 · B 版（標準）· 5/7</title>
+<style>
+  @page { size: A4; margin: 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+    color: #111;
+    background: white;
+    padding: 18px 22px;
+    line-height: 1.7;
+    font-size: 14pt;
+  }
+  .sheet { max-width: 800px; margin: 0 auto; }
+
+  .head { border: 2.5px solid #111; padding: 12px 16px; margin-bottom: 14px; }
+  .head .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .head h1 { font-size: 20pt; font-weight: 900; letter-spacing: 1px; }
+  .head .ver { background: #111; color: #fff; padding: 4px 14px; font-size: 12pt; font-weight: 800; letter-spacing: 2px; }
+  .head .meta { font-size: 11pt; color: #444; margin-top: 4px; }
+  .head .info {
+    margin-top: 10px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    font-size: 11pt;
+    border-top: 1px dashed #999; padding-top: 10px;
+  }
+  .head .info .field { border-bottom: 1.5px solid #111; padding: 2px 4px; min-height: 22px; }
+  .head .info .field b { color: #555; font-weight: 700; }
+
+  .pep {
+    background: #FFF8DC; border-left: 4px solid #FFB300;
+    padding: 8px 14px; margin-bottom: 18px; font-size: 11pt; color: #6B4500;
+  }
+
+  .section-h {
+    background: #111; color: #fff;
+    padding: 6px 14px; margin: 16px 0 10px;
+    font-size: 13pt; font-weight: 800; letter-spacing: 1px;
+  }
+  .section-h .pts { float: right; font-weight: 600; font-size: 11pt; opacity: 0.8; }
+
+  .q { margin-bottom: 14px; page-break-inside: avoid; }
+  .q-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .q-num {
+    background: #111; color: #fff; padding: 2px 10px;
+    font-size: 11pt; font-weight: 800; min-width: 36px; text-align: center;
+  }
+  .q-pts { color: #888; font-size: 10pt; margin-left: auto; }
+  .q-body { font-size: 14pt; line-height: 1.65; padding-left: 4px; }
+
+  .blank { display: inline-block; min-width: 60px; border-bottom: 2px solid #111; padding: 0 6px; text-align: center; font-weight: 600; }
+  .blank-lg { min-width: 100px; }
+  .blank-xl { min-width: 160px; }
+
+  .choices { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 4px; padding-left: 4px; }
+  .choice { display: inline-flex; align-items: center; gap: 6px; }
+  .circle { display: inline-block; width: 16px; height: 16px; border: 2px solid #111; border-radius: 50%; vertical-align: middle; }
+
+  .calc-space {
+    border: 1px dashed #888;
+    margin-top: 6px; padding: 8px 10px;
+    min-height: 80px;
+    font-size: 10pt; color: #999;
+  }
+  .calc-space::before { content: "✏️ 計算區"; font-size: 9pt; color: #aaa; font-weight: 600; }
+
+  /* SVG 圖 */
+  .fig {
+    display: block;
+    margin: 8px auto;
+    max-width: 280px;
+    width: 100%;
+  }
+  .fig.lg { max-width: 320px; }
+  .q-row {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 14px;
+    align-items: start;
+  }
+  @media (max-width: 600px), print and (max-width: 600px) {
+    .q-row { grid-template-columns: 1fr; }
+  }
+
+  /* 答案模式 */
+  body.show-answers .ans { color: #d32f2f; font-weight: 900; }
+  body:not(.show-answers) .ans { color: transparent; }
+  body:not(.show-answers) .ans-only { display: none; }
+
+  @media print {
+    .no-print { display: none !important; }
+    body { padding: 0; }
+    .head, .section-h { page-break-after: avoid; }
+  }
+
+  .ctrl {
+    position: fixed; top: 12px; right: 12px;
+    background: #111; color: #fff;
+    padding: 8px 14px; border-radius: 50px;
+    font-size: 11pt;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    display: flex; gap: 10px; align-items: center;
+  }
+  .ctrl button {
+    background: transparent; color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 4px 10px; border-radius: 50px;
+    font-size: 10pt; cursor: pointer; font-family: inherit;
+  }
+  .ctrl button:hover { background: rgba(255,255,255,0.15); }
+
+  .ending {
+    margin-top: 22px; padding: 10px 16px;
+    border-top: 2.5px solid #111;
+    text-align: center; font-size: 11pt; color: #555;
+  }
+</style>
+</head>
+<body>
+
+<div class="ctrl no-print">
+  <span>📝 B 版（標準）</span>
+  <button onclick="window.print()">🖨️ 列印</button>
+  <button onclick="document.body.classList.toggle('show-answers')" id="ansBtn">👁️ 看答案</button>
+</div>
+
+<div class="sheet">
+
+<div class="head">
+  <div class="top">
+    <h1>8A 數學 · 段考</h1>
+    <div class="ver">B 版</div>
+  </div>
+  <div class="meta">範圍 3-1 ~ 3-4 · 三角形的基本性質 · 5/7（四）</div>
+  <div class="info">
+    <div class="field"><b>班級：</b></div>
+    <div class="field"><b>姓名：</b></div>
+    <div class="field"><b>座號：</b></div>
+    <div class="field"><b>分數：</b></div>
+  </div>
+</div>
+
+<div class="pep">📚 範圍跟你已經練過的一樣！相信自己，慢慢做、檢查再交。每題都附「圖」幫你想清楚～</div>
+
+<!-- ========== 3-1 內角外角（4 題 × 5 分 = 20 分） ========== -->
+<div class="section-h">📐 第一單元 · 三角形的內角與外角 <span class="pts">共 20 分（4 題）</span></div>
+
+<!-- B1 -->
+<div class="q">
+  <div class="q-head"><span class="q-num">1</span><span class="q-pts">5 分</span></div>
+  <div class="q-body">△ABC 中，∠A = 3x，∠B = 2x + 10°，∠C = x + 50°。求 x = ?</div>
+  <div class="calc-space"></div>
+  <div class="q-body" style="margin-top:6px;">x = <span class="blank ans">20</span></div>
+</div>
+
+<!-- B2 -->
+<div class="q">
+  <div class="q-row">
+    <div>
+      <div class="q-head"><span class="q-num">2</span><span class="q-pts">5 分</span></div>
+      <div class="q-body">△ABC 中，∠A = 70°，∠B = 50°，求外角 ∠ACD = ?</div>
+      <div class="calc-space"></div>
+      <div class="q-body" style="margin-top:6px;">∠ACD = <span class="blank ans">120°</span></div>
+    </div>
+    <!-- 三角形 + 外角 (∠A=70°, ∠B=50°, ∠ACB=60°, 外角120°) -->
+    <svg class="fig" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- A(150,30) B(50,180) C(220,180) D(280,180) -->
+      <polygon points="150,30 50,180 220,180" fill="#f5f5f5" stroke="#111" stroke-width="2"/>
+      <line x1="220" y1="180" x2="290" y2="180" stroke="#111" stroke-width="2"/>
+      <!-- 角弧 at A (70°) -->
+      <path d="M 134 56 A 22 22 0 0 0 168 58" fill="none" stroke="#d32f2f" stroke-width="2"/>
+      <!-- 角弧 at B (50°) -->
+      <path d="M 70 167 A 20 20 0 0 0 76 153" fill="none" stroke="#d32f2f" stroke-width="2"/>
+      <!-- 角弧 at C (內 60°) -->
+      <path d="M 198 168 A 18 18 0 0 1 192 150" fill="none" stroke="#999" stroke-width="2"/>
+      <!-- 外角弧 -->
+      <path d="M 240 173 A 22 22 0 0 0 248 155" fill="none" stroke="#1976d2" stroke-width="2.5"/>
+      <text x="150" y="22" font-size="14" font-weight="900" text-anchor="middle">A</text>
+      <text x="40" y="194" font-size="14" font-weight="900">B</text>
+      <text x="216" y="196" font-size="14" font-weight="900">C</text>
+      <text x="290" y="196" font-size="14" font-weight="900">D</text>
+      <text x="125" y="68" font-size="12" font-weight="700" fill="#d32f2f">70°</text>
+      <text x="64" y="148" font-size="12" font-weight="700" fill="#d32f2f">50°</text>
+      <text x="248" y="160" font-size="13" font-weight="900" fill="#1976d2">?</text>
+    </svg>
+  </div>
+</div>
+
+<!-- B3 -->
+<div class="q">
+  <div class="q-head"><span class="q-num">3</span><span class="q-pts">5 分</span></div>
+  <div class="q-body">三角形其中一個外角等於 110°，與它「相鄰」的內角 = <span class="blank ans">70°</span><br>
+  <span style="font-size:11pt;color:#888;">（提示：內角 + 外角 = 180°）</span></div>
+</div>
+
+<!-- B4 -->
+<div class="q">
+  <div class="q-head"><span class="q-num">4</span><span class="q-pts">5 分</span></div>
+  <div class="q-body">下列敘述何者「正確」？答：<span class="blank ans-only ans">B</span></div>
+  <div class="choices">
+    <div class="choice"><span class="circle"></span> (A) 三角形所有內角和 = 360°</div>
+    <div class="choice"><span class="circle"></span> (B) 三角形所有外角和 = 360°</div>
+    <div class="choice"><span class="circle"></span> (C) 三角形可以有兩個直角</div>
+    <div class="choice"><span class="circle"></span> (D) 三角形可以有兩個鈍角</div>
+  </div>
+</div>
+
+<!-- ========== 3-2 邊角關係（3 題 × 5 = 15） ========== -->
+<div class="section-h">📏 第二單元 · 三角形邊角關係 <span class="pts">共 15 分（3 題）</span></div>
+
+<!-- B5 -->
+<div class="q">
+  <div class="q-row">
+    <div>
+      <div class="q-head"><span class="q-num">5</span><span class="q-pts">5 分</span></div>
+      <div class="q-body">△ABC 中三邊 AB=5, BC=9, AC=7。三個角由「大到小」排序為：</div>
+      <div class="q-body" style="margin-top:6px;"><span class="blank-xl ans">∠A &gt; ∠B &gt; ∠C</span></div>
+      <div class="q-body" style="font-size:11pt;color:#888;">提示：大邊對大角。BC 最大 → 對面 ∠A 最大</div>
+    </div>
+    <svg class="fig" viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- 用實際比例：5,7,9 三角形 -->
+      <!-- B 在 (40, 180), C 在 (220, 180), 中間的 A 算位置 -->
+      <!-- BC=9, AB=5, AC=7 -->
+      <!-- A 的 x: (5²-7²+9²)/(2*9) = (25-49+81)/18 = 57/18 = 3.166...units, scale 20px/unit -->
+      <!-- A.x = 40 + 3.166*20 = 103.3 -->
+      <!-- A.y from B: 5²= (A.x-40)²+(A.y-180)² → 25 = 4.0 + (A.y-180)² → (A.y-180)² = 21 → A.y = 180-4.58 = 175.4 ... wait that's wrong scale -->
+      <!-- scale 18px/unit: BC = 9*18 = 162. B(40,180) C(202,180). AB=5*18=90, AC=7*18=126.  -->
+      <!-- A.x = 40 + (5²-7²+9²)/(2*9) * 18 = 40 + 57/18*18 = 40 + 57 = 97 -->
+      <!-- A.y² + (97-40)² = 90² → A.y² = 8100 - 3249 = 4851 → A.y = 69.6 -->
+      <!-- A at (97, 180-69.6) = (97, 110.4) -->
+      <polygon points="97,110 40,180 202,180" fill="#f5f5f5" stroke="#111" stroke-width="2"/>
+      <text x="92" y="102" font-size="14" font-weight="900">A</text>
+      <text x="28" y="194" font-size="14" font-weight="900">B</text>
+      <text x="208" y="194" font-size="14" font-weight="900">C</text>
+      <text x="50" y="155" font-size="12" font-weight="700" fill="#d32f2f">5</text>
+      <text x="118" y="194" font-size="13" font-weight="700" fill="#1976d2">9</text>
+      <text x="158" y="155" font-size="12" font-weight="700" fill="#666">7</text>
+    </svg>
+  </div>
+</div>
+
+<!-- B6 -->
+<div class="q">
+  <div class="q-head"><span class="q-num">6</span><span class="q-pts">5 分</span></div>
+  <div class="q-body">三角形兩邊長為 3 和 7，第三邊長 x 的範圍：<br>
+  <span class="blank ans">4</span> &lt; x &lt; <span class="blank ans">10</span></div>
+  <div class="q-body" style="font-size:11pt;color:#888;">提示：兩邊之差 &lt; 第三邊 &lt; 兩邊之和</div>
+</div>
+
+<!-- B7 -->
+<div class="q">
+  <div class="q-head"><span class="q-num">7</span><span class="q-pts">5 分</span></div>
+  <div class="q-body">下列哪一組長度可以圍成三角形？答：<span class="blank ans-only ans">B</span></div>
+  <div class="choices">
+    <div class="choice"><span class="circle"></span> (A) 2, 3, 6</div>
+    <div class="choice"><span class="circle"></span> (B) 5, 7, 9</div>
+    <div class="choice"><span class="circle"></span> (C) 1, 1, 3</div>
+    <div class="choice"><span class="circle"></span> (D) 4, 4, 8</div>
+  </div>
+</div>
+
+<!-- ========== 3-3 全等（4 題 × 5 = 20） ========== -->
+<div class="section-h">🔁 第三單元 · 全等三角形 <span class="pts">共 20 分（4 題）</span></div>
+
+<!-- B8 -->
+<div class="q">
+  <div class="q-head"><span class="q-num">8</span><span class="q-pts">5 分</span></div>
+  <div class="q-body">填入正確的全等性質縮寫（SSS / SAS / ASA / AAS / RHS）：</div>
+  <div class="q-body" style="margin-top:6px;line-height:2;">
+    (1) 三邊都相等 → <span class="blank ans">SSS</span><br>
+    (2) 兩邊夾一角 → <span class="blank ans">SAS</span><br>
+    (3) 兩角夾一邊 → <span class="blank ans">ASA</span><br>
+    (4) 直角三角形：斜邊 + 一股相等 → <span class="blank ans">RHS</span>
+  </div>
+</div>
+
+<!-- B9 -->
+<div class="q">
+  <div class="q-row">
+    <div>
+      <div class="q-head"><span class="q-num">9</span><span class="q-pts">5 分</span></div>
+      <div class="q-body">如圖，AB = AC，AD 平分 ∠BAC，交 BC 於 D。<br>
+      △ABD ≅ △ACD 用哪一個全等性質？答：<span class="blank ans-only ans">SAS</span></div>
+      <div class="q-body" style="font-size:11pt;color:#888;margin-top:4px;">提示：AB=AC（一邊）、∠BAD=∠CAD（一角）、AD 共用（一邊）</div>
+    </div>
+    <svg class="fig" viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- 等腰三角形, 高 AD -->
+      <polygon points="120,20 40,180 200,180" fill="#f5f5f5" stroke="#111" stroke-width="2"/>
+      <line x1="120" y1="20" x2="120" y2="180" stroke="#111" stroke-width="2"/>
+      <!-- 等號標記 -->
+      <line x1="76" y1="92" x2="86" y2="100" stroke="#111" stroke-width="2"/>
+      <line x1="156" y1="100" x2="166" y2="92" stroke="#111" stroke-width="2"/>
+      <!-- 平分弧 -->
+      <path d="M 110 50 A 22 22 0 0 0 130 50" fill="none" stroke="#111" stroke-width="1.5"/>
+      <text x="115" y="62" font-size="9" fill="#666">∡</text>
+      <text x="125" y="62" font-size="9" fill="#666">∡</text>
+      <text x="120" y="14" font-size="14" font-weight="900" text-anchor="middle">A</text>
+      <text x="32" y="196" font-size="14" font-weight="900">B</text>
+      <text x="206" y="196" font-size="14" font-weight="900">C</text>
+      <text x="124" y="200" font-size="13" font-weight="900">D</text>
+    </svg>
+  </div>
+</div>
+
+<!-- B10 -->
+<div class="q">
+  <div class="q-head"><span class="q-num">10</span><span class="q-pts">5 分</span></div>
+  <div class="q-body">△ABC ≅ △DEF，已知 AB = 8，BC = 10，AC = 6。<br>
+  則 DE = <span class="blank ans">8</span>， EF = <span class="blank ans">10</span>， DF = <span class="blank ans">6</span></div>
+  <div class="q-body" style="font-size:11pt;color:#888;">提示：對應頂點順序對應到對應邊</div>
+</div>
+
+<!-- B11 -->
+<div class="q">
+  <div class="q-row">
+    <div>
+      <div class="q-head"><span class="q-num">11</span><span class="q-pts">5 分</span></div>
+      <div class="q-body">如圖，AB ∥ CD，O 為 AC 的中點。<br>
+      △AOB ≅ △COD 用哪個全等性質？答：<span class="blank ans-only ans">ASA</span></div>
+      <div class="q-body" style="font-size:11pt;color:#888;margin-top:4px;">提示：∠A=∠C（內錯角）、AO=CO（中點）、∠AOB=∠COD（對頂角）</div>
+    </div>
+    <svg class="fig" viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- AB 在上, CD 在下, 交叉於 O -->
+      <line x1="40" y1="40" x2="160" y2="40" stroke="#111" stroke-width="2"/>
+      <line x1="120" y1="180" x2="240" y2="180" stroke="#111" stroke-width="2"/>
+      <line x1="40" y1="40" x2="240" y2="180" stroke="#111" stroke-width="2"/>
+      <line x1="160" y1="40" x2="120" y2="180" stroke="#111" stroke-width="2"/>
+      <!-- O 點 = 中點 = (140, 110) -->
+      <circle cx="140" cy="110" r="3" fill="#111"/>
+      <text x="32" y="36" font-size="14" font-weight="900">A</text>
+      <text x="164" y="36" font-size="14" font-weight="900">B</text>
+      <text x="112" y="196" font-size="14" font-weight="900">D</text>
+      <text x="244" y="196" font-size="14" font-weight="900">C</text>
+      <text x="148" y="108" font-size="13" font-weight="900">O</text>
+      <!-- 中點記號 -->
+      <line x1="86" y1="71" x2="92" y2="79" stroke="#111" stroke-width="2"/>
+      <line x1="200" y1="148" x2="206" y2="156" stroke="#111" stroke-width="2"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ========== 3-4 中垂、平分、等腰、正三角形（9 題 × 5 = 45） ========== -->
+<div class="section-h">⭐ 第四單元 · 中垂線、角平分線、等腰／正三角形 <span class="pts">共 45 分（9 題）</span></div>
+
+<!-- B12 -->
+<div class="q">
+  <div class="q-row">
+    <div>
+      <div class="q-head"><span class="q-num">12</span><span class="q-pts">5 分</span></div>
+      <div class="q-body">線段 AB 的中垂線上有一點 P。已知 PA = 7，則 PB = <span class="blank ans">7</span></div>
+      <div class="q-body" style="font-size:11pt;color:#888;">提示：中垂線上的點 → 到兩端等距</div>
+    </div>
+    <svg class="fig" viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- AB 線段, P 在中垂線上 -->
+      <line x1="40" y1="160" x2="200" y2="160" stroke="#111" stroke-width="2"/>
+      <line x1="120" y1="40" x2="120" y2="180" stroke="#1976d2" stroke-width="2" stroke-dasharray="4 3"/>
+      <line x1="40" y1="160" x2="120" y2="60" stroke="#d32f2f" stroke-width="1.8"/>
+      <line x1="200" y1="160" x2="120" y2="60" stroke="#d32f2f" stroke-width="1.8"/>
+      <!-- 直角符號 in middle -->
+      <rect x="120" y="148" width="12" height="12" fill="none" stroke="#111" stroke-width="1.5"/>
+      <!-- = 記號 -->
+      <line x1="78" y1="106" x2="86" y2="114" stroke="#d32f2f" stroke-width="2"/>
+      <line x1="158" y1="114" x2="166" y2="106" stroke="#d32f2f" stroke-width="2"/>
+      <text x="32" y="178" font-size="14" font-weight="900">A</text>
+      <text x="204" y="178" font-size="14" font-weight="900">B</text>
+      <text x="124" y="56" font-size="14" font-weight="900">P</text>
+      <text x="60" y="135" font-size="12" font-weight="700" fill="#d32f2f">7</text>
+      <text x="170" y="135" font-size="13" font-weight="900" fill="#d32f2f">?</text>
+    </svg>
+  </div>
+</div>
+
+<!-- B13 -->
+<div class="q">
+  <div class="q-row">
+    <div>
+      <div class="q-head"><span class="q-num">13</span><span class="q-pts">5 分</span></div>
+      <div class="q-body">∠ABC 的角平分線上一點 Q。Q 到 BA 的距離 = 5，則 Q 到 BC 的距離 = <span class="blank ans">5</span></div>
+      <div class="q-body" style="font-size:11pt;color:#888;">提示：角平分線上的點 → 到兩邊等距</div>
+    </div>
+    <svg class="fig" viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- ∠ABC -->
+      <line x1="40" y1="180" x2="220" y2="40" stroke="#111" stroke-width="2"/>
+      <line x1="40" y1="180" x2="220" y2="180" stroke="#111" stroke-width="2"/>
+      <!-- 角平分線 -->
+      <line x1="40" y1="180" x2="220" y2="120" stroke="#1976d2" stroke-width="2" stroke-dasharray="4 3"/>
+      <!-- Q 點 -->
+      <circle cx="160" cy="140" r="4" fill="#d32f2f"/>
+      <!-- 垂直線到兩邊 -->
+      <line x1="160" y1="140" x2="138" y2="106" stroke="#d32f2f" stroke-width="1.5"/>
+      <line x1="160" y1="140" x2="160" y2="180" stroke="#d32f2f" stroke-width="1.5"/>
+      <!-- 直角符號 -->
+      <rect x="148" y="168" width="12" height="12" fill="none" stroke="#111" stroke-width="1"/>
+      <!-- = 記號 -->
+      <line x1="146" y1="120" x2="154" y2="124" stroke="#d32f2f" stroke-width="2"/>
+      <line x1="156" y1="156" x2="164" y2="160" stroke="#d32f2f" stroke-width="2"/>
+      <text x="32" y="196" font-size="14" font-weight="900">B</text>
+      <text x="226" y="44" font-size="14" font-weight="900">A</text>
+      <text x="226" y="190" font-size="14" font-weight="900">C</text>
+      <text x="166" y="138" font-size="14" font-weight="900">Q</text>
+      <text x="120" y="120" font-size="12" font-weight="700" fill="#d32f2f">5</text>
+      <text x="166" y="172" font-size="13" font-weight="900" fill="#d32f2f">?</text>
+    </svg>
+  </div>
+</div>
+
+<!-- B14 -->
+<div class="q">
+  <div class="q-row">
+    <div>
+      <div class="q-head"><span class="q-num">14</span><span class="q-pts">5 分</span></div>
+      <div class="q-body">等腰三角形 △ABC 中，AB = AC，∠A = 80°。求 ∠B = <span class="blank ans">50°</span></div>
+      <div class="q-body" style="font-size:11pt;color:#888;">提示：兩底角相等 → ∠B = ∠C = (180° − 80°) ÷ 2</div>
+    </div>
+    <svg class="fig" viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- 等腰，∠A = 80°, base angles = 50° -->
+      <!-- A(120, 30), 高 ~140, half base = 140 * tan(40°) = 117 → too wide. 試 100 高: half base = 100*tan(40°) = 84 -->
+      <!-- A(120, 30), B(36, 170), C(204, 170). 高 = 140, half base = 84 -->
+      <polygon points="120,30 36,170 204,170" fill="#f5f5f5" stroke="#111" stroke-width="2"/>
+      <line x1="78" y1="98" x2="88" y2="106" stroke="#111" stroke-width="2"/>
+      <line x1="152" y1="106" x2="162" y2="98" stroke="#111" stroke-width="2"/>
+      <!-- 角弧 -->
+      <path d="M 102 56 A 22 22 0 0 0 138 56" fill="none" stroke="#d32f2f" stroke-width="2"/>
+      <path d="M 54 158 A 18 18 0 0 0 60 144" fill="none" stroke="#1976d2" stroke-width="2"/>
+      <text x="120" y="22" font-size="14" font-weight="900" text-anchor="middle">A</text>
+      <text x="28" y="186" font-size="14" font-weight="900">B</text>
+      <text x="208" y="186" font-size="14" font-weight="900">C</text>
+      <text x="108" y="62" font-size="12" font-weight="700" fill="#d32f2f">80°</text>
+      <text x="50" y="138" font-size="12" font-weight="900" fill="#1976d2">?</text>
+    </svg>
+  </div>
+</div>
+
+<!-- B15 + B16 (兩題在同一個情境圖) -->
+<div class="q">
+  <div class="q-row">
+    <div>
+      <div class="q-head"><span class="q-num">15</span><span class="q-pts">5 分</span></div>
+      <div class="q-body">如圖，等腰 △ABC，AB=AC=25，BC=14，AD ⊥ BC。求高 AD = ?</div>
+      <div class="calc-space" style="min-height:60px;"></div>
+      <div class="q-body" style="margin-top:6px;">AD = <span class="blank ans">24</span></div>
+    </div>
+    <svg class="fig" viewBox="0 0 280 240" xmlns="http://www.w3.org/2000/svg">
+      <!-- AB=AC=25, BC=14 → BD=7, AD=24. -->
+      <!-- 比例 8 px/unit: BC=14*8=112. B(80, 200), C(192, 200). 高 24*8=192. A(136, 8) -->
+      <!-- 但 8 太小，用 6 px/unit: BC=84, AD=144. B(98, 200), C(182, 200), A(140, 56) -->
+      <polygon points="140,56 98,200 182,200" fill="#f5f5f5" stroke="#111" stroke-width="2"/>
+      <line x1="140" y1="56" x2="140" y2="200" stroke="#111" stroke-width="2"/>
+      <!-- = 記號 -->
+      <line x1="115" y1="124" x2="123" y2="132" stroke="#111" stroke-width="2"/>
+      <line x1="157" y1="132" x2="165" y2="124" stroke="#111" stroke-width="2"/>
+      <!-- ‖ 記號 BD=DC -->
+      <line x1="119" y1="194" x2="119" y2="206" stroke="#d32f2f" stroke-width="2"/>
+      <line x1="161" y1="194" x2="161" y2="206" stroke="#d32f2f" stroke-width="2"/>
+      <!-- 直角 -->
+      <rect x="128" y="188" width="12" height="12" fill="none" stroke="#111" stroke-width="1.5"/>
+      <text x="140" y="48" font-size="14" font-weight="900" text-anchor="middle">A</text>
+      <text x="86" y="216" font-size="14" font-weight="900">B</text>
+      <text x="186" y="216" font-size="14" font-weight="900">C</text>
+      <text x="146" y="220" font-size="13" font-weight="900">D</text>
+      <text x="100" y="124" font-size="12" font-weight="700" fill="#d32f2f">25</text>
+      <text x="170" y="124" font-size="12" font-weight="700" fill="#d32f2f">25</text>
+      <text x="110" y="216" font-size="11" font-weight="700">7</text>
+      <text x="166" y="216" font-size="11" font-weight="700">7</text>
+      <text x="146" y="138" font-size="13" font-weight="900" fill="#d32f2f">?</text>
+    </svg>
+  </div>
+</div>
+
+<!-- B16 -->
+<div class="q">
+  <div class="q-head"><span class="q-num">16</span><span class="q-pts">5 分</span></div>
+  <div class="q-body">承上題（B15）。求 △ABC 的「面積」= ?</div>
+  <div class="q-body" style="font-size:11pt;color:#888;">提示：底 × 高 ÷ 2 = 14 × 24 ÷ 2</div>
+  <div class="calc-space" style="min-height:50px;"></div>
+  <div class="q-body" style="margin-top:6px;">面積 = <span class="blank ans">168</span></div>
+</div>
+
+<!-- B17 -->
+<div class="q">
+  <div class="q-row">
+    <div>
+      <div class="q-head"><span class="q-num">17</span><span class="q-pts">5 分</span></div>
+      <div class="q-body">△ABC 中，∠B = 57°，∠C = 66°。哪兩條邊「一定相等」？答：<span class="blank ans-only ans">AC = BC</span></div>
+      <div class="q-body" style="font-size:11pt;color:#888;">提示：先算 ∠A = 180° − 57° − 66° = ?；相等的角對應的邊相等</div>
+      <div class="choices">
+        <div class="choice"><span class="circle"></span> (A) AB = AC</div>
+        <div class="choice"><span class="circle"></span> (B) AB = BC</div>
+        <div class="choice"><span class="circle"></span> (C) AC = BC</div>
+      </div>
+    </div>
+    <svg class="fig" viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="140,30 40,180 220,180" fill="#f5f5f5" stroke="#111" stroke-width="2"/>
+      <path d="M 124 56 A 22 22 0 0 0 156 56" fill="none" stroke="#666" stroke-width="2"/>
+      <path d="M 60 168 A 20 20 0 0 0 68 152" fill="none" stroke="#d32f2f" stroke-width="2"/>
+      <path d="M 200 168 A 22 22 0 0 1 190 150" fill="none" stroke="#1976d2" stroke-width="2"/>
+      <text x="140" y="22" font-size="14" font-weight="900" text-anchor="middle">A</text>
+      <text x="26" y="194" font-size="14" font-weight="900">B</text>
+      <text x="226" y="194" font-size="14" font-weight="900">C</text>
+      <text x="118" y="56" font-size="13" font-weight="700" fill="#666">?°</text>
+      <text x="62" y="156" font-size="13" font-weight="700" fill="#d32f2f">57°</text>
+      <text x="184" y="156" font-size="13" font-weight="700" fill="#1976d2">66°</text>
+    </svg>
+  </div>
+</div>
+
+<!-- B18 -->
+<div class="q">
+  <div class="q-row">
+    <div>
+      <div class="q-head"><span class="q-num">18</span><span class="q-pts">5 分</span></div>
+      <div class="q-body">正三角形 △ABC，邊長 = 6，AD ⊥ BC 於 D。<br>求高 AD = ?</div>
+      <div class="q-body" style="font-size:11pt;color:#888;">提示：(√3/2) × 邊長 = (√3/2) × 6</div>
+      <div class="calc-space" style="min-height:50px;"></div>
+      <div class="q-body" style="margin-top:6px;">AD = <span class="blank ans">3√3</span></div>
+    </div>
+    <svg class="fig" viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- 正三角形邊 6, 比例 24px/unit: BC = 144. B(48,200), C(192,200). 高 = (√3/2)*6 = 5.196 → ~125. A(120, 75) -->
+      <polygon points="120,75 48,200 192,200" fill="#f5f5f5" stroke="#111" stroke-width="2"/>
+      <line x1="120" y1="75" x2="120" y2="200" stroke="#111" stroke-width="2"/>
+      <!-- = 記號（三邊等長）-->
+      <line x1="78" y1="135" x2="86" y2="143" stroke="#111" stroke-width="2"/>
+      <line x1="154" y1="143" x2="162" y2="135" stroke="#111" stroke-width="2"/>
+      <line x1="116" y1="194" x2="124" y2="206" stroke="#111" stroke-width="2"/>
+      <rect x="108" y="188" width="12" height="12" fill="none" stroke="#111" stroke-width="1.5"/>
+      <text x="120" y="68" font-size="14" font-weight="900" text-anchor="middle">A</text>
+      <text x="40" y="216" font-size="14" font-weight="900">B</text>
+      <text x="196" y="216" font-size="14" font-weight="900">C</text>
+      <text x="124" y="218" font-size="13" font-weight="900">D</text>
+      <text x="64" y="142" font-size="12" font-weight="700">6</text>
+      <text x="166" y="142" font-size="12" font-weight="700">6</text>
+      <text x="115" y="218" font-size="11" font-weight="700">6</text>
+      <text x="128" y="146" font-size="14" font-weight="900" fill="#d32f2f">?</text>
+    </svg>
+  </div>
+</div>
+
+<!-- B19 -->
+<div class="q">
+  <div class="q-head"><span class="q-num">19</span><span class="q-pts">5 分</span></div>
+  <div class="q-body">承上題（B18）。求正三角形 △ABC 的「面積」= ?</div>
+  <div class="q-body" style="font-size:11pt;color:#888;">提示：(√3/4) × 邊長² = (√3/4) × 36</div>
+  <div class="calc-space" style="min-height:50px;"></div>
+  <div class="q-body" style="margin-top:6px;">面積 = <span class="blank ans">9√3</span></div>
+</div>
+
+<!-- B20 -->
+<div class="q">
+  <div class="q-head"><span class="q-num">20</span><span class="q-pts">5 分</span></div>
+  <div class="q-body">下列敘述何者「錯誤」？答：<span class="blank ans-only ans">D</span></div>
+  <div class="choices" style="flex-direction:column;align-items:flex-start;gap:8px;">
+    <div class="choice"><span class="circle"></span> (A) 等腰三角形的兩底角相等</div>
+    <div class="choice"><span class="circle"></span> (B) 中垂線上的點到線段兩端等距</div>
+    <div class="choice"><span class="circle"></span> (C) 角平分線上的點到角兩邊等距</div>
+    <div class="choice"><span class="circle"></span> (D) 正三角形的高等於它的邊長</div>
+  </div>
+  <div class="q-body" style="font-size:11pt;color:#888;">提示：正三角形高 = (√3/2) × 邊長，比邊長短</div>
+</div>
+
+<div class="ending">
+  💪 你完成 B 版段考！檢查一次再交～<br>
+  <span style="color:#888;font-size:10pt;">8A · 段考 · 5/7 · 共 100 分（20 題 × 5 分）</span>
+</div>
+
+</div>
+<script>
+  if (location.search.includes('key=ans')) {
+    document.body.classList.add('show-answers');
+    document.getElementById('ansBtn').textContent = '🙈 隱藏答案';
+  }
+</script>
+</body>
+</html>
