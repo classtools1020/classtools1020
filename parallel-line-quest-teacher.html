@@ -195,10 +195,10 @@
 <script>
 'use strict';
 
-// ntfy.sh：即時推送服務、CORS 完整支援、不需註冊
-const NTFY_TOPIC = 'stacey-classtools-pll-quest-8a-2026-7f3k9d2x';
-const NTFY_JSON_URL = `https://ntfy.sh/${NTFY_TOPIC}/json?poll=1&since=all`;
+// Firebase Realtime Database — 永久儲存
+const FIREBASE_URL = 'https://classtools1019-default-rtdb.firebaseio.com';
 const HOMEWORK_ID = '8a_parallel_4_1_2026_05_26';
+const FIREBASE_NODE = `${FIREBASE_URL}/submissions/${HOMEWORK_ID}.json`;
 const PASSWORD = 'stacey2026';
 const POLL_INTERVAL = 6000; // 6 sec
 const STORAGE_KEY = 'plls_submissions_' + HOMEWORK_ID;
@@ -242,28 +242,19 @@ document.getElementById('pwd-input').addEventListener('keypress', e => {
 
 async function fetchData() {
   try {
-    // 從 ntfy.sh 拉取所有歷史訊息（最近 12 小時內）
-    const res = await fetch(NTFY_JSON_URL + '&_=' + Date.now());
+    // 從 Firebase 拉取所有提交（永久儲存）
+    const res = await fetch(FIREBASE_NODE + '?_=' + Date.now());
     if (!res.ok) throw new Error('GET ' + res.status);
-    const text = await res.text();
-    // ntfy 回傳 newline-delimited JSON（每行一則訊息）
-    const messages = text.trim().split('\n').filter(Boolean).map(l => {
-      try { return JSON.parse(l); } catch { return null; }
-    }).filter(Boolean);
-
-    // 已知的 ntfy 訊息 ID（避免重複加入）
-    const knownIds = new Set(submissions.map(s => s._ntfyId).filter(Boolean));
-    const newOnes = [];
-    for (const m of messages) {
-      if (!m.id || knownIds.has(m.id)) continue;
-      try {
-        const data = JSON.parse(m.message);
-        if (data.hwId !== HOMEWORK_ID) continue;
-        data._ntfyId = m.id;
-        data._receivedAt = new Date(m.time * 1000).toISOString();
-        newOnes.push(data);
-      } catch { /* ignore invalid */ }
-    }
+    const data = await res.json();
+    // Firebase 回傳 {fbKey1: payload1, fbKey2: payload2, ...} 或 null
+    const items = data ? Object.entries(data).map(([k, v]) => {
+      v._fbKey = k;
+      v._receivedAt = v.submittedAt || new Date().toISOString();
+      return v;
+    }) : [];
+    // dedupe by fbKey + 過濾 HOMEWORK_ID
+    const knownKeys = new Set(submissions.map(s => s._fbKey).filter(Boolean));
+    const newOnes = items.filter(s => !knownKeys.has(s._fbKey) && s.hwId === HOMEWORK_ID);
 
     if (newOnes.length > 0) {
       submissions = submissions.concat(newOnes);
@@ -404,14 +395,25 @@ function downloadCSV() {
   URL.revokeObjectURL(url);
 }
 
-function confirmReset() {
-  if (!confirm('⚠️ 確定要清空本機累積的全部提交資料嗎？（此動作不可恢復）\n\n注意：這只清除「本機後台」的累積紀錄。如果 12 小時內有學生剛交，下次刷新可能會從 ntfy 重新拉回。')) return;
-  if (!confirm('真的真的確定？這會清掉全班所有學生的成績紀錄。')) return;
-  submissions = [];
-  saveToStorage();
-  renderStats();
-  renderTable();
-  alert('✅ 本機已清空。提醒：建議先按「匯出 CSV」備份再清。');
+async function confirmReset() {
+  if (!confirm('⚠️ 確定要清空全部提交資料嗎？（此動作不可恢復，會同時清掉伺服器資料）')) return;
+  if (!confirm('真的真的確定？這會清掉全班所有學生的成績紀錄。建議先按「匯出 CSV」備份。')) return;
+  try {
+    // 清 Firebase
+    await fetch(FIREBASE_NODE, { method: 'DELETE' });
+    // 清本地
+    submissions = [];
+    saveToStorage();
+    renderStats();
+    renderTable();
+    alert('✅ 已清空伺服器 + 本機');
+  } catch (err) {
+    alert('❌ 清空失敗：' + err.message + '。本機已清。');
+    submissions = [];
+    saveToStorage();
+    renderStats();
+    renderTable();
+  }
 }
 
 window.tryLogin = tryLogin;

@@ -231,11 +231,10 @@
 'use strict';
 
 /* =============== Config =============== */
-// ntfy.sh：免費即時推送服務、完整支援 CORS、不需註冊
-// topic 取隨機字串避免被別人偷看
-const NTFY_TOPIC = 'stacey-classtools-pll-master-0527-m9n2k5z';
-const NTFY_URL = `https://ntfy.sh/${NTFY_TOPIC}`;
+// Firebase Realtime Database — 永久儲存、CORS 完美、不會 12 小時消失
+const FIREBASE_URL = 'https://classtools1019-default-rtdb.firebaseio.com';
 const HOMEWORK_ID = '8a_parallel_master_2026_05_27';
+const FIREBASE_NODE = `${FIREBASE_URL}/submissions/${HOMEWORK_ID}.json`;
 
 /* =============== Stars =============== */
 (() => {
@@ -955,10 +954,10 @@ async function submitToServer(elapsed) {
     })),
   };
 
-  // 用 ntfy.sh 即時推送：POST body 為 JSON payload
+  // Firebase Realtime Database POST — 永久儲存
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
-      const res = await fetch(NTFY_URL, {
+      const res = await fetch(FIREBASE_NODE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
