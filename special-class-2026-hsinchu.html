@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>集中式特教班・綜合職能科｜115 學年度 · 新竹區</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#1565c0;
+  --accent:#7c4dff;
+  --ink:#2c3e50;
+  --soft:#5a6c7d;
+  --bg:#fafbfc;
+  --line:#e8edf2;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:17px;-webkit-font-smoothing:antialiased}
+.container{max-width:920px;margin:0 auto;padding:0 24px}
+
+/* ===== 頂部導覽 ===== */
+.topnav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,.06);padding:10px 16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.topnav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;text-decoration:none;color:var(--soft);font-size:.92em;font-weight:700;transition:all .15s}
+.nav-link:hover{background:#ede7f6;color:var(--accent)}
+.nav-link.active{background:var(--accent);color:#fff}
+.nav-divider{color:#cbd5e0;font-size:.85em}
+.nav-spacer{flex:1}
+.nav-ext{font-size:.85em;color:#94a3b8;text-decoration:none}
+.nav-ext:hover{color:var(--primary)}
+@media(max-width:520px){.nav-link{padding:6px 12px;font-size:.85em}.nav-divider{display:none}}
+
+/* ===== Hero ===== */
+.hero{padding:56px 24px 40px;text-align:center;background:linear-gradient(180deg,#ede7f6 0%,var(--bg) 100%)}
+.hero .tag{display:inline-block;background:#fff;color:var(--accent);padding:6px 18px;border-radius:30px;font-size:.88em;font-weight:700;margin-bottom:18px;border:1.5px solid #d1c4e9}
+.hero h1{font-size:2em;font-weight:900;color:var(--accent);letter-spacing:-.8px;margin-bottom:10px;line-height:1.3}
+.hero .lead{font-size:1.05em;color:var(--soft);max-width:560px;margin:0 auto}
+
+/* ===== Section ===== */
+section{padding:48px 0}
+.section-title{font-size:1.5em;font-weight:900;margin-bottom:8px;color:var(--ink);display:flex;align-items:center;gap:10px}
+.section-title .ico{font-size:1.2em}
+.section-sub{color:var(--soft);margin-bottom:24px;font-size:.98em}
+
+/* ===== Stats ===== */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stat{background:#fff;border-radius:16px;padding:22px 18px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.stat-val{font-size:2.2em;font-weight:900;color:var(--accent);letter-spacing:-1px;line-height:1}
+.stat-val small{font-size:.4em;font-weight:600;color:var(--soft);letter-spacing:0}
+.stat-label{font-size:.88em;color:var(--soft);margin-top:6px;font-weight:600}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* ===== 申請資格 ===== */
+.eligibility{background:#fff;border-radius:18px;padding:28px 32px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.elig-row{display:flex;gap:14px;padding:12px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+.elig-row:last-child{border-bottom:none}
+.elig-num{flex:0 0 36px;height:36px;border-radius:50%;background:#ede7f6;color:var(--accent);font-weight:900;display:flex;align-items:center;justify-content:center;font-size:1em}
+.elig-body{flex:1;line-height:1.6}
+.elig-body b{color:var(--ink)}
+.elig-body .small{display:block;color:var(--soft);font-size:.9em;margin-top:2px}
+
+/* ===== 學校卡 ===== */
+.schools{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.school{background:#fff;border-radius:18px;padding:24px 26px;box-shadow:0 2px 10px rgba(0,0,0,.05);border-top:5px solid var(--accent);transition:all .2s;position:relative}
+.school:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.school-type{display:inline-block;font-size:.72em;padding:3px 10px;border-radius:10px;background:#ede7f6;color:var(--accent);font-weight:800;margin-bottom:8px}
+.school-name{font-size:1.2em;font-weight:900;color:var(--ink);margin-bottom:14px}
+.school-dept{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#faf7ff;border-radius:10px;margin-bottom:8px}
+.dept-name{font-weight:700;color:var(--ink);font-size:.98em}
+.dept-skill{font-size:.78em;color:var(--soft);margin-top:2px}
+.dept-quota{font-weight:900;color:var(--accent);font-size:1.3em;line-height:1;white-space:nowrap;margin-left:10px}
+.dept-quota small{font-size:.55em;font-weight:600;color:var(--soft);margin-left:2px}
+@media(max-width:640px){.schools{grid-template-columns:1fr}}
+
+/* ===== 時間軸 ===== */
+.timeline{background:#fff;border-radius:18px;padding:28px 32px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.tl-item{display:grid;grid-template-columns:120px 1fr;gap:20px;padding:16px 0;border-bottom:1px solid var(--line);align-items:center;position:relative}
+.tl-item:last-child{border-bottom:none}
+.tl-item.key{background:linear-gradient(90deg,#faf7ff 0%,#fff 100%);margin:0 -16px;padding:16px;border-radius:10px;border-bottom:none}
+.tl-date{font-weight:900;color:var(--accent);font-size:1em}
+.tl-date small{display:block;font-size:.7em;color:var(--soft);font-weight:600}
+.tl-event{font-size:1.02em;color:var(--ink);font-weight:600}
+.tl-event small{display:block;color:var(--soft);font-size:.85em;font-weight:500;margin-top:2px}
+
+@media(max-width:640px){.tl-item{grid-template-columns:90px 1fr;gap:14px}}
+
+/* ===== 流程圖 ===== */
+.process{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:8px 0 28px}
+.step{background:#fff;border-radius:12px;padding:18px 12px;text-align:center;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.step-num{font-size:.72em;color:var(--accent);font-weight:800;letter-spacing:1px}
+.step-icon{font-size:1.8em;margin:6px 0}
+.step-title{font-size:.92em;font-weight:800;color:var(--ink);line-height:1.3}
+.step-date{font-size:.75em;color:var(--soft);margin-top:4px;font-weight:600}
+.step::after{content:'';position:absolute;right:-5px;top:50%;width:10px;height:2px;background:#cbd5e0;z-index:1}
+.step:last-child::after{display:none}
+@media(max-width:640px){
+  .process{grid-template-columns:1fr 1fr;gap:8px}
+  .step::after{display:none}
+}
+
+/* ===== 頁面切換 ===== */
+.page-nav-wrap{padding:40px 0 80px;background:linear-gradient(180deg,var(--bg) 0%,#ede7f6 100%)}
+.page-nav{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:760px;margin:0 auto}
+.pn-card{display:flex;align-items:center;gap:14px;padding:22px 26px;background:#fff;border-radius:20px;box-shadow:0 4px 18px rgba(0,0,0,.06);text-decoration:none;color:var(--ink);transition:all .25s;border:2px solid transparent}
+.pn-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(124,77,255,.15);border-color:var(--accent)}
+.pn-card.pn-current{background:linear-gradient(135deg,#7c4dff,#5e35b1);color:#fff;cursor:default}
+.pn-card.pn-current:hover{transform:none}
+.pn-emoji{font-size:2.4em;flex-shrink:0;line-height:1}
+.pn-text strong{display:block;font-size:1.15em;font-weight:900;margin-bottom:2px}
+.pn-text small{display:block;font-size:.85em;opacity:.78;font-weight:500}
+.pn-arrow{font-size:1.4em;color:var(--accent);font-weight:300;transition:transform .25s;margin-left:auto}
+.pn-card:hover .pn-arrow{transform:translateX(6px)}
+@media(max-width:640px){.page-nav{grid-template-columns:1fr}}
+
+/* ===== Footer ===== */
+footer{padding:32px 24px;text-align:center;color:var(--soft);font-size:.88em;line-height:2;border-top:1px solid var(--line);background:#fff}
+footer a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<!-- 頂部導覽 -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a href="paths-2026-hsinchu.html" class="nav-link">🏠 升學指引主頁</a>
+    <span class="nav-divider">|</span>
+    <a href="placement-2026-hsinchu.html" class="nav-link">📋 高中科系</a>
+    <span class="nav-divider">|</span>
+    <a href="special-class-2026-hsinchu.html" class="nav-link active">🎯 集中式特教班</a>
+    <span class="nav-spacer"></span>
+    <a href="https://adapt.set.edu.tw/" target="_blank" class="nav-ext">官方網站 ↗</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="tag">115 學年度 · 新竹區 · 給家長</div>
+  <h1>集中式特殊教育班<br>綜合職能科 安置介紹</h1>
+  <p class="lead">適合輕度／中度智能障礙、或伴隨智能障礙之自閉症等學生<br>不用會考，能力評估後分發</p>
+</div>
+
+<!-- 數據 -->
+<section>
+  <div class="container">
+    <div class="stats">
+      <div class="stat"><div class="stat-val">4</div><div class="stat-label">所學校</div></div>
+      <div class="stat"><div class="stat-val">70</div><div class="stat-label">總名額</div></div>
+      <div class="stat"><div class="stat-val">2</div><div class="stat-label">科別類型</div></div>
+      <div class="stat"><div class="stat-val">5/4<small>～5/11</small></div><div class="stat-label">唱名分發</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 申請資格 -->
+<section>
+  <div class="container">
+    <h2 class="section-title"><span class="ico">✅</span>誰可以申請</h2>
+    <p class="section-sub">須同時符合下列 3 個條件</p>
+
+    <div class="eligibility">
+      <div class="elig-row">
+        <div class="elig-num">1</div>
+        <div class="elig-body">
+          <b>年齡 21 歲以下</b>
+          <span class="small">應屆畢業生不受年齡限制</span>
+        </div>
+      </div>
+      <div class="elig-row">
+        <div class="elig-num">2</div>
+        <div class="elig-body">
+          <b>持有鑑輔會核發的鑑定證明</b>
+          <span class="small">智能障礙 ／ 自閉症伴隨智能障礙 ／ 其他障礙伴隨智能障礙</span>
+        </div>
+      </div>
+      <div class="elig-row">
+        <div class="elig-num">3</div>
+        <div class="elig-body">
+          <b>具輕度或中度智能障礙</b>
+          <span class="small">114 年 12 月 31 日前已於特教通報網登錄</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 新竹區開缺學校 -->
+<section>
+  <div class="container">
+    <h2 class="section-title"><span class="ico">🏫</span>新竹區開缺學校</h2>
+    <p class="section-sub">115 學年度共 4 所學校 · 70 個名額</p>
+
+    <div class="schools">
+
+      <div class="school">
+        <div class="school-type">國立</div>
+        <div class="school-name">國立新竹高工</div>
+        <div class="school-dept">
+          <div>
+            <div class="dept-name">餐飲服務科</div>
+          </div>
+          <div class="dept-quota">28<small>名</small></div>
+        </div>
+      </div>
+
+      <div class="school">
+        <div class="school-type">國立</div>
+        <div class="school-name">國立陽明交大附中</div>
+        <div class="school-dept">
+          <div>
+            <div class="dept-name">門市服務科</div>
+          </div>
+          <div class="dept-quota">14<small>名</small></div>
+        </div>
+      </div>
+
+      <div class="school">
+        <div class="school-type">國立</div>
+        <div class="school-name">國立關西高中</div>
+        <div class="school-dept">
+          <div>
+            <div class="dept-name">綜合職能科</div>
+            <div class="dept-skill">車輛整理技能・產品加工技能</div>
+          </div>
+          <div class="dept-quota">14<small>名</small></div>
+        </div>
+      </div>
+
+      <div class="school">
+        <div class="school-type">私立</div>
+        <div class="school-name">私立東泰高中</div>
+        <div class="school-dept">
+          <div>
+            <div class="dept-name">綜合職能科</div>
+            <div class="dept-skill">車輛整理技能・餐飲製作技能</div>
+          </div>
+          <div class="dept-quota">14<small>名</small></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- 流程 5 步 -->
+<section>
+  <div class="container">
+    <h2 class="section-title"><span class="ico">🛤</span>申請流程 5 步驟</h2>
+    <p class="section-sub">從報名到報到，一條龍進行</p>
+
+    <div class="process">
+      <div class="step">
+        <div class="step-num">STEP 1</div>
+        <div class="step-icon">📝</div>
+        <div class="step-title">網路報名</div>
+        <div class="step-date">2/23–3/3</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 2</div>
+        <div class="step-icon">🧠</div>
+        <div class="step-title">能力評估</div>
+        <div class="step-date">4/11</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 3</div>
+        <div class="step-icon">📢</div>
+        <div class="step-title">唱名分發</div>
+        <div class="step-date">5/4–5/11</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 4</div>
+        <div class="step-icon">🎯</div>
+        <div class="step-title">公告結果</div>
+        <div class="step-date">6/1</div>
+      </div>
+      <div class="step">
+        <div class="step-num">STEP 5</div>
+        <div class="step-icon">🎓</div>
+        <div class="step-title">報到入學</div>
+        <div class="step-date">6/10–6/15</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 完整時間表 -->
+<section>
+  <div class="container">
+    <h2 class="section-title"><span class="ico">📅</span>完整時間表</h2>
+    <p class="section-sub">不要錯過任何一個關鍵日期</p>
+
+    <div class="timeline">
+      <div class="tl-item key">
+        <div class="tl-date">2/23–3/3<small>114→115 年</small></div>
+        <div class="tl-event">網路報名<small>由國中辦理</small></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">3/4–3/9</div>
+        <div class="tl-event">紙本送件<small>送縣市政府教育局</small></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">3/31 前</div>
+        <div class="tl-event">能力評估通知單寄發</div>
+      </div>
+      <div class="tl-item key">
+        <div class="tl-date">4/11<small>星期六</small></div>
+        <div class="tl-event">能力評估<small>基本學習能力＋職業能力</small></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">4/20</div>
+        <div class="tl-event">評估結果通知</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">4/27 前</div>
+        <div class="tl-event">如需複查請申請</div>
+      </div>
+      <div class="tl-item key">
+        <div class="tl-date">5/4–5/11</div>
+        <div class="tl-event">唱名分發<small>家長須親自到場或委託代理</small></div>
+      </div>
+      <div class="tl-item key">
+        <div class="tl-date">6/1</div>
+        <div class="tl-event">公告安置結果</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">6/10–6/15</div>
+        <div class="tl-event">安置學生報到</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 頁面切換 -->
+<div class="page-nav-wrap">
+  <div class="container">
+    <div class="page-nav">
+      <a href="paths-2026-hsinchu.html" class="pn-card">
+        <span class="pn-emoji">🏠</span>
+        <span class="pn-text">
+          <strong>升學指引主頁</strong>
+          <small>兩條升學路說明</small>
+        </span>
+        <span class="pn-arrow">→</span>
+      </a>
+      <a href="special-class-2026-hsinchu.html" class="pn-card pn-current">
+        <span class="pn-emoji">🎯</span>
+        <span class="pn-text">
+          <strong>集中式特教班</strong>
+          <small>您正在這頁</small>
+        </span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  資料整理：曾瓊瑩<br>
+  詳細簡章與最新資訊請查詢 <a href="https://adapt.set.edu.tw/" target="_blank">教育部適性輔導安置網站</a>
+</footer>
+
+</body>
+</html>
