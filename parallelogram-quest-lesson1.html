@@ -39,23 +39,24 @@ body{
   background-attachment:fixed;
   padding:0;
 }
-.stars{
-  position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:
-    radial-gradient(2px 2px at 20% 30%,#fff 50%,transparent),
-    radial-gradient(1px 1px at 40% 70%,#fff 50%,transparent),
-    radial-gradient(2px 2px at 70% 20%,#fff 50%,transparent),
-    radial-gradient(1px 1px at 90% 60%,#fff 50%,transparent),
-    radial-gradient(2px 2px at 55% 85%,#fff 50%,transparent),
-    radial-gradient(1px 1px at 30% 10%,#fff 50%,transparent),
-    radial-gradient(2px 2px at 80% 90%,#fff 50%,transparent);
-  background-size:600px 600px;
-  opacity:.5;
-  animation:twinkle 6s infinite;
-}
-@keyframes twinkle{0%,100%{opacity:.4}50%{opacity:.7}}
 
-.wrap{max-width:980px;margin:0 auto;padding:14px 12px 60px;position:relative;z-index:1}
+/* ========== 動態星空 ========== */
+.starfield{
+  position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;
+}
+.starfield .star{
+  position:absolute;background:#fff;border-radius:50%;
+  box-shadow:0 0 4px #fff,0 0 8px rgba(255,255,255,.6);
+  animation:starTwinkle var(--dur,3s) infinite ease-in-out;
+  animation-delay:var(--delay,0s);
+  opacity:.85;
+}
+@keyframes starTwinkle{
+  0%,100%{opacity:.2;transform:scale(.8)}
+  50%{opacity:1;transform:scale(1.3)}
+}
+
+.wrap{max-width:980px;margin:0 auto;padding:14px 12px 80px;position:relative;z-index:1}
 
 /* ========== 首頁封面 ========== */
 .cover{
@@ -99,6 +100,40 @@ body{
   backdrop-filter:blur(8px);
 }
 .cover .hero-chip span:first-child{font-size:1.2rem}
+
+/* ========== 頂部 5 星進度（驚嘆要素 3 進度條）========== */
+.star-progress{
+  display:flex;justify-content:center;gap:14px;
+  margin:8px 0 16px;
+}
+.prog-star{
+  width:32px;height:32px;position:relative;
+  transition:transform .3s;
+}
+.prog-star svg{width:100%;height:100%;display:block}
+.prog-star .core{
+  fill:rgba(255,255,255,.12);
+  stroke:rgba(255,215,0,.4);
+  stroke-width:2;
+  transition:all .4s;
+}
+.prog-star.lit .core{
+  fill:var(--gold);
+  stroke:#FFA500;
+  filter:drop-shadow(0 0 12px var(--gold));
+  animation:starLitPulse 1.6s infinite;
+}
+@keyframes starLitPulse{
+  0%,100%{filter:drop-shadow(0 0 8px var(--gold))}
+  50%{filter:drop-shadow(0 0 18px var(--gold)) drop-shadow(0 0 24px #FFA500)}
+}
+.prog-star.lit{animation:starPop .6s}
+@keyframes starPop{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.5) rotate(20deg)}
+  70%{transform:scale(.9) rotate(-10deg)}
+  100%{transform:scale(1) rotate(0)}
+}
 
 /* ========== 關卡選擇條 ========== */
 .stage-bar{
@@ -245,8 +280,8 @@ body{
 
 .flyin{animation:flyIn .4s}
 @keyframes flyIn{
-  0%{opacity:0;transform:translateX(20px) scale(1.3);color:#fff}
-  100%{opacity:1;transform:translateX(0) scale(1)}
+  0%{opacity:0;transform:translateX(20px) scale(1.3);color:#fff;text-shadow:0 0 12px var(--gold)}
+  100%{opacity:1;transform:translateX(0) scale(1);text-shadow:none}
 }
 
 /* SVG 互動區 */
@@ -273,6 +308,29 @@ body{
   0%,100%{opacity:.85;transform:translateX(-50%) translateY(0)}
   50%{opacity:1;transform:translateX(-50%) translateY(-3px)}
 }
+
+/* 倒數計時圈 */
+.timer-ring{
+  position:absolute;top:12px;right:12px;
+  width:46px;height:46px;
+  z-index:5;
+}
+.timer-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer-ring .track{fill:none;stroke:rgba(255,255,255,.12);stroke-width:4}
+.timer-ring .bar{
+  fill:none;stroke:var(--gold);stroke-width:4;stroke-linecap:round;
+  stroke-dasharray:125.6;stroke-dashoffset:0;
+  transition:stroke-dashoffset 1s linear,stroke .3s;
+  filter:drop-shadow(0 0 6px var(--gold));
+}
+.timer-ring .bar.warn{stroke:var(--pink);filter:drop-shadow(0 0 6px var(--pink))}
+.timer-ring .bar.danger{stroke:var(--red);filter:drop-shadow(0 0 6px var(--red))}
+.timer-ring .txt{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Consolas',monospace;font-weight:900;font-size:1rem;
+  color:#fff;text-shadow:0 0 4px #000;
+}
+
 svg.stage{
   width:100%;height:auto;
   display:block;
@@ -287,6 +345,16 @@ svg.stage{
 }
 .vertex:active{cursor:grabbing;fill:#FF8C00}
 .vertex:hover{r:14}
+.vertex-pulse{
+  fill:none;stroke:var(--gold);stroke-width:2;
+  opacity:0;pointer-events:none;
+  transform-origin:center;
+  animation:vertexPulse 2.2s infinite;
+}
+@keyframes vertexPulse{
+  0%{opacity:.7;r:11}
+  100%{opacity:0;r:24}
+}
 .vertex-label{
   font-family:'Noto Sans TC',sans-serif;
   font-weight:900;font-size:18px;
@@ -322,6 +390,12 @@ svg.stage{
 .parallel-mark{
   font-size:14px;fill:var(--sky);
   text-anchor:middle;font-weight:900;pointer-events:none;
+}
+
+/* 拖動光點軌跡 */
+.trail-canvas{
+  position:absolute;inset:0;pointer-events:none;z-index:4;
+  border-radius:18px;
 }
 
 /* 生活連結列 */
@@ -435,6 +509,7 @@ svg.stage{
   padding:12px 8px;text-align:center;
   cursor:pointer;
   transition:all .25s;
+  position:relative;
 }
 .prop-card:hover{transform:translateY(-3px)}
 .prop-card .icon{font-size:1.8rem;display:block;margin-bottom:4px}
@@ -448,7 +523,6 @@ svg.stage{
   content:"✓";position:absolute;top:4px;right:6px;
   color:var(--gold);font-weight:900;
 }
-.prop-card{position:relative}
 .team-name-result{
   margin-top:14px;
   background:rgba(0,0,0,.5);
@@ -460,6 +534,15 @@ svg.stage{
   min-height:56px;
   display:flex;align-items:center;justify-content:center;
   line-height:1.4;
+}
+.team-name-result.locked{
+  animation:teamReveal 1.2s;
+  perspective:600px;
+}
+@keyframes teamReveal{
+  0%{transform:rotateY(180deg) scale(.6);opacity:0}
+  60%{transform:rotateY(-20deg) scale(1.15);opacity:1}
+  100%{transform:rotateY(0) scale(1);opacity:1}
 }
 
 /* 進度條 */
@@ -498,10 +581,125 @@ svg.stage{
 }
 .cleared-banner.show{display:block;animation:fadeUp .5s}
 
+/* ========== 灑花紙片畫布 ========== */
+.confetti-canvas{
+  position:fixed;inset:0;pointer-events:none;z-index:200;
+}
+
+/* ========== LEVEL UNLOCKED 大字 ========== */
+.level-unlock{
+  position:fixed;inset:0;
+  display:none;align-items:center;justify-content:center;
+  z-index:150;pointer-events:none;
+}
+.level-unlock.show{display:flex;animation:unlockFade .3s}
+@keyframes unlockFade{from{opacity:0}to{opacity:1}}
+.level-unlock .big{
+  font-size:2.6rem;font-weight:900;
+  background:linear-gradient(90deg,var(--gold),var(--pink),var(--purple),var(--mint),var(--gold));
+  background-size:200% 100%;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  text-shadow:0 0 30px rgba(255,215,0,.5);
+  animation:unlockPop 1.6s,unlockShine 1.6s linear;
+  text-align:center;line-height:1.2;
+  padding:0 20px;
+}
+@keyframes unlockPop{
+  0%{transform:scale(0) rotate(-12deg);opacity:0}
+  40%{transform:scale(1.3) rotate(4deg);opacity:1}
+  60%{transform:scale(.9) rotate(-2deg)}
+  80%{transform:scale(1.05) rotate(1deg)}
+  100%{transform:scale(1) rotate(0);opacity:1}
+}
+@keyframes unlockShine{
+  0%{background-position:0% 50%}
+  100%{background-position:200% 50%}
+}
+
+/* ========== COMBO 提示 ========== */
+.combo-toast{
+  position:fixed;top:30%;left:50%;
+  transform:translateX(-50%) scale(.4);
+  background:linear-gradient(135deg,#FFD700,#FF6B9D,#B967FF);
+  color:#fff;font-weight:900;font-size:1.6rem;
+  padding:14px 28px;border-radius:60px;
+  box-shadow:0 12px 40px rgba(255,215,0,.6),0 0 30px rgba(185,103,255,.5);
+  z-index:160;pointer-events:none;opacity:0;
+  text-shadow:0 2px 8px rgba(0,0,0,.4);
+  letter-spacing:2px;
+}
+.combo-toast.show{
+  animation:comboPop 1.4s;
+}
+@keyframes comboPop{
+  0%{transform:translateX(-50%) scale(.4) rotate(-10deg);opacity:0}
+  20%{transform:translateX(-50%) scale(1.2) rotate(5deg);opacity:1}
+  35%{transform:translateX(-50%) scale(.95) rotate(-2deg)}
+  50%{transform:translateX(-50%) scale(1.05)}
+  85%{transform:translateX(-50%) scale(1);opacity:1}
+  100%{transform:translateX(-50%) scale(.8) translateY(-30px);opacity:0}
+}
+
+/* ========== 最終 MISSION COMPLETE ========== */
+.final-overlay{
+  position:fixed;inset:0;z-index:180;
+  display:none;align-items:center;justify-content:center;
+  background:radial-gradient(circle at center,rgba(26,31,74,.85) 0%,rgba(10,14,39,.95) 80%);
+  flex-direction:column;
+  text-align:center;padding:20px;
+}
+.final-overlay.show{display:flex;animation:fadeUp .5s}
+.final-overlay .neon{
+  font-size:2.8rem;font-weight:900;
+  color:#fff;
+  text-shadow:
+    0 0 8px #fff,
+    0 0 16px var(--gold),
+    0 0 30px var(--pink),
+    0 0 50px var(--purple);
+  letter-spacing:3px;
+  animation:neonFlicker 2s infinite;
+  margin-bottom:20px;
+  line-height:1.3;
+}
+@keyframes neonFlicker{
+  0%,100%{opacity:1;text-shadow:0 0 8px #fff,0 0 16px var(--gold),0 0 30px var(--pink),0 0 50px var(--purple)}
+  45%,55%{opacity:.9;text-shadow:0 0 4px #fff,0 0 8px var(--gold),0 0 14px var(--pink)}
+  47%{opacity:.5}
+  53%{opacity:.6}
+}
+.final-overlay .team3d{
+  font-size:1.8rem;font-weight:900;
+  background:linear-gradient(90deg,var(--gold),var(--pink),var(--purple),var(--mint));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:team3d 4s infinite linear;
+  transform-style:preserve-3d;
+  padding:20px 30px;
+  border:2px solid var(--gold);
+  border-radius:20px;
+  background-color:rgba(0,0,0,.4);
+  margin-bottom:24px;
+  min-width:280px;
+}
+@keyframes team3d{
+  0%{transform:rotateY(0deg)}
+  100%{transform:rotateY(360deg)}
+}
+.final-overlay .final-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.final-overlay .share-btn{
+  background:linear-gradient(135deg,var(--mint),var(--sky));
+  color:#fff;
+}
+
 </style>
 </head>
 <body>
-<div class="stars"></div>
+<div class="starfield" id="starfield"></div>
+<canvas class="confetti-canvas" id="confettiCanvas"></canvas>
 
 <div class="wrap">
 
@@ -515,6 +713,15 @@ svg.stage{
       <div class="hero-chip"><span>🥜</span><span>安妮亞</span></div>
       <div class="hero-chip"><span>👁️</span><span>五条悟</span></div>
       <div class="hero-chip"><span>⚔️</span><span>黃泉雙使</span></div>
+    </div>
+
+    <!-- 5 星進度 -->
+    <div class="star-progress" id="starProgress">
+      <div class="prog-star" data-star="1"><svg viewBox="0 0 32 32"><polygon class="core" points="16,2 20,12 31,13 23,20 26,31 16,25 6,31 9,20 1,13 12,12"/></svg></div>
+      <div class="prog-star" data-star="2"><svg viewBox="0 0 32 32"><polygon class="core" points="16,2 20,12 31,13 23,20 26,31 16,25 6,31 9,20 1,13 12,12"/></svg></div>
+      <div class="prog-star" data-star="3"><svg viewBox="0 0 32 32"><polygon class="core" points="16,2 20,12 31,13 23,20 26,31 16,25 6,31 9,20 1,13 12,12"/></svg></div>
+      <div class="prog-star" data-star="4"><svg viewBox="0 0 32 32"><polygon class="core" points="16,2 20,12 31,13 23,20 26,31 16,25 6,31 9,20 1,13 12,12"/></svg></div>
+      <div class="prog-star" data-star="5"><svg viewBox="0 0 32 32"><polygon class="core" points="16,2 20,12 31,13 23,20 26,31 16,25 6,31 9,20 1,13 12,12"/></svg></div>
     </div>
   </section>
 
@@ -547,6 +754,11 @@ svg.stage{
 
       <div class="canvas-wrap">
         <div class="hint">👆 拖動金色點看看</div>
+        <div class="timer-ring" data-timer="1">
+          <svg viewBox="0 0 50 50"><circle class="track" cx="25" cy="25" r="20"/><circle class="bar" cx="25" cy="25" r="20"/></svg>
+          <div class="txt">30</div>
+        </div>
+        <canvas class="trail-canvas" data-trail="1"></canvas>
         <svg class="stage" viewBox="0 0 360 320" id="svg1"></svg>
       </div>
 
@@ -597,6 +809,11 @@ svg.stage{
 
       <div class="canvas-wrap">
         <div class="hint">👆 拖頂點看紫色數字</div>
+        <div class="timer-ring" data-timer="2">
+          <svg viewBox="0 0 50 50"><circle class="track" cx="25" cy="25" r="20"/><circle class="bar" cx="25" cy="25" r="20"/></svg>
+          <div class="txt">30</div>
+        </div>
+        <canvas class="trail-canvas" data-trail="2"></canvas>
         <svg class="stage" viewBox="0 0 360 320" id="svg2"></svg>
       </div>
 
@@ -643,6 +860,11 @@ svg.stage{
 
       <div class="canvas-wrap">
         <div class="hint">👆 看四個角度數</div>
+        <div class="timer-ring" data-timer="3">
+          <svg viewBox="0 0 50 50"><circle class="track" cx="25" cy="25" r="20"/><circle class="bar" cx="25" cy="25" r="20"/></svg>
+          <div class="txt">30</div>
+        </div>
+        <canvas class="trail-canvas" data-trail="3"></canvas>
         <svg class="stage" viewBox="0 0 360 320" id="svg3"></svg>
       </div>
 
@@ -692,6 +914,11 @@ svg.stage{
 
       <div class="canvas-wrap">
         <div class="hint">👆 看金色 O 點</div>
+        <div class="timer-ring" data-timer="4">
+          <svg viewBox="0 0 50 50"><circle class="track" cx="25" cy="25" r="20"/><circle class="bar" cx="25" cy="25" r="20"/></svg>
+          <div class="txt">30</div>
+        </div>
+        <canvas class="trail-canvas" data-trail="4"></canvas>
         <svg class="stage" viewBox="0 0 360 320" id="svg4"></svg>
       </div>
 
@@ -745,6 +972,11 @@ svg.stage{
 
       <div class="canvas-wrap">
         <div class="hint">👆 4 個三角形面積</div>
+        <div class="timer-ring" data-timer="5">
+          <svg viewBox="0 0 50 50"><circle class="track" cx="25" cy="25" r="20"/><circle class="bar" cx="25" cy="25" r="20"/></svg>
+          <div class="txt">30</div>
+        </div>
+        <canvas class="trail-canvas" data-trail="5"></canvas>
         <svg class="stage" viewBox="0 0 360 320" id="svg5"></svg>
       </div>
 
@@ -823,6 +1055,24 @@ svg.stage{
   </div>
 </div>
 
+<!-- LEVEL UNLOCKED 大字 -->
+<div class="level-unlock" id="levelUnlock">
+  <div class="big" id="levelUnlockText">🔓 LEVEL 1 UNLOCKED!</div>
+</div>
+
+<!-- COMBO toast -->
+<div class="combo-toast" id="comboToast">⚡ 3 COMBO! ⚡</div>
+
+<!-- 最終結尾 overlay -->
+<div class="final-overlay" id="finalOverlay">
+  <div class="neon">✨ MISSION COMPLETE ✨</div>
+  <div class="team3d" id="finalTeam">平行四邊形大師</div>
+  <div class="final-btns">
+    <button class="clear-btn share-btn" id="shareBtn">📲 分享給朋友</button>
+    <button class="clear-btn" id="finalClose">再來一次</button>
+  </div>
+</div>
+
 <!-- 進度條 -->
 <div class="progress-wrap">
   <span>🎖️</span>
@@ -832,82 +1082,307 @@ svg.stage{
 
 <script>
 /* =================================================== */
-/* ============ 全域：音效 + 狀態管理 ============ */
+/* ============ 全域：音效（升級版）+ 狀態管理 ============ */
 /* =================================================== */
 const STORAGE_KEY='parallelogram_quest_v1';
 const state=loadState();
 function loadState(){
-  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{cleared:{},lifePicks:{}}}
-  catch(e){return {cleared:{},lifePicks:{}}}
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{cleared:{},lifePicks:{},combo:0}}
+  catch(e){return {cleared:{},lifePicks:{},combo:0}}
 }
 function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
 
-/* 8-bit beep using Web Audio API */
+/* ===== 升級版 Web Audio 合成音效 ===== */
 let audioCtx=null;
-function beep(freq=440,dur=120,type='square'){
+let dragHumOsc=null,dragHumGain=null;
+function ensureAudio(){
+  if(!audioCtx){
+    try{audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}
+  }
+}
+/* 基礎 tone */
+function tone(freq,dur,type='square',vol=.08,attack=.005,decay=null){
+  ensureAudio();if(!audioCtx)return;
   try{
-    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
     const o=audioCtx.createOscillator();
     const g=audioCtx.createGain();
     o.type=type;o.frequency.value=freq;
-    g.gain.setValueAtTime(.08,audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur/1000);
+    const t0=audioCtx.currentTime;
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(vol,t0+attack);
+    const decT=decay==null?dur/1000:decay;
+    g.gain.exponentialRampToValueAtTime(.0001,t0+decT);
     o.connect(g);g.connect(audioCtx.destination);
-    o.start();o.stop(audioCtx.currentTime+dur/1000);
+    o.start(t0);o.stop(t0+dur/1000+.02);
   }catch(e){}
 }
-function coinSound(){
-  beep(988,80,'square');setTimeout(()=>beep(1319,140,'square'),80);
-}
+function toneAt(delay,freq,dur,type,vol){setTimeout(()=>tone(freq,dur,type,vol),delay)}
+
+/* 過關歡呼 C-E-G-C */
 function clearSound(){
-  beep(523,80);setTimeout(()=>beep(659,80),80);
-  setTimeout(()=>beep(784,80),160);setTimeout(()=>beep(1047,200),240);
+  toneAt(0,523.25,100,'square',.07);
+  toneAt(100,659.25,100,'square',.07);
+  toneAt(200,783.99,100,'square',.07);
+  toneAt(300,1046.5,260,'square',.08);
 }
-function dragSound(){beep(220+Math.random()*60,40,'sine')}
+/* 完美音效 (叮咚雙音) */
+function correctSound(){
+  toneAt(0,1318.5,90,'triangle',.07);
+  toneAt(90,1760,180,'triangle',.08);
+}
+/* 錯誤音 (柔和 buzz) */
+function wrongSound(){
+  toneAt(0,220,100,'sawtooth',.06);
+  toneAt(100,165,140,'sawtooth',.05);
+}
+/* 拖動軟綿低頻 hum (持續) */
+function dragHumStart(){
+  ensureAudio();if(!audioCtx||dragHumOsc)return;
+  try{
+    dragHumOsc=audioCtx.createOscillator();
+    dragHumGain=audioCtx.createGain();
+    dragHumOsc.type='sine';dragHumOsc.frequency.value=30;
+    dragHumGain.gain.setValueAtTime(0,audioCtx.currentTime);
+    dragHumGain.gain.linearRampToValueAtTime(.04,audioCtx.currentTime+.08);
+    /* 加一點點高頻使感受得到 */
+    const o2=audioCtx.createOscillator();o2.type='sine';o2.frequency.value=120;
+    const g2=audioCtx.createGain();g2.gain.value=.012;
+    dragHumOsc.connect(dragHumGain);o2.connect(g2);
+    dragHumGain.connect(audioCtx.destination);g2.connect(audioCtx.destination);
+    dragHumOsc.start();o2.start();
+    dragHumOsc._extra=o2;dragHumOsc._extraG=g2;
+  }catch(e){}
+}
+function dragHumStop(){
+  if(!dragHumOsc||!audioCtx)return;
+  try{
+    const t=audioCtx.currentTime;
+    dragHumGain.gain.linearRampToValueAtTime(0,t+.1);
+    if(dragHumOsc._extraG)dragHumOsc._extraG.gain.linearRampToValueAtTime(0,t+.1);
+    setTimeout(()=>{
+      try{dragHumOsc.stop();if(dragHumOsc._extra)dragHumOsc._extra.stop();}catch(e){}
+      dragHumOsc=null;dragHumGain=null;
+    },140);
+  }catch(e){dragHumOsc=null;dragHumGain=null;}
+}
+/* 徽章 fanfare C-G-C-E-G */
+function badgeFanfare(){
+  toneAt(0,523.25,140,'square',.08);
+  toneAt(120,783.99,140,'square',.08);
+  toneAt(260,1046.5,140,'square',.08);
+  toneAt(400,1318.5,140,'square',.08);
+  toneAt(540,1568,460,'square',.09);
+}
+/* 8-bit 馬力歐風 8 秒勝利曲 */
+function finalVictoryTune(){
+  /* 用音名陣列 [freq, dur ms, gap ms] */
+  const seq=[
+    [523.25,150,30],[659.25,150,30],[783.99,150,30],[1046.5,260,80],
+    [783.99,150,30],[1046.5,460,150],
+    [880,150,30],[783.99,150,30],[659.25,150,30],[523.25,260,80],
+    [659.25,150,30],[783.99,150,30],[1046.5,150,30],[1318.5,260,80],
+    [1046.5,150,30],[1318.5,150,30],[1568,460,150],
+    [1318.5,150,30],[1046.5,150,30],[783.99,150,30],[1046.5,150,30],[1318.5,460,150],
+    [1568,200,40],[2093,500,0]
+  ];
+  let t=0;
+  seq.forEach(([f,d,g])=>{
+    toneAt(t,f,d,'square',.075);
+    /* 加和聲低八度（馬力歐風）*/
+    toneAt(t,f/2,d,'triangle',.03);
+    t+=d+g;
+  });
+}
+/* coinSound 保留向下相容 */
+function coinSound(){correctSound()}
 
 /* =================================================== */
-/* ============ 場景切換 ============ */
+/* ============ 灑花特效 ============ */
+/* =================================================== */
+const confettiCanvas=document.getElementById('confettiCanvas');
+const cctx=confettiCanvas.getContext('2d');
+let confettiParticles=[];
+let confettiAnimId=null;
+function sizeCanvas(){
+  confettiCanvas.width=window.innerWidth;
+  confettiCanvas.height=window.innerHeight;
+}
+sizeCanvas();
+window.addEventListener('resize',sizeCanvas);
+
+const confettiColors=['#4A90E2','#B967FF','#FF6B9D','#F6E05E','#4ECDC4','#FFD700','#FFA500'];
+
+function launchConfetti(count=120,duration=3000){
+  const startCount=confettiParticles.length;
+  for(let i=0;i<count;i++){
+    confettiParticles.push({
+      x:Math.random()*window.innerWidth,
+      y:-20-Math.random()*200,
+      vx:(Math.random()-.5)*4,
+      vy:2+Math.random()*4,
+      w:6+Math.random()*8,
+      h:10+Math.random()*8,
+      rot:Math.random()*Math.PI*2,
+      vr:(Math.random()-.5)*.3,
+      color:confettiColors[Math.floor(Math.random()*confettiColors.length)],
+      life:0,
+      maxLife:duration+Math.random()*500
+    });
+  }
+  if(!confettiAnimId)animateConfetti();
+}
+function animateConfetti(){
+  cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  confettiParticles=confettiParticles.filter(p=>{
+    p.life+=16;
+    p.x+=p.vx;
+    p.y+=p.vy;
+    p.vy+=.08;
+    p.rot+=p.vr;
+    /* 飄盪 */
+    p.vx+=Math.sin(p.life*.005)*.05;
+    p.vx*=.995;
+    /* 淡出 */
+    let alpha=1;
+    if(p.life>p.maxLife-500)alpha=Math.max(0,(p.maxLife-p.life)/500);
+    cctx.save();
+    cctx.translate(p.x,p.y);
+    cctx.rotate(p.rot);
+    cctx.globalAlpha=alpha;
+    cctx.fillStyle=p.color;
+    cctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    /* 反光條 */
+    cctx.fillStyle='rgba(255,255,255,.4)';
+    cctx.fillRect(-p.w/2,-p.h/2,p.w,p.h/3);
+    cctx.restore();
+    return p.life<p.maxLife&&p.y<window.innerHeight+50;
+  });
+  if(confettiParticles.length>0){
+    confettiAnimId=requestAnimationFrame(animateConfetti);
+  }else{
+    confettiAnimId=null;
+  }
+}
+
+/* =================================================== */
+/* ============ 星空背景 ============ */
+/* =================================================== */
+function buildStars(){
+  const sf=document.getElementById('starfield');
+  const frag=document.createDocumentFragment();
+  for(let i=0;i<30;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=1+Math.random()*2.5;
+    s.style.width=sz+'px';s.style.height=sz+'px';
+    s.style.left=Math.random()*100+'%';
+    s.style.top=Math.random()*100+'%';
+    s.style.setProperty('--dur',(2+Math.random()*4)+'s');
+    s.style.setProperty('--delay',(Math.random()*4)+'s');
+    frag.appendChild(s);
+  }
+  sf.appendChild(frag);
+}
+buildStars();
+
+/* =================================================== */
+/* ============ 場景切換 + LEVEL UNLOCKED 動畫 ============ */
 /* =================================================== */
 const stageBar=document.getElementById('stageBar');
 stageBar.addEventListener('click',e=>{
   const t=e.target.closest('.stage-tab');
   if(!t)return;
-  switchScene(t.dataset.scene);
+  switchScene(t.dataset.scene,true);
 });
 document.querySelectorAll('[data-next]').forEach(b=>{
   b.addEventListener('click',()=>{
     coinSound();
-    switchScene(b.dataset.next);
+    switchScene(b.dataset.next,true);
   });
 });
-function switchScene(n){
+let currentScene='1';
+function switchScene(n,showUnlock){
+  if(currentScene===n)return;
+  const prev=currentScene;
+  currentScene=n;
   document.querySelectorAll('.scene').forEach(s=>s.classList.toggle('active',s.dataset.scene===n));
   document.querySelectorAll('.stage-tab').forEach(t=>t.classList.toggle('active',t.dataset.scene===n));
   window.scrollTo({top:0,behavior:'smooth'});
   if(n==='6')renderBadgeRow();
+  /* 啟動該關倒數計時 */
+  resetTimer(n);
+  /* LEVEL UNLOCKED 動畫 */
+  if(showUnlock&&n!==prev){
+    showLevelUnlock(n);
+  }
+}
+function showLevelUnlock(n){
+  const labels={
+    '1':'🔓 LEVEL 1 · 定義',
+    '2':'🔓 LEVEL 2 · 對邊雙胞胎',
+    '3':'🔓 LEVEL 3 · 對角小心機',
+    '4':'🔓 LEVEL 4 · 無量空處',
+    '5':'🔓 LEVEL 5 · 等面積結界',
+    '6':'⭐ FINAL · 戰隊組合'
+  };
+  const el=document.getElementById('levelUnlock');
+  document.getElementById('levelUnlockText').textContent=labels[n]||('🔓 LEVEL '+n);
+  el.classList.add('show');
+  /* 小灑花 */
+  launchConfetti(40,1600);
+  /* 音效輕快上揚 */
+  toneAt(0,659.25,90,'square',.06);
+  toneAt(90,880,90,'square',.06);
+  toneAt(180,1318.5,160,'square',.07);
+  setTimeout(()=>el.classList.remove('show'),1600);
+}
+
+/* =================================================== */
+/* ============ 倒數計時 ============ */
+/* =================================================== */
+const timers={};
+function resetTimer(scene){
+  /* 清掉舊的 */
+  Object.keys(timers).forEach(k=>{
+    if(timers[k]){clearInterval(timers[k].interval);timers[k]=null;}
+  });
+  if(scene==='6')return;
+  const ring=document.querySelector(`.timer-ring[data-timer="${scene}"]`);
+  if(!ring)return;
+  const bar=ring.querySelector('.bar');
+  const txt=ring.querySelector('.txt');
+  const total=30;
+  let left=total;
+  const circ=2*Math.PI*20;
+  bar.style.strokeDasharray=circ;
+  bar.style.strokeDashoffset='0';
+  bar.classList.remove('warn','danger');
+  txt.textContent=total;
+  const tick=()=>{
+    left--;
+    if(left<0){left=0;clearInterval(timers[scene].interval);timers[scene]=null;return;}
+    txt.textContent=left;
+    const off=circ*(1-left/total);
+    bar.style.strokeDashoffset=off;
+    if(left<=5)bar.classList.add('danger');
+    else if(left<=12)bar.classList.add('warn');
+  };
+  timers[scene]={interval:setInterval(tick,1000)};
 }
 
 /* =================================================== */
 /* ============ 通用平行四邊形 SVG 工廠 ============ */
 /* =================================================== */
-/*
-  座標系：viewBox 0 0 360 320
-  4 頂點：A(左下) B(右下) C(右上) D(左上)
-  保持平行四邊形性質：C = B + (D - A)
-  使用者拖動 A、B、D，C 自動計算。
-*/
 class ParaStage{
   constructor(svgId,opts){
     this.svg=document.getElementById(svgId);
     this.opts=opts||{};
-    // 初始頂點
     this.A={x:80,y:240};
     this.B={x:280,y:240};
     this.D={x:130,y:90};
-    // 加入到陣列方便拖曳
     this.dragTarget=null;
-    this.scale=1; // SVG scale to data unit (px to "unit")
-    this.unit=20; // 1 unit = 20px
+    this.scale=1;
+    this.unit=20;
     this.render();
     this.bindDrag();
   }
@@ -938,7 +1413,6 @@ class ParaStage{
 
     let html='';
 
-    /* 三角形填色 (scene 5) */
     if(showTris){
       const tris=[
         {pts:[A,O,B],c:'#4ECDC4'},
@@ -951,19 +1425,16 @@ class ParaStage{
       });
     }
 
-    /* 對角線 */
     if(showDiag){
       html+=`<line class="diag solid" x1="${A.x}" y1="${A.y}" x2="${C.x}" y2="${C.y}"/>`;
       html+=`<line class="diag solid" x1="${B.x}" y1="${B.y}" x2="${D.x}" y2="${D.y}"/>`;
     }
 
-    /* 四邊 */
-    html+=`<line class="side purple" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`; // AB
-    html+=`<line class="side sky" x1="${B.x}" y1="${B.y}" x2="${C.x}" y2="${C.y}"/>`;   // BC
-    html+=`<line class="side purple" x1="${D.x}" y1="${D.y}" x2="${C.x}" y2="${C.y}"/>`; // DC
-    html+=`<line class="side sky" x1="${A.x}" y1="${A.y}" x2="${D.x}" y2="${D.y}"/>`;   // AD
+    html+=`<line class="side purple" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`;
+    html+=`<line class="side sky" x1="${B.x}" y1="${B.y}" x2="${C.x}" y2="${C.y}"/>`;
+    html+=`<line class="side purple" x1="${D.x}" y1="${D.y}" x2="${C.x}" y2="${C.y}"/>`;
+    html+=`<line class="side sky" x1="${A.x}" y1="${A.y}" x2="${D.x}" y2="${D.y}"/>`;
 
-    /* 平行符號 (scene 1) */
     if(showParallel){
       const midAB={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
       const midDC={x:(D.x+C.x)/2,y:(D.y+C.y)/2};
@@ -975,7 +1446,6 @@ class ParaStage{
       html+=`<text class="parallel-mark" x="${midAD.x-12}" y="${midAD.y}" style="fill:#FF6B9D">▶▶</text>`;
     }
 
-    /* 邊長標記 (scene 2) */
     if(showLengths){
       const midAB={x:(A.x+B.x)/2,y:(A.y+B.y)/2+18};
       const midDC={x:(D.x+C.x)/2,y:(D.y+C.y)/2-8};
@@ -987,7 +1457,6 @@ class ParaStage{
       html+=`<text class="length-label" x="${midAD.x}" y="${midAD.y}" style="fill:#4A90E2">${this.toUnit(this.dist(A,D))}</text>`;
     }
 
-    /* 角弧 + 角度 (scene 3) */
     if(showAngles){
       const corners=[
         {p:A,prev:D,next:B,id:'A',color:'pink'},
@@ -1000,7 +1469,6 @@ class ParaStage{
         const r=22;
         const a1=Math.atan2(co.prev.y-co.p.y,co.prev.x-co.p.x);
         const a2=Math.atan2(co.next.y-co.p.y,co.next.x-co.p.x);
-        // 確定畫法
         const x1=co.p.x+r*Math.cos(a1),y1=co.p.y+r*Math.sin(a1);
         const x2=co.p.x+r*Math.cos(a2),y2=co.p.y+r*Math.sin(a2);
         let delta=a2-a1;
@@ -1009,7 +1477,6 @@ class ParaStage{
         const largeArc=Math.abs(delta)>Math.PI?1:0;
         const sweep=delta>0?1:0;
         html+=`<path class="angle-arc ${co.color}" d="M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2} L ${co.p.x} ${co.p.y} Z"/>`;
-        // 角度數值位置 (頂點往中心方向)
         const cen={x:(A.x+B.x+C.x+D.x)/4,y:(A.y+B.y+C.y+D.y)/4};
         const dx=cen.x-co.p.x,dy=cen.y-co.p.y;
         const len=Math.hypot(dx,dy);
@@ -1020,14 +1487,12 @@ class ParaStage{
       });
     }
 
-    /* 中點 O (scene 4 + 5) */
     if(showDiag){
       html+=`<circle class="center-point" cx="${O.x}" cy="${O.y}" r="7"/>`;
       html+=`<text class="vertex-label" x="${O.x+14}" y="${O.y-8}" style="fill:#FFD700;font-size:14px">O</text>`;
     }
 
-    /* 4 頂點 */
-    const labels={A:'A',B:'B',C:'C',D:'D'};
+    /* 4 頂點 + 脈動光環 */
     const verts=[
       {p:A,label:'A',dx:-14,dy:8,draggable:true},
       {p:B,label:'B',dx:14,dy:8,draggable:true},
@@ -1035,6 +1500,9 @@ class ParaStage{
       {p:D,label:'D',dx:-14,dy:-10,draggable:true}
     ];
     verts.forEach(v=>{
+      if(v.draggable){
+        html+=`<circle class="vertex-pulse" cx="${v.p.x}" cy="${v.p.y}" r="11"/>`;
+      }
       html+=`<circle class="vertex" data-v="${v.label}" cx="${v.p.x}" cy="${v.p.y}" r="11" ${v.draggable?'':'style="opacity:.7;cursor:default"'}/>`;
       html+=`<text class="vertex-label" x="${v.p.x+v.dx}" y="${v.p.y+v.dy}">${v.label}</text>`;
     });
@@ -1048,7 +1516,7 @@ class ParaStage{
       const vb=this.svg.viewBox.baseVal;
       const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
       const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
-      return {x:cx*(vb.width/r.width),y:cy*(vb.height/r.height)};
+      return {x:cx*(vb.width/r.width),y:cy*(vb.height/r.height),sx:cx,sy:cy};
     };
     const onStart=(e)=>{
       const t=e.target;
@@ -1060,26 +1528,26 @@ class ParaStage{
         const p=this[v];
         offset={x:pt.x-p.x,y:pt.y-p.y};
         e.preventDefault();
-        dragSound();
+        dragHumStart();
       }
     };
     const onMove=(e)=>{
       if(!drag)return;
       const pt=getPt(e);
       let nx=pt.x-offset.x,ny=pt.y-offset.y;
-      // 邊界保護
       nx=Math.max(30,Math.min(330,nx));
       ny=Math.max(30,Math.min(290,ny));
       this[drag].x=nx;this[drag].y=ny;
-      // 避免退化：限制最小距離
-      if(this.dist(this.A,this.B)<40||this.dist(this.A,this.D)<40){
-        // 撤銷
-      }
+      /* 拖動光點軌跡 */
+      addTrail(this.svg,pt.sx,pt.sy);
       this.render();
       if(this.opts.onUpdate)this.opts.onUpdate(this);
       e.preventDefault();
     };
-    const onEnd=()=>{drag=null};
+    const onEnd=()=>{
+      if(drag){dragHumStop()}
+      drag=null;
+    };
     this.svg.addEventListener('mousedown',onStart);
     this.svg.addEventListener('touchstart',onStart,{passive:false});
     document.addEventListener('mousemove',onMove);
@@ -1090,7 +1558,61 @@ class ParaStage{
 }
 
 /* =================================================== */
-/* ============ Scene 1 初始化 ============ */
+/* ============ 拖動光點軌跡 (canvas) ============ */
+/* =================================================== */
+const trailCanvases={};
+function setupTrailCanvas(scene){
+  const c=document.querySelector(`.trail-canvas[data-trail="${scene}"]`);
+  if(!c)return null;
+  const parent=c.parentElement;
+  const rect=parent.getBoundingClientRect();
+  c.width=rect.width;c.height=rect.height;
+  return {canvas:c,ctx:c.getContext('2d'),points:[]};
+}
+function addTrail(svg,sx,sy){
+  const wrap=svg.closest('.canvas-wrap');
+  if(!wrap)return;
+  const tc=wrap.querySelector('.trail-canvas');
+  if(!tc)return;
+  const rect=wrap.getBoundingClientRect();
+  let store=trailCanvases[tc.dataset.trail];
+  if(!store||store.canvas.width!==rect.width){
+    tc.width=rect.width;tc.height=rect.height;
+    store={canvas:tc,ctx:tc.getContext('2d'),points:[]};
+    trailCanvases[tc.dataset.trail]=store;
+  }
+  store.points.push({x:sx,y:sy,life:0,maxLife:600});
+  if(!store.animating){
+    store.animating=true;
+    drawTrail(store);
+  }
+}
+function drawTrail(store){
+  const ctx=store.ctx;
+  ctx.clearRect(0,0,store.canvas.width,store.canvas.height);
+  store.points=store.points.filter(p=>{
+    p.life+=16;
+    const a=Math.max(0,1-p.life/p.maxLife);
+    const r=4+a*4;
+    ctx.beginPath();
+    const grd=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,r*2);
+    grd.addColorStop(0,`rgba(255,215,0,${a*.9})`);
+    grd.addColorStop(.5,`rgba(255,165,0,${a*.5})`);
+    grd.addColorStop(1,'rgba(255,165,0,0)');
+    ctx.fillStyle=grd;
+    ctx.arc(p.x,p.y,r*2,0,Math.PI*2);
+    ctx.fill();
+    return p.life<p.maxLife;
+  });
+  if(store.points.length>0){
+    requestAnimationFrame(()=>drawTrail(store));
+  }else{
+    store.animating=false;
+  }
+}
+
+/* =================================================== */
+/* ============ Scene 1~5 初始化 ============ */
 /* =================================================== */
 const stage1=new ParaStage('svg1',{
   showParallel:true,
@@ -1099,10 +1621,6 @@ const stage1=new ParaStage('svg1',{
     document.getElementById('d1-par2').textContent='是 ✓';
   }
 });
-
-/* =================================================== */
-/* ============ Scene 2 初始化（對邊長度）============ */
-/* =================================================== */
 const stage2=new ParaStage('svg2',{
   showLengths:true,
   onUpdate(s){
@@ -1118,9 +1636,6 @@ const stage2=new ParaStage('svg2',{
 });
 stage2.opts.onUpdate(stage2);
 
-/* =================================================== */
-/* ============ Scene 3 初始化（角度）============ */
-/* =================================================== */
 const stage3=new ParaStage('svg3',{
   showAngles:true,
   onUpdate(s){
@@ -1137,9 +1652,6 @@ const stage3=new ParaStage('svg3',{
 });
 stage3.opts.onUpdate(stage3);
 
-/* =================================================== */
-/* ============ Scene 4 初始化（對角線）============ */
-/* =================================================== */
 const stage4=new ParaStage('svg4',{
   showDiag:true,
   onUpdate(s){
@@ -1152,9 +1664,6 @@ const stage4=new ParaStage('svg4',{
 });
 stage4.opts.onUpdate(stage4);
 
-/* =================================================== */
-/* ============ Scene 5 初始化（4 三角形）============ */
-/* =================================================== */
 const stage5=new ParaStage('svg5',{
   showDiag:true,
   showTris:true,
@@ -1188,20 +1697,69 @@ function setFly(id,v){
 }
 
 /* =================================================== */
+/* ============ COMBO 連擊系統 ============ */
+/* =================================================== */
+let comboCount=0;
+let comboResetTimer=null;
+function triggerCombo(){
+  comboCount++;
+  clearTimeout(comboResetTimer);
+  comboResetTimer=setTimeout(()=>{comboCount=0;},8000);
+  if(comboCount>=3){
+    const toast=document.getElementById('comboToast');
+    toast.textContent=`⚡ ${comboCount} COMBO! ⚡`;
+    toast.classList.remove('show');
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    /* 額外特效音 */
+    toneAt(0,1568,80,'square',.07);
+    toneAt(80,1976,80,'square',.07);
+    toneAt(160,2349,160,'square',.08);
+    /* 小灑花 */
+    launchConfetti(50,1500);
+  }
+}
+
+/* =================================================== */
 /* ============ 通關按鈕 ============ */
 /* =================================================== */
 document.querySelectorAll('[data-clear]').forEach(b=>{
   b.addEventListener('click',()=>{
     const n=b.dataset.clear;
+    const wasCleared=state.cleared[n];
     state.cleared[n]=true;
     saveState();
     clearSound();
     document.getElementById('banner'+n).classList.add('show');
     document.querySelector('.stage-tab[data-scene="'+n+'"]').classList.add('cleared');
     updateProgress();
+    /* 點亮對應星星 */
+    lightStar(n);
+    /* 灑花 */
+    launchConfetti(150,3000);
+    /* 連擊 */
+    if(!wasCleared)triggerCombo();
+    /* 徽章 fanfare */
+    setTimeout(badgeFanfare,300);
     showBadge(n);
   });
 });
+
+/* =================================================== */
+/* ============ 5 星進度點亮 ============ */
+/* =================================================== */
+function lightStar(n){
+  const star=document.querySelector(`.prog-star[data-star="${n}"]`);
+  if(!star)return;
+  if(!star.classList.contains('lit')){
+    star.classList.add('lit');
+  }else{
+    /* 重新觸發動畫 */
+    star.classList.remove('lit');
+    void star.offsetWidth;
+    star.classList.add('lit');
+  }
+}
 
 /* =================================================== */
 /* ============ 徽章彈窗 ============ */
@@ -1238,6 +1796,7 @@ function makeBadgeSVG(color,emoji,num){
 }
 document.getElementById('badgeClose').addEventListener('click',()=>{
   document.getElementById('badgePop').classList.remove('show');
+  correctSound();
 });
 
 /* =================================================== */
@@ -1253,6 +1812,8 @@ function restoreCleared(){
     if(state.cleared[i]){
       const b=document.getElementById('banner'+i);if(b)b.classList.add('show');
       const t=document.querySelector('.stage-tab[data-scene="'+i+'"]');if(t)t.classList.add('cleared');
+      const star=document.querySelector(`.prog-star[data-star="${i}"]`);
+      if(star)star.classList.add('lit');
     }
   }
   updateProgress();
@@ -1264,8 +1825,9 @@ restoreCleared();
 /* =================================================== */
 document.querySelectorAll('.life-chip').forEach(c=>{
   c.addEventListener('click',()=>{
+    const wasPicked=c.classList.contains('picked');
     c.classList.toggle('picked');
-    coinSound();
+    if(!wasPicked){correctSound()}else{wrongSound()}
   });
 });
 
@@ -1283,32 +1845,37 @@ propCards.forEach(card=>{
     const picked=document.querySelectorAll('#propCards .prop-card.picked');
     if(card.classList.contains('picked')){
       card.classList.remove('picked');
+      wrongSound();
     }else{
       if(picked.length>=3){
-        // 取消最先選的
         picked[0].classList.remove('picked');
       }
       card.classList.add('picked');
-      coinSound();
+      correctSound();
     }
     updateTeamName();
   });
 });
+let teamFinalName='';
 function updateTeamName(){
   const picked=Array.from(document.querySelectorAll('#propCards .prop-card.picked'));
   const box=document.getElementById('teamName');
+  box.classList.remove('locked');
   if(picked.length<3){
     box.innerHTML=`⚡ 再選 ${3-picked.length} 張卡 ⚡`;
     return;
   }
   const keys=picked.map(p=>teamNames[p.dataset.prop]);
-  // 用 seed 產生決定性的選擇
   const seed=picked.map(p=>p.dataset.prop).join('|').length;
   const adj=adjectives[seed%adjectives.length];
   const suf=suffixes[(seed*3)%suffixes.length];
   const name=`${adj}・${keys.join('×')} ${suf}`;
+  teamFinalName=name;
   box.innerHTML=`🏆<br>${name}`;
+  void box.offsetWidth;
+  box.classList.add('locked');
   clearSound();
+  launchConfetti(80,2200);
 }
 
 /* 徽章一覽 */
@@ -1327,20 +1894,67 @@ function renderBadgeRow(){
   }
 }
 
+/* =================================================== */
+/* ============ 最終結尾大爆炸 ============ */
+/* =================================================== */
 document.getElementById('finalBtn').addEventListener('click',()=>{
   const cleared=Object.values(state.cleared).filter(Boolean).length;
   if(cleared<5){
+    wrongSound();
     alert(`你還有 ${5-cleared} 關沒通關，回去把它們搞定吧！⚡`);
     return;
   }
-  clearSound();setTimeout(clearSound,400);
-  alert('🏆 恭喜你完成 4-2 平行四邊形大冒險！\n你已經是「平行四邊形大師」了！\n下節課我們挑戰更難的特殊四邊形 ⭐');
+  /* 全螢幕灑花連發 */
+  launchConfetti(250,5000);
+  setTimeout(()=>launchConfetti(180,4000),800);
+  setTimeout(()=>launchConfetti(180,4000),1800);
+  setTimeout(()=>launchConfetti(150,3000),3200);
+  /* 8 秒勝利曲 */
+  finalVictoryTune();
+  /* 顯示 overlay */
+  const ov=document.getElementById('finalOverlay');
+  const teamEl=document.getElementById('finalTeam');
+  teamEl.textContent=teamFinalName||'平行四邊形大師戰隊';
+  ov.classList.add('show');
+});
+document.getElementById('finalClose').addEventListener('click',()=>{
+  document.getElementById('finalOverlay').classList.remove('show');
+});
+document.getElementById('shareBtn').addEventListener('click',async()=>{
+  correctSound();
+  const text=`我在「4-2 平行四邊形大冒險」拿到 5 個英雄徽章，組成了「${teamFinalName||'平行四邊形大師戰隊'}」！⚡`;
+  if(navigator.share){
+    try{await navigator.share({title:'平行四邊形大冒險',text})}
+    catch(e){}
+  }else if(navigator.clipboard){
+    try{
+      await navigator.clipboard.writeText(text);
+      alert('已複製成就到剪貼簿！可以貼給朋友看 ✨');
+    }catch(e){
+      alert(text);
+    }
+  }else{
+    alert(text);
+  }
 });
 
 /* 防止 svg 拖曳選取 */
 document.querySelectorAll('svg').forEach(s=>{
   s.addEventListener('dragstart',e=>e.preventDefault());
 });
+
+/* 啟動第一關 timer */
+resetTimer('1');
+
+/* 首次互動才能播放音訊（解除 autoplay 限制） */
+function unlockAudio(){
+  ensureAudio();
+  if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
+  document.removeEventListener('click',unlockAudio);
+  document.removeEventListener('touchstart',unlockAudio);
+}
+document.addEventListener('click',unlockAudio);
+document.addEventListener('touchstart',unlockAudio);
 
 </script>
 </body>
