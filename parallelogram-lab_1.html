@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>平行四邊形實驗室 · Parallelogram Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FDF8F0;
+    --paper: #FFFEF9;
+    --ink: #2B2A35;
+    --ink-soft: #6B6878;
+    --line: #E8E2D5;
+    --grid: #EDE6D3;
+    --side-a: #FF6B6B;
+    --side-b: #4ECDC4;
+    --angle: #9B6DD7;
+    --diag: #2E8B57;
+    --highlight: #FFD93D;
+    --good: #6BCB77;
+    --shadow: 0 4px 0 rgba(43,42,53,0.08), 0 12px 30px -10px rgba(43,42,53,0.15);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Noto Sans TC', 'Fredoka', sans-serif;
+    background:
+      radial-gradient(circle at 10% 0%, rgba(78,205,196,0.08), transparent 40%),
+      radial-gradient(circle at 90% 100%, rgba(255,107,107,0.08), transparent 40%),
+      var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 20px 16px 60px;
+    line-height: 1.5;
+  }
+  .app { max-width: 1200px; margin: 0 auto; }
+
+  /* HEADER */
+  header { text-align: center; margin-bottom: 24px; position: relative; }
+  .badge {
+    display: inline-block;
+    font-family: 'Fredoka', sans-serif;
+    background: var(--ink); color: var(--paper);
+    padding: 4px 14px; border-radius: 999px;
+    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+    font-size: clamp(28px, 5vw, 44px); font-weight: 700;
+    line-height: 1.1; letter-spacing: -0.02em;
+  }
+  h1 .accent {
+    background: linear-gradient(180deg, transparent 60%, var(--highlight) 60%);
+    padding: 0 4px;
+  }
+  .subtitle {
+    color: var(--ink-soft); font-size: 14px; margin-top: 8px;
+    font-family: 'Fredoka', sans-serif; letter-spacing: 0.05em;
+  }
+
+  /* MODE TABS */
+  .modes {
+    display: flex; gap: 8px; justify-content: center;
+    margin: 24px 0; flex-wrap: wrap;
+  }
+  .mode-btn {
+    background: var(--paper); border: 2px solid var(--ink);
+    border-radius: 14px; padding: 10px 18px;
+    font-family: 'Noto Sans TC', sans-serif; font-weight: 700; font-size: 15px;
+    cursor: pointer; color: var(--ink);
+    transition: all 0.15s; box-shadow: 0 3px 0 var(--ink);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .mode-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 0 var(--ink); }
+  .mode-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+  .mode-btn.active {
+    background: var(--ink); color: var(--paper);
+    box-shadow: 0 3px 0 var(--side-a);
+  }
+  .mode-btn .tier {
+    background: var(--highlight); color: var(--ink);
+    padding: 1px 6px; border-radius: 999px;
+    font-size: 11px; font-weight: 700;
+  }
+  .mode-btn.active .tier { background: var(--paper); color: var(--ink); }
+
+  /* LAYOUT */
+  .workspace {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  @media (min-width: 900px) {
+    .workspace { grid-template-columns: 1fr 320px; }
+  }
+
+  /* CANVAS */
+  .canvas-card {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .canvas-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; padding: 0 4px;
+  }
+  .canvas-title {
+    font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 14px;
+    color: var(--ink-soft); letter-spacing: 0.05em;
+  }
+  .reset-btn {
+    background: transparent; border: 1.5px solid var(--ink-soft);
+    color: var(--ink-soft); border-radius: 8px;
+    padding: 4px 12px; font-size: 12px; font-weight: 500;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.15s;
+  }
+  .reset-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .svg-wrap {
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 30px 30px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 30px 30px,
+      #FFFEF6;
+    border-radius: 12px;
+    border: 1px dashed var(--line);
+    width: 100%; aspect-ratio: 4/3;
+    touch-action: none;
+  }
+  svg { width: 100%; height: 100%; display: block; }
+  .vertex {
+    cursor: grab; transition: r 0.15s, filter 0.15s;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+  .vertex:hover { filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)) brightness(1.1); }
+  .vertex.dragging { cursor: grabbing; r: 12; }
+  .vertex-label {
+    font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 18px;
+    fill: var(--ink); pointer-events: none; user-select: none;
+  }
+  .edge-label {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px;
+    pointer-events: none; user-select: none;
+  }
+  .angle-arc { fill: var(--angle); fill-opacity: 0.15; stroke: var(--angle); stroke-width: 1.5; }
+  .angle-text {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 11px;
+    fill: var(--angle); pointer-events: none;
+  }
+
+  /* CONTROL BAR (mode-specific) */
+  .control-bar {
+    margin-top: 16px; padding: 14px;
+    background: linear-gradient(180deg, #FFF8E1, #FFF3CC);
+    border: 1.5px dashed var(--ink);
+    border-radius: 12px;
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    justify-content: center;
+  }
+  .play-btn {
+    background: var(--side-a); color: white;
+    border: 2px solid var(--ink); border-radius: 12px;
+    padding: 10px 22px; font-size: 15px; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+    box-shadow: 0 3px 0 var(--ink);
+    transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .play-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 0 var(--ink); }
+  .play-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+  .play-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .slider-group { display: flex; flex-direction: column; gap: 4px; min-width: 200px; flex: 1; }
+  .slider-group label {
+    font-size: 13px; font-weight: 500; color: var(--ink);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .slider-group label .val {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--ink); color: var(--paper);
+    padding: 2px 8px; border-radius: 6px; font-size: 12px;
+  }
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 8px; background: var(--line);
+    border-radius: 999px; outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--side-b); border: 2px solid var(--ink);
+    cursor: pointer; box-shadow: 0 2px 0 var(--ink);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--side-b); border: 2px solid var(--ink);
+    cursor: pointer;
+  }
+
+  .shape-name {
+    text-align: center; padding: 12px;
+    background: var(--ink); color: var(--paper);
+    border-radius: 12px; margin-top: 12px;
+    font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+    font-weight: 600; font-size: 18px;
+    letter-spacing: 0.05em;
+  }
+  .shape-name .en { color: var(--highlight); font-size: 14px; margin-left: 8px; }
+
+  /* INFO PANEL */
+  .info-stack { display: flex; flex-direction: column; gap: 16px; }
+  .info-card {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .info-card h3 {
+    font-family: 'Fredoka', 'Noto Sans TC', sans-serif;
+    font-size: 14px; font-weight: 600;
+    color: var(--ink-soft); margin-bottom: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .measurements {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .measure {
+    background: #FAF5E9; border-radius: 10px;
+    padding: 8px 10px;
+    border-left: 4px solid var(--ink);
+  }
+  .measure.side-a { border-color: var(--side-a); }
+  .measure.side-b { border-color: var(--side-b); }
+  .measure.angle { border-color: var(--angle); }
+  .measure.diag { border-color: var(--diag); }
+  .measure .lbl {
+    font-size: 11px; color: var(--ink-soft); font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .measure .num {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-size: 15px; color: var(--ink);
+  }
+  .check-list { display: flex; flex-direction: column; gap: 6px; }
+  .check {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 10px; border-radius: 8px;
+    background: #F0F9F2; border-left: 3px solid var(--good);
+    font-size: 13px; font-weight: 500;
+  }
+  .check .tick {
+    color: var(--good); font-weight: 900; font-size: 16px;
+  }
+  .encourage {
+    background: linear-gradient(135deg, #FFE5E5, #FFF3CC);
+    border: 1.5px solid var(--ink);
+    border-radius: 12px; padding: 12px 14px;
+    font-size: 13px; font-weight: 500;
+    line-height: 1.6;
+    position: relative;
+  }
+  .encourage::before {
+    content: "💡"; position: absolute; top: -10px; left: 12px;
+    background: var(--paper); padding: 0 6px;
+  }
+  .formula {
+    background: var(--ink); color: var(--paper);
+    border-radius: 10px; padding: 14px;
+    text-align: center; font-family: 'JetBrains Mono', monospace;
+    font-size: 16px; font-weight: 700;
+    line-height: 1.8;
+  }
+  .formula .hi { color: var(--highlight); }
+
+  /* FOOTER */
+  footer {
+    text-align: center; margin-top: 32px;
+    font-size: 12px; color: var(--ink-soft);
+    font-family: 'Fredoka', sans-serif;
+  }
+  footer .heart { color: var(--side-a); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <span class="badge">8 年級數學 · DEMO</span>
+    <h1>平行四邊形<span class="accent">實驗室</span></h1>
+    <p class="subtitle">PARALLELOGRAM LAB · Drag · Prove · Transform</p>
+  </header>
+
+  <nav class="modes">
+    <button class="mode-btn active" data-mode="explore">
+      🔍 探索性質 <span class="tier">⭐</span>
+    </button>
+    <button class="mode-btn" data-mode="area">
+      ✂️ 面積證明 <span class="tier">🌙</span>
+    </button>
+    <button class="mode-btn" data-mode="morph">
+      🎚️ 變形實驗 <span class="tier">☀️</span>
+    </button>
+  </nav>
+
+  <div class="workspace">
+
+    <!-- LEFT: CANVAS -->
+    <section class="canvas-card">
+      <div class="canvas-header">
+        <span class="canvas-title" id="canvasTitle">EXPLORE MODE</span>
+        <button class="reset-btn" id="resetBtn">↺ 重設</button>
+      </div>
+      <div class="svg-wrap">
+        <svg id="canvas" viewBox="0 0 600 450" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div class="control-bar" id="controlBar"></div>
+    </section>
+
+    <!-- RIGHT: INFO -->
+    <aside class="info-stack" id="infoPanel"></aside>
+
+  </div>
+
+  <footer>
+    Built with <span class="heart">♥</span> for Stacey · 國中數學
+  </footer>
+</div>
+
+<script>
+// ============== STATE ==============
+let mode = 'explore';
+const svg = document.getElementById('canvas');
+const SVG_W = 600, SVG_H = 450;
+
+// Parallelogram defined by 3 free vertices, 4th computed
+// ABCD where C = B + D - A
+let A = {x: 150, y: 320, name: 'A'};
+let B = {x: 450, y: 320, name: 'B'};
+let D = {x: 220, y: 140, name: 'D'};
+function getC() { return {x: B.x + D.x - A.x, y: B.y + D.y - A.y, name: 'C'}; }
+
+// Morph mode params
+let morphAngle = 70;      // 70deg = oblique, 90 = rectangle
+let morphRatio = 1.5;     // side ratio (1 = rhombus)
+
+// ============== GEOMETRY HELPERS ==============
+const len = (p, q) => Math.hypot(p.x - q.x, p.y - q.y);
+const mid = (p, q) => ({x: (p.x+q.x)/2, y: (p.y+q.y)/2});
+const angleAt = (p, a, b) => {
+  // angle at vertex p formed by rays to a and to b (degrees)
+  const v1 = {x: a.x - p.x, y: a.y - p.y};
+  const v2 = {x: b.x - p.x, y: b.y - p.y};
+  const dot = v1.x*v2.x + v1.y*v2.y;
+  const m1 = Math.hypot(v1.x, v1.y);
+  const m2 = Math.hypot(v2.x, v2.y);
+  if (m1 === 0 || m2 === 0) return 0;
+  return Math.acos(Math.max(-1, Math.min(1, dot/(m1*m2)))) * 180 / Math.PI;
+};
+const PX_PER_UNIT = 30; // 1 grid = 1 unit
+const toUnit = px => (px / PX_PER_UNIT).toFixed(1);
+
+// ============== RENDERING ==============
+function clearSvg() { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+
+function el(tag, attrs={}) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+
+function drawLine(x1,y1,x2,y2,color,width=3,dash=null) {
+  const l = el('line', {x1, y1, x2, y2, stroke: color, 'stroke-width': width, 'stroke-linecap': 'round'});
+  if (dash) l.setAttribute('stroke-dasharray', dash);
+  svg.appendChild(l);
+  return l;
+}
+
+function drawPolygon(pts, fill, stroke, sw=2) {
+  const p = el('polygon', {
+    points: pts.map(pt => `${pt.x},${pt.y}`).join(' '),
+    fill, stroke, 'stroke-width': sw, 'stroke-linejoin': 'round'
+  });
+  svg.appendChild(p);
+  return p;
+}
+
+function drawText(x, y, text, opts={}) {
+  const t = el('text', {x, y, 'text-anchor': opts.anchor || 'middle', 'dominant-baseline': opts.baseline || 'middle'});
+  t.setAttribute('class', opts.cls || '');
+  if (opts.fill) t.setAttribute('fill', opts.fill);
+  t.textContent = text;
+  svg.appendChild(t);
+  return t;
+}
+
+function drawVertex(p, color, draggable=true) {
+  const c = el('circle', {cx: p.x, cy: p.y, r: 10, fill: color, stroke: '#2B2A35', 'stroke-width': 2.5});
+  c.setAttribute('class', 'vertex');
+  if (draggable) {
+    c.style.cursor = 'grab';
+    c.addEventListener('pointerdown', e => startDrag(e, p));
+  } else {
+    c.style.cursor = 'default';
+    c.style.opacity = '0.7';
+  }
+  svg.appendChild(c);
+  // Label
+  const offset = labelOffset(p);
+  drawText(p.x + offset.x, p.y + offset.y, p.name, {cls: 'vertex-label'});
+  return c;
+}
+
+function labelOffset(p) {
+  // place label outward from centroid
+  const cx = (A.x + B.x + D.x + getC().x) / 4;
+  const cy = (A.y + B.y + D.y + getC().y) / 4;
+  const dx = p.x - cx, dy = p.y - cy;
+  const m = Math.hypot(dx, dy) || 1;
+  return {x: dx/m * 22, y: dy/m * 22};
+}
+
+// ============== DRAG ==============
+let dragging = null;
+function startDrag(e, point) {
+  e.preventDefault();
+  dragging = point;
+  e.target.classList.add('dragging');
+  svg.setPointerCapture && svg.setPointerCapture(e.pointerId);
+}
+function moveDrag(e) {
+  if (!dragging) return;
+  const pt = svgPoint(e);
+  // Clamp
+  dragging.x = Math.max(30, Math.min(SVG_W - 30, pt.x));
+  dragging.y = Math.max(30, Math.min(SVG_H - 30, pt.y));
+  render();
+}
+function endDrag(e) {
+  if (!dragging) return;
+  dragging = null;
+  document.querySelectorAll('.vertex.dragging').forEach(v => v.classList.remove('dragging'));
+}
+function svgPoint(e) {
+  const rect = svg.getBoundingClientRect();
+  return {
+    x: (e.clientX - rect.left) * SVG_W / rect.width,
+    y: (e.clientY - rect.top) * SVG_H / rect.height
+  };
+}
+svg.addEventListener('pointermove', moveDrag);
+svg.addEventListener('pointerup', endDrag);
+svg.addEventListener('pointercancel', endDrag);
+svg.addEventListener('pointerleave', endDrag);
+
+// ============== MODE: EXPLORE ==============
+function renderExplore() {
+  clearSvg();
+  const C = getC();
+
+  // Pair 1: AB, DC (red)
+  drawLine(A.x, A.y, B.x, B.y, 'var(--side-a)', 4);
+  drawLine(D.x, D.y, C.x, C.y, 'var(--side-a)', 4);
+  // Pair 2: AD, BC (teal)
+  drawLine(A.x, A.y, D.x, D.y, 'var(--side-b)', 4);
+  drawLine(B.x, B.y, C.x, C.y, 'var(--side-b)', 4);
+
+  // Diagonals
+  drawLine(A.x, A.y, C.x, C.y, 'var(--diag)', 2, '6,4');
+  drawLine(B.x, B.y, D.x, D.y, 'var(--diag)', 2, '6,4');
+
+  // Midpoint marker (where diagonals meet)
+  const M = mid(A, C);
+  const mCirc = el('circle', {cx: M.x, cy: M.y, r: 5, fill: 'var(--diag)', stroke: '#2B2A35', 'stroke-width': 1.5});
+  svg.appendChild(mCirc);
+
+  // Edge length labels
+  const lab = (p, q, color) => {
+    const m = mid(p, q);
+    const dx = q.x - p.x, dy = q.y - p.y;
+    const nx = -dy, ny = dx;
+    const n = Math.hypot(nx, ny);
+    const ox = (nx/n) * 16, oy = (ny/n) * 16;
+    // pick side facing away from centroid
+    const cx = (A.x + B.x + D.x + C.x)/4, cy = (A.y + B.y + D.y + C.y)/4;
+    const sign = ((m.x + ox - cx)*(m.x + ox - cx) + (m.y + oy - cy)*(m.y + oy - cy) > (m.x - ox - cx)*(m.x - ox - cx) + (m.y - oy - cy)*(m.y - oy - cy)) ? 1 : -1;
+    drawText(m.x + sign*ox, m.y + sign*oy, toUnit(len(p,q)), {cls: 'edge-label', fill: color});
+  };
+  lab(A, B, 'var(--side-a)');
+  lab(D, C, 'var(--side-a)');
+  lab(A, D, 'var(--side-b)');
+  lab(B, C, 'var(--side-b)');
+
+  // Vertices (A, B, D draggable; C auto)
+  drawVertex(A, '#FFB84D');
+  drawVertex(B, '#FFB84D');
+  drawVertex(D, '#FFB84D');
+  drawVertex(C, '#C8C5D4', false);
+
+  updateExploreInfo();
+}
+
+function updateExploreInfo() {
+  const C = getC();
+  const ab = len(A,B), bc = len(B,C), cd = len(C,D), da = len(D,A);
+  const angA = angleAt(A, B, D);
+  const angB = angleAt(B, A, C);
+  const angC = angleAt(C, B, D);
+  const angD = angleAt(D, A, C);
+  const M1 = mid(A, C), M2 = mid(B, D);
+  const meet = len(M1, M2) < 0.5;
+
+  document.getElementById('infoPanel').innerHTML = `
+    <div class="info-card">
+      <h3>📐 邊長 Sides</h3>
+      <div class="measurements">
+        <div class="measure side-a"><div class="lbl">AB</div><div class="num">${toUnit(ab)}</div></div>
+        <div class="measure side-a"><div class="lbl">DC</div><div class="num">${toUnit(cd)}</div></div>
+        <div class="measure side-b"><div class="lbl">AD</div><div class="num">${toUnit(da)}</div></div>
+        <div class="measure side-b"><div class="lbl">BC</div><div class="num">${toUnit(bc)}</div></div>
+      </div>
+    </div>
+    <div class="info-card">
+      <h3>📏 角度 Angles</h3>
+      <div class="measurements">
+        <div class="measure angle"><div class="lbl">∠A</div><div class="num">${angA.toFixed(0)}°</div></div>
+        <div class="measure angle"><div class="lbl">∠B</div><div class="num">${angB.toFixed(0)}°</div></div>
+        <div class="measure angle"><div class="lbl">∠C</div><div class="num">${angC.toFixed(0)}°</div></div>
+        <div class="measure angle"><div class="lbl">∠D</div><div class="num">${angD.toFixed(0)}°</div></div>
+      </div>
+    </div>
+    <div class="info-card">
+      <h3>✓ 性質檢查</h3>
+      <div class="check-list">
+        <div class="check"><span class="tick">✓</span>AB ＝ DC（對邊相等）</div>
+        <div class="check"><span class="tick">✓</span>∠A ＝ ∠C（對角相等）</div>
+        <div class="check"><span class="tick">✓</span>對角線互相平分</div>
+        <div class="check"><span class="tick">✓</span>∠A ＋ ∠B ＝ ${(angA+angB).toFixed(0)}°（鄰角互補）</div>
+      </div>
+    </div>
+    <div class="encourage">
+      <strong>怎麼玩：</strong>拖動橘色頂點 A、B、D，看灰色 C 怎麼跟著動。不管你怎麼拉，<strong>對邊永遠平行＋相等</strong>，這就是平行四邊形的核心！
+    </div>
+  `;
+}
+
+// ============== MODE: AREA ==============
+let areaAnimT = 0;     // 0 = original, 1 = rectangle
+let areaPlaying = false;
+
+function renderArea() {
+  clearSvg();
+  // Parallelogram stays FIXED; left triangle slides right to form rectangle
+  const Ax = 100, Ay = 340;
+  const baseW = 300;
+  const h = 180;
+  const skew = 90; // CONSTANT - parallelogram doesn't morph
+  const cutX = Ax + skew;
+
+  // Original parallelogram (always shown faintly)
+  const P1 = {x: Ax, y: Ay};
+  const P2 = {x: Ax + baseW, y: Ay};
+  const P3 = {x: Ax + baseW + skew, y: Ay - h};
+  const P4 = {x: Ax + skew, y: Ay - h};
+
+  // Remaining quadrilateral after cut: cut, P2, P3, P4
+  const remaining = [{x: cutX, y: Ay}, P2, P3, P4];
+
+  // Left triangle: P1, cut, P4
+  const triBase = [P1, {x: cutX, y: Ay}, P4];
+  const offX = baseW * areaAnimT;
+  const triMoving = triBase.map(p => ({x: p.x + offX, y: p.y}));
+
+  // Target rectangle outline (appears as triangle approaches destination)
+  if (areaAnimT > 0.05) {
+    const opacity = Math.min(1, areaAnimT * 1.5);
+    drawPolygon(
+      [{x: cutX, y: Ay}, {x: cutX + baseW, y: Ay}, {x: cutX + baseW, y: Ay - h}, {x: cutX, y: Ay - h}],
+      `rgba(255,217,61,${0.10 * opacity})`,
+      `rgba(224,168,0,${0.5 + 0.5*opacity})`, 2.5
+    );
+  }
+
+  // Original parallelogram outline (always faint)
+  drawPolygon([P1, P2, P3, P4], 'rgba(155,109,215,0.05)', 'rgba(155,109,215,0.4)', 1.5);
+
+  // Cut line (the perpendicular)
+  drawLine(cutX, Ay, cutX, Ay - h, '#2B2A35', 2, '5,4');
+
+  // Remaining quadrilateral (the "staying" part of parallelogram)
+  drawPolygon(remaining, 'rgba(78,205,196,0.40)', 'var(--side-b)', 2.5);
+
+  // Moving triangle
+  drawPolygon(triMoving, 'rgba(255,107,107,0.60)', 'var(--side-a)', 2.5);
+
+  // Arrow showing movement direction (during animation)
+  if (areaAnimT > 0.02 && areaAnimT < 0.98) {
+    const arrowY = Ay - h - 30;
+    const arrowStartX = (P1.x + cutX) / 2;
+    const arrowEndX = arrowStartX + offX;
+    drawLine(arrowStartX, arrowY, arrowEndX - 8, arrowY, 'var(--ink)', 2.5);
+    const arrow = el('polygon', {
+      points: `${arrowEndX},${arrowY} ${arrowEndX-10},${arrowY-5} ${arrowEndX-10},${arrowY+5}`,
+      fill: 'var(--ink)'
+    });
+    svg.appendChild(arrow);
+  }
+
+  // Base label (b)
+  drawLine(P1.x, Ay + 16, P2.x, Ay + 16, 'var(--ink)', 1.5);
+  drawLine(P1.x, Ay + 12, P1.x, Ay + 20, 'var(--ink)', 1.5);
+  drawLine(P2.x, Ay + 12, P2.x, Ay + 20, 'var(--ink)', 1.5);
+  drawText((P1.x + P2.x)/2, Ay + 32, `底 b ＝ ${(baseW/PX_PER_UNIT).toFixed(0)}`, {cls: 'edge-label', fill: 'var(--ink)'});
+
+  // Height label (h) - on the left side of cut line
+  drawLine(cutX - 16, Ay, cutX - 16, Ay - h, 'var(--ink)', 1.5);
+  drawLine(cutX - 20, Ay, cutX - 12, Ay, 'var(--ink)', 1.5);
+  drawLine(cutX - 20, Ay - h, cutX - 12, Ay - h, 'var(--ink)', 1.5);
+  drawText(cutX - 36, Ay - h/2, `高 h ＝ ${(h/PX_PER_UNIT).toFixed(0)}`, {cls: 'edge-label', fill: 'var(--ink)'});
+
+  // Vertex labels (visible only at start)
+  if (areaAnimT < 0.1) {
+    const fade = 1 - areaAnimT * 10;
+    const labels = [
+      {p: P1, off: {x: -12, y: 10}, t: 'A'},
+      {p: P2, off: {x: 12, y: 10}, t: 'B'},
+      {p: P3, off: {x: 14, y: -4}, t: 'C'},
+      {p: P4, off: {x: -14, y: -4}, t: 'D'}
+    ];
+    labels.forEach(l => {
+      const t = drawText(l.p.x + l.off.x, l.p.y + l.off.y, l.t, {cls: 'vertex-label'});
+      t.setAttribute('opacity', fade);
+    });
+  }
+
+  // "= matches" indicator when nearly done
+  if (areaAnimT > 0.93) {
+    drawText(cutX + baseW/2, Ay - h/2, '＝ b × h', {
+      cls: 'vertex-label',
+      fill: '#E0A800'
+    }).setAttribute('font-size', '24');
+  }
+
+  updateAreaInfo();
+}
+
+function updateAreaInfo() {
+  const baseU = 300/PX_PER_UNIT, hU = 180/PX_PER_UNIT;
+  const area = baseU * hU;
+  document.getElementById('infoPanel').innerHTML = `
+    <div class="info-card">
+      <h3>✂️ 面積公式</h3>
+      <div class="formula">
+        平行四邊形面積<br>
+        ＝ <span class="hi">底 × 高</span><br>
+        ＝ ${baseU} × ${hU}<br>
+        ＝ <span class="hi">${area}</span>
+      </div>
+    </div>
+    <div class="info-card">
+      <h3>💭 為什麼？</h3>
+      <p style="font-size:13px; line-height:1.7;">
+        把<span style="color:var(--side-a); font-weight:700;">左邊那個三角形</span>剪下來，
+        平移到<span style="color:var(--side-b); font-weight:700;">右邊</span>，
+        就變成一個<span style="background:var(--highlight); padding:0 4px;">矩形</span>！
+      </p>
+      <p style="font-size:13px; line-height:1.7; margin-top:8px;">
+        矩形面積 = 長 × 寬 = 底 × 高，所以平行四邊形面積也是 <strong>底 × 高</strong>。
+      </p>
+    </div>
+    <div class="encourage">
+      <strong>口訣：</strong>「<span style="background:var(--highlight); padding:0 4px; font-weight:700;">剪一刀、平移、變矩形</span>」。按下播放鍵看動畫！
+    </div>
+  `;
+}
+
+function playAreaAnimation() {
+  if (areaPlaying) return;
+  areaPlaying = true;
+  document.getElementById('playBtn').disabled = true;
+  document.getElementById('playBtn').textContent = '⏳ 變身中...';
+  areaAnimT = 0;
+  const start = performance.now();
+  const dur = 2200;
+  function step(now) {
+    const t = Math.min(1, (now - start) / dur);
+    // easeInOutCubic
+    areaAnimT = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+    renderArea();
+    if (t < 1) requestAnimationFrame(step);
+    else {
+      areaPlaying = false;
+      const btn = document.getElementById('playBtn');
+      if (btn) { btn.disabled = false; btn.textContent = '🔁 再播一次'; }
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+// ============== MODE: MORPH ==============
+function renderMorph() {
+  clearSvg();
+  const cx = 300, cy = 230;
+  // base length & side length controlled by morphRatio (1 = rhombus, larger = stretched)
+  const baseLen = 280;
+  const sideLen = baseLen / morphRatio;
+  const angRad = morphAngle * Math.PI / 180;
+  const halfBase = baseLen / 2;
+  const dx = sideLen * Math.cos(angRad);
+  const dy = sideLen * Math.sin(angRad);
+
+  // Vertices (centered)
+  const P1 = {x: cx - halfBase - dx/2, y: cy + dy/2};
+  const P2 = {x: cx + halfBase - dx/2, y: cy + dy/2};
+  const P3 = {x: cx + halfBase + dx/2, y: cy - dy/2};
+  const P4 = {x: cx - halfBase + dx/2, y: cy - dy/2};
+
+  // Determine which special shape
+  const isRect = Math.abs(morphAngle - 90) < 2;
+  const isRhombus = Math.abs(morphRatio - 1) < 0.05;
+  let shape = '一般平行四邊形', shapeEn = 'Parallelogram';
+  let bg = 'rgba(155,109,215,0.20)', stroke = 'var(--angle)';
+  if (isRect && isRhombus) {
+    shape = '正方形'; shapeEn = 'Square';
+    bg = 'rgba(255,217,61,0.35)'; stroke = '#E0A800';
+  } else if (isRect) {
+    shape = '矩形（長方形）'; shapeEn = 'Rectangle';
+    bg = 'rgba(78,205,196,0.30)'; stroke = 'var(--side-b)';
+  } else if (isRhombus) {
+    shape = '菱形'; shapeEn = 'Rhombus';
+    bg = 'rgba(255,107,107,0.25)'; stroke = 'var(--side-a)';
+  }
+
+  // Draw shape
+  drawPolygon([P1, P2, P3, P4], bg, stroke, 3);
+
+  // Right angle markers when applicable
+  if (isRect) {
+    const sz = 14;
+    [P1, P2, P3, P4].forEach((p, i) => {
+      const next = [P2, P3, P4, P1][i];
+      const prev = [P4, P1, P2, P3][i];
+      const v1 = {x: (next.x - p.x), y: (next.y - p.y)};
+      const v2 = {x: (prev.x - p.x), y: (prev.y - p.y)};
+      const m1 = Math.hypot(v1.x, v1.y), m2 = Math.hypot(v2.x, v2.y);
+      const u1 = {x: v1.x/m1 * sz, y: v1.y/m1 * sz};
+      const u2 = {x: v2.x/m2 * sz, y: v2.y/m2 * sz};
+      const path = el('path', {
+        d: `M ${p.x + u1.x} ${p.y + u1.y} L ${p.x + u1.x + u2.x} ${p.y + u1.y + u2.y} L ${p.x + u2.x} ${p.y + u2.y}`,
+        fill: 'none', stroke: stroke, 'stroke-width': 2
+      });
+      svg.appendChild(path);
+    });
+  }
+
+  // Equal side ticks when rhombus/square
+  if (isRhombus) {
+    const tick = (p, q, n) => {
+      const m = mid(p, q);
+      const dx2 = q.x - p.x, dy2 = q.y - p.y;
+      const nx = -dy2 / Math.hypot(dx2,dy2), ny = dx2 / Math.hypot(dx2,dy2);
+      for (let i = 0; i < n; i++) {
+        const off = (i - (n-1)/2) * 5;
+        const cx2 = m.x + dx2/Math.hypot(dx2,dy2) * off;
+        const cy2 = m.y + dy2/Math.hypot(dx2,dy2) * off;
+        drawLine(cx2 - nx*5, cy2 - ny*5, cx2 + nx*5, cy2 + ny*5, stroke, 2);
+      }
+    };
+    tick(P1, P2, 2); tick(P2, P3, 2); tick(P3, P4, 2); tick(P4, P1, 2);
+  }
+
+  // Vertex dots (non-draggable in morph)
+  [P1, P2, P3, P4].forEach((p, i) => {
+    const c = el('circle', {cx: p.x, cy: p.y, r: 7, fill: stroke, stroke: '#2B2A35', 'stroke-width': 2});
+    svg.appendChild(c);
+  });
+
+  // Update shape name display
+  const sn = document.getElementById('shapeName');
+  if (sn) sn.innerHTML = `${shape}<span class="en">${shapeEn}</span>`;
+
+  updateMorphInfo(shape, shapeEn, isRect, isRhombus);
+}
+
+function updateMorphInfo(shape, shapeEn, isRect, isRhombus) {
+  let hint = '';
+  if (!isRect && !isRhombus) hint = '把兩個滑桿都拉到底，看會變什麼？';
+  else if (isRect && !isRhombus) hint = '🎉 變成<strong>矩形</strong>了！再把第二個滑桿拉到 1.0 看看？';
+  else if (!isRect && isRhombus) hint = '🎉 變成<strong>菱形</strong>了！再把第一個滑桿拉到 90° 試試？';
+  else hint = '🌟 太強了！矩形 ＋ 菱形 ＝ <strong>正方形</strong>！四個性質一次滿足！';
+
+  document.getElementById('infoPanel').innerHTML = `
+    <div class="info-card">
+      <h3>🔄 家族關係</h3>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div class="check" style="background:#F8F4FF; border-color:var(--angle);">
+          <span style="color:var(--angle); font-weight:700;">●</span>平行四邊形 Parallelogram
+        </div>
+        <div class="check" style="background:${isRect?'#E0F7F5':'#F5F5F5'}; border-color:var(--side-b); margin-left:16px;">
+          <span style="color:var(--side-b); font-weight:700;">↳</span>角＝90° → <strong>矩形</strong>
+        </div>
+        <div class="check" style="background:${isRhombus?'#FFE5E5':'#F5F5F5'}; border-color:var(--side-a); margin-left:16px;">
+          <span style="color:var(--side-a); font-weight:700;">↳</span>邊都相等 → <strong>菱形</strong>
+        </div>
+        <div class="check" style="background:${(isRect&&isRhombus)?'#FFF7CC':'#F5F5F5'}; border-color:#E0A800; margin-left:32px;">
+          <span style="color:#E0A800; font-weight:700;">★</span>兩個都符合 → <strong>正方形</strong>
+        </div>
+      </div>
+    </div>
+    <div class="encourage">${hint}</div>
+    <div class="info-card">
+      <h3>🎯 學習重點</h3>
+      <p style="font-size:13px; line-height:1.7;">
+        所有的<strong>矩形、菱形、正方形</strong>，本質上都是<strong>平行四邊形</strong>，
+        只是多了一些「特別條件」。<br><br>
+        ⭐ 矩形＝有 90° 的平行四邊形<br>
+        🌙 菱形＝四邊相等的平行四邊形<br>
+        ☀️ 正方形＝兩個條件都有！
+      </p>
+    </div>
+  `;
+}
+
+// ============== CONTROL BARS ==============
+function renderControlBar() {
+  const bar = document.getElementById('controlBar');
+  if (mode === 'explore') {
+    bar.innerHTML = `
+      <span style="font-size:13px; color:var(--ink-soft);">
+        👆 拖動 <strong>橘色</strong>頂點 A、B、D，灰色 C 會自動跟上保持平行四邊形
+      </span>
+    `;
+  } else if (mode === 'area') {
+    bar.innerHTML = `
+      <button class="play-btn" id="playBtn">▶️ 剪一刀，看面積</button>
+    `;
+    document.getElementById('playBtn').addEventListener('click', playAreaAnimation);
+  } else if (mode === 'morph') {
+    bar.innerHTML = `
+      <div class="slider-group">
+        <label>① 內角 <span class="val" id="vAng">${morphAngle}°</span></label>
+        <input type="range" id="sAng" min="45" max="90" value="${morphAngle}" step="1">
+      </div>
+      <div class="slider-group">
+        <label>② 邊長比 <span class="val" id="vRatio">${morphRatio.toFixed(1)} : 1</span></label>
+        <input type="range" id="sRatio" min="1" max="3" value="${morphRatio}" step="0.1">
+      </div>
+      <div id="shapeName" class="shape-name" style="width:100%; margin:0;"></div>
+    `;
+    document.getElementById('sAng').addEventListener('input', e => {
+      morphAngle = +e.target.value;
+      document.getElementById('vAng').textContent = morphAngle + '°';
+      renderMorph();
+    });
+    document.getElementById('sRatio').addEventListener('input', e => {
+      morphRatio = +e.target.value;
+      document.getElementById('vRatio').textContent = morphRatio.toFixed(1) + ' : 1';
+      renderMorph();
+    });
+  }
+}
+
+// ============== MAIN RENDER ==============
+function render() {
+  if (mode === 'explore') renderExplore();
+  else if (mode === 'area') renderArea();
+  else if (mode === 'morph') renderMorph();
+}
+
+function switchMode(newMode) {
+  mode = newMode;
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === newMode);
+  });
+  const titles = {
+    explore: 'EXPLORE · 探索性質',
+    area: 'PROOF · 面積證明',
+    morph: 'MORPH · 變形實驗'
+  };
+  document.getElementById('canvasTitle').textContent = titles[newMode];
+  if (newMode === 'area') areaAnimT = 0;
+  renderControlBar();
+  render();
+}
+
+document.querySelectorAll('.mode-btn').forEach(b => {
+  b.addEventListener('click', () => switchMode(b.dataset.mode));
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (mode === 'explore') {
+    A = {x: 150, y: 320, name: 'A'};
+    B = {x: 450, y: 320, name: 'B'};
+    D = {x: 220, y: 140, name: 'D'};
+  } else if (mode === 'area') {
+    areaAnimT = 0;
+    const btn = document.getElementById('playBtn');
+    if (btn) { btn.disabled = false; btn.textContent = '▶️ 剪一刀，看面積'; }
+  } else if (mode === 'morph') {
+    morphAngle = 70; morphRatio = 1.5;
+    const sa = document.getElementById('sAng'), sr = document.getElementById('sRatio');
+    if (sa) sa.value = 70;
+    if (sr) sr.value = 1.5;
+    document.getElementById('vAng').textContent = '70°';
+    document.getElementById('vRatio').textContent = '1.5 : 1';
+  }
+  render();
+});
+
+// INIT
+renderControlBar();
+render();
+</script>
+</body>
+</html>
