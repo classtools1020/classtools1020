@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>4-2 平行四邊形大冒險 · 8A 數學</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg-deep:#0A0E27;
+  --bg-mid:#1A1F4A;
+  --gold:#FFD700;
+  --gold-soft:#F6E05E;
+  --sky:#4A90E2;
+  --purple:#B967FF;
+  --pink:#FF6B9D;
+  --mint:#4ECDC4;
+  --red:#C53030;
+  --white:#F5F7FF;
+  --shadow:rgba(0,0,0,.4);
+}
+html,body{
+  font-family:'Noto Sans TC','Microsoft JhengHei',sans-serif;
+  background:var(--bg-deep);
+  color:var(--white);
+  min-height:100vh;
+  min-height:100dvh;
+  user-select:none;
+  -webkit-user-select:none;
+  overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  background:
+    radial-gradient(circle at 15% 20%,rgba(255,215,0,.15) 0,transparent 40%),
+    radial-gradient(circle at 85% 30%,rgba(185,103,255,.18) 0,transparent 45%),
+    radial-gradient(circle at 50% 80%,rgba(78,205,196,.12) 0,transparent 40%),
+    linear-gradient(180deg,var(--bg-deep) 0%,var(--bg-mid) 100%);
+  background-attachment:fixed;
+  padding:0;
+}
+.stars{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%,#fff 50%,transparent),
+    radial-gradient(1px 1px at 40% 70%,#fff 50%,transparent),
+    radial-gradient(2px 2px at 70% 20%,#fff 50%,transparent),
+    radial-gradient(1px 1px at 90% 60%,#fff 50%,transparent),
+    radial-gradient(2px 2px at 55% 85%,#fff 50%,transparent),
+    radial-gradient(1px 1px at 30% 10%,#fff 50%,transparent),
+    radial-gradient(2px 2px at 80% 90%,#fff 50%,transparent);
+  background-size:600px 600px;
+  opacity:.5;
+  animation:twinkle 6s infinite;
+}
+@keyframes twinkle{0%,100%{opacity:.4}50%{opacity:.7}}
+
+.wrap{max-width:980px;margin:0 auto;padding:14px 12px 60px;position:relative;z-index:1}
+
+/* ========== 首頁封面 ========== */
+.cover{
+  text-align:center;
+  padding:30px 14px 22px;
+  animation:bounceIn .8s;
+}
+@keyframes bounceIn{
+  0%{opacity:0;transform:scale(.5)}
+  60%{transform:scale(1.05)}
+  100%{opacity:1;transform:scale(1)}
+}
+.cover h1{
+  font-size:2.4rem;
+  font-weight:900;
+  margin-bottom:6px;
+  background:linear-gradient(90deg,var(--gold),var(--pink),var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  letter-spacing:-1px;
+  text-shadow:0 0 30px rgba(255,215,0,.2);
+}
+.cover .sub{
+  font-size:1.0rem;
+  color:var(--gold-soft);
+  margin-bottom:14px;
+  font-weight:600;
+  letter-spacing:1px;
+}
+.cover .heroes{
+  display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.cover .hero-chip{
+  background:rgba(255,255,255,.08);
+  border:1.5px solid rgba(255,215,0,.4);
+  padding:6px 12px;border-radius:30px;
+  font-size:.9rem;
+  display:flex;align-items:center;gap:6px;
+  backdrop-filter:blur(8px);
+}
+.cover .hero-chip span:first-child{font-size:1.2rem}
+
+/* ========== 關卡選擇條 ========== */
+.stage-bar{
+  position:sticky;top:0;z-index:10;
+  background:rgba(10,14,39,.92);
+  backdrop-filter:blur(12px);
+  padding:10px 6px;
+  margin:0 -12px 16px;
+  border-bottom:2px solid rgba(255,215,0,.25);
+  display:flex;gap:6px;overflow-x:auto;
+  scrollbar-width:none;
+}
+.stage-bar::-webkit-scrollbar{display:none}
+.stage-tab{
+  flex:0 0 auto;
+  padding:8px 12px;
+  background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(255,255,255,.15);
+  border-radius:12px;
+  color:var(--white);
+  font-size:.85rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .25s;
+  display:flex;align-items:center;gap:6px;
+  white-space:nowrap;
+}
+.stage-tab:hover{transform:translateY(-2px);border-color:var(--gold)}
+.stage-tab.active{
+  background:linear-gradient(135deg,var(--gold) 0%,#FFA500 100%);
+  color:#1A1A1A;
+  border-color:var(--gold);
+  box-shadow:0 4px 18px rgba(255,215,0,.45);
+  transform:translateY(-2px);
+}
+.stage-tab .num{
+  width:22px;height:22px;border-radius:50%;
+  background:rgba(0,0,0,.25);color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;font-weight:900;
+}
+.stage-tab.active .num{background:rgba(0,0,0,.3);color:var(--gold)}
+.stage-tab.cleared::after{content:"✓";color:var(--mint);margin-left:4px;font-weight:900}
+
+/* ========== 場景容器 ========== */
+.scene{display:none;animation:fadeUp .5s}
+.scene.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.scene-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+@media(min-width:780px){
+  .scene-grid{grid-template-columns:1fr 1.3fr 1fr;align-items:start}
+}
+
+/* 角色側 */
+.character-card{
+  background:linear-gradient(135deg,rgba(255,215,0,.08) 0%,rgba(185,103,255,.12) 100%);
+  border:1.5px solid rgba(255,215,0,.3);
+  border-radius:18px;
+  padding:16px 14px;
+  box-shadow:0 8px 26px var(--shadow);
+}
+.character-card .avatar{
+  font-size:3.6rem;text-align:center;
+  filter:drop-shadow(0 0 12px rgba(255,215,0,.4));
+  animation:floatUp 3s infinite ease-in-out;
+  margin-bottom:6px;
+}
+@keyframes floatUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.character-card h3{
+  text-align:center;color:var(--gold);
+  font-size:1.15rem;margin-bottom:4px;
+}
+.character-card .role{
+  text-align:center;font-size:.8rem;
+  color:var(--mint);margin-bottom:12px;letter-spacing:1px;
+}
+.dialogue{
+  background:rgba(0,0,0,.3);
+  border-left:3px solid var(--gold);
+  padding:10px 12px;
+  border-radius:10px;
+  font-size:.95rem;
+  line-height:1.55;
+  margin-bottom:10px;
+}
+.dialogue strong{color:var(--gold-soft)}
+.task-box{
+  background:rgba(255,107,157,.12);
+  border:1.5px dashed var(--pink);
+  border-radius:10px;
+  padding:8px 10px;
+  font-size:.85rem;
+  margin-top:8px;
+  color:var(--pink);
+  font-weight:600;
+}
+.task-box::before{content:"任務 ";color:var(--gold-soft)}
+
+/* 數據顯示側 */
+.data-panel{
+  background:rgba(255,255,255,.04);
+  border:1.5px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 8px 26px var(--shadow);
+}
+.data-panel h4{
+  color:var(--gold);
+  font-size:.95rem;
+  margin-bottom:10px;
+  letter-spacing:1px;
+  display:flex;align-items:center;gap:6px;
+}
+.data-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 10px;margin-bottom:6px;
+  background:rgba(0,0,0,.25);
+  border-radius:10px;
+  font-size:.92rem;
+}
+.data-row .label{color:#aab}
+.data-row .value{font-weight:900;font-family:'Consolas',monospace}
+.data-row.equal{
+  border:1.5px solid var(--mint);
+  background:rgba(78,205,196,.1);
+  animation:equalPulse 2s infinite;
+}
+@keyframes equalPulse{0%,100%{box-shadow:0 0 0 0 rgba(78,205,196,.4)}50%{box-shadow:0 0 0 8px rgba(78,205,196,0)}}
+.data-row.ab{border-left:4px solid var(--purple)}.data-row.ab .value{color:var(--purple)}
+.data-row.cd{border-left:4px solid var(--purple)}.data-row.cd .value{color:var(--purple)}
+.data-row.bc{border-left:4px solid var(--sky)}.data-row.bc .value{color:var(--sky)}
+.data-row.ad{border-left:4px solid var(--sky)}.data-row.ad .value{color:var(--sky)}
+.data-row.angA{border-left:4px solid var(--pink)}.data-row.angA .value{color:var(--pink)}
+.data-row.angC{border-left:4px solid var(--pink)}.data-row.angC .value{color:var(--pink)}
+.data-row.angB{border-left:4px solid var(--gold-soft)}.data-row.angB .value{color:var(--gold-soft)}
+.data-row.angD{border-left:4px solid var(--gold-soft)}.data-row.angD .value{color:var(--gold-soft)}
+.data-row.diag{border-left:4px solid var(--gold)}.data-row.diag .value{color:var(--gold)}
+.data-row.area{border-left:4px solid var(--mint)}.data-row.area .value{color:var(--mint)}
+
+.flyin{animation:flyIn .4s}
+@keyframes flyIn{
+  0%{opacity:0;transform:translateX(20px) scale(1.3);color:#fff}
+  100%{opacity:1;transform:translateX(0) scale(1)}
+}
+
+/* SVG 互動區 */
+.canvas-wrap{
+  background:linear-gradient(180deg,rgba(255,255,255,.06) 0%,rgba(255,255,255,.02) 100%);
+  border:1.5px solid rgba(255,215,0,.3);
+  border-radius:18px;
+  padding:10px;
+  box-shadow:0 8px 26px var(--shadow);
+  position:relative;
+}
+.canvas-wrap .hint{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  background:rgba(255,215,0,.18);
+  color:var(--gold-soft);
+  padding:4px 12px;border-radius:20px;
+  font-size:.78rem;font-weight:700;
+  pointer-events:none;
+  z-index:5;
+  border:1px solid var(--gold);
+  animation:hintPulse 2.4s infinite;
+}
+@keyframes hintPulse{
+  0%,100%{opacity:.85;transform:translateX(-50%) translateY(0)}
+  50%{opacity:1;transform:translateX(-50%) translateY(-3px)}
+}
+svg.stage{
+  width:100%;height:auto;
+  display:block;
+  touch-action:none;
+}
+.vertex{
+  fill:var(--gold);
+  stroke:#fff;stroke-width:2.5;
+  cursor:grab;
+  filter:drop-shadow(0 0 6px rgba(255,215,0,.7));
+  transition:r .2s,fill .2s;
+}
+.vertex:active{cursor:grabbing;fill:#FF8C00}
+.vertex:hover{r:14}
+.vertex-label{
+  font-family:'Noto Sans TC',sans-serif;
+  font-weight:900;font-size:18px;
+  fill:#fff;text-anchor:middle;
+  pointer-events:none;
+  text-shadow:0 0 4px #000;
+}
+.side{stroke-width:4;fill:none;stroke-linecap:round}
+.side.purple{stroke:var(--purple);filter:drop-shadow(0 0 4px var(--purple))}
+.side.sky{stroke:var(--sky);filter:drop-shadow(0 0 4px var(--sky))}
+.diag{stroke:var(--gold-soft);stroke-width:2.5;stroke-dasharray:6 4;fill:none}
+.diag.solid{stroke-dasharray:none;stroke-width:3}
+.center-point{fill:var(--gold);stroke:#fff;stroke-width:2;
+  filter:drop-shadow(0 0 8px var(--gold))}
+.angle-arc{fill:none;stroke-width:2.5}
+.angle-arc.pink{stroke:var(--pink);fill:rgba(255,107,157,.18)}
+.angle-arc.yellow{stroke:var(--gold-soft);fill:rgba(246,224,94,.18)}
+.angle-label{
+  font-family:'Consolas',monospace;
+  font-size:13px;font-weight:900;
+  text-anchor:middle;pointer-events:none;
+  fill:#fff;text-shadow:0 0 4px #000;
+}
+.tri-fill{opacity:.28;pointer-events:none}
+.length-label{
+  font-family:'Consolas',monospace;
+  font-size:14px;font-weight:900;
+  text-anchor:middle;pointer-events:none;
+  fill:#fff;
+  paint-order:stroke;
+  stroke:#0A0E27;stroke-width:3;stroke-linejoin:round;
+}
+.parallel-mark{
+  font-size:14px;fill:var(--sky);
+  text-anchor:middle;font-weight:900;pointer-events:none;
+}
+
+/* 生活連結列 */
+.life-strip{
+  margin-top:18px;
+  background:linear-gradient(90deg,rgba(78,205,196,.08) 0%,rgba(255,215,0,.08) 100%);
+  border:1.5px solid rgba(78,205,196,.3);
+  border-radius:16px;
+  padding:14px;
+}
+.life-strip h4{
+  color:var(--mint);font-size:1rem;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.life-row{
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-bottom:8px;
+}
+.life-chip{
+  flex:1;min-width:78px;
+  background:rgba(255,255,255,.06);
+  border:1.5px solid rgba(255,255,255,.18);
+  border-radius:12px;
+  padding:10px 6px;text-align:center;
+  cursor:pointer;
+  transition:all .25s;
+}
+.life-chip:hover{transform:translateY(-3px);border-color:var(--gold)}
+.life-chip .ic{font-size:1.8rem;display:block;margin-bottom:2px}
+.life-chip .nm{font-size:.8rem;color:#bbd}
+.life-chip.picked{
+  background:rgba(255,215,0,.2);border-color:var(--gold);
+  box-shadow:0 0 18px rgba(255,215,0,.4);
+}
+.life-q{
+  font-size:.92rem;color:var(--gold-soft);
+  background:rgba(0,0,0,.25);
+  border-radius:10px;
+  padding:8px 12px;
+  margin-top:6px;
+  line-height:1.5;
+}
+
+/* 通關按鈕 */
+.clear-row{
+  margin-top:14px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;
+}
+.clear-btn{
+  background:linear-gradient(135deg,var(--gold) 0%,#FF8C00 100%);
+  color:#1A1A1A;
+  border:none;
+  padding:12px 24px;
+  border-radius:30px;
+  font-size:1rem;font-weight:900;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(255,215,0,.4);
+  transition:transform .2s;
+}
+.clear-btn:hover{transform:translateY(-3px) scale(1.04)}
+.clear-btn:active{transform:translateY(0) scale(.98)}
+.clear-btn.next{background:linear-gradient(135deg,var(--mint) 0%,var(--sky) 100%);color:#fff}
+.clear-btn.disabled{opacity:.5;cursor:not-allowed}
+
+/* 徽章彈窗 */
+.badge-pop{
+  position:fixed;inset:0;
+  display:none;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.75);
+  z-index:100;
+  animation:fadeUp .4s;
+}
+.badge-pop.show{display:flex}
+.badge-pop .card{
+  background:linear-gradient(180deg,#1A1F4A 0%,#0A0E27 100%);
+  border:2px solid var(--gold);
+  border-radius:24px;
+  padding:30px 24px;
+  text-align:center;max-width:340px;
+  box-shadow:0 20px 60px rgba(255,215,0,.3);
+}
+.badge-pop .badge-svg{
+  width:120px;height:120px;margin:0 auto 12px;
+  animation:badgeSpin 1s;
+}
+@keyframes badgeSpin{
+  0%{transform:scale(0) rotate(-180deg)}
+  100%{transform:scale(1) rotate(0)}
+}
+.badge-pop h2{
+  color:var(--gold);font-size:1.5rem;margin-bottom:8px;
+}
+.badge-pop p{color:#fff;margin-bottom:16px;line-height:1.6}
+
+/* 性質卡組合（最後關卡 L6） */
+.combo-area{
+  margin-top:18px;
+  background:linear-gradient(135deg,rgba(185,103,255,.1) 0%,rgba(255,215,0,.1) 100%);
+  border:1.5px solid var(--purple);
+  border-radius:18px;
+  padding:16px;
+}
+.combo-area h4{color:var(--purple);margin-bottom:10px;font-size:1.05rem}
+.prop-cards{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+}
+@media(min-width:560px){.prop-cards{grid-template-columns:repeat(3,1fr)}}
+.prop-card{
+  background:rgba(0,0,0,.4);
+  border:2px solid rgba(255,255,255,.15);
+  border-radius:14px;
+  padding:12px 8px;text-align:center;
+  cursor:pointer;
+  transition:all .25s;
+}
+.prop-card:hover{transform:translateY(-3px)}
+.prop-card .icon{font-size:1.8rem;display:block;margin-bottom:4px}
+.prop-card .name{font-size:.82rem;font-weight:700;color:var(--white);line-height:1.3}
+.prop-card.picked{
+  border-color:var(--gold);
+  background:rgba(255,215,0,.18);
+  box-shadow:0 0 20px rgba(255,215,0,.4);
+}
+.prop-card.picked::after{
+  content:"✓";position:absolute;top:4px;right:6px;
+  color:var(--gold);font-weight:900;
+}
+.prop-card{position:relative}
+.team-name-result{
+  margin-top:14px;
+  background:rgba(0,0,0,.5);
+  border:2px dashed var(--gold);
+  border-radius:14px;
+  padding:14px;text-align:center;
+  font-size:1.2rem;font-weight:900;
+  color:var(--gold);
+  min-height:56px;
+  display:flex;align-items:center;justify-content:center;
+  line-height:1.4;
+}
+
+/* 進度條 */
+.progress-wrap{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(10,14,39,.95);
+  padding:6px 14px;
+  border-top:2px solid rgba(255,215,0,.25);
+  display:flex;align-items:center;gap:10px;
+  z-index:50;
+  font-size:.82rem;
+}
+.progress-bar{
+  flex:1;height:8px;background:rgba(255,255,255,.1);
+  border-radius:6px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--mint),var(--gold));
+  width:0%;transition:width .5s;
+}
+
+/* ====== Small util ====== */
+.center{text-align:center}
+.glow{filter:drop-shadow(0 0 8px var(--gold))}
+.cleared-banner{
+  background:linear-gradient(90deg,rgba(78,205,196,.2),rgba(255,215,0,.2));
+  border:1.5px solid var(--mint);
+  border-radius:14px;
+  padding:10px 14px;
+  text-align:center;
+  margin-top:14px;
+  font-size:.95rem;
+  color:var(--mint);
+  font-weight:700;
+  display:none;
+}
+.cleared-banner.show{display:block;animation:fadeUp .5s}
+
+</style>
+</head>
+<body>
+<div class="stars"></div>
+
+<div class="wrap">
+
+  <!-- ======== 封面 ======== -->
+  <section class="cover">
+    <h1>4-2 平行四邊形大冒險</h1>
+    <div class="sub">★ 拖動頂點 · 解鎖 5 大祕密 · 蒐集英雄徽章 ★</div>
+    <div class="heroes">
+      <div class="hero-chip"><span>🏴‍☠️</span><span>路飛</span></div>
+      <div class="hero-chip"><span>👹</span><span>禰豆子</span></div>
+      <div class="hero-chip"><span>🥜</span><span>安妮亞</span></div>
+      <div class="hero-chip"><span>👁️</span><span>五条悟</span></div>
+      <div class="hero-chip"><span>⚔️</span><span>黃泉雙使</span></div>
+    </div>
+  </section>
+
+  <!-- ======== 關卡選擇條 ======== -->
+  <nav class="stage-bar" id="stageBar">
+    <div class="stage-tab active" data-scene="1"><span class="num">1</span>定義</div>
+    <div class="stage-tab" data-scene="2"><span class="num">2</span>對邊雙胞胎</div>
+    <div class="stage-tab" data-scene="3"><span class="num">3</span>對角小心機</div>
+    <div class="stage-tab" data-scene="4"><span class="num">4</span>對角線交點</div>
+    <div class="stage-tab" data-scene="5"><span class="num">5</span>四三角等積</div>
+    <div class="stage-tab" data-scene="6"><span class="num">★</span>戰隊組合</div>
+  </nav>
+
+  <!-- ======================================== -->
+  <!-- ============ Scene 1：定義 ============ -->
+  <!-- ======================================== -->
+  <section class="scene active" data-scene="1">
+    <div class="scene-grid">
+      <div class="character-card">
+        <div class="avatar">🏴‍☠️</div>
+        <h3>路飛 船長</h3>
+        <div class="role">關卡 1 · 平行四邊形定義</div>
+        <div class="dialogue">
+          欸欸欸！這個四邊形<strong>很神奇</strong>欸 ——<br>
+          不管你怎麼拖，<strong>對邊永遠平行</strong>！<br>
+          這就是 <strong>平行四邊形</strong>。
+        </div>
+        <div class="task-box">用手指拖動 4 個金色頂點，看看 AB ∥ DC、BC ∥ AD 永遠成立！</div>
+      </div>
+
+      <div class="canvas-wrap">
+        <div class="hint">👆 拖動金色點看看</div>
+        <svg class="stage" viewBox="0 0 360 320" id="svg1"></svg>
+      </div>
+
+      <div class="data-panel">
+        <h4>📐 即時觀察</h4>
+        <div class="data-row ab"><span class="label">AB ∥ DC？</span><span class="value" id="d1-par1">是 ✓</span></div>
+        <div class="data-row bc"><span class="label">BC ∥ AD？</span><span class="value" id="d1-par2">是 ✓</span></div>
+        <div class="data-row equal"><span class="label">頂點數量</span><span class="value">4</span></div>
+        <div class="data-row"><span class="label">是否是平行四邊形</span><span class="value" style="color:var(--mint)">YES</span></div>
+      </div>
+    </div>
+
+    <div class="life-strip">
+      <h4>🏠 你家有沒有平行四邊形？</h4>
+      <div class="life-row">
+        <div class="life-chip" data-life="1"><span class="ic">🍽️</span><span class="nm">飯桌</span></div>
+        <div class="life-chip" data-life="1"><span class="ic">📚</span><span class="nm">書架</span></div>
+        <div class="life-chip" data-life="1"><span class="ic">🪁</span><span class="nm">風箏</span></div>
+        <div class="life-chip" data-life="1"><span class="ic">🎀</span><span class="nm">蝴蝶結</span></div>
+        <div class="life-chip" data-life="1"><span class="ic">🚪</span><span class="nm">門</span></div>
+      </div>
+      <div class="life-q">💬 點看看你家有的東西。<strong>跟旁邊夥伴比比看，你們挑的一樣嗎？</strong></div>
+    </div>
+
+    <div class="cleared-banner" id="banner1">✓ 關卡 1 通過！對邊永遠平行就是平行四邊形 ✨</div>
+    <div class="clear-row">
+      <button class="clear-btn" data-clear="1">我懂了！(通關)</button>
+      <button class="clear-btn next" data-next="2">下一關 ▶</button>
+    </div>
+  </section>
+
+  <!-- ======================================== -->
+  <!-- ===== Scene 2：對邊雙胞胎 ===== -->
+  <!-- ======================================== -->
+  <section class="scene" data-scene="2">
+    <div class="scene-grid">
+      <div class="character-card">
+        <div class="avatar">👹</div>
+        <h3>禰豆子</h3>
+        <div class="role">關卡 2 · 對邊雙胞胎</div>
+        <div class="dialogue">
+          嗯～嗯～！(指著)<br>
+          <strong>AB = DC</strong>，<strong>BC = AD</strong> 對邊永遠一樣長！<br>
+          就像我跟炭治郎是兄妹一樣 💕
+        </div>
+        <div class="task-box">拖動頂點，看左右兩組對邊的數字會「一起變」（紫色標籤同步飛入）</div>
+      </div>
+
+      <div class="canvas-wrap">
+        <div class="hint">👆 拖頂點看紫色數字</div>
+        <svg class="stage" viewBox="0 0 360 320" id="svg2"></svg>
+      </div>
+
+      <div class="data-panel">
+        <h4>📏 對邊長度（紫色）</h4>
+        <div class="data-row ab"><span class="label">AB =</span><span class="value" id="d2-ab">—</span></div>
+        <div class="data-row cd"><span class="label">DC =</span><span class="value" id="d2-cd">—</span></div>
+        <div class="data-row equal"><span class="label">AB = DC ?</span><span class="value" id="d2-eq1">✓ 相等</span></div>
+        <div style="height:10px"></div>
+        <div class="data-row bc"><span class="label">BC =</span><span class="value" id="d2-bc">—</span></div>
+        <div class="data-row ad"><span class="label">AD =</span><span class="value" id="d2-ad">—</span></div>
+        <div class="data-row equal"><span class="label">BC = AD ?</span><span class="value" id="d2-eq2">✓ 相等</span></div>
+      </div>
+    </div>
+
+    <div class="life-strip">
+      <h4>🤔 反向思考（系統思考 A2）</h4>
+      <div class="life-q">💬 <strong>如果 AB ≠ DC 會發生什麼？</strong><br>(提示：那它就不是平行四邊形了！變成「梯形」)</div>
+    </div>
+
+    <div class="cleared-banner" id="banner2">✓ 關卡 2 通過！平行四邊形的對邊一樣長 💜</div>
+    <div class="clear-row">
+      <button class="clear-btn" data-clear="2">我懂了！(通關)</button>
+      <button class="clear-btn next" data-next="3">下一關 ▶</button>
+    </div>
+  </section>
+
+  <!-- ======================================== -->
+  <!-- ===== Scene 3：對角小心機 ===== -->
+  <!-- ======================================== -->
+  <section class="scene" data-scene="3">
+    <div class="scene-grid">
+      <div class="character-card">
+        <div class="avatar">🥜</div>
+        <h3>安妮亞</h3>
+        <div class="role">關卡 3 · 對角小心機</div>
+        <div class="dialogue">
+          哇酷哇酷！安妮亞發現了 ——<br>
+          <strong>∠A = ∠C</strong>、<strong>∠B = ∠D</strong><br>
+          對角的度數永遠相同！心電感應！
+        </div>
+        <div class="task-box">拖動頂點，看四個角度，粉紅色(A、C)同步、金色(B、D)同步</div>
+      </div>
+
+      <div class="canvas-wrap">
+        <div class="hint">👆 看四個角度數</div>
+        <svg class="stage" viewBox="0 0 360 320" id="svg3"></svg>
+      </div>
+
+      <div class="data-panel">
+        <h4>📐 角度即時量測</h4>
+        <div class="data-row angA"><span class="label">∠A =</span><span class="value" id="d3-A">—</span></div>
+        <div class="data-row angC"><span class="label">∠C =</span><span class="value" id="d3-C">—</span></div>
+        <div class="data-row equal"><span class="label">∠A = ∠C ?</span><span class="value" id="d3-eq1">✓ 相等</span></div>
+        <div style="height:10px"></div>
+        <div class="data-row angB"><span class="label">∠B =</span><span class="value" id="d3-B">—</span></div>
+        <div class="data-row angD"><span class="label">∠D =</span><span class="value" id="d3-D">—</span></div>
+        <div class="data-row equal"><span class="label">∠B = ∠D ?</span><span class="value" id="d3-eq2">✓ 相等</span></div>
+        <div style="height:10px"></div>
+        <div class="data-row"><span class="label">四角總和</span><span class="value" id="d3-sum" style="color:var(--gold)">360°</span></div>
+      </div>
+    </div>
+
+    <div class="life-strip">
+      <h4>🧠 高層次思考（L4 分析）</h4>
+      <div class="life-q">💬 <strong>∠A + ∠B = ?</strong> 試試把所有頂點都拖一拖，答案會永遠是 <strong>180°</strong>（這叫「鄰角互補」）<br>因為 AB ∥ DC，被 BC 截過去就是同側內角！</div>
+    </div>
+
+    <div class="cleared-banner" id="banner3">✓ 關卡 3 通過！對角永遠相等、鄰角互補 💖</div>
+    <div class="clear-row">
+      <button class="clear-btn" data-clear="3">我懂了！(通關)</button>
+      <button class="clear-btn next" data-next="4">下一關 ▶</button>
+    </div>
+  </section>
+
+  <!-- ======================================== -->
+  <!-- ===== Scene 4：對角線交點 ===== -->
+  <!-- ======================================== -->
+  <section class="scene" data-scene="4">
+    <div class="scene-grid">
+      <div class="character-card">
+        <div class="avatar">👁️</div>
+        <h3>五条悟</h3>
+        <div class="role">關卡 4 · 無量空處</div>
+        <div class="dialogue">
+          看到了嗎？金色那兩條對角線 ——<br>
+          它們的<strong>交點 O</strong>，<br>
+          剛好把兩條對角線都<strong>平分成兩半</strong>！<br>
+          <strong>AO = OC、BO = OD</strong>
+        </div>
+        <div class="task-box">拖動頂點，看 O 點永遠落在兩條對角線中點(金色脈動點)</div>
+      </div>
+
+      <div class="canvas-wrap">
+        <div class="hint">👆 看金色 O 點</div>
+        <svg class="stage" viewBox="0 0 360 320" id="svg4"></svg>
+      </div>
+
+      <div class="data-panel">
+        <h4>✨ 對角線交點 O</h4>
+        <div class="data-row diag"><span class="label">AO =</span><span class="value" id="d4-ao">—</span></div>
+        <div class="data-row diag"><span class="label">OC =</span><span class="value" id="d4-oc">—</span></div>
+        <div class="data-row equal"><span class="label">AO = OC ?</span><span class="value" id="d4-eq1">✓ 相等</span></div>
+        <div style="height:10px"></div>
+        <div class="data-row diag"><span class="label">BO =</span><span class="value" id="d4-bo">—</span></div>
+        <div class="data-row diag"><span class="label">OD =</span><span class="value" id="d4-od">—</span></div>
+        <div class="data-row equal"><span class="label">BO = OD ?</span><span class="value" id="d4-eq2">✓ 相等</span></div>
+      </div>
+    </div>
+
+    <div class="life-strip">
+      <h4>🪁 生活連結</h4>
+      <div class="life-row">
+        <div class="life-chip" data-life="4"><span class="ic">🪁</span><span class="nm">風箏骨架</span></div>
+        <div class="life-chip" data-life="4"><span class="ic">✂️</span><span class="nm">剪刀</span></div>
+        <div class="life-chip" data-life="4"><span class="ic">🎀</span><span class="nm">蝴蝶結</span></div>
+        <div class="life-chip" data-life="4"><span class="ic">📐</span><span class="nm">伸縮架</span></div>
+      </div>
+      <div class="life-q">💬 這些東西的「交叉點」都在<strong>正中間</strong>，跟我們的 O 點一樣！</div>
+    </div>
+
+    <div class="cleared-banner" id="banner4">✓ 關卡 4 通過！兩條對角線互相平分於 O 🌟</div>
+    <div class="clear-row">
+      <button class="clear-btn" data-clear="4">我懂了！(通關)</button>
+      <button class="clear-btn next" data-next="5">下一關 ▶</button>
+    </div>
+  </section>
+
+  <!-- ======================================== -->
+  <!-- ===== Scene 5：四三角等積 ===== -->
+  <!-- ======================================== -->
+  <section class="scene" data-scene="5">
+    <div class="scene-grid">
+      <div class="character-card">
+        <div class="avatar">⚔️</div>
+        <h3>黃泉雙使</h3>
+        <div class="role">關卡 5 · 等面積結界</div>
+        <div class="dialogue">
+          注意了！對角線把平行四邊形<br>
+          切成<strong>4 個薄荷綠三角形</strong>，<br>
+          它們的<strong>面積完全一樣大</strong>！<br>
+          ΔAOB = ΔBOC = ΔCOD = ΔDOA
+        </div>
+        <div class="task-box">拖動頂點，看 4 個三角形面積永遠相等(綠色填色)</div>
+      </div>
+
+      <div class="canvas-wrap">
+        <div class="hint">👆 4 個三角形面積</div>
+        <svg class="stage" viewBox="0 0 360 320" id="svg5"></svg>
+      </div>
+
+      <div class="data-panel">
+        <h4>🟢 三角形面積</h4>
+        <div class="data-row area"><span class="label">ΔAOB =</span><span class="value" id="d5-t1">—</span></div>
+        <div class="data-row area"><span class="label">ΔBOC =</span><span class="value" id="d5-t2">—</span></div>
+        <div class="data-row area"><span class="label">ΔCOD =</span><span class="value" id="d5-t3">—</span></div>
+        <div class="data-row area"><span class="label">ΔDOA =</span><span class="value" id="d5-t4">—</span></div>
+        <div class="data-row equal"><span class="label">四個都相等?</span><span class="value" id="d5-eq">✓ YES</span></div>
+        <div style="height:8px"></div>
+        <div class="data-row"><span class="label">總面積</span><span class="value" id="d5-total" style="color:var(--gold)">—</span></div>
+      </div>
+    </div>
+
+    <div class="life-strip">
+      <h4>🧠 反向思考（L4-L5）</h4>
+      <div class="life-q">💬 <strong>如果只給你「一個」小三角形，你能畫出整個平行四邊形嗎？</strong><br>(可以！只要 ×4 + 把對角線翻轉過去) <strong>跟夥伴比比看你們畫的長什麼樣！</strong></div>
+    </div>
+
+    <div class="cleared-banner" id="banner5">✓ 關卡 5 通過！4 個三角形面積完全相等 💚</div>
+    <div class="clear-row">
+      <button class="clear-btn" data-clear="5">我懂了！(通關)</button>
+      <button class="clear-btn next" data-next="6">最終關 ▶</button>
+    </div>
+  </section>
+
+  <!-- ======================================== -->
+  <!-- ===== Scene 6：戰隊組合（L6 創造） ===== -->
+  <!-- ======================================== -->
+  <section class="scene" data-scene="6">
+    <div class="character-card" style="margin-bottom:14px">
+      <div class="avatar">👑</div>
+      <h3>性平守護者 · 戰隊組合</h3>
+      <div class="role">最終關 · 用 3 張性質卡組合你的戰隊名</div>
+      <div class="dialogue">
+        恭喜你解鎖 5 個祕密！<br>
+        現在 ——<strong>選 3 張你最在乎的性質卡</strong>，<br>
+        系統會幫你產出獨一無二的<strong>戰隊名字</strong>！
+      </div>
+    </div>
+
+    <div class="combo-area">
+      <h4>★ 從 6 張性質卡選 3 張</h4>
+      <div class="prop-cards" id="propCards">
+        <div class="prop-card" data-prop="平行邊"><span class="icon">📏</span><span class="name">對邊平行</span></div>
+        <div class="prop-card" data-prop="等邊"><span class="icon">💜</span><span class="name">對邊等長</span></div>
+        <div class="prop-card" data-prop="同心角"><span class="icon">💖</span><span class="name">對角相等</span></div>
+        <div class="prop-card" data-prop="鄰角補"><span class="icon">🧡</span><span class="name">鄰角互補</span></div>
+        <div class="prop-card" data-prop="交點"><span class="icon">✨</span><span class="name">對角線平分</span></div>
+        <div class="prop-card" data-prop="等積"><span class="icon">🟢</span><span class="name">四三角等積</span></div>
+      </div>
+      <div class="team-name-result" id="teamName">⚡ 點 3 張卡，看你的戰隊名 ⚡</div>
+    </div>
+
+    <div class="life-strip" style="margin-top:18px">
+      <h4>🎖️ 解鎖徽章一覽</h4>
+      <div class="life-row" id="badgeRow"></div>
+      <div class="life-q">💬 通關 5 個關卡 = 拿到 5 個英雄徽章！跟夥伴比比看你拿了幾個！</div>
+    </div>
+
+    <div class="clear-row">
+      <button class="clear-btn" id="finalBtn">🏆 完成大冒險</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- 徽章彈窗 -->
+<div class="badge-pop" id="badgePop">
+  <div class="card">
+    <div class="badge-svg" id="badgeSvg"></div>
+    <h2 id="badgeTitle">徽章解鎖！</h2>
+    <p id="badgeDesc">恭喜你通關！</p>
+    <button class="clear-btn" id="badgeClose">繼續冒險</button>
+  </div>
+</div>
+
+<!-- 進度條 -->
+<div class="progress-wrap">
+  <span>🎖️</span>
+  <span id="progressText">0 / 5</span>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<script>
+/* =================================================== */
+/* ============ 全域：音效 + 狀態管理 ============ */
+/* =================================================== */
+const STORAGE_KEY='parallelogram_quest_v1';
+const state=loadState();
+function loadState(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{cleared:{},lifePicks:{}}}
+  catch(e){return {cleared:{},lifePicks:{}}}
+}
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+
+/* 8-bit beep using Web Audio API */
+let audioCtx=null;
+function beep(freq=440,dur=120,type='square'){
+  try{
+    if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator();
+    const g=audioCtx.createGain();
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(.08,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur/1000);
+    o.connect(g);g.connect(audioCtx.destination);
+    o.start();o.stop(audioCtx.currentTime+dur/1000);
+  }catch(e){}
+}
+function coinSound(){
+  beep(988,80,'square');setTimeout(()=>beep(1319,140,'square'),80);
+}
+function clearSound(){
+  beep(523,80);setTimeout(()=>beep(659,80),80);
+  setTimeout(()=>beep(784,80),160);setTimeout(()=>beep(1047,200),240);
+}
+function dragSound(){beep(220+Math.random()*60,40,'sine')}
+
+/* =================================================== */
+/* ============ 場景切換 ============ */
+/* =================================================== */
+const stageBar=document.getElementById('stageBar');
+stageBar.addEventListener('click',e=>{
+  const t=e.target.closest('.stage-tab');
+  if(!t)return;
+  switchScene(t.dataset.scene);
+});
+document.querySelectorAll('[data-next]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    coinSound();
+    switchScene(b.dataset.next);
+  });
+});
+function switchScene(n){
+  document.querySelectorAll('.scene').forEach(s=>s.classList.toggle('active',s.dataset.scene===n));
+  document.querySelectorAll('.stage-tab').forEach(t=>t.classList.toggle('active',t.dataset.scene===n));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(n==='6')renderBadgeRow();
+}
+
+/* =================================================== */
+/* ============ 通用平行四邊形 SVG 工廠 ============ */
+/* =================================================== */
+/*
+  座標系：viewBox 0 0 360 320
+  4 頂點：A(左下) B(右下) C(右上) D(左上)
+  保持平行四邊形性質：C = B + (D - A)
+  使用者拖動 A、B、D，C 自動計算。
+*/
+class ParaStage{
+  constructor(svgId,opts){
+    this.svg=document.getElementById(svgId);
+    this.opts=opts||{};
+    // 初始頂點
+    this.A={x:80,y:240};
+    this.B={x:280,y:240};
+    this.D={x:130,y:90};
+    // 加入到陣列方便拖曳
+    this.dragTarget=null;
+    this.scale=1; // SVG scale to data unit (px to "unit")
+    this.unit=20; // 1 unit = 20px
+    this.render();
+    this.bindDrag();
+  }
+  get C(){return {x:this.B.x+(this.D.x-this.A.x),y:this.B.y+(this.D.y-this.A.y)}}
+  get O(){return {x:(this.A.x+this.C.x)/2,y:(this.A.y+this.C.y)/2}}
+  dist(p,q){return Math.sqrt((p.x-q.x)**2+(p.y-q.y)**2)}
+  angle(p,center,q){
+    const v1={x:p.x-center.x,y:p.y-center.y};
+    const v2={x:q.x-center.x,y:q.y-center.y};
+    const dot=v1.x*v2.x+v1.y*v2.y;
+    const m1=Math.hypot(v1.x,v1.y);
+    const m2=Math.hypot(v2.x,v2.y);
+    if(m1*m2===0)return 0;
+    let cos=dot/(m1*m2);cos=Math.max(-1,Math.min(1,cos));
+    return Math.acos(cos)*180/Math.PI;
+  }
+  triArea(p,q,r){
+    return Math.abs((p.x*(q.y-r.y)+q.x*(r.y-p.y)+r.x*(p.y-q.y))/2);
+  }
+  toUnit(px){return (px/this.unit).toFixed(1)}
+  render(){
+    const A=this.A,B=this.B,C=this.C,D=this.D,O=this.O;
+    const showAngles=this.opts.showAngles;
+    const showDiag=this.opts.showDiag;
+    const showTris=this.opts.showTris;
+    const showLengths=this.opts.showLengths;
+    const showParallel=this.opts.showParallel;
+
+    let html='';
+
+    /* 三角形填色 (scene 5) */
+    if(showTris){
+      const tris=[
+        {pts:[A,O,B],c:'#4ECDC4'},
+        {pts:[B,O,C],c:'#A8E6CF'},
+        {pts:[C,O,D],c:'#4ECDC4'},
+        {pts:[D,O,A],c:'#A8E6CF'}
+      ];
+      tris.forEach(t=>{
+        html+=`<polygon class="tri-fill" points="${t.pts.map(p=>p.x+','+p.y).join(' ')}" fill="${t.c}"/>`;
+      });
+    }
+
+    /* 對角線 */
+    if(showDiag){
+      html+=`<line class="diag solid" x1="${A.x}" y1="${A.y}" x2="${C.x}" y2="${C.y}"/>`;
+      html+=`<line class="diag solid" x1="${B.x}" y1="${B.y}" x2="${D.x}" y2="${D.y}"/>`;
+    }
+
+    /* 四邊 */
+    html+=`<line class="side purple" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`; // AB
+    html+=`<line class="side sky" x1="${B.x}" y1="${B.y}" x2="${C.x}" y2="${C.y}"/>`;   // BC
+    html+=`<line class="side purple" x1="${D.x}" y1="${D.y}" x2="${C.x}" y2="${C.y}"/>`; // DC
+    html+=`<line class="side sky" x1="${A.x}" y1="${A.y}" x2="${D.x}" y2="${D.y}"/>`;   // AD
+
+    /* 平行符號 (scene 1) */
+    if(showParallel){
+      const midAB={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
+      const midDC={x:(D.x+C.x)/2,y:(D.y+C.y)/2};
+      const midBC={x:(B.x+C.x)/2,y:(B.y+C.y)/2};
+      const midAD={x:(A.x+D.x)/2,y:(A.y+D.y)/2};
+      html+=`<text class="parallel-mark" x="${midAB.x}" y="${midAB.y+18}">▶</text>`;
+      html+=`<text class="parallel-mark" x="${midDC.x}" y="${midDC.y-8}">▶</text>`;
+      html+=`<text class="parallel-mark" x="${midBC.x+12}" y="${midBC.y}" style="fill:#FF6B9D">▶▶</text>`;
+      html+=`<text class="parallel-mark" x="${midAD.x-12}" y="${midAD.y}" style="fill:#FF6B9D">▶▶</text>`;
+    }
+
+    /* 邊長標記 (scene 2) */
+    if(showLengths){
+      const midAB={x:(A.x+B.x)/2,y:(A.y+B.y)/2+18};
+      const midDC={x:(D.x+C.x)/2,y:(D.y+C.y)/2-8};
+      const midBC={x:(B.x+C.x)/2+22,y:(B.y+C.y)/2+4};
+      const midAD={x:(A.x+D.x)/2-22,y:(A.y+D.y)/2+4};
+      html+=`<text class="length-label" x="${midAB.x}" y="${midAB.y}" style="fill:#B967FF">${this.toUnit(this.dist(A,B))}</text>`;
+      html+=`<text class="length-label" x="${midDC.x}" y="${midDC.y}" style="fill:#B967FF">${this.toUnit(this.dist(D,C))}</text>`;
+      html+=`<text class="length-label" x="${midBC.x}" y="${midBC.y}" style="fill:#4A90E2">${this.toUnit(this.dist(B,C))}</text>`;
+      html+=`<text class="length-label" x="${midAD.x}" y="${midAD.y}" style="fill:#4A90E2">${this.toUnit(this.dist(A,D))}</text>`;
+    }
+
+    /* 角弧 + 角度 (scene 3) */
+    if(showAngles){
+      const corners=[
+        {p:A,prev:D,next:B,id:'A',color:'pink'},
+        {p:B,prev:A,next:C,id:'B',color:'yellow'},
+        {p:C,prev:B,next:D,id:'C',color:'pink'},
+        {p:D,prev:C,next:A,id:'D',color:'yellow'}
+      ];
+      corners.forEach(co=>{
+        const ang=this.angle(co.prev,co.p,co.next);
+        const r=22;
+        const a1=Math.atan2(co.prev.y-co.p.y,co.prev.x-co.p.x);
+        const a2=Math.atan2(co.next.y-co.p.y,co.next.x-co.p.x);
+        // 確定畫法
+        const x1=co.p.x+r*Math.cos(a1),y1=co.p.y+r*Math.sin(a1);
+        const x2=co.p.x+r*Math.cos(a2),y2=co.p.y+r*Math.sin(a2);
+        let delta=a2-a1;
+        while(delta>Math.PI)delta-=2*Math.PI;
+        while(delta<-Math.PI)delta+=2*Math.PI;
+        const largeArc=Math.abs(delta)>Math.PI?1:0;
+        const sweep=delta>0?1:0;
+        html+=`<path class="angle-arc ${co.color}" d="M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} ${sweep} ${x2} ${y2} L ${co.p.x} ${co.p.y} Z"/>`;
+        // 角度數值位置 (頂點往中心方向)
+        const cen={x:(A.x+B.x+C.x+D.x)/4,y:(A.y+B.y+C.y+D.y)/4};
+        const dx=cen.x-co.p.x,dy=cen.y-co.p.y;
+        const len=Math.hypot(dx,dy);
+        const lx=co.p.x+(dx/len)*38;
+        const ly=co.p.y+(dy/len)*38;
+        const cl=co.color==='pink'?'#FF6B9D':'#F6E05E';
+        html+=`<text class="angle-label" x="${lx}" y="${ly+4}" style="fill:${cl}">${ang.toFixed(0)}°</text>`;
+      });
+    }
+
+    /* 中點 O (scene 4 + 5) */
+    if(showDiag){
+      html+=`<circle class="center-point" cx="${O.x}" cy="${O.y}" r="7"/>`;
+      html+=`<text class="vertex-label" x="${O.x+14}" y="${O.y-8}" style="fill:#FFD700;font-size:14px">O</text>`;
+    }
+
+    /* 4 頂點 */
+    const labels={A:'A',B:'B',C:'C',D:'D'};
+    const verts=[
+      {p:A,label:'A',dx:-14,dy:8,draggable:true},
+      {p:B,label:'B',dx:14,dy:8,draggable:true},
+      {p:C,label:'C',dx:14,dy:-10,draggable:false},
+      {p:D,label:'D',dx:-14,dy:-10,draggable:true}
+    ];
+    verts.forEach(v=>{
+      html+=`<circle class="vertex" data-v="${v.label}" cx="${v.p.x}" cy="${v.p.y}" r="11" ${v.draggable?'':'style="opacity:.7;cursor:default"'}/>`;
+      html+=`<text class="vertex-label" x="${v.p.x+v.dx}" y="${v.p.y+v.dy}">${v.label}</text>`;
+    });
+
+    this.svg.innerHTML=html;
+  }
+  bindDrag(){
+    let drag=null,offset={x:0,y:0};
+    const getPt=(e)=>{
+      const r=this.svg.getBoundingClientRect();
+      const vb=this.svg.viewBox.baseVal;
+      const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+      const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+      return {x:cx*(vb.width/r.width),y:cy*(vb.height/r.height)};
+    };
+    const onStart=(e)=>{
+      const t=e.target;
+      if(t.classList&&t.classList.contains('vertex')){
+        const v=t.dataset.v;
+        if(v==='C')return;
+        drag=v;
+        const pt=getPt(e);
+        const p=this[v];
+        offset={x:pt.x-p.x,y:pt.y-p.y};
+        e.preventDefault();
+        dragSound();
+      }
+    };
+    const onMove=(e)=>{
+      if(!drag)return;
+      const pt=getPt(e);
+      let nx=pt.x-offset.x,ny=pt.y-offset.y;
+      // 邊界保護
+      nx=Math.max(30,Math.min(330,nx));
+      ny=Math.max(30,Math.min(290,ny));
+      this[drag].x=nx;this[drag].y=ny;
+      // 避免退化：限制最小距離
+      if(this.dist(this.A,this.B)<40||this.dist(this.A,this.D)<40){
+        // 撤銷
+      }
+      this.render();
+      if(this.opts.onUpdate)this.opts.onUpdate(this);
+      e.preventDefault();
+    };
+    const onEnd=()=>{drag=null};
+    this.svg.addEventListener('mousedown',onStart);
+    this.svg.addEventListener('touchstart',onStart,{passive:false});
+    document.addEventListener('mousemove',onMove);
+    document.addEventListener('touchmove',onMove,{passive:false});
+    document.addEventListener('mouseup',onEnd);
+    document.addEventListener('touchend',onEnd);
+  }
+}
+
+/* =================================================== */
+/* ============ Scene 1 初始化 ============ */
+/* =================================================== */
+const stage1=new ParaStage('svg1',{
+  showParallel:true,
+  onUpdate(s){
+    document.getElementById('d1-par1').textContent='是 ✓';
+    document.getElementById('d1-par2').textContent='是 ✓';
+  }
+});
+
+/* =================================================== */
+/* ============ Scene 2 初始化（對邊長度）============ */
+/* =================================================== */
+const stage2=new ParaStage('svg2',{
+  showLengths:true,
+  onUpdate(s){
+    const ab=s.toUnit(s.dist(s.A,s.B));
+    const dc=s.toUnit(s.dist(s.D,s.C));
+    const bc=s.toUnit(s.dist(s.B,s.C));
+    const ad=s.toUnit(s.dist(s.A,s.D));
+    setFly('d2-ab',ab);
+    setFly('d2-cd',dc);
+    setFly('d2-bc',bc);
+    setFly('d2-ad',ad);
+  }
+});
+stage2.opts.onUpdate(stage2);
+
+/* =================================================== */
+/* ============ Scene 3 初始化（角度）============ */
+/* =================================================== */
+const stage3=new ParaStage('svg3',{
+  showAngles:true,
+  onUpdate(s){
+    const A=s.angle(s.D,s.A,s.B).toFixed(0);
+    const B=s.angle(s.A,s.B,s.C).toFixed(0);
+    const C=s.angle(s.B,s.C,s.D).toFixed(0);
+    const D=s.angle(s.C,s.D,s.A).toFixed(0);
+    setFly('d3-A',A+'°');
+    setFly('d3-C',C+'°');
+    setFly('d3-B',B+'°');
+    setFly('d3-D',D+'°');
+    document.getElementById('d3-sum').textContent=(+A+ +B+ +C+ +D).toFixed(0)+'°';
+  }
+});
+stage3.opts.onUpdate(stage3);
+
+/* =================================================== */
+/* ============ Scene 4 初始化（對角線）============ */
+/* =================================================== */
+const stage4=new ParaStage('svg4',{
+  showDiag:true,
+  onUpdate(s){
+    const O=s.O;
+    setFly('d4-ao',s.toUnit(s.dist(s.A,O)));
+    setFly('d4-oc',s.toUnit(s.dist(s.C,O)));
+    setFly('d4-bo',s.toUnit(s.dist(s.B,O)));
+    setFly('d4-od',s.toUnit(s.dist(s.D,O)));
+  }
+});
+stage4.opts.onUpdate(stage4);
+
+/* =================================================== */
+/* ============ Scene 5 初始化（4 三角形）============ */
+/* =================================================== */
+const stage5=new ParaStage('svg5',{
+  showDiag:true,
+  showTris:true,
+  onUpdate(s){
+    const O=s.O;
+    const t1=s.triArea(s.A,O,s.B);
+    const t2=s.triArea(s.B,O,s.C);
+    const t3=s.triArea(s.C,O,s.D);
+    const t4=s.triArea(s.D,O,s.A);
+    const f=v=>(v/(s.unit*s.unit)).toFixed(1);
+    setFly('d5-t1',f(t1));
+    setFly('d5-t2',f(t2));
+    setFly('d5-t3',f(t3));
+    setFly('d5-t4',f(t4));
+    document.getElementById('d5-total').textContent=f(t1+t2+t3+t4);
+  }
+});
+stage5.opts.onUpdate(stage5);
+
+/* =================================================== */
+/* ============ 飛入動畫 helper ============ */
+/* =================================================== */
+function setFly(id,v){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(el.textContent===v)return;
+  el.textContent=v;
+  el.classList.remove('flyin');
+  void el.offsetWidth;
+  el.classList.add('flyin');
+}
+
+/* =================================================== */
+/* ============ 通關按鈕 ============ */
+/* =================================================== */
+document.querySelectorAll('[data-clear]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const n=b.dataset.clear;
+    state.cleared[n]=true;
+    saveState();
+    clearSound();
+    document.getElementById('banner'+n).classList.add('show');
+    document.querySelector('.stage-tab[data-scene="'+n+'"]').classList.add('cleared');
+    updateProgress();
+    showBadge(n);
+  });
+});
+
+/* =================================================== */
+/* ============ 徽章彈窗 ============ */
+/* =================================================== */
+const badgeData={
+  '1':{title:'路飛勳章 · 平行船長',desc:'你掌握了平行四邊形的定義！',color:'#FF6B9D',emoji:'🏴‍☠️'},
+  '2':{title:'禰豆子徽章 · 雙胞胎之眼',desc:'對邊永遠等長，你看到了！',color:'#B967FF',emoji:'👹'},
+  '3':{title:'安妮亞徽章 · 心電感應',desc:'對角同步、鄰角互補，全被你看穿！',color:'#FFD700',emoji:'🥜'},
+  '4':{title:'五条悟徽章 · 無量空處',desc:'對角線交點 O 永遠是中點！',color:'#F6E05E',emoji:'👁️'},
+  '5':{title:'黃泉雙使徽章 · 等積結界',desc:'4 個三角形面積完全相等！',color:'#4ECDC4',emoji:'⚔️'}
+};
+function showBadge(n){
+  const d=badgeData[n];if(!d)return;
+  document.getElementById('badgeTitle').textContent=d.title;
+  document.getElementById('badgeDesc').textContent=d.desc;
+  document.getElementById('badgeSvg').innerHTML=makeBadgeSVG(d.color,d.emoji,n);
+  document.getElementById('badgePop').classList.add('show');
+}
+function makeBadgeSVG(color,emoji,num){
+  return `
+  <svg viewBox="0 0 120 120" width="120" height="120">
+    <defs>
+      <radialGradient id="bg${num}">
+        <stop offset="0" stop-color="${color}" stop-opacity="1"/>
+        <stop offset="1" stop-color="${color}" stop-opacity=".3"/>
+      </radialGradient>
+    </defs>
+    <polygon points="60,8 75,28 100,30 92,55 105,78 80,82 60,108 40,82 15,78 28,55 20,30 45,28"
+      fill="url(#bg${num})" stroke="#FFD700" stroke-width="3"/>
+    <circle cx="60" cy="58" r="28" fill="rgba(0,0,0,.35)" stroke="#FFD700" stroke-width="2"/>
+    <text x="60" y="72" text-anchor="middle" font-size="36">${emoji}</text>
+    <text x="60" y="100" text-anchor="middle" font-size="11" fill="#fff" font-weight="900">LV.${num}</text>
+  </svg>`;
+}
+document.getElementById('badgeClose').addEventListener('click',()=>{
+  document.getElementById('badgePop').classList.remove('show');
+});
+
+/* =================================================== */
+/* ============ 進度條 ============ */
+/* =================================================== */
+function updateProgress(){
+  const cleared=Object.values(state.cleared).filter(Boolean).length;
+  document.getElementById('progressText').textContent=cleared+' / 5';
+  document.getElementById('progressFill').style.width=(cleared/5*100)+'%';
+}
+function restoreCleared(){
+  for(let i=1;i<=5;i++){
+    if(state.cleared[i]){
+      const b=document.getElementById('banner'+i);if(b)b.classList.add('show');
+      const t=document.querySelector('.stage-tab[data-scene="'+i+'"]');if(t)t.classList.add('cleared');
+    }
+  }
+  updateProgress();
+}
+restoreCleared();
+
+/* =================================================== */
+/* ============ 生活連結 picker ============ */
+/* =================================================== */
+document.querySelectorAll('.life-chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    c.classList.toggle('picked');
+    coinSound();
+  });
+});
+
+/* =================================================== */
+/* ============ Scene 6 性質卡組合 L6 ============ */
+/* =================================================== */
+const propCards=document.querySelectorAll('#propCards .prop-card');
+const teamNames={
+  '平行邊':'平行','等邊':'等邊','同心角':'同心','鄰角補':'鄰補','交點':'交點','等積':'等積'
+};
+const adjectives=['無敵','閃電','鋼鐵','金色','彩虹','傳奇'];
+const suffixes=['戰隊','突擊隊','守護者','英雄會','護衛軍','聯盟'];
+propCards.forEach(card=>{
+  card.addEventListener('click',()=>{
+    const picked=document.querySelectorAll('#propCards .prop-card.picked');
+    if(card.classList.contains('picked')){
+      card.classList.remove('picked');
+    }else{
+      if(picked.length>=3){
+        // 取消最先選的
+        picked[0].classList.remove('picked');
+      }
+      card.classList.add('picked');
+      coinSound();
+    }
+    updateTeamName();
+  });
+});
+function updateTeamName(){
+  const picked=Array.from(document.querySelectorAll('#propCards .prop-card.picked'));
+  const box=document.getElementById('teamName');
+  if(picked.length<3){
+    box.innerHTML=`⚡ 再選 ${3-picked.length} 張卡 ⚡`;
+    return;
+  }
+  const keys=picked.map(p=>teamNames[p.dataset.prop]);
+  // 用 seed 產生決定性的選擇
+  const seed=picked.map(p=>p.dataset.prop).join('|').length;
+  const adj=adjectives[seed%adjectives.length];
+  const suf=suffixes[(seed*3)%suffixes.length];
+  const name=`${adj}・${keys.join('×')} ${suf}`;
+  box.innerHTML=`🏆<br>${name}`;
+  clearSound();
+}
+
+/* 徽章一覽 */
+function renderBadgeRow(){
+  const row=document.getElementById('badgeRow');
+  row.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const got=state.cleared[i];
+    const d=badgeData[i];
+    const div=document.createElement('div');
+    div.className='life-chip';
+    div.style.opacity=got?1:.35;
+    div.style.filter=got?'none':'grayscale(.8)';
+    div.innerHTML=`<span class="ic">${d.emoji}</span><span class="nm">${got?'已解鎖':'未解鎖'}</span>`;
+    row.appendChild(div);
+  }
+}
+
+document.getElementById('finalBtn').addEventListener('click',()=>{
+  const cleared=Object.values(state.cleared).filter(Boolean).length;
+  if(cleared<5){
+    alert(`你還有 ${5-cleared} 關沒通關，回去把它們搞定吧！⚡`);
+    return;
+  }
+  clearSound();setTimeout(clearSound,400);
+  alert('🏆 恭喜你完成 4-2 平行四邊形大冒險！\n你已經是「平行四邊形大師」了！\n下節課我們挑戰更難的特殊四邊形 ⭐');
+});
+
+/* 防止 svg 拖曳選取 */
+document.querySelectorAll('svg').forEach(s=>{
+  s.addEventListener('dragstart',e=>e.preventDefault());
+});
+
+</script>
+</body>
+</html>
