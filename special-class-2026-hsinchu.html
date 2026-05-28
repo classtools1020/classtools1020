@@ -9,112 +9,166 @@
 :root{
   --primary:#1565c0;
   --accent:#7c4dff;
+  --accent-deep:#5e35b1;
+  --accent-soft:#ede7f6;
+  --accent-bg:#f7f3ff;
+  --warm:#ff8a65;
+  --warm-soft:#ffe8e0;
+  --sun:#f9a825;
+  --sun-soft:#fff4d6;
   --ink:#2c3e50;
-  --soft:#5a6c7d;
-  --bg:#fafbfc;
-  --line:#e8edf2;
+  --soft:#6b7280;
+  --bg:#fdfaf5;
+  --card:#ffffff;
+  --line:#efe9e0;
 }
 html{scroll-behavior:smooth}
 body{font-family:'Noto Sans TC',-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;font-size:17px;-webkit-font-smoothing:antialiased}
-.container{max-width:920px;margin:0 auto;padding:0 24px}
+.container{max-width:960px;margin:0 auto;padding:0 24px}
 
 /* ===== 頂部導覽 ===== */
-.topnav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,.06);padding:10px 16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.topnav{position:sticky;top:0;z-index:100;background:rgba(253,250,245,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(0,0,0,.05);padding:10px 16px}
 .topnav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.nav-link{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;text-decoration:none;color:var(--soft);font-size:.92em;font-weight:700;transition:all .15s}
-.nav-link:hover{background:#ede7f6;color:var(--accent)}
-.nav-link.active{background:var(--accent);color:#fff}
-.nav-divider{color:#cbd5e0;font-size:.85em}
+.nav-link{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:22px;text-decoration:none;color:var(--soft);font-size:.92em;font-weight:700;transition:all .18s}
+.nav-link:hover{background:var(--accent-soft);color:var(--accent)}
+.nav-link.active{background:var(--accent);color:#fff;box-shadow:0 4px 12px rgba(124,77,255,.25)}
+.nav-divider{color:#d6cfc1;font-size:.85em}
 .nav-spacer{flex:1}
 .nav-ext{font-size:.85em;color:#94a3b8;text-decoration:none}
-.nav-ext:hover{color:var(--primary)}
+.nav-ext:hover{color:var(--accent)}
 @media(max-width:520px){.nav-link{padding:6px 12px;font-size:.85em}.nav-divider{display:none}}
 
 /* ===== Hero ===== */
-.hero{padding:56px 24px 40px;text-align:center;background:linear-gradient(180deg,#ede7f6 0%,var(--bg) 100%)}
-.hero .tag{display:inline-block;background:#fff;color:var(--accent);padding:6px 18px;border-radius:30px;font-size:.88em;font-weight:700;margin-bottom:18px;border:1.5px solid #d1c4e9}
-.hero h1{font-size:2em;font-weight:900;color:var(--accent);letter-spacing:-.8px;margin-bottom:10px;line-height:1.3}
-.hero .lead{font-size:1.05em;color:var(--soft);max-width:560px;margin:0 auto}
+.hero{padding:64px 24px 56px;text-align:center;background:linear-gradient(180deg,#f0e6ff 0%,#fce8df 60%,var(--bg) 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40px;left:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,138,101,.18),transparent 70%);border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(124,77,255,.16),transparent 70%);border-radius:50%}
+.hero-inner{position:relative;z-index:1}
+.hero .tag{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--accent-deep);padding:7px 18px;border-radius:30px;font-size:.88em;font-weight:700;margin-bottom:22px;border:1.5px solid #e1d3ff;box-shadow:0 4px 14px rgba(124,77,255,.08)}
+.hero h1{font-size:2.2em;font-weight:900;color:var(--accent-deep);letter-spacing:-1px;margin-bottom:14px;line-height:1.3}
+.hero .lead{font-size:1.1em;color:var(--soft);max-width:600px;margin:0 auto 18px;line-height:1.85}
+.hero .lead b{color:var(--ink)}
+.hero-note{display:inline-block;background:rgba(255,255,255,.7);padding:8px 18px;border-radius:14px;font-size:.92em;color:var(--soft);margin-top:6px}
+.hero-note span{color:var(--warm);font-weight:800}
 
 /* ===== Section ===== */
-section{padding:48px 0}
-.section-title{font-size:1.5em;font-weight:900;margin-bottom:8px;color:var(--ink);display:flex;align-items:center;gap:10px}
-.section-title .ico{font-size:1.2em}
-.section-sub{color:var(--soft);margin-bottom:24px;font-size:.98em}
+section{padding:56px 0}
+.section-head{margin-bottom:28px}
+.section-title{font-size:1.55em;font-weight:900;margin-bottom:6px;color:var(--ink);display:flex;align-items:center;gap:12px}
+.section-title .ico{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:var(--accent-soft);border-radius:14px;font-size:1.1em}
+.section-sub{color:var(--soft);font-size:1em;margin-left:56px}
+@media(max-width:520px){.section-sub{margin-left:0}}
 
 /* ===== Stats ===== */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.stat{background:#fff;border-radius:16px;padding:22px 18px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-.stat-val{font-size:2.2em;font-weight:900;color:var(--accent);letter-spacing:-1px;line-height:1}
-.stat-val small{font-size:.4em;font-weight:600;color:var(--soft);letter-spacing:0}
-.stat-label{font-size:.88em;color:var(--soft);margin-top:6px;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat{background:var(--card);border-radius:20px;padding:26px 18px;text-align:center;box-shadow:0 4px 18px rgba(124,77,255,.06);border:1px solid var(--line);position:relative;transition:transform .2s}
+.stat:hover{transform:translateY(-2px)}
+.stat-ico{font-size:1.6em;margin-bottom:6px;display:block}
+.stat-val{font-size:2.4em;font-weight:900;color:var(--accent);letter-spacing:-1.5px;line-height:1}
+.stat-val small{font-size:.36em;font-weight:600;color:var(--soft);letter-spacing:0;display:block;margin-top:6px}
+.stat-label{font-size:.92em;color:var(--soft);margin-top:8px;font-weight:700}
+.stat.warm .stat-val{color:var(--warm)}
+.stat.warm{background:linear-gradient(180deg,#fff,var(--warm-soft))}
 @media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
 
-/* ===== 申請資格 ===== */
-.eligibility{background:#fff;border-radius:18px;padding:28px 32px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-.elig-row{display:flex;gap:14px;padding:12px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
-.elig-row:last-child{border-bottom:none}
-.elig-num{flex:0 0 36px;height:36px;border-radius:50%;background:#ede7f6;color:var(--accent);font-weight:900;display:flex;align-items:center;justify-content:center;font-size:1em}
-.elig-body{flex:1;line-height:1.6}
-.elig-body b{color:var(--ink)}
-.elig-body .small{display:block;color:var(--soft);font-size:.9em;margin-top:2px}
+/* ===== 申請資格 條件卡 ===== */
+.elig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.elig-card{background:var(--card);border-radius:20px;padding:24px 22px;box-shadow:0 4px 18px rgba(0,0,0,.04);border:1px solid var(--line);border-top:4px solid var(--accent);position:relative}
+.elig-card .check{position:absolute;top:-14px;right:18px;width:36px;height:36px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.05em;box-shadow:0 4px 12px rgba(124,77,255,.3)}
+.elig-card h3{font-size:1.08em;font-weight:900;color:var(--ink);margin-bottom:10px;line-height:1.4}
+.elig-card .desc{font-size:.95em;color:var(--soft);line-height:1.7}
+.elig-card .desc b{color:var(--accent-deep)}
+.elig-note{margin-top:18px;background:var(--sun-soft);border-radius:14px;padding:14px 18px;font-size:.92em;color:#7a5c00;display:flex;gap:10px;align-items:flex-start}
+.elig-note .n-ico{flex-shrink:0;font-size:1.2em}
+@media(max-width:720px){.elig-grid{grid-template-columns:1fr}}
 
-/* ===== 學校卡 ===== */
-.schools{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-.school{background:#fff;border-radius:18px;padding:24px 26px;box-shadow:0 2px 10px rgba(0,0,0,.05);border-top:5px solid var(--accent);transition:all .2s;position:relative}
-.school:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
-.school-type{display:inline-block;font-size:.72em;padding:3px 10px;border-radius:10px;background:#ede7f6;color:var(--accent);font-weight:800;margin-bottom:8px}
-.school-name{font-size:1.2em;font-weight:900;color:var(--ink);margin-bottom:14px}
-.school-dept{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#faf7ff;border-radius:10px;margin-bottom:8px}
-.dept-name{font-weight:700;color:var(--ink);font-size:.98em}
-.dept-skill{font-size:.78em;color:var(--soft);margin-top:2px}
-.dept-quota{font-weight:900;color:var(--accent);font-size:1.3em;line-height:1;white-space:nowrap;margin-left:10px}
-.dept-quota small{font-size:.55em;font-weight:600;color:var(--soft);margin-left:2px}
-@media(max-width:640px){.schools{grid-template-columns:1fr}}
+/* ===== 學校比較表 ===== */
+.compare-wrap{background:var(--card);border-radius:22px;padding:8px;box-shadow:0 4px 18px rgba(0,0,0,.05);border:1px solid var(--line);overflow:hidden}
+.compare-head{display:grid;grid-template-columns:1.6fr 1fr 1.8fr .9fr;gap:14px;padding:14px 20px;background:var(--accent-bg);border-radius:14px;font-size:.82em;font-weight:800;color:var(--accent-deep);letter-spacing:.5px}
+.compare-row{display:grid;grid-template-columns:1.6fr 1fr 1.8fr .9fr;gap:14px;padding:18px 20px;border-bottom:1px solid var(--line);align-items:center;transition:background .15s}
+.compare-row:last-child{border-bottom:none}
+.compare-row:hover{background:#faf8f4}
+.cmp-school{display:flex;align-items:center;gap:10px}
+.cmp-school .badge{display:inline-block;font-size:.7em;padding:2px 8px;border-radius:8px;font-weight:800;flex-shrink:0;margin-bottom:4px}
+.cmp-school .badge.public{background:#e0f2fe;color:#0369a1}
+.cmp-school .badge.private{background:#fef3c7;color:#a16207}
+.cmp-name{font-weight:800;color:var(--ink);font-size:1.02em;line-height:1.3}
+.cmp-type{color:var(--soft);font-size:.92em;font-weight:600}
+.cmp-dept{font-weight:700;color:var(--ink);font-size:.95em}
+.cmp-skills{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.cmp-skills .tag{font-size:.74em;padding:3px 9px;border-radius:8px;background:var(--accent-soft);color:var(--accent-deep);font-weight:700;white-space:nowrap}
+.cmp-quota{font-weight:900;font-size:1.7em;color:var(--accent);text-align:right;line-height:1;white-space:nowrap}
+.cmp-quota small{font-size:.42em;font-weight:600;color:var(--soft);margin-left:2px}
 
-/* ===== 時間軸 ===== */
-.timeline{background:#fff;border-radius:18px;padding:28px 32px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-.tl-item{display:grid;grid-template-columns:120px 1fr;gap:20px;padding:16px 0;border-bottom:1px solid var(--line);align-items:center;position:relative}
-.tl-item:last-child{border-bottom:none}
-.tl-item.key{background:linear-gradient(90deg,#faf7ff 0%,#fff 100%);margin:0 -16px;padding:16px;border-radius:10px;border-bottom:none}
-.tl-date{font-weight:900;color:var(--accent);font-size:1em}
-.tl-date small{display:block;font-size:.7em;color:var(--soft);font-weight:600}
-.tl-event{font-size:1.02em;color:var(--ink);font-weight:600}
-.tl-event small{display:block;color:var(--soft);font-size:.85em;font-weight:500;margin-top:2px}
-
-@media(max-width:640px){.tl-item{grid-template-columns:90px 1fr;gap:14px}}
+@media(max-width:720px){
+  .compare-head{display:none}
+  .compare-wrap{padding:0;background:transparent;box-shadow:none;border:none}
+  .compare-row{grid-template-columns:1fr;gap:10px;padding:18px 20px;background:#fff;border-radius:16px;border:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:10px;box-shadow:0 4px 14px rgba(0,0,0,.04)}
+  .compare-row:last-child{margin-bottom:0}
+  .cmp-type{display:none}
+  .cmp-quota{text-align:left;font-size:1.5em;background:var(--accent-soft);padding:10px 16px;border-radius:12px;color:var(--accent-deep)}
+  .cmp-quota::after{content:' 個名額';font-size:.5em;font-weight:700;color:var(--soft);margin-left:6px}
+  .cmp-quota small{display:none}
+}
 
 /* ===== 流程圖 ===== */
-.process{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:8px 0 28px}
-.step{background:#fff;border-radius:12px;padding:18px 12px;text-align:center;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-.step-num{font-size:.72em;color:var(--accent);font-weight:800;letter-spacing:1px}
-.step-icon{font-size:1.8em;margin:6px 0}
-.step-title{font-size:.92em;font-weight:800;color:var(--ink);line-height:1.3}
-.step-date{font-size:.75em;color:var(--soft);margin-top:4px;font-weight:600}
-.step::after{content:'';position:absolute;right:-5px;top:50%;width:10px;height:2px;background:#cbd5e0;z-index:1}
+.process{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.step{background:var(--card);border-radius:18px;padding:22px 14px;text-align:center;position:relative;box-shadow:0 4px 14px rgba(0,0,0,.04);border:1px solid var(--line);transition:transform .2s}
+.step:hover{transform:translateY(-3px);border-color:var(--accent)}
+.step-num{font-size:.72em;color:var(--accent);font-weight:800;letter-spacing:1.5px}
+.step-icon{font-size:2.2em;margin:8px 0;display:block;line-height:1.1}
+.step-title{font-size:.96em;font-weight:800;color:var(--ink);line-height:1.3;margin-top:4px}
+.step-date{font-size:.78em;color:var(--soft);margin-top:8px;font-weight:600;background:var(--accent-bg);display:inline-block;padding:3px 10px;border-radius:10px}
+.step::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:#cbb8e8;font-weight:900;z-index:1;font-size:1.2em}
 .step:last-child::after{display:none}
-@media(max-width:640px){
-  .process{grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:720px){
+  .process{grid-template-columns:1fr 1fr;gap:10px}
   .step::after{display:none}
 }
 
+/* ===== 時間軸（月份分組） ===== */
+.tl-month-block{margin-bottom:20px}
+.tl-month-tag{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#fff;padding:8px 18px;border-radius:14px;font-weight:900;font-size:.95em;margin-bottom:10px;box-shadow:0 4px 12px rgba(124,77,255,.25)}
+.tl-month-tag .dot{width:6px;height:6px;background:#fff;border-radius:50%;opacity:.85}
+.tl-events{background:var(--card);border-radius:18px;padding:6px 20px;box-shadow:0 4px 18px rgba(0,0,0,.04);border:1px solid var(--line)}
+.tl-item{display:grid;grid-template-columns:130px 1fr auto;gap:18px;padding:16px 4px;border-bottom:1px dashed var(--line);align-items:center}
+.tl-item:last-child{border-bottom:none}
+.tl-date{font-weight:800;color:var(--ink);font-size:1em}
+.tl-event{font-size:1em;color:var(--ink);font-weight:600;line-height:1.5}
+.tl-event small{display:block;color:var(--soft);font-size:.84em;font-weight:500;margin-top:3px}
+.tl-flag{display:inline-block;font-size:.7em;padding:4px 11px;border-radius:10px;font-weight:800;letter-spacing:.5px;white-space:nowrap}
+.tl-flag.key{background:var(--warm-soft);color:#c4360e}
+.tl-flag.note{background:var(--accent-soft);color:var(--accent-deep)}
+@media(max-width:640px){
+  .tl-item{grid-template-columns:90px 1fr;gap:12px}
+  .tl-flag{grid-column:2;justify-self:start;margin-top:4px}
+  .tl-date{font-size:.92em}
+}
+
+/* ===== 結尾溫馨提示 ===== */
+.warm-end{background:linear-gradient(135deg,var(--warm-soft) 0%,#fff5ec 100%);border-radius:22px;padding:34px 28px;text-align:center;border:1px solid #ffd5c4}
+.warm-end .em{font-size:2em;display:block;margin-bottom:10px}
+.warm-end p{font-size:1.05em;color:#4a3a2e;line-height:1.9;max-width:620px;margin:0 auto}
+.warm-end p b{color:var(--warm)}
+
 /* ===== 頁面切換 ===== */
-.page-nav-wrap{padding:40px 0 80px;background:linear-gradient(180deg,var(--bg) 0%,#ede7f6 100%)}
+.page-nav-wrap{padding:48px 0 80px;background:linear-gradient(180deg,var(--bg) 0%,#f0e6ff 100%)}
 .page-nav{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:760px;margin:0 auto}
 .pn-card{display:flex;align-items:center;gap:14px;padding:22px 26px;background:#fff;border-radius:20px;box-shadow:0 4px 18px rgba(0,0,0,.06);text-decoration:none;color:var(--ink);transition:all .25s;border:2px solid transparent}
-.pn-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(124,77,255,.15);border-color:var(--accent)}
+.pn-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(124,77,255,.18);border-color:var(--accent)}
 .pn-card.pn-current{background:linear-gradient(135deg,#7c4dff,#5e35b1);color:#fff;cursor:default}
-.pn-card.pn-current:hover{transform:none}
+.pn-card.pn-current:hover{transform:none;border-color:transparent}
 .pn-emoji{font-size:2.4em;flex-shrink:0;line-height:1}
 .pn-text strong{display:block;font-size:1.15em;font-weight:900;margin-bottom:2px}
 .pn-text small{display:block;font-size:.85em;opacity:.78;font-weight:500}
 .pn-arrow{font-size:1.4em;color:var(--accent);font-weight:300;transition:transform .25s;margin-left:auto}
 .pn-card:hover .pn-arrow{transform:translateX(6px)}
+.pn-card.pn-current .pn-arrow{color:rgba(255,255,255,.6)}
 @media(max-width:640px){.page-nav{grid-template-columns:1fr}}
 
 /* ===== Footer ===== */
-footer{padding:32px 24px;text-align:center;color:var(--soft);font-size:.88em;line-height:2;border-top:1px solid var(--line);background:#fff}
-footer a{color:var(--accent);text-decoration:none}
+footer{padding:36px 24px;text-align:center;color:var(--soft);font-size:.88em;line-height:2;border-top:1px solid var(--line);background:#fff}
+footer a{color:var(--accent);text-decoration:none;font-weight:700}
+footer a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -134,19 +188,41 @@ footer a{color:var(--accent);text-decoration:none}
 
 <!-- Hero -->
 <div class="hero">
-  <div class="tag">115 學年度 · 新竹區 · 給家長</div>
-  <h1>集中式特殊教育班<br>綜合職能科 安置介紹</h1>
-  <p class="lead">適合輕度／中度智能障礙、或伴隨智能障礙之自閉症等學生<br>不用會考，能力評估後分發</p>
+  <div class="hero-inner">
+    <div class="tag">🌸 115 學年度 · 新竹區 · 給家長</div>
+    <h1>集中式特殊教育班<br>綜合職能科 安置介紹</h1>
+    <p class="lead">
+      適合 <b>輕度／中度智能障礙</b>，<br>
+      或 <b>伴隨智能障礙的自閉症</b> 等學生
+    </p>
+    <div class="hero-note">不用會考　🌟　<span>能力評估後分發</span></div>
+  </div>
 </div>
 
-<!-- 數據 -->
+<!-- 數據摘要 -->
 <section>
   <div class="container">
     <div class="stats">
-      <div class="stat"><div class="stat-val">4</div><div class="stat-label">所學校</div></div>
-      <div class="stat"><div class="stat-val">70</div><div class="stat-label">總名額</div></div>
-      <div class="stat"><div class="stat-val">2</div><div class="stat-label">科別類型</div></div>
-      <div class="stat"><div class="stat-val">5/4<small>～5/11</small></div><div class="stat-label">唱名分發</div></div>
+      <div class="stat">
+        <span class="stat-ico">🏫</span>
+        <div class="stat-val">4</div>
+        <div class="stat-label">所開缺學校</div>
+      </div>
+      <div class="stat">
+        <span class="stat-ico">🎯</span>
+        <div class="stat-val">70</div>
+        <div class="stat-label">總名額</div>
+      </div>
+      <div class="stat">
+        <span class="stat-ico">📚</span>
+        <div class="stat-val">2</div>
+        <div class="stat-label">科別類型</div>
+      </div>
+      <div class="stat warm">
+        <span class="stat-ico">📢</span>
+        <div class="stat-val">5/4<small>～ 5/11 唱名</small></div>
+        <div class="stat-label">關鍵日期</div>
+      </div>
     </div>
   </div>
 </section>
@@ -154,31 +230,32 @@ footer a{color:var(--accent);text-decoration:none}
 <!-- 申請資格 -->
 <section>
   <div class="container">
-    <h2 class="section-title"><span class="ico">✅</span>誰可以申請</h2>
-    <p class="section-sub">須同時符合下列 3 個條件</p>
+    <div class="section-head">
+      <h2 class="section-title"><span class="ico">✅</span>誰可以申請</h2>
+      <p class="section-sub">需 <b>同時符合</b> 下列 3 個條件</p>
+    </div>
 
-    <div class="eligibility">
-      <div class="elig-row">
-        <div class="elig-num">1</div>
-        <div class="elig-body">
-          <b>年齡 21 歲以下</b>
-          <span class="small">應屆畢業生不受年齡限制</span>
-        </div>
+    <div class="elig-grid">
+      <div class="elig-card">
+        <div class="check">1</div>
+        <h3>🎂 年齡 21 歲以下</h3>
+        <p class="desc"><b>應屆畢業生</b>不受年齡限制</p>
       </div>
-      <div class="elig-row">
-        <div class="elig-num">2</div>
-        <div class="elig-body">
-          <b>持有鑑輔會核發的鑑定證明</b>
-          <span class="small">智能障礙 ／ 自閉症伴隨智能障礙 ／ 其他障礙伴隨智能障礙</span>
-        </div>
+      <div class="elig-card">
+        <div class="check">2</div>
+        <h3>📄 持鑑輔會鑑定證明</h3>
+        <p class="desc">智能障礙 ／<br>自閉症伴隨智能障礙 ／<br>其他障礙伴隨智能障礙</p>
       </div>
-      <div class="elig-row">
-        <div class="elig-num">3</div>
-        <div class="elig-body">
-          <b>具輕度或中度智能障礙</b>
-          <span class="small">114 年 12 月 31 日前已於特教通報網登錄</span>
-        </div>
+      <div class="elig-card">
+        <div class="check">3</div>
+        <h3>🧩 具輕度或中度智能障礙</h3>
+        <p class="desc">需於 <b>114 年 12 月 31 日前</b><br>已於特教通報網登錄</p>
       </div>
+    </div>
+
+    <div class="elig-note">
+      <span class="n-ico">💡</span>
+      <div>三個條件 <b>缺一不可</b>。如果不確定是否符合，建議先聯絡孩子目前學校的特教組或輔導室確認。</div>
     </div>
   </div>
 </section>
@@ -186,57 +263,88 @@ footer a{color:var(--accent);text-decoration:none}
 <!-- 新竹區開缺學校 -->
 <section>
   <div class="container">
-    <h2 class="section-title"><span class="ico">🏫</span>新竹區開缺學校</h2>
-    <p class="section-sub">115 學年度共 4 所學校 · 70 個名額</p>
+    <div class="section-head">
+      <h2 class="section-title"><span class="ico">🏫</span>新竹區開缺學校</h2>
+      <p class="section-sub">115 學年度共 <b>4 所學校</b> · <b>70 個名額</b></p>
+    </div>
 
-    <div class="schools">
-
-      <div class="school">
-        <div class="school-type">國立</div>
-        <div class="school-name">國立新竹高工</div>
-        <div class="school-dept">
-          <div>
-            <div class="dept-name">餐飲服務科</div>
-          </div>
-          <div class="dept-quota">28<small>名</small></div>
-        </div>
+    <div class="compare-wrap">
+      <div class="compare-head">
+        <div>學校</div>
+        <div>性質</div>
+        <div>科別／技能</div>
+        <div style="text-align:right">名額</div>
       </div>
 
-      <div class="school">
-        <div class="school-type">國立</div>
-        <div class="school-name">國立陽明交大附中</div>
-        <div class="school-dept">
+      <div class="compare-row">
+        <div class="cmp-school">
           <div>
-            <div class="dept-name">門市服務科</div>
+            <span class="badge public">國立</span>
+            <div class="cmp-name">新竹高工</div>
           </div>
-          <div class="dept-quota">14<small>名</small></div>
         </div>
+        <div class="cmp-type">國立</div>
+        <div>
+          <div class="cmp-dept">餐飲服務科</div>
+          <div class="cmp-skills">
+            <span class="tag">🍽 餐飲服務</span>
+          </div>
+        </div>
+        <div class="cmp-quota">28<small>名</small></div>
       </div>
 
-      <div class="school">
-        <div class="school-type">國立</div>
-        <div class="school-name">國立關西高中</div>
-        <div class="school-dept">
+      <div class="compare-row">
+        <div class="cmp-school">
           <div>
-            <div class="dept-name">綜合職能科</div>
-            <div class="dept-skill">車輛整理技能・產品加工技能</div>
+            <span class="badge public">國立</span>
+            <div class="cmp-name">陽明交大附中</div>
           </div>
-          <div class="dept-quota">14<small>名</small></div>
         </div>
+        <div class="cmp-type">國立</div>
+        <div>
+          <div class="cmp-dept">門市服務科</div>
+          <div class="cmp-skills">
+            <span class="tag">🛒 門市服務</span>
+          </div>
+        </div>
+        <div class="cmp-quota">14<small>名</small></div>
       </div>
 
-      <div class="school">
-        <div class="school-type">私立</div>
-        <div class="school-name">私立東泰高中</div>
-        <div class="school-dept">
+      <div class="compare-row">
+        <div class="cmp-school">
           <div>
-            <div class="dept-name">綜合職能科</div>
-            <div class="dept-skill">車輛整理技能・餐飲製作技能</div>
+            <span class="badge public">國立</span>
+            <div class="cmp-name">關西高中</div>
           </div>
-          <div class="dept-quota">14<small>名</small></div>
         </div>
+        <div class="cmp-type">國立</div>
+        <div>
+          <div class="cmp-dept">綜合職能科</div>
+          <div class="cmp-skills">
+            <span class="tag">🚗 車輛整理</span>
+            <span class="tag">📦 產品加工</span>
+          </div>
+        </div>
+        <div class="cmp-quota">14<small>名</small></div>
       </div>
 
+      <div class="compare-row">
+        <div class="cmp-school">
+          <div>
+            <span class="badge private">私立</span>
+            <div class="cmp-name">東泰高中</div>
+          </div>
+        </div>
+        <div class="cmp-type">私立</div>
+        <div>
+          <div class="cmp-dept">綜合職能科</div>
+          <div class="cmp-skills">
+            <span class="tag">🚗 車輛整理</span>
+            <span class="tag">🍱 餐飲製作</span>
+          </div>
+        </div>
+        <div class="cmp-quota">14<small>名</small></div>
+      </div>
     </div>
   </div>
 </section>
@@ -244,8 +352,10 @@ footer a{color:var(--accent);text-decoration:none}
 <!-- 流程 5 步 -->
 <section>
   <div class="container">
-    <h2 class="section-title"><span class="ico">🛤</span>申請流程 5 步驟</h2>
-    <p class="section-sub">從報名到報到，一條龍進行</p>
+    <div class="section-head">
+      <h2 class="section-title"><span class="ico">🛤️</span>申請流程 5 步驟</h2>
+      <p class="section-sub">從報名到報到，學校會陪你一起走</p>
+    </div>
 
     <div class="process">
       <div class="step">
@@ -282,49 +392,95 @@ footer a{color:var(--accent);text-decoration:none}
   </div>
 </section>
 
-<!-- 完整時間表 -->
+<!-- 完整時間表（月份分組） -->
 <section>
   <div class="container">
-    <h2 class="section-title"><span class="ico">📅</span>完整時間表</h2>
-    <p class="section-sub">不要錯過任何一個關鍵日期</p>
+    <div class="section-head">
+      <h2 class="section-title"><span class="ico">📅</span>完整時程表</h2>
+      <p class="section-sub">關鍵日期已標紅，記得設提醒</p>
+    </div>
 
-    <div class="timeline">
-      <div class="tl-item key">
-        <div class="tl-date">2/23–3/3<small>114→115 年</small></div>
-        <div class="tl-event">網路報名<small>由國中辦理</small></div>
+    <div class="tl-month-block">
+      <div class="tl-month-tag"><span class="dot"></span>2 ～ 3 月　報名階段</div>
+      <div class="tl-events">
+        <div class="tl-item">
+          <div class="tl-date">2/23 → 3/3</div>
+          <div class="tl-event">網路報名<small>由國中辦理，家長提供資料配合</small></div>
+          <span class="tl-flag key">📌 重點</span>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">3/4 → 3/9</div>
+          <div class="tl-event">紙本送件<small>送至縣市政府教育局</small></div>
+          <span class="tl-flag note">學校</span>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">3/31 前</div>
+          <div class="tl-event">能力評估通知單寄發</div>
+          <span class="tl-flag note">收信</span>
+        </div>
       </div>
-      <div class="tl-item">
-        <div class="tl-date">3/4–3/9</div>
-        <div class="tl-event">紙本送件<small>送縣市政府教育局</small></div>
+    </div>
+
+    <div class="tl-month-block">
+      <div class="tl-month-tag"><span class="dot"></span>4 月　能力評估</div>
+      <div class="tl-events">
+        <div class="tl-item">
+          <div class="tl-date">4/11（六）</div>
+          <div class="tl-event">能力評估<small>基本學習能力 ＋ 職業能力</small></div>
+          <span class="tl-flag key">📌 重點</span>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">4/20</div>
+          <div class="tl-event">評估結果通知</div>
+          <span class="tl-flag note">收信</span>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">4/27 前</div>
+          <div class="tl-event">如需複查請申請</div>
+          <span class="tl-flag note">可選</span>
+        </div>
       </div>
-      <div class="tl-item">
-        <div class="tl-date">3/31 前</div>
-        <div class="tl-event">能力評估通知單寄發</div>
+    </div>
+
+    <div class="tl-month-block">
+      <div class="tl-month-tag"><span class="dot"></span>5 月　唱名分發</div>
+      <div class="tl-events">
+        <div class="tl-item">
+          <div class="tl-date">5/4 → 5/11</div>
+          <div class="tl-event">唱名分發<small>家長須親自到場，或委託代理人</small></div>
+          <span class="tl-flag key">📌 重點</span>
+        </div>
       </div>
-      <div class="tl-item key">
-        <div class="tl-date">4/11<small>星期六</small></div>
-        <div class="tl-event">能力評估<small>基本學習能力＋職業能力</small></div>
+    </div>
+
+    <div class="tl-month-block">
+      <div class="tl-month-tag"><span class="dot"></span>6 月　結果與報到</div>
+      <div class="tl-events">
+        <div class="tl-item">
+          <div class="tl-date">6/1</div>
+          <div class="tl-event">公告安置結果</div>
+          <span class="tl-flag key">📌 重點</span>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">6/10 → 6/15</div>
+          <div class="tl-event">安置學生報到</div>
+          <span class="tl-flag key">📌 重點</span>
+        </div>
       </div>
-      <div class="tl-item">
-        <div class="tl-date">4/20</div>
-        <div class="tl-event">評估結果通知</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-date">4/27 前</div>
-        <div class="tl-event">如需複查請申請</div>
-      </div>
-      <div class="tl-item key">
-        <div class="tl-date">5/4–5/11</div>
-        <div class="tl-event">唱名分發<small>家長須親自到場或委託代理</small></div>
-      </div>
-      <div class="tl-item key">
-        <div class="tl-date">6/1</div>
-        <div class="tl-event">公告安置結果</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-date">6/10–6/15</div>
-        <div class="tl-event">安置學生報到</div>
-      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 結尾溫馨提示 -->
+<section style="padding-top:0">
+  <div class="container">
+    <div class="warm-end">
+      <span class="em">🌷</span>
+      <p>
+        每個孩子都有自己的步調，<br>
+        這條路不孤單 ── <b>學校老師、特教中心、輔導室</b> 都會一起陪伴。<br>
+        如果有任何疑問，隨時都可以聯絡孩子現在的學校特教組詢問喔！
+      </p>
     </div>
   </div>
 </section>
@@ -347,6 +503,7 @@ footer a{color:var(--accent);text-decoration:none}
           <strong>集中式特教班</strong>
           <small>您正在這頁</small>
         </span>
+        <span class="pn-arrow">✓</span>
       </a>
     </div>
   </div>
