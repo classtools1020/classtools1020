@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>平行四邊形大冒險 · 5 英雄解封印 (5/29)</title>
+<style>
+  :root {
+    --bg-dark: #0F1729;
+    --bg-mid: #1B2745;
+    --primary: #5B6FE8;
+    --primary-soft: #A8B5E8;
+    --gold: #FFC93C;
+    --gold-soft: #FFE066;
+    --accent: #FF6B9D;
+    --success: #4ADE80;
+    --success-soft: #BBF7D0;
+    --warning: #FB923C;
+    --danger: #EF4444;
+    --text: #F5F7FA;
+    --text-dim: #94A3B8;
+    --L1-color: #5B9DD9;
+    --L2-color: #FF8FA3;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+  html,body{font-family:'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;background:var(--bg-dark);color:var(--text);min-height:100vh;overflow-x:hidden}
+  body{background:radial-gradient(ellipse at top,#1B2745 0%,#0F1729 80%);background-attachment:fixed}
+
+  .app{max-width:780px;margin:0 auto;padding:16px;min-height:100vh}
+
+  /* HUD */
+  .hud{display:flex;justify-content:space-between;align-items:center;background:rgba(91,111,232,0.15);border:2px solid var(--primary);border-radius:14px;padding:10px 16px;margin-bottom:14px;backdrop-filter:blur(6px)}
+  .hud-left{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .hud-nick{font-weight:700;color:var(--gold-soft);font-size:15px}
+  .hud-stat{display:flex;align-items:center;gap:4px;font-size:14px;color:var(--primary-soft)}
+  .hud-stat .icon{font-size:18px}
+  .hud-coins{color:var(--gold)}
+
+  /* Progress dots */
+  .progress{display:flex;gap:6px}
+  .pdot{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.1);border:2px solid var(--primary-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary-soft)}
+  .pdot.done{background:var(--success);border-color:var(--success);color:white}
+  .pdot.active{background:var(--gold);border-color:var(--gold);color:#222;transform:scale(1.15);box-shadow:0 0 14px var(--gold)}
+
+  /* Card */
+  .card{background:linear-gradient(180deg,rgba(91,111,232,0.12) 0%,rgba(27,39,69,0.6) 100%);border:2px solid var(--primary);border-radius:20px;padding:22px;backdrop-filter:blur(8px);box-shadow:0 8px 32px rgba(91,111,232,0.2);animation:cardIn 0.4s ease}
+  @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  h1{font-size:clamp(22px,5.5vw,30px);color:var(--gold);text-align:center;letter-spacing:1.5px;margin-bottom:6px;text-shadow:0 0 16px rgba(255,201,60,0.4)}
+  h2{font-size:clamp(18px,4.6vw,22px);color:var(--gold-soft);margin-bottom:10px}
+  h3{font-size:clamp(16px,4vw,19px);color:var(--primary-soft);margin-bottom:8px}
+  .subtitle{text-align:center;color:var(--text-dim);font-size:14px;margin-bottom:14px}
+
+  /* Buttons */
+  .btn{min-height:52px;padding:12px 22px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--primary) 0%,#7B8DFF 100%);color:white;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;box-shadow:0 4px 14px rgba(91,111,232,0.4);min-width:120px}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(91,111,232,0.6)}
+  .btn:active{transform:translateY(0)}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+  .btn-gold{background:linear-gradient(135deg,var(--gold) 0%,#FFD970 100%);color:#222;box-shadow:0 4px 14px rgba(255,201,60,0.5)}
+  .btn-gold:hover{box-shadow:0 6px 20px rgba(255,201,60,0.8)}
+  .btn-ghost{background:transparent;border:2px solid var(--primary-soft);color:var(--primary-soft);box-shadow:none}
+  .btn-ghost:hover{background:rgba(91,111,232,0.15);color:white}
+  .btn-warning{background:linear-gradient(135deg,var(--warning) 0%,#FBBF24 100%);color:#222}
+
+  /* Input */
+  .input{width:100%;padding:14px 18px;background:rgba(255,255,255,0.08);border:2px solid var(--primary-soft);border-radius:12px;font-size:18px;color:var(--text);font-family:inherit;text-align:center}
+  .input:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,0.12)}
+  .input::placeholder{color:var(--text-dim)}
+
+  /* Quiz Q + options */
+  .qtitle{font-size:clamp(17px,4.4vw,21px);font-weight:700;line-height:1.5;color:var(--gold-soft);margin:18px 0 8px;text-align:center}
+  .qhint{font-size:14px;color:var(--text-dim);text-align:center;margin-bottom:14px}
+
+  .stage-wrap{background:rgba(255,255,255,0.05);border:1px dashed rgba(168,181,232,0.3);border-radius:14px;padding:14px;margin:14px 0;overflow:hidden}
+  .stage{width:100%;height:auto;display:block}
+
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px}
+  .opt{min-height:60px;padding:14px 14px;background:rgba(91,111,232,0.18);border:2px solid var(--primary-soft);border-radius:12px;color:var(--text);font-size:16px;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;text-align:center;line-height:1.4}
+  .opt:hover{background:rgba(91,111,232,0.35);border-color:var(--gold-soft)}
+  .opt.correct{background:rgba(74,222,128,0.3);border-color:var(--success);color:var(--success-soft);font-weight:800;animation:pulse 0.5s}
+  .opt.wrong{background:rgba(239,68,68,0.2);border-color:var(--danger);opacity:0.7}
+  .opt.show-correct{background:rgba(74,222,128,0.3);border-color:var(--success);color:var(--success-soft);font-weight:800}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+  /* Feedback */
+  .fb{margin-top:14px;padding:14px 18px;border-radius:12px;font-size:15px;line-height:1.6;display:none;animation:cardIn 0.3s}
+  .fb.show{display:block}
+  .fb.win{background:rgba(74,222,128,0.15);color:var(--success-soft);border:1px solid var(--success)}
+  .fb.gentle{background:rgba(251,146,60,0.15);color:#FED7AA;border:1px solid var(--warning)}
+
+  /* Hint cards */
+  .hints{display:none;margin-top:12px}
+  .hints.show{display:block;animation:cardIn 0.3s}
+  .hint{background:rgba(251,146,60,0.12);border-left:4px solid var(--warning);border-radius:10px;padding:12px 14px;margin-bottom:8px;color:#FED7AA;font-size:14px;line-height:1.6}
+  .hint strong{color:var(--gold)}
+
+  /* SVG defaults */
+  .stage text{user-select:none}
+
+  /* Nav row */
+  .nav{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+  .nav .btn{flex:1;min-width:120px}
+
+  /* Coin animation */
+  @keyframes coinPop{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-50px) scale(1.5);opacity:0}}
+  .coin-pop{position:fixed;font-size:32px;pointer-events:none;animation:coinPop 1s ease-out forwards;z-index:9999}
+
+  /* Victory screen */
+  .victory{text-align:center;padding:24px}
+  .victory .emoji{font-size:72px;margin-bottom:8px;animation:bounce 1.5s infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .victory h1{font-size:32px;color:var(--gold);margin-bottom:14px}
+  .score-display{background:rgba(255,201,60,0.15);border:2px solid var(--gold);border-radius:16px;padding:20px;margin:18px 0}
+  .score-display .num{font-size:54px;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(255,201,60,0.5)}
+  .score-display .label{font-size:14px;color:var(--gold-soft);margin-top:4px}
+
+  /* Status banner (submitting/success) */
+  .submit-status{padding:14px 18px;border-radius:12px;text-align:center;font-weight:700;margin:14px 0}
+  .submit-status.pending{background:rgba(91,111,232,0.2);color:var(--primary-soft)}
+  .submit-status.success{background:rgba(74,222,128,0.2);color:var(--success-soft);border:1px solid var(--success)}
+  .submit-status.error{background:rgba(239,68,68,0.2);color:#FECACA;border:1px solid var(--danger)}
+
+  /* Loading spinner */
+  .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Decorations */
+  .deco-stars{position:fixed;top:0;left:0;right:0;height:200px;pointer-events:none;overflow:hidden;z-index:0}
+  .star{position:absolute;color:white;opacity:0.15;font-size:14px;animation:twinkle 3s infinite}
+  @keyframes twinkle{0%,100%{opacity:0.05}50%{opacity:0.25}}
+
+  /* Modal-ish dialog */
+  .start-screen{text-align:center;padding:30px 18px}
+  .start-screen .crown{font-size:64px;margin-bottom:10px}
+  .start-screen h1{font-size:36px;margin-bottom:6px;color:var(--gold)}
+  .start-screen .tagline{color:var(--primary-soft);font-size:16px;margin-bottom:24px;line-height:1.6}
+  .stage-info{background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin:18px 0;font-size:14px;color:var(--text-dim);line-height:1.6}
+
+  /* Q level badge */
+  .lvl-badge{display:inline-block;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:8px}
+  .lvl-base{background:rgba(74,222,128,0.2);color:var(--success-soft)}
+  .lvl-mid{background:rgba(251,146,60,0.2);color:#FED7AA}
+  .lvl-boss{background:rgba(239,68,68,0.2);color:#FECACA}
+
+  /* Tiny badges */
+  .crystal{font-size:22px;animation:float 2s infinite ease-in-out}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+</style>
+</head>
+<body>
+
+<div class="deco-stars" id="stars"></div>
+
+<div class="app" id="app">
+
+  <!-- Start Screen -->
+  <section id="screen-start" class="card start-screen">
+    <div class="crown">👑</div>
+    <h1>平行四邊形大冒險 · 5 英雄解封印</h1>
+    <p class="tagline">⚔️ 5 英雄 + 1 BOSS · 闖過去就是<strong style="color:var(--gold)">英雄聯盟主</strong> ⚔️</p>
+
+    <div style="margin:20px 0">
+      <label style="display:block;margin-bottom:8px;color:var(--gold-soft);font-weight:600">請輸入你的召喚師暱稱</label>
+      <input id="nick-input" class="input" type="text" placeholder="例：小新、艾妲、神槍手" maxlength="12" autocomplete="off">
+    </div>
+
+    <div class="stage-info">
+      📜 任務內容：6 關卡（5 英雄 + FINAL BOSS）<br>
+      ⏱️ 預計時間：15-20 分鐘<br>
+      💎 每位英雄送金幣，全破得「英雄聯盟主」勳章 👑<br>
+      🛡️ 答錯不扣分！可以看提示
+    </div>
+
+    <button id="start-btn" class="btn btn-gold" style="width:100%;font-size:18px;min-height:60px">
+      🚀 出發！進入王國
+    </button>
+  </section>
+
+  <!-- Quest Screen (HUD + Q) -->
+  <section id="screen-quest" style="display:none">
+    <div class="hud">
+      <div class="hud-left">
+        <span class="hud-nick">👑 <span id="hud-name">召喚師</span></span>
+        <span class="hud-stat hud-coins"><span class="icon">💰</span><span id="hud-coins">0</span></span>
+      </div>
+      <div class="progress" id="hud-progress"></div>
+    </div>
+
+    <div class="card" id="quest-card">
+      <!-- 動態填入題目 -->
+    </div>
+  </section>
+
+  <!-- Victory Screen -->
+  <section id="screen-victory" style="display:none">
+    <div class="card victory">
+      <div class="emoji">🏆</div>
+      <h1>王國大冒險完成！</h1>
+      <p style="color:var(--primary-soft);margin-bottom:18px">召喚師 <strong style="color:var(--gold-soft)" id="vic-name">XXX</strong> 通過全部關卡！</p>
+
+      <div class="score-display">
+        <div class="num"><span id="vic-correct">0</span>/6</div>
+        <div class="label">答對題數</div>
+      </div>
+
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:14px 0">
+        <div style="background:rgba(91,111,232,0.15);border-radius:12px;padding:12px 18px">
+          <div style="font-size:24px;font-weight:700;color:var(--gold)">💰 <span id="vic-coins">0</span></div>
+          <div style="font-size:12px;color:var(--text-dim)">金幣</div>
+        </div>
+        <div style="background:rgba(91,111,232,0.15);border-radius:12px;padding:12px 18px">
+          <div style="font-size:24px;font-weight:700;color:var(--gold)">⏱️ <span id="vic-time">0:00</span></div>
+          <div style="font-size:12px;color:var(--text-dim)">用時</div>
+        </div>
+      </div>
+
+      <div id="vic-status" class="submit-status pending"><span class="spinner"></span>正在送出成績給老師...</div>
+
+      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin:18px 0;font-size:13px;color:var(--text-dim);line-height:1.7">
+        💝 不管答對幾題，<strong style="color:var(--gold)">願意挑戰就是了不起</strong>。<br>
+        明天上課，老師會在後台看到你的成績喔！
+      </div>
+
+      <button class="btn btn-ghost" style="width:100%" onclick="restartGame()">🔄 再玩一次</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+'use strict';
+
+/* =============== Config =============== */
+// Firebase Realtime Database — 永久儲存、CORS 完美、不會 12 小時消失
+const FIREBASE_URL = 'https://classtools1019-default-rtdb.firebaseio.com';
+const HOMEWORK_ID = '8a_parallelogram_heroes_2026_05_29';
+const FIREBASE_NODE = `${FIREBASE_URL}/submissions/${HOMEWORK_ID}.json`;
+
+/* =============== Stars =============== */
+(() => {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 25; i++) {
+    const s = document.createElement('span');
+    s.className = 'star';
+    s.textContent = '✦';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = Math.random() * 3 + 's';
+    s.style.fontSize = (Math.random() * 16 + 8) + 'px';
+    c.appendChild(s);
+  }
+})();
+
+/* =============== Game State =============== */
+const state = {
+  nick: '',
+  startTime: 0,
+  currentQ: 0,
+  coins: 0,
+  correct: 0,
+  answers: [],
+  hintsUsed: [],
+};
+
+/* =============== SVG Helpers =============== */
+// 角度弧（標準數學角度系：0°=右、90°=上、180°=左、270°=下）
+// SVG y 向下，自動翻轉處理
+function svgArc(cx, cy, fromDeg, toDeg, r, color = '#FFC93C', sw = 2.8) {
+  const PI = Math.PI;
+  const sx = cx + r * Math.cos(fromDeg * PI / 180);
+  const sy = cy - r * Math.sin(fromDeg * PI / 180);
+  const ex = cx + r * Math.cos(toDeg * PI / 180);
+  const ey = cy - r * Math.sin(toDeg * PI / 180);
+  let delta = toDeg - fromDeg;
+  while (delta > 180) delta -= 360;
+  while (delta < -180) delta += 360;
+  // SVG sweep=1 = 視覺順時針；數學 delta<0 (順時針) 對應 SVG y 翻轉後仍視覺順時針
+  const sweep = delta < 0 ? 1 : 0;
+  return `<path d="M ${sx.toFixed(2)} ${sy.toFixed(2)} A ${r} ${r} 0 0 ${sweep} ${ex.toFixed(2)} ${ey.toFixed(2)}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>`;
+}
+// 角度數字標籤（自動放在弧中間外側，處理 wrap-around）
+function svgAngleLabel(cx, cy, fromDeg, toDeg, r, text, color = '#FFC93C', size = 16) {
+  const PI = Math.PI;
+  let _from = fromDeg, _to = toDeg;
+  while (_to - _from > 180) _to -= 360;
+  while (_to - _from < -180) _to += 360;
+  const midDeg = (_from + _to) / 2;
+  const lr = r + 14;
+  const lx = cx + lr * Math.cos(midDeg * PI / 180);
+  const ly = cy - lr * Math.sin(midDeg * PI / 180);
+  return `<text x="${lx.toFixed(1)}" y="${(ly + size/3).toFixed(1)}" text-anchor="middle" fill="${color}" font-size="${size}" font-weight="800">${text}</text>`;
+}
+// 角度名稱標籤（∠1、∠2 等，放在更外側）
+function svgAngleName(cx, cy, fromDeg, toDeg, r, text, color = '#FFD970', size = 18) {
+  const PI = Math.PI;
+  let _from = fromDeg, _to = toDeg;
+  while (_to - _from > 180) _to -= 360;
+  while (_to - _from < -180) _to += 360;
+  const midDeg = (_from + _to) / 2;
+  const lr = r + 32;
+  const lx = cx + lr * Math.cos(midDeg * PI / 180);
+  const ly = cy - lr * Math.sin(midDeg * PI / 180);
+  return `<text x="${lx.toFixed(1)}" y="${(ly + size/3).toFixed(1)}" text-anchor="middle" fill="${color}" font-size="${size}" font-weight="800">${text}</text>`;
+}
+// 整合標籤：把 "∠A" + "30°" 合併成單一文字 "∠A=30°"（避免兩個標籤擠在同方向）
+function svgAngleFull(cx, cy, fromDeg, toDeg, r, name, value, color = '#FFD970', size = 17) {
+  const PI = Math.PI;
+  let _from = fromDeg, _to = toDeg;
+  while (_to - _from > 180) _to -= 360;
+  while (_to - _from < -180) _to += 360;
+  const midDeg = (_from + _to) / 2;
+  const lr = r + 22;
+  const lx = cx + lr * Math.cos(midDeg * PI / 180);
+  const ly = cy - lr * Math.sin(midDeg * PI / 180);
+  const text = value ? `${name}=${value}` : name;
+  return `<text x="${lx.toFixed(1)}" y="${(ly + size/3).toFixed(1)}" text-anchor="middle" fill="${color}" font-size="${size}" font-weight="800">${text}</text>`;
+}
+// 點圓 + 標籤
+function svgPoint(cx, cy, label, color = '#FFC93C', labelOffsetX = 0, labelOffsetY = -14, size = 16) {
+  return `<circle cx="${cx}" cy="${cy}" r="7" fill="${color}" stroke="#1B2745" stroke-width="2"/>` +
+    (label ? `<text x="${cx + labelOffsetX}" y="${cy + labelOffsetY}" text-anchor="middle" fill="${color}" font-size="${size}" font-weight="800">${label}</text>` : '');
+}
+
+/* =============== Questions =============== */
+const QUESTIONS = [
+
+  /* ============ LEVEL 1 ⚔️ 魯夫：兩組對邊互相平行（定義） ============ */
+  {
+    level: 1,
+    levelLabel: '⚔️ LEVEL 1 · 魯夫的航海平行術',
+    title: '🏴‍☠️ 魯夫航海到一個神秘島嶼，看到 4 種四邊形！「平行四邊形」必須「兩組對邊都互相平行」。請問哪一個 100% 是平行四邊形？',
+    hint: '提示：看「上下兩條邊」是否平行，「左右兩條邊」是否平行。兩組都平行才算！',
+    buildSvg() {
+      // 4 種四邊形比較：(1) 平行四邊形 ✓ (2) 梯形 (3) 不規則 (4) 風箏形
+      return `
+      <svg class="stage" viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+        <!-- 圖 1: 平行四邊形 -->
+        <g transform="translate(40, 60)">
+          <polygon points="20,140 120,140 150,40 50,40" fill="rgba(74,222,128,0.15)" stroke="#7BC4A8" stroke-width="3"/>
+          <text x="85" y="200" text-anchor="middle" fill="#FFC93C" font-size="18" font-weight="800">圖 1</text>
+        </g>
+        <!-- 圖 2: 梯形（上短下長） -->
+        <g transform="translate(220, 60)">
+          <polygon points="20,140 140,140 110,40 50,40" fill="rgba(168,181,232,0.15)" stroke="#A8B5E8" stroke-width="3"/>
+          <text x="80" y="200" text-anchor="middle" fill="#FFC93C" font-size="18" font-weight="800">圖 2</text>
+        </g>
+        <!-- 圖 3: 不規則四邊形 -->
+        <g transform="translate(400, 60)">
+          <polygon points="10,130 140,140 120,30 30,50" fill="rgba(168,181,232,0.15)" stroke="#A8B5E8" stroke-width="3"/>
+          <text x="80" y="200" text-anchor="middle" fill="#FFC93C" font-size="18" font-weight="800">圖 3</text>
+        </g>
+        <!-- 圖 4: 風箏形 -->
+        <g transform="translate(580, 60)">
+          <polygon points="60,20 110,90 60,160 10,90" fill="rgba(168,181,232,0.15)" stroke="#A8B5E8" stroke-width="3"/>
+          <text x="60" y="200" text-anchor="middle" fill="#FFC93C" font-size="18" font-weight="800">圖 4</text>
+        </g>
+        <text x="350" y="30" text-anchor="middle" fill="#FFD970" font-size="17" font-weight="800">兩組對邊都平行才是「平行四邊形」</text>
+        <text x="350" y="265" text-anchor="middle" fill="#A8B5E8" font-size="13">🏴‍☠️ 魯夫：「我用眼睛看，圖 ___ 看起來上下平行 + 左右平行！」</text>
+      </svg>`;
+    },
+    options: [
+      { text: '圖 1', correct: true },
+      { text: '圖 2（梯形）', correct: false },
+      { text: '圖 3', correct: false },
+      { text: '圖 4（風箏）', correct: false },
+    ],
+    explainCorrect: '答對！🏴‍☠️ 圖 1 上下兩邊平行 + 左右兩邊平行 → 兩組對邊都平行 → 平行四邊形！圖 2 只有 1 組平行（梯形），其他都不行。',
+    explainWrong: '看仔細～圖 1 才是「兩組對邊都平行」的平行四邊形。圖 2 是梯形（只有一組平行）。',
+    hints: [
+      '平行四邊形的定義：「兩組對邊都互相平行」 — 缺一不可',
+      '圖 1：上下平行 ✓ + 左右平行 ✓ → 平行四邊形',
+      '圖 2 梯形只有上下平行，左右不平行 → 不算！只有圖 1 是 ✅',
+    ],
+  },
+
+  /* ============ LEVEL 2 🌸 禰豆子：對邊雙胞胎 ============ */
+  {
+    level: 1,
+    levelLabel: '🌸 LEVEL 2 · 禰豆子的對邊雙胞胎',
+    title: '🌸 禰豆子說：「平行四邊形的『對邊』就像雙胞胎一樣，長度一樣！」已知平行四邊形 ABCD，AB = 8 公分。請問對邊 CD = ?',
+    hint: '提示：對邊像雙胞胎 — 長度必相等',
+    buildSvg() {
+      return buildPlg({ AB: '8', CD: '?', highlight: ['AB', 'CD'] });
+    },
+    options: [
+      { text: '8 公分', correct: true },
+      { text: '4 公分', correct: false },
+      { text: '16 公分', correct: false },
+      { text: '不能判斷', correct: false },
+    ],
+    explainCorrect: '答對！🌸 禰豆子的「對邊雙胞胎」 → AB 跟 CD 是雙胞胎 → 都是 8 公分 ✅',
+    explainWrong: '對邊就像雙胞胎！AB = CD = 8 公分。',
+    hints: [
+      'AB 在下面、CD 在上面 — 它們是「對邊」（隔著面對的兩條邊）',
+      '禰豆子說：對邊像雙胞胎 → 長度一樣',
+      'CD = AB = 8 公分 ✅',
+    ],
+  },
+
+  /* ============ LEVEL 3 🌺 安妮亞：對角小機 ============ */
+  {
+    level: 2,
+    levelLabel: '🌺 LEVEL 3 · 安妮亞的對角小機',
+    title: '🌺 安妮亞讀心術發現：「平行四邊形的『對角』，心電感應一樣，角度相等！」已知平行四邊形 ABCD，∠A = 70°。請問對角 ∠C = ?',
+    hint: '提示：對角像心電感應 — 角度必相等',
+    buildSvg() {
+      return buildPlg({ angleA: '70°', angleC: '?', highlight: ['angleA', 'angleC'] });
+    },
+    options: [
+      { text: '70°', correct: true },
+      { text: '20°', correct: false },
+      { text: '90°', correct: false },
+      { text: '110°', correct: false },
+    ],
+    explainCorrect: '答對！🌺 安妮亞的對角小機 → ∠A 跟 ∠C 是對角 → 心電感應 → 都是 70° ✅',
+    explainWrong: '對角就像心電感應！∠C = ∠A = 70°。',
+    hints: [
+      '∠A 在左下、∠C 在右上 — 它們「隔著面對」，叫對角',
+      '安妮亞的對角小機：對角永遠相等',
+      '∠C = ∠A = 70° ✅',
+    ],
+  },
+
+  /* ============ LEVEL 4 ⚡ 五條悟：對角線無量空虛 ============ */
+  {
+    level: 2,
+    levelLabel: '⚡ LEVEL 4 · 五條悟的對角線平分',
+    title: '⚡ 五條悟使出「對角線無量空虛」：「平行四邊形的兩條對角線會在 O 點互相切成兩半！」已知 AC = 12 公分、BD = 8 公分。請問 AO、BO 各是多少？',
+    hint: '提示：對角線「互相平分」 → O 是兩條的「正中點」',
+    buildSvg() {
+      return buildPlg({
+        diagonals: true, O: true,
+        AC: '12', BD: '8', AO: '?', BO: '?',
+        highlight: ['AC', 'BD'],
+      });
+    },
+    options: [
+      { text: 'AO = 6, BO = 4', correct: true },
+      { text: 'AO = 12, BO = 8', correct: false },
+      { text: 'AO = 6, BO = 8', correct: false },
+      { text: 'AO = 12, BO = 4', correct: false },
+    ],
+    explainCorrect: '答對！⚡ 五條悟的「無量空虛」 → AC 跟 BD 互相平分。AO = AC ÷ 2 = 6、BO = BD ÷ 2 = 4 ✅',
+    explainWrong: '兩條對角線都被 O 切成兩半！AO = 12÷2 = 6, BO = 8÷2 = 4。',
+    hints: [
+      '對角線 AC 被 O 切成兩段 → AO = OC = AC ÷ 2 = 12 ÷ 2 = 6',
+      '對角線 BD 也被 O 切成兩段 → BO = OD = BD ÷ 2 = 8 ÷ 2 = 4',
+      '所以 AO = 6, BO = 4 ✅',
+    ],
+  },
+
+  /* ============ LEVEL 5 🔪 黃泉雙使：四等三角形 ============ */
+  {
+    level: 2,
+    levelLabel: '🔪 LEVEL 5 · 黃泉雙使的四等形',
+    title: '🔪 黃泉雙使的最強招式：兩條對角線把平行四邊形切成 4 個三角形（△1、△2、△3、△4）。請問這 4 個三角形的面積關係？',
+    hint: '提示：對角線平分 + 同底等高 → 4 個三角形面積完全相等',
+    buildSvg() {
+      // 平行四邊形 + 對角線 + 4 個三角形編號
+      const Ax=130, Ay=240, Bx=430, By=240, Cx=540, Cy=100, Dx=240, Dy=100;
+      const Ox=(Ax+Cx)/2, Oy=(Ay+Cy)/2;
+      return `
+      <svg class="stage" viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg">
+        <!-- 4 個三角形 (依不同顏色) -->
+        <polygon points="${Ax},${Ay} ${Bx},${By} ${Ox},${Oy}" fill="rgba(255,143,163,0.3)" stroke="#FF8FA3" stroke-width="2"/>
+        <polygon points="${Bx},${By} ${Cx},${Cy} ${Ox},${Oy}" fill="rgba(255,201,60,0.3)" stroke="#FFC93C" stroke-width="2"/>
+        <polygon points="${Cx},${Cy} ${Dx},${Dy} ${Ox},${Oy}" fill="rgba(123,196,168,0.3)" stroke="#7BC4A8" stroke-width="2"/>
+        <polygon points="${Dx},${Dy} ${Ax},${Ay} ${Ox},${Oy}" fill="rgba(91,157,217,0.3)" stroke="#5B9DD9" stroke-width="2"/>
+        <!-- 對角線 -->
+        <line x1="${Ax}" y1="${Ay}" x2="${Cx}" y2="${Cy}" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 4"/>
+        <line x1="${Bx}" y1="${By}" x2="${Dx}" y2="${Dy}" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 4"/>
+        <!-- 外框 -->
+        <polygon points="${Ax},${Ay} ${Bx},${By} ${Cx},${Cy} ${Dx},${Dy}" fill="none" stroke="var(--L1-color)" stroke-width="4"/>
+        <!-- 三角形編號 -->
+        <text x="${(Ax+Bx+Ox)/3}" y="${(Ay+By+Oy)/3+6}" text-anchor="middle" fill="#FF8FA3" font-size="22" font-weight="800">△1</text>
+        <text x="${(Bx+Cx+Ox)/3}" y="${(By+Cy+Oy)/3+6}" text-anchor="middle" fill="#FFC93C" font-size="22" font-weight="800">△2</text>
+        <text x="${(Cx+Dx+Ox)/3}" y="${(Cy+Dy+Oy)/3+6}" text-anchor="middle" fill="#7BC4A8" font-size="22" font-weight="800">△3</text>
+        <text x="${(Dx+Ax+Ox)/3}" y="${(Dy+Ay+Oy)/3+6}" text-anchor="middle" fill="#5B9DD9" font-size="22" font-weight="800">△4</text>
+        <!-- 頂點 -->
+        ${[[Ax,Ay,'A',-16,6],[Bx,By,'B',16,6],[Cx,Cy,'C',16,-6],[Dx,Dy,'D',-16,-6]].map(([x,y,n,ox,oy])=>
+          `<circle cx="${x}" cy="${y}" r="8" fill="#FFC93C" stroke="#1B2745" stroke-width="2.5"/><text x="${x+ox}" y="${y+oy}" text-anchor="middle" fill="#FFC93C" font-size="20" font-weight="800">${n}</text>`).join('')}
+        <circle cx="${Ox}" cy="${Oy}" r="6" fill="#FF8FA3" stroke="#1B2745" stroke-width="2"/>
+        <text x="${Ox+14}" y="${Oy+5}" fill="#FF8FA3" font-size="16" font-weight="800">O</text>
+      </svg>`;
+    },
+    options: [
+      { text: '△1 = △2 = △3 = △4（四個完全一樣大）', correct: true },
+      { text: '△1 > △2 > △3 > △4（一個比一個小）', correct: false },
+      { text: '△1 跟 △3 一樣，△2 跟 △4 一樣（但兩組不同）', correct: false },
+      { text: '不能判斷', correct: false },
+    ],
+    explainCorrect: '答對！🔪 黃泉雙使的奧義！對角線互相平分 + 同底等高 → 4 個三角形面積完全相等！這就是平行四邊形最酷的秘密 ✨',
+    explainWrong: '4 個三角形的「底」跟「高」都一樣（因為 O 是中點 + 同高度），所以面積一定完全相等！',
+    hints: [
+      '對角線把平行四邊形切成 4 個小三角形，O 是它們共同的頂點',
+      '對角線互相平分 → 每個三角形的「底」一樣長',
+      '4 個三角形的「高」也都一樣 → 同底等高 → 面積完全相等 ✅',
+    ],
+  },
+
+  /* ============ FINAL BOSS 🐉 蠟筆小新：課本 P.204 例 2 綜合 ============ */
+  {
+    level: 3,
+    levelLabel: '🐉 FINAL BOSS · 蠟筆小新打開課本',
+    title: '🎒 蠟筆小新打開課本 P.204 例 2！平行四邊形 ABCD，對角線交於 O。已知 AB = 9、AO = 5、BO = 4。請算出：CD + OC + OD = ?',
+    hint: '提示：3 步驟 — CD（對邊相等）+ OC（對角線平分）+ OD（對角線平分）',
+    buildSvg() {
+      return buildPlg({
+        diagonals: true, O: true,
+        AB: '9', AO: '5', BO: '4',
+        title_extra: '求 CD + OC + OD',
+        highlight: ['AB', 'AO', 'BO'],
+      });
+    },
+    options: [
+      { text: '18', correct: true },  // CD=9, OC=5, OD=4 → 18
+      { text: '9', correct: false },
+      { text: '13', correct: false },
+      { text: '14', correct: false },
+    ],
+    explainCorrect: '答對！🐉 BOSS 破解！\nStep 1: CD = AB = 9（對邊相等）\nStep 2: OC = AO = 5（對角線平分）\nStep 3: OD = BO = 4（對角線平分）\nCD + OC + OD = 9 + 5 + 4 = 18 ✅\n你是英雄聯盟主！👑',
+    explainWrong: 'BOSS 題分 3 步！CD=9（對邊）、OC=5（對角線平分）、OD=4（對角線平分）。加起來 = 18。',
+    hints: [
+      'Step 1: 對邊相等 → CD = AB = 9',
+      'Step 2: 對角線互相平分 → OC = AO = 5',
+      'Step 3: 對角線互相平分 → OD = BO = 4。三個加起來 = 9 + 5 + 4 = 18 ✅',
+    ],
+  },
+];
+
+/* === 平行四邊形 SVG builder === */
+function buildPlg(opts) {
+  const Ax=130, Ay=240, Bx=430, By=240, Cx=540, Cy=100, Dx=240, Dy=100;
+  const Ox = (Ax+Cx)/2, Oy = (Ay+Cy)/2;
+  const H = (s) => (opts.highlight || []).includes(s);
+  const HL_C = '#FFD970', NORM_C = '#A8B5E8';
+  const parts = [];
+  parts.push(`<svg class="stage" viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg">`);
+
+  const edges = [
+    ['AB', Ax, Ay, Bx, By, opts.AB, 'mid-bottom'],
+    ['BC', Bx, By, Cx, Cy, opts.BC, 'mid-right'],
+    ['CD', Cx, Cy, Dx, Dy, opts.CD, 'mid-top'],
+    ['DA', Dx, Dy, Ax, Ay, opts.DA, 'mid-left'],
+  ];
+  for (const [name, x1, y1, x2, y2, label, pos] of edges) {
+    const isHL = H(name);
+    const col = isHL ? '#FF8FA3' : 'var(--L1-color)';
+    const w = isHL ? 5 : 4;
+    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`);
+    if (label) {
+      const mx = (x1+x2)/2, my = (y1+y2)/2;
+      const ox = pos === 'mid-right' ? 18 : pos === 'mid-left' ? -18 : 0;
+      const oy = pos === 'mid-bottom' ? 22 : pos === 'mid-top' ? -10 : 4;
+      parts.push(`<text x="${mx+ox}" y="${my+oy}" text-anchor="middle" fill="${isHL ? HL_C : NORM_C}" font-size="18" font-weight="800">${label}</text>`);
+    }
+  }
+
+  if (opts.diagonals) {
+    parts.push(`<line x1="${Ax}" y1="${Ay}" x2="${Cx}" y2="${Cy}" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 4" opacity="0.7"/>`);
+    parts.push(`<line x1="${Bx}" y1="${By}" x2="${Dx}" y2="${Dy}" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6 4" opacity="0.7"/>`);
+  }
+  if (opts.AC) parts.push(`<text x="${Ox+10}" y="${Oy+50}" fill="${H('AC') ? HL_C : NORM_C}" font-size="15" font-weight="800">AC=${opts.AC}</text>`);
+  if (opts.BD) parts.push(`<text x="${Ox-90}" y="${Oy+50}" fill="${H('BD') ? HL_C : NORM_C}" font-size="15" font-weight="800">BD=${opts.BD}</text>`);
+  if (opts.AO) parts.push(`<text x="${(Ax+Ox)/2 - 20}" y="${(Ay+Oy)/2 + 4}" fill="${H('AO') ? HL_C : NORM_C}" font-size="14" font-weight="800">AO=${opts.AO}</text>`);
+  if (opts.BO) parts.push(`<text x="${(Bx+Ox)/2 + 20}" y="${(By+Oy)/2 + 4}" fill="${H('BO') ? HL_C : NORM_C}" font-size="14" font-weight="800">BO=${opts.BO}</text>`);
+  if (opts.OC) parts.push(`<text x="${(Cx+Ox)/2 + 8}" y="${(Cy+Oy)/2}" fill="${H('OC') ? HL_C : NORM_C}" font-size="14" font-weight="800">OC=${opts.OC}</text>`);
+  if (opts.OD) parts.push(`<text x="${(Dx+Ox)/2 - 25}" y="${(Dy+Oy)/2}" fill="${H('OD') ? HL_C : NORM_C}" font-size="14" font-weight="800">OD=${opts.OD}</text>`);
+
+  const angles = [
+    ['angleA', Ax+18, Ay-12, opts.angleA, '∠A'],
+    ['angleB', Bx-22, By-12, opts.angleB, '∠B'],
+    ['angleC', Cx-22, Cy+22, opts.angleC, '∠C'],
+    ['angleD', Dx+18, Dy+22, opts.angleD, '∠D'],
+  ];
+  for (const [name, x, y, val, label] of angles) {
+    if (val !== undefined && val !== null) {
+      const isHL = H(name);
+      const col = isHL ? HL_C : NORM_C;
+      const text = val ? `${label}=${val}` : label;
+      parts.push(`<text x="${x}" y="${y}" fill="${col}" font-size="15" font-weight="800">${text}</text>`);
+    }
+  }
+
+  for (const [name, x, y, off_x, off_y] of [
+    ['A', Ax, Ay, -16, 6], ['B', Bx, By, 16, 6],
+    ['C', Cx, Cy, 16, -6], ['D', Dx, Dy, -16, -6],
+  ]) {
+    parts.push(`<circle cx="${x}" cy="${y}" r="8" fill="#FFC93C" stroke="#1B2745" stroke-width="2.5"/>`);
+    parts.push(`<text x="${x+off_x}" y="${y+off_y}" text-anchor="middle" fill="#FFC93C" font-size="20" font-weight="800">${name}</text>`);
+  }
+
+  if (opts.O) {
+    parts.push(`<circle cx="${Ox}" cy="${Oy}" r="6" fill="#FF8FA3" stroke="#1B2745" stroke-width="2"/>`);
+    parts.push(`<text x="${Ox+14}" y="${Oy+4}" fill="#FF8FA3" font-size="16" font-weight="800">O</text>`);
+  }
+  if (opts.title_extra) {
+    parts.push(`<text x="330" y="40" text-anchor="middle" fill="#FFD970" font-size="18" font-weight="800">${opts.title_extra}</text>`);
+  }
+  parts.push(`</svg>`);
+  return parts.join('\n');
+}
+
+/* =============== UI rendering =============== */
+function showScreen(id) {
+  document.querySelectorAll('section[id^="screen-"]').forEach(s => s.style.display = 'none');
+  document.getElementById('screen-' + id).style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderProgress() {
+  const c = document.getElementById('hud-progress');
+  c.innerHTML = '';
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    const d = document.createElement('div');
+    d.className = 'pdot';
+    if (i < state.currentQ) d.classList.add('done');
+    else if (i === state.currentQ) d.classList.add('active');
+    d.textContent = i + 1;
+    c.appendChild(d);
+  }
+}
+
+function renderQuest() {
+  document.getElementById('hud-name').textContent = state.nick;
+  document.getElementById('hud-coins').textContent = state.coins;
+  renderProgress();
+
+  const q = QUESTIONS[state.currentQ];
+  const lvlClass = q.level === 1 ? 'lvl-base' : q.level === 2 ? 'lvl-mid' : 'lvl-boss';
+  const lvlIcon = q.level === 1 ? '⭐' : q.level === 2 ? '🌙' : '☀️';
+
+  const card = document.getElementById('quest-card');
+  card.innerHTML = `
+    <div style="text-align:center">
+      <span class="lvl-badge ${lvlClass}">${lvlIcon} ${q.levelLabel}</span>
+    </div>
+    <div class="qtitle">${q.title}</div>
+    <div class="qhint">${q.hint}</div>
+    <div class="stage-wrap">${q.buildSvg()}</div>
+    <div class="opts" id="q-opts">
+      ${q.options.map((o, i) => `<button class="opt" data-i="${i}">${o.text}</button>`).join('')}
+    </div>
+    <div class="fb" id="q-fb"></div>
+    <div class="hints" id="q-hints">
+      ${q.hints.map((h, i) => `<div class="hint"><strong>提示 ${i+1}：</strong> ${h}</div>`).join('')}
+    </div>
+    <div class="nav">
+      <button class="btn btn-warning" id="hint-btn" onclick="toggleHints()">💡 看提示</button>
+      <button class="btn btn-gold" id="next-btn" onclick="nextQuestion()" disabled>下一關 →</button>
+    </div>
+  `;
+
+  // Attach option clicks
+  card.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', () => answerOption(parseInt(btn.dataset.i), btn));
+  });
+
+  state.hintsUsed[state.currentQ] = state.hintsUsed[state.currentQ] || 0;
+}
+
+function toggleHints() {
+  const h = document.getElementById('q-hints');
+  h.classList.toggle('show');
+  state.hintsUsed[state.currentQ] = (state.hintsUsed[state.currentQ] || 0) + 1;
+}
+
+let answered = false;
+function answerOption(idx, btnEl) {
+  if (answered) return;
+  answered = true;
+  const q = QUESTIONS[state.currentQ];
+  const opt = q.options[idx];
+  const fb = document.getElementById('q-fb');
+  const optsContainer = document.getElementById('q-opts');
+
+  state.answers[state.currentQ] = {
+    pickedIndex: idx,
+    pickedText: opt.text,
+    correct: opt.correct,
+  };
+
+  if (opt.correct) {
+    btnEl.classList.add('correct');
+    fb.className = 'fb win show';
+    fb.innerHTML = q.explainCorrect;
+    state.correct++;
+    state.coins += (q.level === 3 ? 30 : q.level === 2 ? 20 : 10);
+    popCoin(btnEl);
+    playSound('correct');
+  } else {
+    btnEl.classList.add('wrong');
+    // Highlight correct
+    optsContainer.querySelectorAll('.opt').forEach((b, i) => {
+      if (q.options[i].correct) b.classList.add('show-correct');
+    });
+    fb.className = 'fb gentle show';
+    fb.innerHTML = q.explainWrong;
+    playSound('wrong');
+  }
+
+  document.getElementById('next-btn').disabled = false;
+  document.getElementById('hud-coins').textContent = state.coins;
+}
+
+function nextQuestion() {
+  state.currentQ++;
+  answered = false;
+  if (state.currentQ >= QUESTIONS.length) {
+    finishGame();
+  } else {
+    renderQuest();
+  }
+}
+
+/* =============== Sound (8-bit) =============== */
+let audioCtx;
+function playSound(type) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    if (type === 'correct') {
+      o.type = 'square';
+      o.frequency.setValueAtTime(523, audioCtx.currentTime); // C5
+      o.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1); // E5
+      o.frequency.setValueAtTime(784, audioCtx.currentTime + 0.2); // G5
+      g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+      o.start(); o.stop(audioCtx.currentTime + 0.4);
+    } else if (type === 'wrong') {
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(220, audioCtx.currentTime);
+      o.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.3);
+      g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      o.start(); o.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'victory') {
+      [523, 659, 784, 1047].forEach((f, i) => {
+        const oo = audioCtx.createOscillator();
+        const gg = audioCtx.createGain();
+        oo.connect(gg); gg.connect(audioCtx.destination);
+        oo.type = 'square';
+        oo.frequency.value = f;
+        gg.gain.setValueAtTime(0.12, audioCtx.currentTime + i * 0.15);
+        gg.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.15 + 0.3);
+        oo.start(audioCtx.currentTime + i * 0.15);
+        oo.stop(audioCtx.currentTime + i * 0.15 + 0.3);
+      });
+    }
+  } catch (e) {}
+}
+
+function popCoin(refEl) {
+  const r = refEl.getBoundingClientRect();
+  const coin = document.createElement('div');
+  coin.className = 'coin-pop';
+  coin.textContent = '💰';
+  coin.style.left = (r.left + r.width / 2 - 16) + 'px';
+  coin.style.top = (r.top - 10) + 'px';
+  document.body.appendChild(coin);
+  setTimeout(() => coin.remove(), 1100);
+}
+
+/* =============== Finish + Submit =============== */
+function finishGame() {
+  const elapsed = Math.round((Date.now() - state.startTime) / 1000);
+  document.getElementById('vic-name').textContent = state.nick;
+  document.getElementById('vic-correct').textContent = state.correct;
+  document.getElementById('vic-coins').textContent = state.coins;
+  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+  document.getElementById('vic-time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  showScreen('victory');
+  playSound('victory');
+
+  submitToServer(elapsed);
+}
+
+async function submitToServer(elapsed) {
+  const status = document.getElementById('vic-status');
+  const payload = {
+    nick: state.nick,
+    hwId: HOMEWORK_ID,
+    correctCount: state.correct,
+    totalQuestions: QUESTIONS.length,
+    coins: state.coins,
+    elapsedSec: elapsed,
+    submittedAt: new Date().toISOString(),
+    answers: state.answers.map((a, i) => ({
+      q: i + 1,
+      level: QUESTIONS[i].levelLabel,
+      pickedText: a ? a.pickedText : null,
+      correct: a ? a.correct : false,
+      hintsUsed: state.hintsUsed[i] || 0,
+    })),
+  };
+
+  // Firebase Realtime Database POST — 永久儲存
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const res = await fetch(FIREBASE_NODE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('POST ' + res.status);
+
+      status.className = 'submit-status success';
+      status.innerHTML = '✅ 成績已送達老師後台！';
+      return;
+    } catch (err) {
+      if (attempt === 4) {
+        status.className = 'submit-status error';
+        status.innerHTML = '⚠️ 送出失敗，請告訴老師你的暱稱和成績：<br><strong>' + state.nick + ' — ' + state.correct + '/' + QUESTIONS.length + ' 分</strong>';
+        return;
+      }
+      await new Promise(r => setTimeout(r, 500 + Math.random() * 800));
+    }
+  }
+}
+
+/* =============== Restart =============== */
+function restartGame() {
+  state.nick = '';
+  state.startTime = 0;
+  state.currentQ = 0;
+  state.coins = 0;
+  state.correct = 0;
+  state.answers = [];
+  state.hintsUsed = [];
+  answered = false;
+  document.getElementById('nick-input').value = '';
+  showScreen('start');
+}
+
+/* =============== Start =============== */
+document.getElementById('start-btn').addEventListener('click', () => {
+  const input = document.getElementById('nick-input');
+  const nick = input.value.trim();
+  if (!nick) {
+    input.focus();
+    input.style.borderColor = 'var(--danger)';
+    setTimeout(() => input.style.borderColor = '', 1500);
+    return;
+  }
+  state.nick = nick;
+  state.startTime = Date.now();
+  state.currentQ = 0;
+  state.coins = 0;
+  state.correct = 0;
+  state.answers = [];
+  showScreen('quest');
+  renderQuest();
+});
+
+// Enter key in nick input
+document.getElementById('nick-input').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') document.getElementById('start-btn').click();
+});
+
+// Expose for inline onclick
+window.toggleHints = toggleHints;
+window.nextQuestion = nextQuestion;
+window.restartGame = restartGame;
+</script>
+
+</body>
+</html>
