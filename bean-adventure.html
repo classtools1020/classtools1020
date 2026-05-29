@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<title>豆豆大冒險 · Bean's Tiny Adventure</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;background:#1a1530;overflow:hidden;touch-action:none;font-family:'Press Start 2P','Noto Sans TC',monospace}
+@font-face{
+  font-family:'Press Start 2P';
+  src:url('https://fonts.gstatic.com/s/pressstart2p/v15/e3t4euO8T-267oIAQAu6jDQyK0nSgPJE4580.woff2') format('woff2');
+}
+.stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#2d2456,#1a1530)}
+.frame{position:relative;display:flex;flex-direction:column;width:100%;max-width:960px;aspect-ratio:16/9;max-height:100vh;box-shadow:0 0 40px rgba(255,200,100,.15)}
+canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block;background:#000;border:4px solid #2d2456;border-radius:4px}
+
+/* HUD overlay */
+.hud{position:absolute;top:12px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:0 16px;color:#fff;pointer-events:none;font-size:clamp(8px,1.6vw,14px);text-shadow:2px 2px 0 #000;font-family:'Press Start 2P',monospace;letter-spacing:1px;z-index:10}
+.hud-left,.hud-right{display:flex;gap:14px;align-items:center}
+.hud-item{background:rgba(0,0,0,.45);padding:6px 10px;border:2px solid rgba(255,255,255,.2);border-radius:2px}
+.hud-item .lbl{color:#ffc857;margin-right:4px}
+.btn-pause{pointer-events:auto;background:rgba(0,0,0,.5);border:2px solid rgba(255,255,255,.3);color:#fff;padding:6px 12px;border-radius:2px;cursor:pointer;font-family:inherit;font-size:inherit;letter-spacing:1px}
+.btn-pause:hover{background:rgba(255,200,100,.3)}
+
+/* Title bar */
+.title-bar{position:absolute;top:-2px;left:0;right:0;text-align:center;color:#ffc857;padding:8px;font-size:clamp(9px,1.4vw,14px);text-shadow:2px 2px 0 #000;font-family:'Press Start 2P',monospace;letter-spacing:2px;pointer-events:none;z-index:11}
+.title-bar small{display:block;font-size:.65em;color:#fff;margin-top:3px;opacity:.7;letter-spacing:1px}
+
+/* Touch controls */
+.touch{position:absolute;bottom:0;left:0;right:0;display:none;justify-content:space-between;padding:14px 18px;z-index:20;pointer-events:none}
+.touch.on{display:flex}
+.tch-group{display:flex;gap:10px;pointer-events:auto}
+.tch{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.4);color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;font-weight:900;backdrop-filter:blur(8px);user-select:none;cursor:pointer;font-family:monospace}
+.tch:active{background:rgba(255,200,100,.5);transform:scale(.95)}
+.tch.jump{background:rgba(255,200,100,.3);border-color:rgba(255,200,100,.6);width:78px;height:78px}
+
+/* Overlay screens */
+.screen{position:absolute;inset:0;background:rgba(26,21,48,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:24px;z-index:30;font-family:'Press Start 2P',monospace;letter-spacing:1px}
+.screen h1{font-size:clamp(20px,4vw,36px);color:#ffc857;margin-bottom:14px;text-shadow:3px 3px 0 #000}
+.screen .sub{font-size:clamp(10px,1.8vw,14px);color:#fff;opacity:.85;margin-bottom:24px;line-height:1.8}
+.screen .key{display:inline-block;background:#fff;color:#1a1530;padding:3px 8px;border-radius:3px;margin:0 2px;font-size:.9em;box-shadow:0 2px 0 #888}
+.screen button{font-family:'Press Start 2P',monospace;font-size:clamp(11px,2vw,16px);padding:12px 28px;background:#ffc857;color:#1a1530;border:none;border-radius:4px;cursor:pointer;letter-spacing:2px;box-shadow:0 4px 0 #c89a3a;transition:transform .1s}
+.screen button:active{transform:translateY(2px);box-shadow:0 2px 0 #c89a3a}
+.screen .credit{margin-top:24px;font-size:9px;opacity:.5}
+.screen.hide{display:none}
+
+@media(max-width:520px){
+  .title-bar{font-size:9px}
+  .hud{font-size:8px}
+}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="frame">
+
+    <div class="title-bar">
+      🌱 豆豆大冒險 🌱
+      <small>Bean's Tiny Adventure · classtools1020.github.io</small>
+    </div>
+
+    <div class="hud">
+      <div class="hud-left">
+        <div class="hud-item"><span class="lbl">分數</span><span id="score">0</span></div>
+        <div class="hud-item"><span class="lbl">時間</span><span id="time">120</span></div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-item"><span class="lbl">愛心</span><span id="lives">3</span></div>
+        <button class="btn-pause" id="btnPause">⏸</button>
+      </div>
+    </div>
+
+    <canvas id="game" width="480" height="270"></canvas>
+
+    <div class="touch" id="touchControls">
+      <div class="tch-group">
+        <div class="tch" data-key="left">◀</div>
+        <div class="tch" data-key="right">▶</div>
+      </div>
+      <div class="tch-group">
+        <div class="tch jump" data-key="jump">↑</div>
+      </div>
+    </div>
+
+    <!-- 開始畫面 -->
+    <div class="screen" id="screenStart">
+      <h1>🌱 豆豆大冒險</h1>
+      <p class="sub">
+        幫豆豆收集 ⭐ 星星，<br>
+        找到 🏁 終點旗子！<br><br>
+        <span class="key">← →</span> 移動 ・ <span class="key">↑ / 空白</span> 跳<br>
+        <small style="opacity:.6">（手機請用畫面下方按鈕）</small>
+      </p>
+      <button id="btnStart">開始冒險</button>
+      <div class="credit">原創角色設計 ・ classtools1020</div>
+    </div>
+
+    <!-- 暫停畫面 -->
+    <div class="screen hide" id="screenPause">
+      <h1>⏸ 暫停</h1>
+      <button id="btnResume">繼續</button>
+    </div>
+
+    <!-- 勝利畫面 -->
+    <div class="screen hide" id="screenWin">
+      <h1>🎉 過關啦！</h1>
+      <p class="sub">
+        最後分數：<span id="finalScore" style="color:#ffc857">0</span><br>
+        剩餘愛心：<span id="finalLives" style="color:#ff6b9a">0</span>
+      </p>
+      <button id="btnRestart">再玩一次</button>
+    </div>
+
+    <!-- 失敗畫面 -->
+    <div class="screen hide" id="screenLose">
+      <h1>😵 GAME OVER</h1>
+      <p class="sub" id="loseReason">愛心用完了…</p>
+      <button id="btnRetry">再試一次</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// =============================================
+// 豆豆大冒險 · 原創 2D 平台冒險
+// =============================================
+
+const cvs = document.getElementById('game');
+const ctx = cvs.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+const W = cvs.width, H = cvs.height;
+
+// ===== 色票（柔和像素風）=====
+const COL = {
+  sky1:'#ffd4a3', sky2:'#ffa9b9', sky3:'#8db4d4',
+  mtn1:'#6b5b8c', mtn2:'#9b8bb4',
+  ground:'#7a4f2c', grass:'#5fa84b', grass2:'#4a8a3a',
+  cloud:'#fff5e8',
+  bean:'#f4d4a8', beanD:'#d4a878', beanFace:'#3a2820',
+  cheek:'#ffaa9a',
+  star:'#ffd96a', starGlow:'#fff5a8',
+  snail:'#aa7ed4', snailShell:'#d49aff',
+  flag:'#ff6b9a', flagPole:'#8b6f47',
+  platform:'#9c6f3f', platTop:'#6fb84b',
+  spark:'#fff5a8',
+};
+
+// ===== 鍵盤輸入 =====
+const keys = { left:false, right:false, jump:false, jumpHeld:false };
+function setKey(k, v){
+  if(k==='left') keys.left = v;
+  if(k==='right') keys.right = v;
+  if(k==='jump'){
+    if(v && !keys.jumpHeld){ keys.jump = true; }
+    keys.jumpHeld = v;
+  }
+}
+addEventListener('keydown', e=>{
+  if(['ArrowLeft','a','A'].includes(e.key)) setKey('left', true);
+  if(['ArrowRight','d','D'].includes(e.key)) setKey('right', true);
+  if(['ArrowUp','w','W',' ','z','Z'].includes(e.key)){ setKey('jump', true); e.preventDefault(); }
+});
+addEventListener('keyup', e=>{
+  if(['ArrowLeft','a','A'].includes(e.key)) setKey('left', false);
+  if(['ArrowRight','d','D'].includes(e.key)) setKey('right', false);
+  if(['ArrowUp','w','W',' ','z','Z'].includes(e.key)) setKey('jump', false);
+});
+
+// ===== 觸控輸入 =====
+const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+if(isTouch) document.getElementById('touchControls').classList.add('on');
+document.querySelectorAll('.tch').forEach(b => {
+  const k = b.dataset.key;
+  const press = e => { e.preventDefault(); setKey(k, true); };
+  const release = e => { e.preventDefault(); setKey(k, false); };
+  b.addEventListener('pointerdown', press);
+  b.addEventListener('pointerup', release);
+  b.addEventListener('pointerleave', release);
+  b.addEventListener('pointercancel', release);
+});
+
+// ===== 關卡資料 =====
+const LEVEL = {
+  width: 1920,
+  // 地面平台 [x, y, w, h]
+  ground: [
+    [0,   240, 460, 30],     // 起始地
+    [520, 240, 360, 30],     // 中段地 1
+    [930, 240, 240, 30],     // 中段地 2
+    [1230,240, 280, 30],     // 中段地 3
+    [1570,240, 350, 30],     // 終點地
+  ],
+  // 浮空平台 [x, y, w]
+  platforms: [
+    [200, 180, 60], [340, 140, 60],
+    [560, 180, 60], [690, 150, 70], [810, 195, 60],
+    [930, 155, 60], [1030, 130, 50], [1100, 165, 60],
+    [1260, 175, 60], [1370, 145, 70], [1450, 175, 60],
+    [1600, 170, 60], [1700, 135, 80],
+  ],
+  // 星星 [x, y]
+  stars: [
+    [110, 200], [220, 145], [360, 105], [430, 200],
+    [560, 145], [710, 115], [820, 160], [870, 200],
+    [950, 120], [1050, 95], [1115, 130], [1170, 200],
+    [1280, 140], [1390, 110], [1470, 140], [1500, 200],
+    [1620, 135], [1730, 100], [1820, 200],
+  ],
+  // 蝸牛敵人 [x, leftBound, rightBound]
+  snails: [
+    [350, 270, 460],
+    [700, 540, 860],
+    [1050, 950, 1160],
+    [1430, 1240, 1500],
+    [1750, 1580, 1900],
+  ],
+  // 終點旗子
+  goal: [1860, 200],
+  // 起始位置
+  start: [60, 200],
+};
+
+// ===== 物理常數 =====
+const GRAV = 0.42;
+const WALK = 1.6;
+const ACCEL = 0.4;
+const FRICTION = 0.78;
+const JUMP_V = -7.2;
+const JUMP_CUT = 0.4;
+const MAX_FALL = 9;
+
+// ===== 遊戲狀態 =====
+let state = 'start'; // start / playing / paused / win / lose
+let camX = 0;
+let timeLeft = 120;
+let timeFrame = 0;
+let score = 0;
+let lives = 3;
+let invul = 0;
+let player = null, stars = [], snails = [], sparkles = [], clouds = [];
+let frame = 0;
+
+function initGame(){
+  player = {
+    x: LEVEL.start[0], y: LEVEL.start[1],
+    vx: 0, vy: 0, w: 14, h: 16,
+    grounded: false, facing: 1, walkAnim: 0,
+  };
+  stars = LEVEL.stars.map(([x,y]) => ({x, y, taken:false, bob: Math.random()*Math.PI*2}));
+  snails = LEVEL.snails.map(([x, lb, rb]) => ({
+    x, y: 224, vx: -0.5, w: 16, h: 12,
+    leftBound: lb, rightBound: rb, alive: true, anim:0,
+  }));
+  sparkles = [];
+  clouds = [];
+  for(let i=0;i<8;i++){
+    clouds.push({
+      x: Math.random()*LEVEL.width,
+      y: 20 + Math.random()*60,
+      w: 30 + Math.random()*30,
+      speed: 0.05 + Math.random()*0.1,
+    });
+  }
+  score = 0;
+  lives = 3;
+  timeLeft = 120;
+  timeFrame = 0;
+  camX = 0;
+  invul = 0;
+  updateHUD();
+}
+
+function updateHUD(){
+  document.getElementById('score').textContent = String(score).padStart(5,'0');
+  document.getElementById('time').textContent = String(Math.max(0, Math.ceil(timeLeft))).padStart(3,'0');
+  document.getElementById('lives').textContent = lives;
+}
+
+// ===== 物理：碰撞 =====
+function getAllSolids(){
+  return [...LEVEL.ground.map(([x,y,w,h]) => ({x,y,w,h})),
+          ...LEVEL.platforms.map(([x,y,w]) => ({x,y,w,h:8, oneWay:true}))];
+}
+const SOLIDS = getAllSolids();
+
+function collideX(p){
+  for(const s of SOLIDS){
+    if(s.oneWay) continue;
+    if(p.x+p.w > s.x && p.x < s.x+s.w && p.y+p.h > s.y && p.y < s.y+s.h){
+      if(p.vx > 0) p.x = s.x - p.w;
+      else if(p.vx < 0) p.x = s.x + s.w;
+      p.vx = 0;
+    }
+  }
+}
+function collideY(p){
+  p.grounded = false;
+  for(const s of SOLIDS){
+    if(p.x+p.w > s.x && p.x < s.x+s.w && p.y+p.h > s.y && p.y < s.y+s.h){
+      if(s.oneWay){
+        if(p.vy > 0 && p.y+p.h - p.vy <= s.y + 2){
+          p.y = s.y - p.h;
+          p.vy = 0;
+          p.grounded = true;
+        }
+      } else {
+        if(p.vy > 0){
+          p.y = s.y - p.h;
+          p.vy = 0;
+          p.grounded = true;
+        } else if(p.vy < 0){
+          p.y = s.y + s.h;
+          p.vy = 0;
+        }
+      }
+    }
+  }
+}
+
+// ===== 更新邏輯 =====
+function update(){
+  if(state !== 'playing') return;
+  frame++;
+  timeFrame++;
+  if(timeFrame >= 60){
+    timeFrame = 0;
+    timeLeft--;
+    if(timeLeft <= 0){ lose('時間到了…'); return; }
+    updateHUD();
+  }
+
+  // 玩家輸入
+  if(keys.left)  player.vx = Math.max(player.vx - ACCEL, -WALK);
+  if(keys.right) player.vx = Math.min(player.vx + ACCEL,  WALK);
+  if(!keys.left && !keys.right){
+    player.vx *= player.grounded ? FRICTION : 0.92;
+    if(Math.abs(player.vx) < 0.1) player.vx = 0;
+  }
+  if(player.vx > 0) player.facing = 1;
+  if(player.vx < 0) player.facing = -1;
+
+  // 跳躍
+  if(keys.jump && player.grounded){
+    player.vy = JUMP_V;
+    player.grounded = false;
+    spawnSpark(player.x + player.w/2, player.y + player.h, 4);
+  }
+  keys.jump = false;
+  if(!keys.jumpHeld && player.vy < 0) player.vy *= JUMP_CUT;
+
+  // 重力
+  player.vy = Math.min(player.vy + GRAV, MAX_FALL);
+
+  // 水平移動 + 碰撞
+  player.x += player.vx;
+  if(player.x < 0) { player.x = 0; player.vx = 0; }
+  if(player.x + player.w > LEVEL.width){ player.x = LEVEL.width - player.w; player.vx = 0; }
+  collideX(player);
+
+  // 垂直移動 + 碰撞
+  player.y += player.vy;
+  collideY(player);
+
+  // 掉出畫面外
+  if(player.y > H + 40) loseLife('掉下去了！');
+
+  // 走路動畫
+  if(player.grounded && Math.abs(player.vx) > 0.5) player.walkAnim += 0.2;
+
+  // 攝影機跟隨
+  const targetCam = Math.max(0, Math.min(LEVEL.width - W, player.x + player.w/2 - W/2));
+  camX += (targetCam - camX) * 0.12;
+
+  // 蝸牛移動
+  for(const s of snails){
+    if(!s.alive) continue;
+    s.x += s.vx;
+    if(s.x < s.leftBound){ s.x = s.leftBound; s.vx *= -1; }
+    if(s.x + s.w > s.rightBound){ s.x = s.rightBound - s.w; s.vx *= -1; }
+    s.anim += 0.08;
+    // 玩家踩蝸牛 or 被撞
+    if(player.x + player.w > s.x && player.x < s.x + s.w &&
+       player.y + player.h > s.y && player.y < s.y + s.h){
+      if(player.vy > 0 && player.y + player.h < s.y + 8){
+        s.alive = false;
+        player.vy = -5;
+        score += 200;
+        spawnSpark(s.x + s.w/2, s.y, 8);
+        updateHUD();
+      } else if(invul <= 0){
+        loseLife('被蝸牛撞到了！');
+      }
+    }
+  }
+
+  // 收集星星
+  for(const st of stars){
+    if(st.taken) continue;
+    st.bob += 0.08;
+    if(player.x + player.w > st.x - 6 && player.x < st.x + 6 &&
+       player.y + player.h > st.y - 6 && player.y < st.y + 6){
+      st.taken = true;
+      score += 100;
+      spawnSpark(st.x, st.y, 10);
+      updateHUD();
+    }
+  }
+
+  // 到達終點
+  const [gx, gy] = LEVEL.goal;
+  if(player.x + player.w > gx && player.x < gx + 16 &&
+     player.y + player.h > gy && player.y < gy + 40){
+    win();
+  }
+
+  // 火花更新
+  for(const sp of sparkles){
+    sp.life--;
+    sp.x += sp.vx;
+    sp.y += sp.vy;
+    sp.vy += 0.15;
+  }
+  sparkles = sparkles.filter(s => s.life > 0);
+
+  // 雲移動
+  for(const c of clouds){
+    c.x -= c.speed;
+    if(c.x + c.w < 0) c.x = LEVEL.width;
+  }
+
+  // 無敵時間
+  if(invul > 0) invul--;
+}
+
+function spawnSpark(x, y, n){
+  for(let i=0;i<n;i++){
+    sparkles.push({
+      x, y, vx:(Math.random()-0.5)*3, vy:-Math.random()*3-1,
+      life: 30 + Math.random()*15,
+    });
+  }
+}
+
+function loseLife(reason){
+  lives--;
+  updateHUD();
+  if(lives <= 0){ lose(reason); return; }
+  invul = 90;
+  player.vx = -player.facing * 2;
+  player.vy = -3;
+}
+
+function lose(reason){
+  state = 'lose';
+  document.getElementById('loseReason').textContent = reason;
+  document.getElementById('screenLose').classList.remove('hide');
+}
+
+function win(){
+  state = 'win';
+  score += lives * 500;
+  score += Math.ceil(timeLeft) * 10;
+  document.getElementById('finalScore').textContent = String(score).padStart(5,'0');
+  document.getElementById('finalLives').textContent = lives;
+  document.getElementById('screenWin').classList.remove('hide');
+  updateHUD();
+}
+
+// ===== 繪圖 =====
+function drawSky(){
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, COL.sky3);
+  g.addColorStop(0.5, COL.sky2);
+  g.addColorStop(1, COL.sky1);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+}
+
+function drawMountains(){
+  // 遠景山（視差）
+  ctx.fillStyle = COL.mtn2;
+  for(let i=0;i<8;i++){
+    const x = (i*180 - camX*0.2) % (LEVEL.width + 180);
+    const xx = x < -180 ? x + LEVEL.width + 180 : x;
+    ctx.beginPath();
+    ctx.moveTo(xx, 200);
+    ctx.lineTo(xx + 90, 110);
+    ctx.lineTo(xx + 180, 200);
+    ctx.fill();
+  }
+  // 近景山
+  ctx.fillStyle = COL.mtn1;
+  for(let i=0;i<6;i++){
+    const x = (i*230 - camX*0.4) % (LEVEL.width + 230);
+    const xx = x < -230 ? x + LEVEL.width + 230 : x;
+    ctx.beginPath();
+    ctx.moveTo(xx, 220);
+    ctx.lineTo(xx + 115, 130);
+    ctx.lineTo(xx + 230, 220);
+    ctx.fill();
+  }
+}
+
+function drawClouds(){
+  ctx.fillStyle = COL.cloud;
+  for(const c of clouds){
+    const x = c.x - camX*0.3;
+    if(x + c.w < 0 || x > W) continue;
+    ctx.beginPath();
+    ctx.arc(x, c.y, c.w*0.25, 0, Math.PI*2);
+    ctx.arc(x + c.w*0.3, c.y - 4, c.w*0.3, 0, Math.PI*2);
+    ctx.arc(x + c.w*0.55, c.y, c.w*0.28, 0, Math.PI*2);
+    ctx.arc(x + c.w*0.8, c.y + 2, c.w*0.22, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function drawGround(){
+  for(const [x,y,w,h] of LEVEL.ground){
+    const sx = x - camX;
+    if(sx + w < 0 || sx > W) continue;
+    ctx.fillStyle = COL.ground;
+    ctx.fillRect(sx, y, w, h);
+    // 草頂
+    ctx.fillStyle = COL.grass;
+    ctx.fillRect(sx, y, w, 4);
+    ctx.fillStyle = COL.grass2;
+    for(let i=0;i<w;i+=8){
+      ctx.fillRect(sx+i+1, y-2, 2, 2);
+      ctx.fillRect(sx+i+4, y-1, 1, 1);
+    }
+    // 土壤花紋
+    ctx.fillStyle = '#5d3a1f';
+    for(let i=8;i<w;i+=22){
+      ctx.fillRect(sx+i, y+10, 3, 2);
+      ctx.fillRect(sx+i+14, y+20, 2, 2);
+    }
+  }
+}
+
+function drawPlatforms(){
+  for(const [x,y,w] of LEVEL.platforms){
+    const sx = x - camX;
+    if(sx + w < 0 || sx > W) continue;
+    ctx.fillStyle = COL.platform;
+    ctx.fillRect(sx, y, w, 6);
+    ctx.fillStyle = COL.platTop;
+    ctx.fillRect(sx, y, w, 3);
+    // 小花
+    ctx.fillStyle = '#ff9ac4';
+    for(let i=4;i<w;i+=14){
+      ctx.fillRect(sx+i, y-2, 2, 2);
+    }
+  }
+}
+
+function drawStars(){
+  for(const st of stars){
+    if(st.taken) continue;
+    const sx = st.x - camX;
+    if(sx < -10 || sx > W+10) continue;
+    const off = Math.sin(st.bob) * 1.5;
+    // 光暈
+    ctx.fillStyle = COL.starGlow;
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath();
+    ctx.arc(sx, st.y + off, 7, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    // 星形（用 4 條矩形拼）
+    ctx.fillStyle = COL.star;
+    ctx.fillRect(sx-1, st.y-5+off, 2, 10);
+    ctx.fillRect(sx-5, st.y-1+off, 10, 2);
+    ctx.fillRect(sx-3, st.y-3+off, 6, 6);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(sx-1, st.y-2+off, 2, 2);
+  }
+}
+
+function drawSnails(){
+  for(const s of snails){
+    if(!s.alive) continue;
+    const sx = s.x - camX;
+    if(sx + s.w < 0 || sx > W) continue;
+    const wob = Math.sin(s.anim) * 1;
+    // 身體
+    ctx.fillStyle = COL.snail;
+    ctx.fillRect(sx, s.y + 4 + wob, 6, 8);
+    ctx.fillRect(sx + 4, s.y + 6 + wob, s.w - 4, 6);
+    // 殼
+    ctx.fillStyle = COL.snailShell;
+    ctx.beginPath();
+    ctx.arc(sx + 11, s.y + 5, 6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = COL.snail;
+    ctx.beginPath();
+    ctx.arc(sx + 11, s.y + 5, 3, 0, Math.PI*2);
+    ctx.fill();
+    // 眼睛
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(sx + 1, s.y + 4 + wob, 2, 2);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(sx + 1, s.y + 5 + wob, 1, 1);
+  }
+}
+
+function drawGoal(){
+  const [gx, gy] = LEVEL.goal;
+  const sx = gx - camX;
+  if(sx > W + 20 || sx < -20) return;
+  // 旗桿
+  ctx.fillStyle = COL.flagPole;
+  ctx.fillRect(sx, gy - 30, 3, 70);
+  // 旗子（飄動）
+  const flap = Math.sin(frame * 0.1) * 1.5;
+  ctx.fillStyle = COL.flag;
+  ctx.beginPath();
+  ctx.moveTo(sx + 3, gy - 30);
+  ctx.lineTo(sx + 22 + flap, gy - 25);
+  ctx.lineTo(sx + 3, gy - 20);
+  ctx.fill();
+  // 旗子上的笑臉
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(sx + 10, gy - 27, 2, 2);
+  ctx.fillRect(sx + 14, gy - 27, 2, 2);
+  ctx.fillRect(sx + 11, gy - 24, 4, 1);
+}
+
+function drawPlayer(){
+  if(!player) return;
+  if(invul > 0 && Math.floor(invul/4) % 2) return;
+  const px = Math.round(player.x - camX), py = Math.round(player.y);
+  const w = player.w, h = player.h;
+  const f = player.facing;
+  const hop = (player.grounded && Math.abs(player.vx) > 0.5) ? Math.floor(player.walkAnim) % 2 : 0;
+
+  // 影子
+  ctx.fillStyle = 'rgba(0,0,0,.2)';
+  ctx.beginPath();
+  ctx.ellipse(px + w/2, py + h + 2, w/2, 2, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // 身體（豆豆形）
+  ctx.fillStyle = COL.beanD;
+  ctx.fillRect(px, py + h - hop, w, 1); // 底部陰影
+  ctx.fillStyle = COL.bean;
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(px, py - hop, w, h, 5) : ctx.rect(px, py - hop, w, h);
+  ctx.fill();
+
+  // 腮紅
+  ctx.fillStyle = COL.cheek;
+  if(f > 0){
+    ctx.fillRect(px + 2, py + 8 - hop, 3, 2);
+    ctx.fillRect(px + 9, py + 8 - hop, 3, 2);
+  } else {
+    ctx.fillRect(px + 2, py + 8 - hop, 3, 2);
+    ctx.fillRect(px + 9, py + 8 - hop, 3, 2);
+  }
+
+  // 眼睛
+  ctx.fillStyle = COL.beanFace;
+  if(f > 0){
+    ctx.fillRect(px + 4, py + 5 - hop, 2, 2);
+    ctx.fillRect(px + 9, py + 5 - hop, 2, 2);
+  } else {
+    ctx.fillRect(px + 3, py + 5 - hop, 2, 2);
+    ctx.fillRect(px + 8, py + 5 - hop, 2, 2);
+  }
+  // 嘴
+  ctx.fillStyle = COL.beanFace;
+  ctx.fillRect(px + 6, py + 9 - hop, 2, 1);
+
+  // 跳起時的小腳
+  if(!player.grounded){
+    ctx.fillStyle = COL.beanD;
+    ctx.fillRect(px + 2, py + h - 2 - hop, 3, 2);
+    ctx.fillRect(px + w - 5, py + h - 2 - hop, 3, 2);
+  }
+}
+
+function drawSparkles(){
+  for(const sp of sparkles){
+    const sx = sp.x - camX;
+    if(sx < 0 || sx > W) continue;
+    ctx.fillStyle = COL.spark;
+    ctx.globalAlpha = Math.min(1, sp.life / 20);
+    ctx.fillRect(sx, sp.y, 2, 2);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function render(){
+  drawSky();
+  drawMountains();
+  drawClouds();
+  drawGround();
+  drawPlatforms();
+  drawStars();
+  drawGoal();
+  drawSnails();
+  drawSparkles();
+  drawPlayer();
+}
+
+// ===== 主迴圈 =====
+function loop(){
+  update();
+  render();
+  requestAnimationFrame(loop);
+}
+loop();
+
+// ===== 按鈕控制 =====
+function start(){
+  initGame();
+  state = 'playing';
+  document.getElementById('screenStart').classList.add('hide');
+  document.getElementById('screenWin').classList.add('hide');
+  document.getElementById('screenLose').classList.add('hide');
+  document.getElementById('screenPause').classList.add('hide');
+}
+function pause(){
+  if(state !== 'playing') return;
+  state = 'paused';
+  document.getElementById('screenPause').classList.remove('hide');
+}
+function resume(){
+  state = 'playing';
+  document.getElementById('screenPause').classList.add('hide');
+}
+
+document.getElementById('btnStart').addEventListener('click', start);
+document.getElementById('btnRestart').addEventListener('click', start);
+document.getElementById('btnRetry').addEventListener('click', start);
+document.getElementById('btnResume').addEventListener('click', resume);
+document.getElementById('btnPause').addEventListener('click', () => {
+  state === 'playing' ? pause() : resume();
+});
+
+// 防止觸控滑動
+document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+</script>
+</body>
+</html>
