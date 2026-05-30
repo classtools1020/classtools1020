@@ -3,33 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
-<title>豆豆冒險 · 我就是我 — 國中社會科性別平等遊戲</title>
+<title>豆豆冒險 · 我就是我｜性別平等公民遊戲</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;background:#1a1530;overflow:hidden;touch-action:none;font-family:'Noto Sans TC','PingFang TC',sans-serif}
 .stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#2d2456,#1a1530)}
-.frame{position:relative;display:flex;flex-direction:column;width:100%;max-width:960px;aspect-ratio:16/9;max-height:100vh;box-shadow:0 0 40px rgba(255,200,100,.15)}
+.frame{position:relative;display:flex;flex-direction:column;width:100%;max-width:1100px;aspect-ratio:16/9;max-height:100vh;box-shadow:0 0 40px rgba(255,200,100,.15)}
 canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block;background:#000;border:4px solid #2d2456;border-radius:4px}
 
 /* HUD */
-.hud{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:0 16px;color:#fff;pointer-events:none;font-size:clamp(11px,1.5vw,15px);text-shadow:2px 2px 0 #000;letter-spacing:1px;font-weight:900;z-index:10}
-.hud-left,.hud-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.hud-item{background:rgba(0,0,0,.5);padding:6px 12px;border:2px solid rgba(255,255,255,.25);border-radius:6px}
+.hud{position:absolute;top:8px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:0 14px;color:#fff;pointer-events:none;font-size:clamp(11px,1.5vw,15px);text-shadow:2px 2px 0 #000;letter-spacing:1px;font-weight:900;z-index:10;flex-wrap:wrap;gap:8px}
+.hud-left,.hud-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hud-item{background:rgba(0,0,0,.5);padding:6px 10px;border:2px solid rgba(255,255,255,.25);border-radius:6px}
 .hud-item .lbl{color:#ffc857;margin-right:6px;font-size:.85em}
-.btn-icon{pointer-events:auto;background:rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.3);color:#fff;width:38px;height:38px;border-radius:8px;cursor:pointer;font-size:16px;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.hud-item.combo{background:linear-gradient(135deg,#ff6b9a,#ff8a65);border-color:#fff;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.btn-icon{pointer-events:auto;background:rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.3);color:#fff;width:40px;height:40px;border-radius:8px;cursor:pointer;font-size:18px;font-family:inherit;display:flex;align-items:center;justify-content:center}
 .btn-icon:hover,.btn-icon:active{background:rgba(255,200,100,.35);transform:scale(.95)}
+.btn-icon.active{background:rgba(126,212,135,.6);border-color:#7ed487}
 
 /* Title bar */
 .title-bar{position:absolute;top:-2px;left:0;right:0;text-align:center;color:#ffc857;padding:6px;font-size:clamp(11px,1.5vw,15px);text-shadow:2px 2px 0 #000;letter-spacing:2px;font-weight:900;pointer-events:none;z-index:11}
 .title-bar small{display:block;font-size:.65em;color:#fff;margin-top:2px;opacity:.7;letter-spacing:1px;font-weight:600}
 
-/* Touch */
-.touch{position:absolute;bottom:0;left:0;right:0;display:none;justify-content:space-between;padding:12px 16px;z-index:20;pointer-events:none}
-.touch.on{display:flex}
-.tch-group{display:flex;gap:10px;pointer-events:auto}
-.tch{width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.4);color:#fff;font-size:32px;display:flex;align-items:center;justify-content:center;font-weight:900;backdrop-filter:blur(8px);cursor:pointer;font-family:monospace}
-.tch:active{background:rgba(255,200,100,.5);transform:scale(.92)}
-.tch.jump{background:rgba(255,200,100,.3);border-color:rgba(255,200,100,.6);width:82px;height:82px}
+/* Touch controls - ALWAYS visible, BIGGER */
+.touch{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:14px 18px;z-index:20;pointer-events:none}
+.tch-group{display:flex;gap:14px;pointer-events:auto}
+.tch{width:clamp(70px,9vw,100px);height:clamp(70px,9vw,100px);border-radius:50%;background:rgba(255,255,255,.18);border:4px solid rgba(255,255,255,.5);color:#fff;font-size:clamp(28px,4vw,42px);display:flex;align-items:center;justify-content:center;font-weight:900;backdrop-filter:blur(8px);cursor:pointer;font-family:monospace;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.tch:active{background:rgba(255,200,100,.6);transform:scale(.92)}
+.tch.jump{background:rgba(255,200,100,.4);border-color:rgba(255,200,100,.8);width:clamp(85px,11vw,120px);height:clamp(85px,11vw,120px)}
 
 /* Screens */
 .screen{position:absolute;inset:0;background:rgba(26,21,48,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;z-index:30;letter-spacing:1px;overflow-y:auto}
@@ -63,10 +65,36 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
 .feedback-box b{color:#d65f00}
 .feedback-emoji{font-size:42px;display:block;text-align:center;margin-bottom:6px}
 
+/* Flower quiz modal (in-game) */
+.flower-quiz{position:absolute;inset:0;background:rgba(26,21,48,.88);display:flex;align-items:center;justify-content:center;z-index:40;padding:20px;animation:fadeIn .25s}
+.flower-quiz.hide{display:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.fq-card{background:#fff;color:#1a1530;border-radius:20px;padding:24px;max-width:600px;width:100%;border:5px solid #ffc857;box-shadow:0 8px 0 rgba(0,0,0,.3);text-align:center}
+.fq-emoji{font-size:54px;margin-bottom:8px}
+.fq-q{font-size:clamp(16px,2.4vw,22px);font-weight:900;margin-bottom:18px;line-height:1.5;color:#1a1530}
+.fq-opts{display:flex;flex-direction:column;gap:10px}
+.fq-opt{background:#fff5d6;color:#1a1530;border:3px solid #ffc857;border-radius:12px;padding:14px 18px;font-size:clamp(14px,2vw,18px);font-weight:900;cursor:pointer;font-family:inherit;text-align:left;transition:transform .1s}
+.fq-opt:hover{background:#ffe8a8;transform:translateX(4px)}
+.fq-opt.right{background:#7ed487;color:#fff;border-color:#5fa84b;animation:pop .3s}
+.fq-opt.wrong{background:#e88a8a;color:#fff;border-color:#c84040;animation:shake .3s}
+.fq-feedback{margin-top:14px;font-size:clamp(13px,1.8vw,16px);font-weight:700;color:#1a1530;background:#fff5d6;padding:12px;border-radius:10px;border-left:5px solid #ffc857;text-align:left;line-height:1.6;display:none}
+.fq-feedback.on{display:block}
+.fq-next{margin-top:14px;display:none}
+.fq-next.on{display:inline-block}
+
+/* Teacher tools tray */
+.teacher-tray{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:8px;padding:8px;background:rgba(0,0,0,.5);z-index:15;pointer-events:none;transform:translateY(110%);transition:transform .25s}
+.teacher-tray.on{transform:translateY(0)}
+.tt-btn{pointer-events:auto;background:#1a1530;color:#fff;border:2px solid rgba(255,255,255,.35);padding:6px 12px;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;font-weight:900}
+.tt-btn.on{background:#7ed487;color:#1a1530;border-color:#5fa84b}
+
+/* Report card canvas */
+#reportCanvas{display:block;max-width:100%;border:3px solid #ffc857;border-radius:12px;margin:14px auto;box-shadow:0 6px 20px rgba(0,0,0,.4);background:#fff}
+
 @media(max-width:520px){
   .level-card-grid{grid-template-columns:1fr}
-  .hud-item{padding:5px 8px}
-  .btn-icon{width:32px;height:32px;font-size:13px}
+  .hud-item{padding:5px 8px;font-size:10px}
+  .btn-icon{width:34px;height:34px;font-size:14px}
 }
 </style>
 </head>
@@ -83,17 +111,28 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
     <div class="hud">
       <div class="hud-left">
         <div class="hud-item"><span class="lbl">分數</span><span id="score">0</span></div>
-        <div class="hud-item"><span class="lbl">星星</span><span id="starCnt">0/0</span></div>
+        <div class="hud-item"><span class="lbl">星</span><span id="starCnt">0/0</span></div>
+        <div class="hud-item combo hide" id="comboBox">🔥 連擊 <span id="comboN">0</span> · ×<span id="comboX">1</span></div>
       </div>
       <div class="hud-right">
         <div class="hud-item"><span class="lbl">愛心</span><span id="lives">3</span></div>
-        <button class="btn-icon" id="btnSound" title="音效開關">🔊</button>
+        <button class="btn-icon" id="btnTeacher" title="老師工具">🧑‍🏫</button>
+        <button class="btn-icon" id="btnSound" title="音效">🔊</button>
         <button class="btn-icon" id="btnPause" title="暫停">⏸</button>
       </div>
     </div>
 
     <canvas id="game" width="480" height="270"></canvas>
 
+    <!-- 老師工具列 -->
+    <div class="teacher-tray" id="teacherTray">
+      <button class="tt-btn" id="ttSlow">🐢 慢動作</button>
+      <button class="tt-btn" id="ttInvul">🛡 無敵模式</button>
+      <button class="tt-btn" id="ttJump">🚀 高跳</button>
+      <button class="tt-btn" id="ttSkip">⏭ 跳過此關</button>
+    </div>
+
+    <!-- 觸控（永遠顯示） -->
     <div class="touch" id="touchControls">
       <div class="tch-group">
         <div class="tch" data-key="left">◀</div>
@@ -104,16 +143,28 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
       </div>
     </div>
 
-    <!-- 開始畫面 -->
+    <!-- 花朵問答 -->
+    <div class="flower-quiz hide" id="flowerQuiz">
+      <div class="fq-card">
+        <div class="fq-emoji" id="fqEmoji">🌸</div>
+        <div class="fq-q" id="fqQ"></div>
+        <div class="fq-opts" id="fqOpts"></div>
+        <div class="fq-feedback" id="fqFb"></div>
+        <button class="fq-next" id="fqNext">繼續冒險 →</button>
+      </div>
+    </div>
+
+    <!-- 開始 -->
     <div class="screen" id="screenStart">
       <h1>🌈 豆豆冒險：我就是我</h1>
       <p class="sub">
-        一個關於「性別平等」的冒險遊戲，<br>
-        陪豆豆走完 <b>4 個世界</b>，學會 <b>「我可以做我自己」</b>。
+        一個關於「<b>性別平等</b>」的冒險遊戲，<br>
+        陪豆豆走完 <b>4 個世界</b>，學會「<b>我可以做我自己</b>」。
       </p>
       <p class="sub" style="font-size:.9em">
         <span class="key">← →</span> 移動 ・ <span class="key">↑ / 空白</span> 跳<br>
-        <small style="opacity:.6">（手機請用畫面下方按鈕）</small>
+        <small style="opacity:.7">📱 手機 / 大屏：點下方圓形按鈕</small><br>
+        <small style="opacity:.7">🌸 撞到花會出題，答對 → <b style="color:#ffc857">變大!跳更高!</b></small>
       </p>
       <button id="btnStart">開始冒險</button>
       <button class="alt" id="btnLevelSelect">選關卡</button>
@@ -123,28 +174,19 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
       </div>
     </div>
 
-    <!-- 選關卡 -->
+    <!-- 選關 -->
     <div class="screen hide" id="screenSelect">
       <h1>選擇關卡</h1>
       <div class="level-card-grid" id="levelGrid"></div>
       <button class="alt" id="btnBackToStart">← 回首頁</button>
     </div>
 
-    <!-- 關卡前介紹 -->
+    <!-- 關卡介紹 -->
     <div class="screen hide" id="screenIntro">
       <h2 id="introTitle">第 1 關</h2>
       <h1 id="introName">我是誰</h1>
       <p class="sub" id="introDesc"></p>
       <button id="btnIntroGo">出發！</button>
-    </div>
-
-    <!-- Quiz 判斷題 -->
-    <div class="screen hide" id="screenQuiz">
-      <h2>🤔 想一想</h2>
-      <p class="sub" id="quizQ" style="font-size:clamp(15px,2.3vw,21px);font-weight:900;color:#fff"></p>
-      <div id="quizOpts"></div>
-      <div id="quizFeedback" class="feedback-box hide"></div>
-      <button id="btnQuizNext" class="hide">繼續 →</button>
     </div>
 
     <!-- 暫停 -->
@@ -154,14 +196,16 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
       <button class="alt" id="btnBackHome">回首頁</button>
     </div>
 
-    <!-- 關卡勝利 -->
+    <!-- 關卡勝利 + 學習卡 -->
     <div class="screen hide" id="screenLvlWin">
       <h1>🎉 過關啦！</h1>
       <p class="sub">
-        分數：<span id="lvlScore" style="color:#ffc857">0</span><br>
+        分數：<span id="lvlScore" style="color:#ffc857">0</span>　·
         星星：<span id="lvlStars" style="color:#ffc857">0/0</span>
       </p>
       <div id="lvlMessage" class="feedback-box"></div>
+      <canvas id="reportCanvas" width="640" height="400"></canvas>
+      <p class="sub" style="font-size:.85em;opacity:.7">⬆ 長按圖片可儲存｜可截圖給家長看</p>
       <button id="btnNextLvl">下一關 →</button>
     </div>
 
@@ -169,15 +213,12 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
     <div class="screen hide" id="screenAllWin">
       <h1>🏆 全破啦！</h1>
       <p class="sub">
-        你陪豆豆走完 4 個世界，<br>
-        記住豆豆學到的事：<br><br>
+        豆豆走完 4 個世界，記住：<br><br>
         <b>「我可以做我自己。」</b><br>
         <b>「男生女生，都可以。」</b><br>
         <b>「不一樣，也很好。」</b>
       </p>
-      <p class="sub">
-        總分：<span id="totalScore" style="color:#ffc857">0</span>
-      </p>
+      <p class="sub">總分：<span id="totalScore" style="color:#ffc857">0</span></p>
       <button id="btnPlayAgain">再玩一次</button>
     </div>
 
@@ -193,139 +234,92 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
 </div>
 
 <script>
-// =====================================================
-// 豆豆冒險 · 我就是我｜性別平等公民課遊戲
-// =====================================================
-
 const cvs = document.getElementById('game');
 const ctx = cvs.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 const W = cvs.width, H = cvs.height;
 
-// ============ 音效系統（Web Audio 合成）============
+// ================ 音效合成 ================
 class Sound {
-  constructor(){
-    this.enabled = true;
-    this.actx = null;
-    this.musicNodes = [];
-    this.musicTimer = null;
-  }
-  init(){
-    if(this.actx) return;
-    try{ this.actx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
-  }
-  beep(freq, dur=0.1, type='square', vol=0.15, attack=0.005, release=0.05){
+  constructor(){ this.enabled = true; this.actx = null; this.musicTimer = null; }
+  init(){ if(this.actx) return; try{ this.actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  beep(f, d=0.1, t='square', v=0.15){
     if(!this.enabled || !this.actx) return;
-    const t = this.actx.currentTime;
-    const osc = this.actx.createOscillator();
-    const gain = this.actx.createGain();
-    osc.type = type;
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(vol, t + attack);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    osc.connect(gain).connect(this.actx.destination);
-    osc.start(t);
-    osc.stop(t + dur + release);
+    const a = this.actx, n = a.currentTime;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = t; o.frequency.value = f;
+    g.gain.setValueAtTime(0, n); g.gain.linearRampToValueAtTime(v, n+0.005);
+    g.gain.exponentialRampToValueAtTime(0.001, n+d);
+    o.connect(g).connect(a.destination); o.start(n); o.stop(n+d+0.05);
   }
-  slide(f1, f2, dur=0.15, type='square', vol=0.15){
+  slide(f1, f2, d=0.15, t='square', v=0.15){
     if(!this.enabled || !this.actx) return;
-    const t = this.actx.currentTime;
-    const osc = this.actx.createOscillator();
-    const gain = this.actx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(f1, t);
-    osc.frequency.exponentialRampToValueAtTime(f2, t + dur);
-    gain.gain.setValueAtTime(vol, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    osc.connect(gain).connect(this.actx.destination);
-    osc.start(t);
-    osc.stop(t + dur + 0.05);
+    const a = this.actx, n = a.currentTime;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = t;
+    o.frequency.setValueAtTime(f1, n);
+    o.frequency.exponentialRampToValueAtTime(f2, n+d);
+    g.gain.setValueAtTime(v, n);
+    g.gain.exponentialRampToValueAtTime(0.001, n+d);
+    o.connect(g).connect(a.destination); o.start(n); o.stop(n+d+0.05);
   }
-  noise(dur=0.1, vol=0.1, hp=400){
+  noise(d=0.1, v=0.1, hp=400){
     if(!this.enabled || !this.actx) return;
-    const t = this.actx.currentTime;
-    const bufSize = Math.floor(this.actx.sampleRate * dur);
-    const buf = this.actx.createBuffer(1, bufSize, this.actx.sampleRate);
-    const data = buf.getChannelData(0);
-    for(let i=0;i<bufSize;i++) data[i] = (Math.random()*2-1) * (1 - i/bufSize);
-    const src = this.actx.createBufferSource();
-    src.buffer = buf;
-    const filter = this.actx.createBiquadFilter();
-    filter.type = 'highpass';
-    filter.frequency.value = hp;
-    const gain = this.actx.createGain();
-    gain.gain.value = vol;
-    src.connect(filter).connect(gain).connect(this.actx.destination);
-    src.start(t);
+    const a = this.actx, n = a.currentTime;
+    const bs = Math.floor(a.sampleRate * d);
+    const b = a.createBuffer(1, bs, a.sampleRate);
+    const dt = b.getChannelData(0);
+    for(let i=0;i<bs;i++) dt[i] = (Math.random()*2-1) * (1 - i/bs);
+    const s = a.createBufferSource(); s.buffer = b;
+    const f = a.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = hp;
+    const g = a.createGain(); g.gain.value = v;
+    s.connect(f).connect(g).connect(a.destination); s.start(n);
   }
-  // 各種音效
   jump(){ this.slide(420, 720, 0.12, 'square', 0.13); }
+  superJump(){ this.slide(300, 900, 0.18, 'square', 0.15); }
   land(){ this.beep(180, 0.06, 'sine', 0.08); }
   star(){ this.slide(880, 1320, 0.08, 'triangle', 0.12); setTimeout(()=>this.slide(1320, 1760, 0.08, 'triangle', 0.10), 50); }
-  bigStar(){ this.slide(660, 1100, 0.1, 'triangle', 0.14); setTimeout(()=>this.slide(1100, 1540, 0.1, 'triangle', 0.12), 60); setTimeout(()=>this.slide(1540, 2000, 0.12, 'triangle', 0.10), 130); }
+  combo(n){ this.beep(660 + n*80, 0.1, 'triangle', 0.13); }
+  flower(){ this.slide(523, 1047, 0.15, 'triangle', 0.14); }
+  grow(){ [440, 554, 659, 880, 1100].forEach((f,i)=>setTimeout(()=>this.beep(f, 0.12, 'triangle', 0.13), i*70)); }
+  shrink(){ this.slide(880, 220, 0.3, 'square', 0.12); }
   stomp(){ this.slide(300, 80, 0.18, 'square', 0.15); }
   hurt(){ this.slide(440, 110, 0.3, 'sawtooth', 0.16); this.noise(0.15, 0.08, 200); }
-  select(){ this.beep(700, 0.05, 'square', 0.1); }
   click(){ this.beep(900, 0.04, 'square', 0.08); }
-  correct(){ this.beep(660, 0.08, 'triangle', 0.13); setTimeout(()=>this.beep(880, 0.12, 'triangle', 0.13), 100); }
+  correct(){ this.beep(660, 0.08, 'triangle', 0.13); setTimeout(()=>this.beep(880, 0.12, 'triangle', 0.13), 100); setTimeout(()=>this.beep(1100, 0.15, 'triangle', 0.13), 200); }
   wrong(){ this.beep(220, 0.15, 'sawtooth', 0.12); setTimeout(()=>this.beep(180, 0.18, 'sawtooth', 0.12), 80); }
   pause(){ this.beep(500, 0.08, 'square', 0.1); setTimeout(()=>this.beep(380, 0.12, 'square', 0.1), 80); }
   blocker(){ this.slide(200, 320, 0.15, 'sawtooth', 0.1); }
-  win(){
-    const notes = [523, 659, 784, 1047];
-    notes.forEach((f, i) => setTimeout(() => this.beep(f, 0.15, 'triangle', 0.14), i * 120));
-  }
-  bigWin(){
-    const notes = [523, 659, 784, 1047, 1319, 1568, 2093];
-    notes.forEach((f, i) => setTimeout(() => this.beep(f, 0.18, 'triangle', 0.15), i * 100));
-  }
-  lose(){
-    [400, 320, 240, 160].forEach((f, i) => setTimeout(() => this.beep(f, 0.2, 'triangle', 0.12), i * 150));
-  }
-  power(){
-    [440, 554, 659, 880].forEach((f, i) => setTimeout(() => this.beep(f, 0.08, 'triangle', 0.12), i * 60));
-  }
-  // 背景音樂（簡單循環，柔和）
+  shutter(){ this.noise(0.05, 0.08, 1000); setTimeout(()=>this.beep(2000, 0.02, 'square', 0.1), 30); }
+  win(){ [523, 659, 784, 1047].forEach((f,i)=>setTimeout(()=>this.beep(f, 0.15, 'triangle', 0.14), i*120)); }
+  bigWin(){ [523, 659, 784, 1047, 1319, 1568, 2093].forEach((f,i)=>setTimeout(()=>this.beep(f, 0.18, 'triangle', 0.15), i*100)); }
+  lose(){ [400, 320, 240, 160].forEach((f,i)=>setTimeout(()=>this.beep(f, 0.2, 'triangle', 0.12), i*150)); }
+  power(){ [440, 554, 659, 880].forEach((f,i)=>setTimeout(()=>this.beep(f, 0.08, 'triangle', 0.12), i*60)); }
   startMusic(){
     this.stopMusic();
     if(!this.enabled || !this.actx) return;
-    const melody = [
-      [523, 0.4], [659, 0.4], [784, 0.4], [659, 0.4],
-      [523, 0.4], [659, 0.4], [880, 0.8],
-      [784, 0.4], [659, 0.4], [523, 0.4], [659, 0.4],
-      [523, 0.4], [440, 0.4], [523, 0.8],
-    ];
-    let i = 0, t = 0;
-    const playNext = () => {
+    const mel = [[523,0.4],[659,0.4],[784,0.4],[659,0.4],[523,0.4],[659,0.4],[880,0.8],
+                 [784,0.4],[659,0.4],[523,0.4],[659,0.4],[523,0.4],[440,0.4],[523,0.8]];
+    let i = 0;
+    const play = () => {
       if(!this.musicTimer) return;
-      const [freq, dur] = melody[i % melody.length];
-      this.beep(freq, dur * 0.8, 'triangle', 0.05);
-      i++;
-      this.musicTimer = setTimeout(playNext, dur * 1000 * 0.9);
+      const [f, d] = mel[i % mel.length];
+      this.beep(f, d*0.8, 'triangle', 0.05); i++;
+      this.musicTimer = setTimeout(play, d*1000*0.9);
     };
-    this.musicTimer = setTimeout(playNext, 100);
+    this.musicTimer = setTimeout(play, 100);
   }
-  stopMusic(){
-    if(this.musicTimer){ clearTimeout(this.musicTimer); this.musicTimer = null; }
-  }
-  toggle(){
-    this.enabled = !this.enabled;
-    if(!this.enabled){ this.stopMusic(); }
-    return this.enabled;
-  }
+  stopMusic(){ if(this.musicTimer){ clearTimeout(this.musicTimer); this.musicTimer = null; } }
+  toggle(){ this.enabled = !this.enabled; if(!this.enabled) this.stopMusic(); return this.enabled; }
 }
 const SND = new Sound();
 
-// ============ 輸入 ============
+// ================ 輸入 ================
 const keys = { left:false, right:false, jump:false, jumpHeld:false };
 function setKey(k, v){
   if(k==='left') keys.left = v;
   if(k==='right') keys.right = v;
-  if(k==='jump'){
-    if(v && !keys.jumpHeld) keys.jump = true;
-    keys.jumpHeld = v;
-  }
+  if(k==='jump'){ if(v && !keys.jumpHeld) keys.jump = true; keys.jumpHeld = v; }
 }
 addEventListener('keydown', e=>{
   SND.init();
@@ -338,9 +332,6 @@ addEventListener('keyup', e=>{
   if(['ArrowRight','d','D'].includes(e.key)) setKey('right', false);
   if(['ArrowUp','w','W',' ','z','Z'].includes(e.key)) setKey('jump', false);
 });
-
-const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-if(isTouch) document.getElementById('touchControls').classList.add('on');
 document.querySelectorAll('.tch').forEach(b => {
   const k = b.dataset.key;
   const press = e => { e.preventDefault(); SND.init(); setKey(k, true); };
@@ -351,242 +342,132 @@ document.querySelectorAll('.tch').forEach(b => {
   b.addEventListener('pointercancel', release);
 });
 
-// ============ 4 大關卡資料 ============
+// ================ 關卡資料 ================
 const LEVELS = [
   {
-    name: '我是誰',
-    desc: '<b>每個人都不一樣，都很棒。</b><br>幫豆豆收集「我的特質」星星，學會：<b>我有我的樣子</b>。',
-    palette: 'sunset',
-    width: 1600,
-    start: [60, 200],
-    ground: [
-      [0, 240, 400, 30],
-      [460, 240, 320, 30],
-      [840, 240, 300, 30],
-      [1200, 240, 400, 30],
+    name: '我是誰', desc: '<b>每個人都不一樣，都很棒。</b><br>幫豆豆收集「我的特質」星星，撞 🌸 答題會變大！',
+    palette: 'sunset', width: 1600, start: [60, 200],
+    npc: { x: 100, y: 200, msg: '嗨！我是小豆！\n每個人都有自己的樣子，\n找找看你的特質吧！' },
+    ground: [[0,240,400,30],[460,240,320,30],[840,240,300,30],[1200,240,400,30]],
+    platforms: [[180,180,60],[310,145,60],[490,180,60],[620,150,70],[740,200,60],[870,165,60],[970,135,50],[1060,175,60],[1250,180,60],[1360,145,70],[1470,175,60]],
+    stars: [[110,200],[200,145],[320,110],[380,200],[510,145],[640,115],[760,165],[810,200],[890,130],[990,100],[1080,140],[1150,200],[1270,145],[1380,110],[1490,140],[1550,200]],
+    flowers: [[420,220,0],[800,220,1],[1180,220,2]],
+    snails: [[330,270,400],[690,460,780],[1000,840,1140],[1400,1200,1580]],
+    blockers: [], goal: [1560,200],
+    winLesson: '🌟 豆豆學到：<b>每個人都有自己的特質。</b>有人安靜、有人活潑、有人愛畫畫、有人愛運動 ── 都很棒。',
+    quizzes: [
+      { q:'你覺得哪個是「特質」？', opts:['很高很矮','男生女生','愛笑、勇敢、聰明、安靜'], correct:2, fb:'<b>對！</b>「特質」就是你的樣子，跟身高、性別沒關係。' },
+      { q:'男生喜歡畫畫，可以嗎？', opts:['可以！','不可以'], correct:0, fb:'<b>可以！</b>畫畫不分男生女生，喜歡就去畫。' },
+      { q:'女生喜歡踢足球，可以嗎？', opts:['可以！','不可以'], correct:0, fb:'<b>可以！</b>運動不分男生女生，誰都可以踢。' },
     ],
-    platforms: [
-      [180, 180, 60], [310, 145, 60],
-      [490, 180, 60], [620, 150, 70], [740, 200, 60],
-      [870, 165, 60], [970, 135, 50], [1060, 175, 60],
-      [1250, 180, 60], [1360, 145, 70], [1470, 175, 60],
-    ],
-    stars: [
-      [110, 200], [200, 145], [320, 110], [380, 200],
-      [510, 145], [640, 115], [760, 165], [810, 200],
-      [890, 130], [990, 100], [1080, 140], [1150, 200],
-      [1270, 145], [1380, 110], [1490, 140], [1550, 200],
-    ],
-    snails: [
-      [330, 270, 400],
-      [690, 460, 780],
-      [1000, 840, 1140],
-      [1400, 1200, 1580],
-    ],
-    blockers: [],
-    goal: [1560, 200],
-    winMsg: '🌟 過關訊息',
-    winLesson: '豆豆學到：<b>每個人都有自己的特質。</b>有人安靜、有人活潑、有人愛畫畫、有人愛運動 ── 都很好。',
   },
   {
-    name: '都可以',
-    desc: '<b>男生女生都可以。</b><br>路上會有「男生不能 / 女生不能」的看板擋路，豆豆要想辦法跳過去！',
-    palette: 'noon',
-    width: 1700,
-    start: [60, 200],
-    ground: [
-      [0, 240, 380, 30],
-      [440, 240, 360, 30],
-      [860, 240, 320, 30],
-      [1240, 240, 460, 30],
+    name: '都可以', desc: '<b>男生女生都可以。</b><br>路上有「不可以」的紅色看板，靠近 1 秒會破除！',
+    palette: 'noon', width: 1700, start: [60, 200],
+    npc: { x: 100, y: 200, msg: '看到「男生不能」「女生不能」\n的看板都是錯的！\n我們一起去打破它～' },
+    ground: [[0,240,380,30],[440,240,360,30],[860,240,320,30],[1240,240,460,30]],
+    platforms: [[150,180,60],[280,140,60],[470,175,60],[600,145,70],[730,195,60],[880,170,60],[990,135,50],[1090,165,60],[1280,175,60],[1400,140,70],[1530,170,60]],
+    stars: [[100,200],[180,140],[300,100],[360,200],[490,140],[620,105],[740,155],[810,200],[900,130],[1010,95],[1110,130],[1180,200],[1300,140],[1420,100],[1550,135],[1650,200]],
+    flowers: [[400,220,0],[820,220,1],[1200,220,2]],
+    snails: [[330,260,380],[680,440,800],[1000,860,1180],[1420,1240,1680]],
+    blockers: [[430,200,'男生\n不能哭','男生也可以哭，難過就哭'],[840,200,'女生\n不能玩\n車車','女生也可以玩車車'],[1235,200,'只有男生\n可以當\n班長','誰都可以當班長']],
+    goal: [1660,200],
+    winLesson: '🌟 豆豆學到：<b>「只有 ___ 才可以做 ___」都是錯的。</b>男生女生，都可以選自己喜歡的事。',
+    quizzes: [
+      { q:'媽媽煮飯，爸爸可以煮飯嗎？', opts:['可以！','不可以'], correct:0, fb:'<b>當然可以！</b>家事不分男女，爸爸煮的菜也很好吃。' },
+      { q:'男生可以穿粉紅色嗎？', opts:['可以！','不可以'], correct:0, fb:'<b>可以！</b>顏色沒有性別，100 年前粉紅色還是男生的顏色呢！' },
+      { q:'警察、消防員，可以是女生嗎？', opts:['可以！','不可以'], correct:0, fb:'<b>可以！</b>很多女生是很厲害的警察、消防員。' },
     ],
-    platforms: [
-      [150, 180, 60], [280, 140, 60],
-      [470, 175, 60], [600, 145, 70], [730, 195, 60],
-      [880, 170, 60], [990, 135, 50], [1090, 165, 60],
-      [1280, 175, 60], [1400, 140, 70], [1530, 170, 60],
-    ],
-    stars: [
-      [100, 200], [180, 140], [300, 100], [360, 200],
-      [490, 140], [620, 105], [740, 155], [810, 200],
-      [900, 130], [1010, 95], [1110, 130], [1180, 200],
-      [1300, 140], [1420, 100], [1550, 135], [1650, 200],
-    ],
-    snails: [
-      [330, 260, 380],
-      [680, 440, 800],
-      [1000, 860, 1180],
-      [1420, 1240, 1680],
-    ],
-    blockers: [
-      [430, 200, '男生\n不能哭', '男生也可以哭，難過就哭'],
-      [840, 200, '女生\n不能玩\n車車', '女生也可以玩車車'],
-      [1235, 200, '只有男生\n可以當\n班長', '誰都可以當班長'],
-    ],
-    goal: [1660, 200],
-    winMsg: '🌟 過關訊息',
-    winLesson: '豆豆學到：<b>「只有 ___ 才可以做 ___」</b> 都是錯的。男生女生，都可以選自己喜歡的事。',
   },
   {
-    name: '尊重不一樣',
-    desc: '<b>跟我不一樣，也很棒。</b><br>路上有取笑別人的小怪，豆豆要小心。記得：朋友不一樣很正常！',
-    palette: 'dusk',
-    width: 1800,
-    start: [60, 200],
-    ground: [
-      [0, 240, 380, 30],
-      [440, 240, 380, 30],
-      [880, 240, 320, 30],
-      [1260, 240, 540, 30],
+    name: '尊重不一樣', desc: '<b>跟我不一樣，也很棒。</b><br>蝸牛代表取笑別人的小怪，小心避開或踩它！',
+    palette: 'dusk', width: 1800, start: [60, 200],
+    npc: { x: 100, y: 200, msg: '世界上有很多人，\n大家都不一樣 ──\n不一樣不是壞事喔。' },
+    ground: [[0,240,380,30],[440,240,380,30],[880,240,320,30],[1260,240,540,30]],
+    platforms: [[170,175,60],[290,140,60],[470,175,60],[600,140,70],[740,195,60],[890,165,60],[1000,130,50],[1110,165,60],[1290,175,60],[1410,140,70],[1550,165,60],[1680,130,60]],
+    stars: [[100,200],[180,135],[300,100],[360,200],[490,135],[620,100],[760,155],[820,200],[910,125],[1020,90],[1130,125],[1200,200],[1310,135],[1430,100],[1570,125],[1700,90],[1780,200]],
+    flowers: [[400,220,0],[850,220,1],[1500,220,2]],
+    snails: [[320,260,380],[680,440,820],[1020,880,1200],[1430,1260,1500],[1620,1500,1780]],
+    blockers: [[435,200,'你穿\n粉紅色\n好奇怪','顏色沒有性別，喜歡就好'],[880,200,'男生\n為什麼\n要跳舞','男生也可以跳舞，超帥的'],[1255,200,'女生\n怎麼可以\n當警察','誰都可以當警察，公平勇敢就好']],
+    goal: [1770,200],
+    winLesson: '🌟 豆豆學到：<b>跟你不一樣的人，不是「奇怪」，只是「不一樣」。</b>互相尊重，世界更好玩。',
+    quizzes: [
+      { q:'看到同學穿的跟你不一樣，你會？', opts:['取笑他','說「你的衣服好特別」','不理他'], correct:1, fb:'<b>很棒！</b>欣賞別人的不一樣，就是尊重。' },
+      { q:'朋友哭了，你會？', opts:['叫他別哭','陪在旁邊','笑他愛哭'], correct:1, fb:'<b>對！</b>陪伴比任何話都重要。' },
+      { q:'同學說「你怎麼跟別人不一樣」，你可以說？', opts:['「不一樣才特別啊」','「對不起」','「我也覺得我很怪」'], correct:0, fb:'<b>沒錯！</b>不一樣不是錯，那是你的特別。' },
     ],
-    platforms: [
-      [170, 175, 60], [290, 140, 60],
-      [470, 175, 60], [600, 140, 70], [740, 195, 60],
-      [890, 165, 60], [1000, 130, 50], [1110, 165, 60],
-      [1290, 175, 60], [1410, 140, 70], [1550, 165, 60], [1680, 130, 60],
-    ],
-    stars: [
-      [100, 200], [180, 135], [300, 100], [360, 200],
-      [490, 135], [620, 100], [760, 155], [820, 200],
-      [910, 125], [1020, 90], [1130, 125], [1200, 200],
-      [1310, 135], [1430, 100], [1570, 125], [1700, 90], [1780, 200],
-    ],
-    snails: [
-      [320, 260, 380],
-      [680, 440, 820],
-      [1020, 880, 1200],
-      [1430, 1260, 1500],
-      [1620, 1500, 1780],
-    ],
-    blockers: [
-      [435, 200, '你穿\n粉紅色\n好奇怪', '顏色沒有性別，喜歡就好'],
-      [880, 200, '男生\n為什麼\n要跳舞', '男生也可以跳舞，超帥的'],
-      [1255, 200, '女生\n怎麼可以\n當警察', '誰都可以當警察，公平、勇敢就好'],
-    ],
-    goal: [1770, 200],
-    winLesson: '豆豆學到：<b>跟你不一樣的人，不是「奇怪」，只是「不一樣」。</b>互相尊重，世界更好玩。',
   },
   {
-    name: '我們的彩虹世界',
-    desc: '<b>慶祝！</b>豆豆要把所有彩虹星星收齊，去拿到 <b>「我就是我」</b> 大彩虹旗！',
-    palette: 'rainbow',
-    width: 1900,
-    start: [60, 200],
-    ground: [
-      [0, 240, 360, 30],
-      [420, 240, 360, 30],
-      [840, 240, 360, 30],
-      [1260, 240, 640, 30],
+    name: '我們的彩虹世界', desc: '<b>慶祝！</b>收齊彩虹星星，去拿到「<b>我就是我</b>」大彩虹旗！',
+    palette: 'rainbow', width: 1900, start: [60, 200],
+    npc: { x: 100, y: 200, msg: '最後一關了！\n世界上每個人都是\n彩虹的一種顏色～' },
+    ground: [[0,240,360,30],[420,240,360,30],[840,240,360,30],[1260,240,640,30]],
+    platforms: [[140,175,60],[260,140,60],[370,105,50],[450,175,60],[580,140,70],[720,105,60],[870,175,60],[990,140,60],[1110,105,60],[1280,175,70],[1400,140,70],[1530,105,70],[1660,140,70],[1780,105,70]],
+    stars: [[90,200],[160,135],[290,100],[390,65],[350,200],[470,135],[600,100],[740,65],[800,200],[890,135],[1010,100],[1130,65],[1200,200],[1300,135],[1420,100],[1550,65],[1680,100],[1800,65],[1850,200]],
+    flowers: [[380,220,0],[800,220,1],[1230,220,2]],
+    snails: [[320,260,360],[640,420,780],[990,840,1200],[1420,1260,1700]],
+    blockers: [], goal: [1870,200],
+    winLesson: '🌈 豆豆學會了：<br><b>我可以做我自己。</b><br><b>男生女生，都可以。</b><br><b>不一樣，也很好。</b>',
+    quizzes: [
+      { q:'「我可以做我自己」這句話對嗎？', opts:['對','不對'], correct:0, fb:'<b>對！</b>你就是你，最棒的就是你自己。' },
+      { q:'你能不能跟別人不一樣？', opts:['可以！','不可以'], correct:0, fb:'<b>當然可以！</b>世界因為不一樣才精彩。' },
+      { q:'最後一題：你最棒的特質是什麼？選一個你喜歡的', opts:['溫柔','勇敢','聰明、會關心人'], correct:-1, fb:'<b>太棒了！</b>你選的就是答案。你就是你的英雄。' },
     ],
-    platforms: [
-      [140, 175, 60], [260, 140, 60], [370, 105, 50],
-      [450, 175, 60], [580, 140, 70], [720, 105, 60],
-      [870, 175, 60], [990, 140, 60], [1110, 105, 60],
-      [1280, 175, 70], [1400, 140, 70], [1530, 105, 70], [1660, 140, 70], [1780, 105, 70],
-    ],
-    stars: [
-      [90, 200], [160, 135], [290, 100], [390, 65], [350, 200],
-      [470, 135], [600, 100], [740, 65], [800, 200],
-      [890, 135], [1010, 100], [1130, 65], [1200, 200],
-      [1300, 135], [1420, 100], [1550, 65], [1680, 100], [1800, 65], [1850, 200],
-    ],
-    snails: [
-      [320, 260, 360],
-      [640, 420, 780],
-      [990, 840, 1200],
-      [1420, 1260, 1700],
-    ],
-    blockers: [],
-    goal: [1870, 200],
-    winLesson: '🌈 豆豆學到的事：<br><b>我可以做我自己。</b><br><b>男生女生，都可以。</b><br><b>不一樣，也很好。</b>',
   },
 ];
 
-// ============ Quiz ============
-const QUIZZES = [
-  // 第 1 關 → 第 2 關
-  {
-    q: '小明是男生，他喜歡跳舞。可以嗎？',
-    opts: ['可以！跳舞跟性別無關', '不可以，男生不能跳舞'],
-    correct: 0,
-    feedback: '<span class="feedback-emoji">💃</span><b>答對啦！</b><br>跳舞不分男生女生，喜歡就去跳。',
-  },
-  // 第 2 關 → 第 3 關
-  {
-    q: '看到同學穿粉紅色衣服，你會說？',
-    opts: ['「粉紅色真好看！」', '「男生穿粉紅色好奇怪」', '不理他'],
-    correct: 0,
-    feedback: '<span class="feedback-emoji">🌸</span><b>很棒！</b><br>顏色沒有性別。100 年前，粉紅色還是男生的顏色喔！',
-  },
-  // 第 3 關 → 第 4 關
-  {
-    q: '班上選班長，誰可以選？',
-    opts: ['只有男生', '只有女生', '都可以'],
-    correct: 2,
-    feedback: '<span class="feedback-emoji">👑</span><b>答對！</b><br>領導力不分男女，每個人都可以試試看。',
-  },
-];
-
-// ============ 物理常數 ============
+// ================ 物理 ================
 const GRAV = 0.42, WALK = 1.6, ACCEL = 0.4, FRICTION = 0.78;
 const JUMP_V = -7.2, JUMP_CUT = 0.4, MAX_FALL = 9;
 
-// ============ 配色（每關不同）============
 const PALETTES = {
-  sunset: { sky:['#8db4d4','#ffa9b9','#ffd4a3'], mtn1:'#6b5b8c', mtn2:'#9b8bb4', ground:'#7a4f2c', grass:'#5fa84b', grass2:'#4a8a3a' },
-  noon:   { sky:['#6fb8e8','#a8d4f0','#fff5d6'], mtn1:'#5a7ba8', mtn2:'#88a4c4', ground:'#8a5f3c', grass:'#6fc859', grass2:'#5aa848' },
-  dusk:   { sky:['#5a4078','#a06a98','#ffa080'], mtn1:'#4a3060', mtn2:'#7a5a98', ground:'#7a4f2c', grass:'#7a8a4a', grass2:'#5a6a3a' },
-  rainbow:{ sky:['#a8e0f0','#ffd4a3','#ffb0d4'], mtn1:'#8a6abe', mtn2:'#bea4d4', ground:'#9c6f3f', grass:'#7ec849', grass2:'#5fa83a' },
+  sunset: { sky:['#8db4d4','#ffa9b9','#ffd4a3'], mtn1:'#6b5b8c', mtn2:'#9b8bb4', ground:'#7a4f2c', grass:'#5fa84b' },
+  noon:   { sky:['#6fb8e8','#a8d4f0','#fff5d6'], mtn1:'#5a7ba8', mtn2:'#88a4c4', ground:'#8a5f3c', grass:'#6fc859' },
+  dusk:   { sky:['#5a4078','#a06a98','#ffa080'], mtn1:'#4a3060', mtn2:'#7a5a98', ground:'#7a4f2c', grass:'#7a8a4a' },
+  rainbow:{ sky:['#a8e0f0','#ffd4a3','#ffb0d4'], mtn1:'#8a6abe', mtn2:'#bea4d4', ground:'#9c6f3f', grass:'#7ec849' },
 };
 
-// ============ 遊戲狀態 ============
-let curLevel = 0;
-let totalScore = 0;
-let state = 'start';
-let camX = 0;
-let score = 0, lives = 3, invul = 0;
-let player = null, stars = [], snails = [], blockers = [], sparkles = [], clouds = [];
+// ================ 狀態 ================
+let curLevel = 0, totalScore = 0, state = 'start';
+let camX = 0, score = 0, lives = 3, invul = 0;
+let player = null, stars = [], snails = [], blockers = [], flowers = [], sparkles = [], clouds = [], bubbles = [];
 let SOLIDS = [];
 let starsTaken = 0, starsTotal = 0;
 let frame = 0;
 let curPal = PALETTES.sunset;
+let combo = 0, comboTimer = 0;
+let teacher = { slow:false, invul:false, highJump:false };
+let npc = null, npcShown = 0;
+let starsPerLevel = [];
+let correctQuizzes = 0;
 
 function initLevel(idx){
   const L = LEVELS[idx];
   curPal = PALETTES[L.palette];
   player = {
-    x: L.start[0], y: L.start[1],
-    vx: 0, vy: 0, w: 14, h: 16,
+    x: L.start[0], y: L.start[1], vx: 0, vy: 0,
+    w: 14, h: 16, baseW: 14, baseH: 16,
     grounded: false, facing: 1, walkAnim: 0,
+    superTime: 0, // 變大時間
   };
   stars = L.stars.map(([x,y], i) => ({x, y, taken:false, bob: Math.random()*Math.PI*2, kind: idx === 3 ? i % 6 : 0}));
-  snails = L.snails.map(([x, lb, rb]) => ({
-    x, y: 224, vx: -0.6, w: 16, h: 12,
-    leftBound: lb, rightBound: rb, alive: true, anim:0,
-  }));
-  blockers = (L.blockers || []).map(([x, y, text, lesson]) => ({
-    x, y, w: 26, h: 50, text, lesson, broken: false, shake: 0,
-  }));
-  sparkles = [];
+  snails = L.snails.map(([x, lb, rb]) => ({ x, y: 224, vx: -0.6, w: 16, h: 12, leftBound: lb, rightBound: rb, alive: true, anim:0 }));
+  blockers = (L.blockers || []).map(([x, y, text, lesson]) => ({ x, y, w: 26, h: 50, text, lesson, broken: false, shake: 0, _touched: 0, _sounded: false }));
+  flowers = (L.flowers || []).map(([x, y, qIdx]) => ({ x, y: y - 18, qIdx, taken: false, bob: Math.random()*Math.PI*2 }));
+  sparkles = []; bubbles = [];
   clouds = [];
   for(let i=0;i<8;i++){
-    clouds.push({
-      x: Math.random()*L.width,
-      y: 18 + Math.random()*55,
-      w: 26 + Math.random()*30,
-      speed: 0.04 + Math.random()*0.08,
-    });
+    clouds.push({ x: Math.random()*L.width, y: 18 + Math.random()*55, w: 26 + Math.random()*30, speed: 0.04 + Math.random()*0.08 });
   }
   SOLIDS = [
     ...L.ground.map(([x,y,w,h]) => ({x,y,w,h})),
     ...L.platforms.map(([x,y,w]) => ({x,y,w,h:8, oneWay:true})),
   ];
-  starsTaken = 0;
-  starsTotal = L.stars.length;
-  score = 0;
-  lives = 3;
-  invul = 0;
-  camX = 0;
+  starsTaken = 0; starsTotal = L.stars.length;
+  score = 0; lives = 3; invul = 0; camX = 0;
+  combo = 0; comboTimer = 0;
+  npc = L.npc ? { ...L.npc, life: 240 } : null;
+  npcShown = 0;
   updateHUD();
   document.getElementById('levelLabel').textContent = `第 ${idx+1} 關 · ${L.name}`;
 }
@@ -595,9 +476,16 @@ function updateHUD(){
   document.getElementById('score').textContent = String(score).padStart(5,'0');
   document.getElementById('starCnt').textContent = `${starsTaken}/${starsTotal}`;
   document.getElementById('lives').textContent = lives;
+  const cb = document.getElementById('comboBox');
+  if(combo >= 3){
+    cb.classList.remove('hide');
+    document.getElementById('comboN').textContent = combo;
+    document.getElementById('comboX').textContent = comboMult();
+  } else cb.classList.add('hide');
 }
+function comboMult(){ return combo >= 10 ? 3 : (combo >= 5 ? 2 : 1); }
 
-// ============ 碰撞 ============
+// ================ 碰撞 ================
 function collideX(p){
   for(const s of SOLIDS){
     if(s.oneWay) continue;
@@ -613,24 +501,26 @@ function collideY(p){
   for(const s of SOLIDS){
     if(p.x+p.w > s.x && p.x < s.x+s.w && p.y+p.h > s.y && p.y < s.y+s.h){
       if(s.oneWay){
-        if(p.vy > 0 && p.y+p.h - p.vy <= s.y + 2){
-          p.y = s.y - p.h; p.vy = 0; p.grounded = true;
-        }
+        if(p.vy > 0 && p.y+p.h - p.vy <= s.y + 2){ p.y = s.y - p.h; p.vy = 0; p.grounded = true; }
       } else {
-        if(p.vy > 0){ p.y = s.y - p.h; p.vy = 0; if(!p.grounded){ SND.land(); } p.grounded = true; }
+        if(p.vy > 0){ p.y = s.y - p.h; p.vy = 0; if(!p.grounded) SND.land(); p.grounded = true; }
         else if(p.vy < 0){ p.y = s.y + s.h; p.vy = 0; }
       }
     }
   }
 }
 
-// ============ 更新 ============
+// ================ 更新 ================
+let inFlowerQuiz = false;
 function update(){
-  if(state !== 'playing') return;
+  if(state !== 'playing' || inFlowerQuiz) return;
   frame++;
+  const slowFactor = teacher.slow ? 0.55 : 1;
 
-  if(keys.left)  player.vx = Math.max(player.vx - ACCEL, -WALK);
-  if(keys.right) player.vx = Math.min(player.vx + ACCEL,  WALK);
+  if(comboTimer > 0){ comboTimer--; if(comboTimer === 0){ combo = 0; updateHUD(); } }
+
+  if(keys.left)  player.vx = Math.max(player.vx - ACCEL*slowFactor, -WALK*slowFactor);
+  if(keys.right) player.vx = Math.min(player.vx + ACCEL*slowFactor,  WALK*slowFactor);
   if(!keys.left && !keys.right){
     player.vx *= player.grounded ? FRICTION : 0.92;
     if(Math.abs(player.vx) < 0.1) player.vx = 0;
@@ -639,21 +529,21 @@ function update(){
   if(player.vx < 0) player.facing = -1;
 
   if(keys.jump && player.grounded){
-    player.vy = JUMP_V;
+    const jv = teacher.highJump ? JUMP_V * 1.4 : (player.superTime > 0 ? JUMP_V * 1.15 : JUMP_V);
+    player.vy = jv;
     player.grounded = false;
     spawnSpark(player.x + player.w/2, player.y + player.h, 4);
-    SND.jump();
+    player.superTime > 0 ? SND.superJump() : SND.jump();
   }
   keys.jump = false;
   if(!keys.jumpHeld && player.vy < 0) player.vy *= JUMP_CUT;
 
-  player.vy = Math.min(player.vy + GRAV, MAX_FALL);
+  player.vy = Math.min(player.vy + GRAV*slowFactor, MAX_FALL);
 
   player.x += player.vx;
-  if(player.x < 0) { player.x = 0; player.vx = 0; }
+  if(player.x < 0){ player.x = 0; player.vx = 0; }
   if(player.x + player.w > LEVELS[curLevel].width){ player.x = LEVELS[curLevel].width - player.w; player.vx = 0; }
   collideX(player);
-
   player.y += player.vy;
   collideY(player);
 
@@ -664,9 +554,20 @@ function update(){
   const targetCam = Math.max(0, Math.min(LEVELS[curLevel].width - W, player.x + player.w/2 - W/2));
   camX += (targetCam - camX) * 0.12;
 
+  // 變大計時
+  if(player.superTime > 0){
+    player.superTime--;
+    if(player.superTime === 0){
+      player.w = player.baseW; player.h = player.baseH;
+      SND.shrink();
+      addBubble(player.x + player.w/2, player.y, '變小了…');
+    }
+  }
+
+  // 蝸牛
   for(const s of snails){
     if(!s.alive) continue;
-    s.x += s.vx;
+    s.x += s.vx * slowFactor;
     if(s.x < s.leftBound){ s.x = s.leftBound; s.vx *= -1; }
     if(s.x + s.w > s.rightBound){ s.x = s.rightBound - s.w; s.vx *= -1; }
     s.anim += 0.08;
@@ -675,16 +576,26 @@ function update(){
       if(player.vy > 0 && player.y + player.h < s.y + 8){
         s.alive = false;
         player.vy = -5;
-        score += 200;
+        const pts = 200 * comboMult();
+        score += pts;
         spawnSpark(s.x + s.w/2, s.y, 8);
         SND.stomp();
         updateHUD();
-      } else if(invul <= 0){
+      } else if(invul <= 0 && !teacher.invul && player.superTime <= 0){
         loseLife('被撞到了！');
+      } else if(player.superTime > 0){
+        // 變大狀態：撞蝸牛也不痛，反而踢飛
+        s.alive = false;
+        score += 100;
+        spawnSpark(s.x + s.w/2, s.y, 6);
+        SND.stomp();
+        addBubble(player.x + player.w/2, player.y, '不怕！');
+        updateHUD();
       }
     }
   }
 
+  // 星星 + 連擊
   for(const st of stars){
     if(st.taken) continue;
     st.bob += 0.08;
@@ -692,26 +603,56 @@ function update(){
        player.y + player.h > st.y - 6 && player.y < st.y + 6){
       st.taken = true;
       starsTaken++;
-      score += 100;
+      combo++;
+      comboTimer = 180;
+      const pts = 100 * comboMult();
+      score += pts;
       spawnSpark(st.x, st.y, 10);
       SND.star();
+      if(combo >= 3 && combo % 5 === 0){
+        SND.combo(combo);
+        addBubble(st.x, st.y - 10, `🔥 ${combo} 連!`);
+      }
       updateHUD();
     }
   }
 
-  // 看板 blocker：撞到會停下，等學生看完訊息
+  // 花 → 出題
+  for(const f of flowers){
+    if(f.taken) continue;
+    f.bob += 0.06;
+    if(player.x + player.w > f.x - 8 && player.x < f.x + 8 &&
+       player.y + player.h > f.y - 12 && player.y < f.y + 12){
+      f.taken = true;
+      SND.flower();
+      openFlowerQuiz(f.qIdx);
+      return;
+    }
+  }
+
+  // 看板
   for(const b of blockers){
     if(b.broken) continue;
     if(player.x + player.w > b.x && player.x < b.x + b.w &&
        player.y + player.h > b.y && player.y < b.y + b.h){
-      // 推回
+      // 變大狀態：直接破！
+      if(player.superTime > 0){
+        b.broken = true;
+        spawnSpark(b.x + b.w/2, b.y + b.h/2, 18);
+        SND.power();
+        score += 500;
+        addBubble(b.x + b.w/2, b.y, '哈！破！');
+        showBlockerLesson(b.lesson);
+        updateHUD();
+        continue;
+      }
+      // 普通狀態：推回 + 按住 1 秒
       if(player.vx > 0) player.x = b.x - player.w;
       else if(player.vx < 0) player.x = b.x + b.w;
       player.vx = 0;
       b.shake = 8;
       if(!b._sounded){ SND.blocker(); b._sounded = true; setTimeout(()=>b._sounded=false, 500); }
-      // 自動破除：站著靠近 1 秒會破
-      b._touched = (b._touched || 0) + 1;
+      b._touched++;
       if(b._touched > 50){
         b.broken = true;
         spawnSpark(b.x + b.w/2, b.y + b.h/2, 14);
@@ -720,12 +661,11 @@ function update(){
         updateHUD();
         showBlockerLesson(b.lesson);
       }
-    } else {
-      if(b._touched) b._touched = Math.max(0, b._touched - 2);
-    }
+    } else if(b._touched > 0) b._touched = Math.max(0, b._touched - 2);
     if(b.shake > 0) b.shake--;
   }
 
+  // 終點
   const L = LEVELS[curLevel];
   const [gx, gy] = L.goal;
   if(player.x + player.w > gx && player.x < gx + 16 &&
@@ -733,113 +673,140 @@ function update(){
     levelWin();
   }
 
-  for(const sp of sparkles){
-    sp.life--; sp.x += sp.vx; sp.y += sp.vy; sp.vy += 0.15;
-  }
+  for(const sp of sparkles){ sp.life--; sp.x += sp.vx; sp.y += sp.vy; sp.vy += 0.15; }
   sparkles = sparkles.filter(s => s.life > 0);
-
-  for(const c of clouds){
-    c.x -= c.speed;
-    if(c.x + c.w < 0) c.x = LEVELS[curLevel].width;
-  }
+  for(const b of bubbles){ b.life--; b.y -= 0.5; }
+  bubbles = bubbles.filter(b => b.life > 0);
+  for(const c of clouds){ c.x -= c.speed; if(c.x + c.w < 0) c.x = LEVELS[curLevel].width; }
 
   if(invul > 0) invul--;
+  if(npc) npc.life--;
 }
 
 function spawnSpark(x, y, n){
   for(let i=0;i<n;i++){
-    sparkles.push({
-      x, y, vx:(Math.random()-0.5)*3, vy:-Math.random()*3-1,
-      life: 30 + Math.random()*15,
-      color: ['#fff5a8','#ffd96a','#ff6b9a','#88c0e8','#7ed487'][i % 5],
-    });
+    sparkles.push({ x, y, vx:(Math.random()-0.5)*3, vy:-Math.random()*3-1, life: 30+Math.random()*15,
+      color: ['#fff5a8','#ffd96a','#ff6b9a','#88c0e8','#7ed487'][i % 5] });
   }
 }
-
+function addBubble(x, y, text){ bubbles.push({ x, y, text, life: 80 }); }
 function loseLife(reason){
-  lives--;
-  updateHUD();
-  SND.hurt();
+  lives--; updateHUD(); SND.hurt();
+  combo = 0; comboTimer = 0;
   if(lives <= 0){ lose(reason); return; }
-  invul = 90;
-  player.vx = -player.facing * 2;
-  player.vy = -3;
+  invul = 90; player.vx = -player.facing * 2; player.vy = -3;
 }
-
 let blockerToast = null;
-function showBlockerLesson(text){
-  blockerToast = { text, life: 180 };
-}
+function showBlockerLesson(text){ blockerToast = { text, life: 180 }; }
 
 function lose(reason){
-  state = 'lose';
-  SND.lose();
-  SND.stopMusic();
+  state = 'lose'; SND.lose(); SND.stopMusic();
   document.getElementById('loseReason').textContent = reason;
   document.getElementById('screenLose').classList.remove('hide');
 }
 
 function levelWin(){
   state = 'levelwin';
-  SND.win();
-  SND.stopMusic();
+  SND.win(); SND.stopMusic();
   score += starsTaken * 50;
   score += lives * 300;
   totalScore += score;
+  starsPerLevel[curLevel] = `${starsTaken}/${starsTotal}`;
   document.getElementById('lvlScore').textContent = String(score).padStart(5,'0');
   document.getElementById('lvlStars').textContent = `${starsTaken}/${starsTotal}`;
   document.getElementById('lvlMessage').innerHTML = `<span class="feedback-emoji">${['🌟','💪','🌈','🏆'][curLevel]}</span>${LEVELS[curLevel].winLesson}`;
-  const isLast = curLevel >= LEVELS.length - 1;
-  document.getElementById('btnNextLvl').textContent = isLast ? '看結局 →' : '繼續 →';
+  drawReportCard();
+  document.getElementById('btnNextLvl').textContent = curLevel >= LEVELS.length - 1 ? '看結局 →' : '下一關 →';
   document.getElementById('screenLvlWin').classList.remove('hide');
 }
 
-// ============ 繪圖 ============
+// ================ 花朵問答 ================
+function openFlowerQuiz(qIdx){
+  inFlowerQuiz = true;
+  SND.stopMusic();
+  const L = LEVELS[curLevel];
+  const q = L.quizzes[qIdx];
+  document.getElementById('fqEmoji').textContent = ['🌸','🌺','🌻'][qIdx % 3];
+  document.getElementById('fqQ').textContent = q.q;
+  const opts = document.getElementById('fqOpts');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'fq-opt';
+    btn.textContent = `${['A','B','C'][i]}. ${opt}`;
+    btn.addEventListener('click', () => answerFlowerQuiz(qIdx, i, btn));
+    opts.appendChild(btn);
+  });
+  document.getElementById('fqFb').classList.remove('on');
+  document.getElementById('fqNext').classList.remove('on');
+  document.getElementById('flowerQuiz').classList.remove('hide');
+}
+function answerFlowerQuiz(qIdx, ansIdx, btn){
+  const q = LEVELS[curLevel].quizzes[qIdx];
+  const correct = (q.correct === -1) || (ansIdx === q.correct);
+  const all = btn.parentElement.querySelectorAll('button');
+  all.forEach(b => b.disabled = true);
+  btn.classList.add(correct ? 'right' : 'wrong');
+  if(!correct && q.correct >= 0) all[q.correct].classList.add('right');
+  if(correct){
+    SND.correct();
+    growPlayer();
+    score += 500 * comboMult();
+    correctQuizzes++;
+  } else {
+    SND.wrong();
+  }
+  const fb = document.getElementById('fqFb');
+  fb.innerHTML = q.fb;
+  fb.classList.add('on');
+  document.getElementById('fqNext').classList.add('on');
+  updateHUD();
+}
+function closeFlowerQuiz(){
+  document.getElementById('flowerQuiz').classList.add('hide');
+  inFlowerQuiz = false;
+  SND.startMusic();
+}
+document.getElementById('fqNext').addEventListener('click', closeFlowerQuiz);
+
+function growPlayer(){
+  if(!player) return;
+  player.w = player.baseW * 1.4;
+  player.h = player.baseH * 1.4;
+  player.superTime = 600; // 10 秒
+  SND.grow();
+  addBubble(player.x + player.w/2, player.y, ['我可以！','我喜歡！','我就是我！'][Math.floor(Math.random()*3)]);
+  spawnSpark(player.x + player.w/2, player.y + player.h/2, 20);
+}
+
+// ================ 繪圖 ================
 function drawSky(){
   const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, curPal.sky[0]);
-  g.addColorStop(0.5, curPal.sky[1]);
-  g.addColorStop(1, curPal.sky[2]);
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
+  g.addColorStop(0, curPal.sky[0]); g.addColorStop(0.5, curPal.sky[1]); g.addColorStop(1, curPal.sky[2]);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   if(LEVELS[curLevel].palette === 'rainbow'){
-    // 彩虹拱
     const colors = ['#ff8a8a','#ffb86a','#ffe066','#88e08a','#88c0e8','#b388e8'];
     for(let i=0;i<colors.length;i++){
-      ctx.strokeStyle = colors[i];
-      ctx.lineWidth = 6;
-      ctx.globalAlpha = 0.35;
-      ctx.beginPath();
-      ctx.arc(W/2, H + 40, 180 - i*8, Math.PI, 0);
-      ctx.stroke();
+      ctx.strokeStyle = colors[i]; ctx.lineWidth = 6; ctx.globalAlpha = 0.35;
+      ctx.beginPath(); ctx.arc(W/2, H + 40, 180 - i*8, Math.PI, 0); ctx.stroke();
     }
     ctx.globalAlpha = 1;
   }
 }
-
 function drawMountains(){
   ctx.fillStyle = curPal.mtn2;
   for(let i=0;i<10;i++){
     const x = (i*180 - camX*0.2) % (LEVELS[curLevel].width + 360);
     const xx = x < -180 ? x + LEVELS[curLevel].width + 360 : x;
-    ctx.beginPath();
-    ctx.moveTo(xx, 200);
-    ctx.lineTo(xx + 90, 110);
-    ctx.lineTo(xx + 180, 200);
-    ctx.fill();
+    ctx.beginPath(); ctx.moveTo(xx, 200); ctx.lineTo(xx + 90, 110); ctx.lineTo(xx + 180, 200); ctx.fill();
   }
   ctx.fillStyle = curPal.mtn1;
   for(let i=0;i<7;i++){
     const x = (i*230 - camX*0.4) % (LEVELS[curLevel].width + 460);
     const xx = x < -230 ? x + LEVELS[curLevel].width + 460 : x;
-    ctx.beginPath();
-    ctx.moveTo(xx, 220);
-    ctx.lineTo(xx + 115, 130);
-    ctx.lineTo(xx + 230, 220);
-    ctx.fill();
+    ctx.beginPath(); ctx.moveTo(xx, 220); ctx.lineTo(xx + 115, 130); ctx.lineTo(xx + 230, 220); ctx.fill();
   }
 }
-
 function drawClouds(){
   ctx.fillStyle = '#fff5e8';
   for(const c of clouds){
@@ -853,44 +820,26 @@ function drawClouds(){
     ctx.fill();
   }
 }
-
 function drawGround(){
-  const L = LEVELS[curLevel];
-  for(const [x,y,w,h] of L.ground){
+  for(const [x,y,w,h] of LEVELS[curLevel].ground){
     const sx = x - camX;
     if(sx + w < 0 || sx > W) continue;
-    ctx.fillStyle = curPal.ground;
-    ctx.fillRect(sx, y, w, h);
-    ctx.fillStyle = curPal.grass;
-    ctx.fillRect(sx, y, w, 4);
-    ctx.fillStyle = curPal.grass2;
-    for(let i=0;i<w;i+=8){
-      ctx.fillRect(sx+i+1, y-2, 2, 2);
-      ctx.fillRect(sx+i+4, y-1, 1, 1);
-    }
+    ctx.fillStyle = curPal.ground; ctx.fillRect(sx, y, w, h);
+    ctx.fillStyle = curPal.grass; ctx.fillRect(sx, y, w, 4);
     ctx.fillStyle = 'rgba(0,0,0,.15)';
-    for(let i=8;i<w;i+=22){
-      ctx.fillRect(sx+i, y+10, 3, 2);
-      ctx.fillRect(sx+i+14, y+20, 2, 2);
-    }
+    for(let i=8;i<w;i+=22){ ctx.fillRect(sx+i, y+10, 3, 2); ctx.fillRect(sx+i+14, y+20, 2, 2); }
   }
 }
-
 function drawPlatforms(){
   for(const [x,y,w] of LEVELS[curLevel].platforms){
     const sx = x - camX;
     if(sx + w < 0 || sx > W) continue;
-    ctx.fillStyle = '#9c6f3f';
-    ctx.fillRect(sx, y, w, 6);
-    ctx.fillStyle = curPal.grass;
-    ctx.fillRect(sx, y, w, 3);
+    ctx.fillStyle = '#9c6f3f'; ctx.fillRect(sx, y, w, 6);
+    ctx.fillStyle = curPal.grass; ctx.fillRect(sx, y, w, 3);
     ctx.fillStyle = '#ff9ac4';
-    for(let i=4;i<w;i+=14){
-      ctx.fillRect(sx+i, y-2, 2, 2);
-    }
+    for(let i=4;i<w;i+=14) ctx.fillRect(sx+i, y-2, 2, 2);
   }
 }
-
 const STAR_COLORS = ['#ffd96a','#ff8aa3','#88e0c8','#88c0e8','#b388e8','#ff9a6a'];
 function drawStars(){
   for(const st of stars){
@@ -899,11 +848,8 @@ function drawStars(){
     if(sx < -10 || sx > W+10) continue;
     const off = Math.sin(st.bob) * 1.5;
     const col = LEVELS[curLevel].palette === 'rainbow' ? STAR_COLORS[st.kind] : '#ffd96a';
-    ctx.fillStyle = '#fff5a8';
-    ctx.globalAlpha = 0.4;
-    ctx.beginPath();
-    ctx.arc(sx, st.y + off, 7, 0, Math.PI*2);
-    ctx.fill();
+    ctx.fillStyle = '#fff5a8'; ctx.globalAlpha = 0.4;
+    ctx.beginPath(); ctx.arc(sx, st.y + off, 7, 0, Math.PI*2); ctx.fill();
     ctx.globalAlpha = 1;
     ctx.fillStyle = col;
     ctx.fillRect(sx-1, st.y-5+off, 2, 10);
@@ -913,92 +859,79 @@ function drawStars(){
     ctx.fillRect(sx-1, st.y-2+off, 2, 2);
   }
 }
-
+function drawFlowers(){
+  for(const f of flowers){
+    if(f.taken) continue;
+    const sx = f.x - camX;
+    if(sx < -10 || sx > W+10) continue;
+    const off = Math.sin(f.bob) * 1.5;
+    // 莖
+    ctx.fillStyle = '#5fa84b';
+    ctx.fillRect(sx - 1, f.y + 6, 2, 14);
+    ctx.fillRect(sx - 4, f.y + 12, 3, 2);
+    // 花瓣
+    const petalCol = ['#ff8aa3','#ffd96a','#88e0c8'][f.qIdx % 3];
+    ctx.fillStyle = petalCol;
+    [[-4,-2],[4,-2],[-4,4],[4,4],[0,-5],[0,5]].forEach(([dx,dy]) => {
+      ctx.beginPath(); ctx.arc(sx+dx, f.y+dy+off, 3, 0, Math.PI*2); ctx.fill();
+    });
+    // 中心
+    ctx.fillStyle = '#ffe680'; ctx.beginPath();
+    ctx.arc(sx, f.y + off, 2.5, 0, Math.PI*2); ctx.fill();
+    // ?
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('?', sx, f.y + 2 + off);
+  }
+}
 function drawSnails(){
   for(const s of snails){
     if(!s.alive) continue;
     const sx = s.x - camX;
     if(sx + s.w < 0 || sx > W) continue;
     const wob = Math.sin(s.anim) * 1;
-    ctx.fillStyle = '#aa7ed4';
-    ctx.fillRect(sx, s.y + 4 + wob, 6, 8);
-    ctx.fillRect(sx + 4, s.y + 6 + wob, s.w - 4, 6);
-    ctx.fillStyle = '#d49aff';
-    ctx.beginPath();
-    ctx.arc(sx + 11, s.y + 5, 6, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#aa7ed4';
-    ctx.beginPath();
-    ctx.arc(sx + 11, s.y + 5, 3, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(sx + 1, s.y + 4 + wob, 2, 2);
-    ctx.fillStyle = '#000';
-    ctx.fillRect(sx + 1, s.y + 5 + wob, 1, 1);
+    ctx.fillStyle = '#aa7ed4'; ctx.fillRect(sx, s.y + 4 + wob, 6, 8); ctx.fillRect(sx + 4, s.y + 6 + wob, s.w - 4, 6);
+    ctx.fillStyle = '#d49aff'; ctx.beginPath(); ctx.arc(sx + 11, s.y + 5, 6, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#aa7ed4'; ctx.beginPath(); ctx.arc(sx + 11, s.y + 5, 3, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.fillRect(sx + 1, s.y + 4 + wob, 2, 2);
+    ctx.fillStyle = '#000'; ctx.fillRect(sx + 1, s.y + 5 + wob, 1, 1);
   }
 }
-
 function drawBlockers(){
   for(const b of blockers){
     if(b.broken) continue;
     const sx = b.x - camX + (b.shake ? (Math.random()-.5)*3 : 0);
     if(sx + b.w < 0 || sx > W) continue;
-    // 木桿
-    ctx.fillStyle = '#6b4a2a';
-    ctx.fillRect(sx + b.w/2 - 1, b.y + 30, 3, 22);
-    // 牌子
-    ctx.fillStyle = '#ff7a7a';
-    ctx.fillRect(sx, b.y, b.w, 32);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(sx + 2, b.y + 2, b.w - 4, 28);
-    // 文字（小、紅）
-    ctx.fillStyle = '#c84040';
-    ctx.font = 'bold 6px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
+    ctx.fillStyle = '#6b4a2a'; ctx.fillRect(sx + b.w/2 - 1, b.y + 30, 3, 22);
+    ctx.fillStyle = '#ff7a7a'; ctx.fillRect(sx, b.y, b.w, 32);
+    ctx.fillStyle = '#fff'; ctx.fillRect(sx + 2, b.y + 2, b.w - 4, 28);
+    ctx.fillStyle = '#c84040'; ctx.font = 'bold 6px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     const lines = b.text.split('\n');
-    for(let i=0;i<lines.length;i++){
-      ctx.fillText(lines[i], sx + b.w/2, b.y + 3 + i*8);
-    }
-    // 進度條（學生靠近時）
+    for(let i=0;i<lines.length;i++) ctx.fillText(lines[i], sx + b.w/2, b.y + 3 + i*8);
     if(b._touched > 0){
-      const ratio = Math.min(1, b._touched / 50);
-      ctx.fillStyle = '#88e08a';
-      ctx.fillRect(sx, b.y - 5, b.w * ratio, 3);
+      const r = Math.min(1, b._touched / 50);
+      ctx.fillStyle = '#88e08a'; ctx.fillRect(sx, b.y - 5, b.w * r, 3);
     }
   }
 }
-
 function drawGoal(){
   const [gx, gy] = LEVELS[curLevel].goal;
   const sx = gx - camX;
   if(sx > W + 20 || sx < -20) return;
-  ctx.fillStyle = '#8b6f47';
-  ctx.fillRect(sx, gy - 30, 3, 70);
+  ctx.fillStyle = '#8b6f47'; ctx.fillRect(sx, gy - 30, 3, 70);
   const flap = Math.sin(frame * 0.1) * 1.5;
-  // 旗子（依關卡換色）
   const flagCol = ['#ff6b9a','#88c0e8','#7ed487','#ffd96a'][curLevel];
-  ctx.fillStyle = flagCol;
-  ctx.beginPath();
-  ctx.moveTo(sx + 3, gy - 30);
-  ctx.lineTo(sx + 22 + flap, gy - 25);
-  ctx.lineTo(sx + 3, gy - 20);
-  ctx.fill();
-  // 終點旗的笑臉
+  ctx.fillStyle = flagCol; ctx.beginPath();
+  ctx.moveTo(sx + 3, gy - 30); ctx.lineTo(sx + 22 + flap, gy - 25); ctx.lineTo(sx + 3, gy - 20); ctx.fill();
   ctx.fillStyle = '#fff';
-  ctx.fillRect(sx + 10, gy - 27, 2, 2);
-  ctx.fillRect(sx + 14, gy - 27, 2, 2);
+  ctx.fillRect(sx + 10, gy - 27, 2, 2); ctx.fillRect(sx + 14, gy - 27, 2, 2);
   ctx.fillRect(sx + 11, gy - 24, 4, 1);
-  // 最後一關的旗子加彩虹條
   if(curLevel === 3){
     const colors = ['#ff8a8a','#ffb86a','#ffe066','#88e08a','#88c0e8','#b388e8'];
-    for(let i=0;i<colors.length;i++){
-      ctx.fillStyle = colors[i];
-      ctx.fillRect(sx + 3, gy - 30 + i*1.8, 20, 1.8);
-    }
+    for(let i=0;i<colors.length;i++){ ctx.fillStyle = colors[i]; ctx.fillRect(sx + 3, gy - 30 + i*1.8, 20, 1.8); }
   }
 }
-
 function drawPlayer(){
   if(!player) return;
   if(invul > 0 && Math.floor(invul/4) % 2) return;
@@ -1006,41 +939,32 @@ function drawPlayer(){
   const w = player.w, h = player.h;
   const f = player.facing;
   const hop = (player.grounded && Math.abs(player.vx) > 0.5) ? Math.floor(player.walkAnim) % 2 : 0;
+  // 變大狀態光暈
+  if(player.superTime > 0){
+    ctx.globalAlpha = 0.3 + Math.sin(frame*0.2)*0.15;
+    ctx.fillStyle = '#ffd96a';
+    ctx.beginPath(); ctx.arc(px + w/2, py + h/2 - hop, w*0.9, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+  // 影子
   ctx.fillStyle = 'rgba(0,0,0,.2)';
-  ctx.beginPath();
-  ctx.ellipse(px + w/2, py + h + 2, w/2, 2, 0, 0, Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle = '#d4a878';
-  ctx.fillRect(px, py + h - hop, w, 1);
-  ctx.fillStyle = '#f4d4a8';
-  if(ctx.roundRect){
-    ctx.beginPath();
-    ctx.roundRect(px, py - hop, w, h, 5);
-    ctx.fill();
-  } else {
-    ctx.fillRect(px, py - hop, w, h);
-  }
-  // 腮紅
+  ctx.beginPath(); ctx.ellipse(px + w/2, py + h + 2, w/2, 2, 0, 0, Math.PI*2); ctx.fill();
+  // 身體
+  ctx.fillStyle = '#d4a878'; ctx.fillRect(px, py + h - hop, w, 1);
+  ctx.fillStyle = player.superTime > 0 ? '#ffe8b0' : '#f4d4a8';
+  if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(px, py - hop, w, h, w*0.35); ctx.fill(); }
+  else ctx.fillRect(px, py - hop, w, h);
+  // 腮紅 + 眼睛 + 嘴（按比例縮放）
+  const sx = w / player.baseW;
+  const sy = h / player.baseH;
   ctx.fillStyle = '#ffaa9a';
-  ctx.fillRect(px + 2, py + 8 - hop, 3, 2);
-  ctx.fillRect(px + 9, py + 8 - hop, 3, 2);
-  // 眼睛
+  ctx.fillRect(px + 2*sx, py + 8*sy - hop, 3*sx, 2*sy);
+  ctx.fillRect(px + 9*sx, py + 8*sy - hop, 3*sx, 2*sy);
   ctx.fillStyle = '#3a2820';
-  if(f > 0){
-    ctx.fillRect(px + 4, py + 5 - hop, 2, 2);
-    ctx.fillRect(px + 9, py + 5 - hop, 2, 2);
-  } else {
-    ctx.fillRect(px + 3, py + 5 - hop, 2, 2);
-    ctx.fillRect(px + 8, py + 5 - hop, 2, 2);
-  }
-  ctx.fillRect(px + 6, py + 9 - hop, 2, 1);
-  if(!player.grounded){
-    ctx.fillStyle = '#d4a878';
-    ctx.fillRect(px + 2, py + h - 2 - hop, 3, 2);
-    ctx.fillRect(px + w - 5, py + h - 2 - hop, 3, 2);
-  }
+  if(f > 0){ ctx.fillRect(px + 4*sx, py + 5*sy - hop, 2*sx, 2*sy); ctx.fillRect(px + 9*sx, py + 5*sy - hop, 2*sx, 2*sy); }
+  else { ctx.fillRect(px + 3*sx, py + 5*sy - hop, 2*sx, 2*sy); ctx.fillRect(px + 8*sx, py + 5*sy - hop, 2*sx, 2*sy); }
+  ctx.fillRect(px + 6*sx, py + 9*sy - hop, 2*sx, 1*sy);
 }
-
 function drawSparkles(){
   for(const sp of sparkles){
     const sx = sp.x - camX;
@@ -1051,70 +975,137 @@ function drawSparkles(){
     ctx.globalAlpha = 1;
   }
 }
-
+function drawBubbles(){
+  for(const b of bubbles){
+    const sx = b.x - camX;
+    if(sx < -30 || sx > W+30) continue;
+    const alpha = Math.min(1, b.life / 20);
+    ctx.globalAlpha = alpha;
+    const tw = ctx.measureText(b.text).width + 8;
+    ctx.fillStyle = '#fff';
+    if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(sx - tw/2, b.y - 16, tw, 14, 6); ctx.fill(); }
+    else ctx.fillRect(sx - tw/2, b.y - 16, tw, 14);
+    ctx.fillStyle = '#1a1530';
+    ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(b.text, sx, b.y - 9);
+    ctx.globalAlpha = 1;
+  }
+}
+function drawNPC(){
+  if(!npc || npc.life <= 0) return;
+  const sx = npc.x - camX;
+  if(sx < -30 || sx > W+30) return;
+  // 夥伴豆豆
+  ctx.fillStyle = '#a8e0c8';
+  ctx.beginPath(); ctx.arc(sx + 7, npc.y + 8, 7, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#3a2820';
+  ctx.fillRect(sx + 4, npc.y + 6, 2, 2);
+  ctx.fillRect(sx + 9, npc.y + 6, 2, 2);
+  ctx.fillRect(sx + 6, npc.y + 10, 3, 1);
+  // 對話框
+  if(npc.life > 30){
+    const alpha = npc.life > 200 ? (240 - npc.life)/40 : (npc.life > 60 ? 1 : npc.life/30);
+    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    const lines = npc.msg.split('\n');
+    const bw = 110, bh = lines.length * 12 + 10;
+    const bx = sx + 16, by = npc.y - bh - 4;
+    ctx.fillStyle = '#fff';
+    if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 8); ctx.fill(); }
+    else ctx.fillRect(bx, by, bw, bh);
+    ctx.fillStyle = '#1a1530';
+    ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    for(let i=0;i<lines.length;i++) ctx.fillText(lines[i], bx + 5, by + 5 + i*12);
+    ctx.globalAlpha = 1;
+  }
+}
 function drawToast(){
   if(!blockerToast) return;
   blockerToast.life--;
   if(blockerToast.life <= 0){ blockerToast = null; return; }
   const alpha = Math.min(1, blockerToast.life / 30);
   ctx.globalAlpha = alpha;
-  ctx.fillStyle = '#1a1530';
-  ctx.fillRect(W/2 - 140, 30, 280, 38);
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(W/2 - 138, 32, 276, 34);
-  ctx.fillStyle = '#1a1530';
-  ctx.font = 'bold 11px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  // 自動換行
+  ctx.fillStyle = '#1a1530'; ctx.fillRect(W/2 - 140, 30, 280, 38);
+  ctx.fillStyle = '#fff'; ctx.fillRect(W/2 - 138, 32, 276, 34);
+  ctx.fillStyle = '#1a1530'; ctx.font = 'bold 11px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   const maxw = 250;
-  const words = blockerToast.text;
-  const lines = [];
-  let cur = '';
-  for(let i=0;i<words.length;i++){
-    cur += words[i];
-    if(ctx.measureText(cur).width > maxw){
-      lines.push(cur.slice(0, -1));
-      cur = words[i];
-    }
+  const lines = []; let cur = '';
+  for(let i=0;i<blockerToast.text.length;i++){
+    cur += blockerToast.text[i];
+    if(ctx.measureText(cur).width > maxw){ lines.push(cur.slice(0,-1)); cur = blockerToast.text[i]; }
   }
   if(cur) lines.push(cur);
-  for(let i=0;i<lines.length;i++){
-    ctx.fillText(lines[i], W/2, 42 + i*13);
-  }
+  for(let i=0;i<lines.length;i++) ctx.fillText(lines[i], W/2, 42 + i*13);
   ctx.globalAlpha = 1;
 }
 
 function render(){
-  drawSky();
-  drawMountains();
-  drawClouds();
-  drawGround();
-  drawPlatforms();
-  drawStars();
-  drawBlockers();
-  drawGoal();
-  drawSnails();
-  drawSparkles();
-  drawPlayer();
-  drawToast();
+  drawSky(); drawMountains(); drawClouds();
+  drawGround(); drawPlatforms();
+  drawStars(); drawFlowers(); drawBlockers(); drawGoal();
+  drawSnails(); drawSparkles();
+  drawNPC();
+  drawPlayer(); drawBubbles(); drawToast();
 }
-
 function loop(){ update(); render(); requestAnimationFrame(loop); }
 loop();
 
-// ============ 流程 ============
-function hideAllScreens(){
-  document.querySelectorAll('.screen').forEach(s => s.classList.add('hide'));
+// ================ 學習卡 ================
+function drawReportCard(){
+  const c = document.getElementById('reportCanvas');
+  const r = c.getContext('2d');
+  const cw = c.width, ch = c.height;
+  // 背景
+  const g = r.createLinearGradient(0, 0, 0, ch);
+  g.addColorStop(0, '#fff8ef'); g.addColorStop(1, '#ffe8df');
+  r.fillStyle = g; r.fillRect(0, 0, cw, ch);
+  // 邊框
+  r.strokeStyle = '#ff8a65'; r.lineWidth = 8; r.strokeRect(8, 8, cw-16, ch-16);
+  // 標題
+  r.fillStyle = '#5e35b1'; r.font = 'bold 32px sans-serif'; r.textAlign = 'center';
+  r.fillText('🌈 今日學習卡 🌈', cw/2, 50);
+  r.font = 'bold 20px sans-serif'; r.fillStyle = '#ff8a65';
+  r.fillText(`第 ${curLevel+1} 關：${LEVELS[curLevel].name}`, cw/2, 82);
+  // 大豆豆
+  const px = 60, py = 110;
+  r.fillStyle = '#f4d4a8';
+  r.beginPath(); r.arc(px+30, py+30, 32, 0, Math.PI*2); r.fill();
+  r.fillStyle = '#ffaa9a'; r.fillRect(px+12, py+38, 8, 5); r.fillRect(px+40, py+38, 8, 5);
+  r.fillStyle = '#3a2820'; r.fillRect(px+18, py+24, 5, 5); r.fillRect(px+37, py+24, 5, 5);
+  r.fillRect(px+27, py+44, 6, 3);
+  // 資訊
+  r.fillStyle = '#2c3e50'; r.textAlign = 'left'; r.font = 'bold 18px sans-serif';
+  r.fillText(`分數：${String(score).padStart(5,'0')}`, 140, 130);
+  r.fillText(`星星：${starsTaken} / ${starsTotal}`, 140, 158);
+  r.fillText(`愛心：${'❤️'.repeat(lives)}`, 140, 186);
+  // 學習重點
+  r.fillStyle = '#ffd96a'; r.fillRect(40, 220, cw-80, 130);
+  r.strokeStyle = '#ff8a65'; r.lineWidth = 3; r.strokeRect(40, 220, cw-80, 130);
+  r.fillStyle = '#5e35b1'; r.font = 'bold 18px sans-serif'; r.textAlign = 'left';
+  r.fillText('💡 今天豆豆學到：', 55, 248);
+  r.fillStyle = '#2c3e50'; r.font = 'bold 16px sans-serif';
+  const lesson = LEVELS[curLevel].winLesson.replace(/<[^>]*>/g, '').replace(/[🌟💪🌈🏆]/g, '').trim();
+  const lines = wrapText(r, lesson, cw - 110);
+  lines.forEach((line, i) => r.fillText(line, 55, 278 + i*22));
+  // 日期
+  r.fillStyle = '#6b7280'; r.font = '13px sans-serif'; r.textAlign = 'right';
+  const d = new Date();
+  r.fillText(`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} · classtools1020`, cw-30, ch-20);
+  SND.shutter();
+}
+function wrapText(r, text, maxW){
+  const out = []; let cur = '';
+  for(const ch of text){
+    if(r.measureText(cur + ch).width > maxW){ out.push(cur); cur = ch; }
+    else cur += ch;
+  }
+  if(cur) out.push(cur);
+  return out;
 }
 
-function showStart(){
-  hideAllScreens();
-  document.getElementById('screenStart').classList.remove('hide');
-  state = 'start';
-  SND.stopMusic();
-}
-
+// ================ 流程 ================
+function hideAllScreens(){ document.querySelectorAll('.screen').forEach(s => s.classList.add('hide')); }
+function showStart(){ hideAllScreens(); document.getElementById('screenStart').classList.remove('hide'); state = 'start'; SND.stopMusic(); }
 function showLevelSelect(){
   hideAllScreens();
   const grid = document.getElementById('levelGrid');
@@ -1127,15 +1118,11 @@ function showLevelSelect(){
   `).join('');
   grid.querySelectorAll('.lvl-card').forEach(c => {
     c.addEventListener('click', () => {
-      SND.select();
-      curLevel = parseInt(c.dataset.lvl);
-      totalScore = 0;
-      showLevelIntro();
+      SND.click(); curLevel = parseInt(c.dataset.lvl); totalScore = 0; showLevelIntro();
     });
   });
   document.getElementById('screenSelect').classList.remove('hide');
 }
-
 function showLevelIntro(){
   hideAllScreens();
   const L = LEVELS[curLevel];
@@ -1144,108 +1131,59 @@ function showLevelIntro(){
   document.getElementById('introDesc').innerHTML = L.desc;
   document.getElementById('screenIntro').classList.remove('hide');
 }
-
 function startLevel(){
-  hideAllScreens();
-  initLevel(curLevel);
-  state = 'playing';
-  SND.startMusic();
+  hideAllScreens(); initLevel(curLevel); state = 'playing'; SND.startMusic();
 }
-
-function showQuiz(idx){
-  hideAllScreens();
-  const Q = QUIZZES[idx];
-  document.getElementById('quizQ').innerHTML = Q.q;
-  const optsEl = document.getElementById('quizOpts');
-  optsEl.innerHTML = '';
-  Q.opts.forEach((opt, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'quiz-opt';
-    btn.textContent = `${['A','B','C'][i]}. ${opt}`;
-    btn.addEventListener('click', () => handleQuizAns(idx, i, btn));
-    optsEl.appendChild(btn);
-  });
-  document.getElementById('quizFeedback').classList.add('hide');
-  document.getElementById('btnQuizNext').classList.add('hide');
-  document.getElementById('screenQuiz').classList.remove('hide');
-}
-
-function handleQuizAns(qIdx, ansIdx, btn){
-  const Q = QUIZZES[qIdx];
-  const correct = ansIdx === Q.correct;
-  // 標示對錯
-  const allBtns = btn.parentElement.querySelectorAll('button');
-  allBtns.forEach(b => b.disabled = true);
-  btn.classList.add(correct ? 'correct' : 'wrong');
-  if(!correct){
-    // 也標出正確答案
-    allBtns[Q.correct].classList.add('correct');
-  }
-  if(correct) SND.correct(); else SND.wrong();
-  const fb = document.getElementById('quizFeedback');
-  fb.innerHTML = Q.feedback;
-  fb.classList.remove('hide');
-  document.getElementById('btnQuizNext').classList.remove('hide');
-}
-
-function nextAfterQuiz(){
-  curLevel++;
-  showLevelIntro();
-}
-
 function nextLevelClick(){
   hideAllScreens();
-  // 如果還有 quiz，進 quiz；否則直接下一關（或結局）
   if(curLevel < LEVELS.length - 1){
-    showQuiz(curLevel);  // quiz idx = curLevel (0, 1, 2)
+    curLevel++; showLevelIntro();
   } else {
-    // 全破
-    state = 'allwin';
-    SND.bigWin();
-    setTimeout(()=>SND.bigWin(), 800);
+    state = 'allwin'; SND.bigWin(); setTimeout(()=>SND.bigWin(), 800);
     document.getElementById('totalScore').textContent = String(totalScore).padStart(6,'0');
     document.getElementById('screenAllWin').classList.remove('hide');
   }
 }
+function pauseGame(){ if(state !== 'playing') return; state = 'paused'; SND.pause(); SND.stopMusic(); document.getElementById('screenPause').classList.remove('hide'); }
+function resumeGame(){ state = 'playing'; document.getElementById('screenPause').classList.add('hide'); SND.startMusic(); }
 
-function pauseGame(){
-  if(state !== 'playing') return;
-  state = 'paused';
-  SND.pause();
-  SND.stopMusic();
-  document.getElementById('screenPause').classList.remove('hide');
-}
-function resumeGame(){
-  state = 'playing';
-  document.getElementById('screenPause').classList.add('hide');
-  SND.startMusic();
-}
-
-// ============ 按鈕 ============
-document.getElementById('btnStart').addEventListener('click', () => {
-  SND.init(); SND.click();
-  curLevel = 0; totalScore = 0;
-  showLevelIntro();
-});
+// ================ 按鈕 ================
+document.getElementById('btnStart').addEventListener('click', () => { SND.init(); SND.click(); curLevel = 0; totalScore = 0; correctQuizzes = 0; showLevelIntro(); });
 document.getElementById('btnLevelSelect').addEventListener('click', () => { SND.init(); SND.click(); showLevelSelect(); });
 document.getElementById('btnBackToStart').addEventListener('click', () => { SND.click(); showStart(); });
 document.getElementById('btnIntroGo').addEventListener('click', () => { SND.click(); startLevel(); });
 document.getElementById('btnNextLvl').addEventListener('click', () => { SND.click(); nextLevelClick(); });
-document.getElementById('btnQuizNext').addEventListener('click', () => { SND.click(); nextAfterQuiz(); });
-document.getElementById('btnPlayAgain').addEventListener('click', () => { SND.click(); curLevel = 0; totalScore = 0; showLevelIntro(); });
+document.getElementById('btnPlayAgain').addEventListener('click', () => { SND.click(); curLevel = 0; totalScore = 0; correctQuizzes = 0; showLevelIntro(); });
 document.getElementById('btnRetry').addEventListener('click', () => { SND.click(); showLevelIntro(); });
 document.getElementById('btnLoseHome').addEventListener('click', () => { SND.click(); showStart(); });
 document.getElementById('btnBackHome').addEventListener('click', () => { SND.click(); showStart(); });
 document.getElementById('btnResume').addEventListener('click', () => { SND.click(); resumeGame(); });
-document.getElementById('btnPause').addEventListener('click', () => {
-  SND.init();
-  state === 'playing' ? pauseGame() : (state === 'paused' && resumeGame());
-});
+document.getElementById('btnPause').addEventListener('click', () => { SND.init(); state === 'playing' ? pauseGame() : (state === 'paused' && resumeGame()); });
 document.getElementById('btnSound').addEventListener('click', () => {
   SND.init();
   const on = SND.toggle();
   document.getElementById('btnSound').textContent = on ? '🔊' : '🔇';
   if(on && state === 'playing') SND.startMusic();
+});
+// 老師工具
+document.getElementById('btnTeacher').addEventListener('click', () => {
+  SND.click();
+  document.getElementById('teacherTray').classList.toggle('on');
+  document.getElementById('btnTeacher').classList.toggle('active');
+});
+function toggleTeacherBtn(key, id){
+  document.getElementById(id).addEventListener('click', () => {
+    SND.click();
+    teacher[key] = !teacher[key];
+    document.getElementById(id).classList.toggle('on');
+  });
+}
+toggleTeacherBtn('slow', 'ttSlow');
+toggleTeacherBtn('invul', 'ttInvul');
+toggleTeacherBtn('highJump', 'ttJump');
+document.getElementById('ttSkip').addEventListener('click', () => {
+  SND.click();
+  if(state === 'playing'){ levelWin(); }
 });
 
 document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
