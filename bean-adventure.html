@@ -9,31 +9,39 @@
 html,body{width:100%;height:100%;background:#1a1530;overflow:hidden;touch-action:none;font-family:'Noto Sans TC','PingFang TC',sans-serif}
 .stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#2d2456,#1a1530)}
 .frame{position:relative;display:flex;flex-direction:column;width:100%;max-width:1100px;aspect-ratio:16/9;max-height:100vh;box-shadow:0 0 40px rgba(255,200,100,.15)}
-canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block;background:#000;border:4px solid #2d2456;border-radius:4px}
+canvas#game{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block;background:#000;border:4px solid #2d2456;border-radius:4px}
 
-/* HUD */
 .hud{position:absolute;top:8px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:0 14px;color:#fff;pointer-events:none;font-size:clamp(11px,1.5vw,15px);text-shadow:2px 2px 0 #000;letter-spacing:1px;font-weight:900;z-index:10;flex-wrap:wrap;gap:8px}
 .hud-left,.hud-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .hud-item{background:rgba(0,0,0,.5);padding:6px 10px;border:2px solid rgba(255,255,255,.25);border-radius:6px}
 .hud-item .lbl{color:#ffc857;margin-right:6px;font-size:.85em}
 .hud-item.combo{background:linear-gradient(135deg,#ff6b9a,#ff8a65);border-color:#fff;animation:pulse 1s infinite}
+.hud-item.power{background:linear-gradient(135deg,#ffd96a,#ff8a65);border-color:#fff;animation:glow 1.5s infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes glow{0%,100%{box-shadow:0 0 8px rgba(255,217,106,.6)}50%{box-shadow:0 0 18px rgba(255,217,106,1)}}
 .btn-icon{pointer-events:auto;background:rgba(0,0,0,.55);border:2px solid rgba(255,255,255,.3);color:#fff;width:40px;height:40px;border-radius:8px;cursor:pointer;font-size:18px;font-family:inherit;display:flex;align-items:center;justify-content:center}
 .btn-icon:hover,.btn-icon:active{background:rgba(255,200,100,.35);transform:scale(.95)}
 .btn-icon.active{background:rgba(126,212,135,.6);border-color:#7ed487}
+.btn-icon.off{background:rgba(80,80,80,.6);color:#ccc}
 
-/* Title bar */
 .title-bar{position:absolute;top:-2px;left:0;right:0;text-align:center;color:#ffc857;padding:6px;font-size:clamp(11px,1.5vw,15px);text-shadow:2px 2px 0 #000;letter-spacing:2px;font-weight:900;pointer-events:none;z-index:11}
 .title-bar small{display:block;font-size:.65em;color:#fff;margin-top:2px;opacity:.7;letter-spacing:1px;font-weight:600}
 
-/* Touch controls - ALWAYS visible, BIGGER */
+.npc-bubble{position:absolute;top:60px;left:50%;transform:translateX(-50%);background:#fff;color:#1a1530;padding:14px 22px;border-radius:18px;border:4px solid #1a1530;box-shadow:0 6px 0 rgba(0,0,0,.25);font-size:clamp(14px,1.8vw,19px);font-weight:700;line-height:1.7;text-align:center;max-width:80%;z-index:14;pointer-events:none;transition:opacity .4s;opacity:0;letter-spacing:.5px}
+.npc-bubble.on{opacity:1}
+.npc-bubble::before{content:'';position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:14px solid #1a1530}
+.npc-bubble::after{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:10px solid #fff}
+.npc-bubble .speaker{display:block;font-size:.78em;color:#7c4dff;margin-bottom:4px;letter-spacing:1px}
+
+.lesson-toast{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:#7ed487;color:#1a1530;padding:12px 22px;border-radius:14px;border:3px solid #1a1530;font-size:clamp(13px,1.6vw,17px);font-weight:900;z-index:13;pointer-events:none;box-shadow:0 4px 0 rgba(0,0,0,.25);transition:opacity .4s;opacity:0;text-align:center}
+.lesson-toast.on{opacity:1}
+
 .touch{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:14px 18px;z-index:20;pointer-events:none}
 .tch-group{display:flex;gap:14px;pointer-events:auto}
 .tch{width:clamp(70px,9vw,100px);height:clamp(70px,9vw,100px);border-radius:50%;background:rgba(255,255,255,.18);border:4px solid rgba(255,255,255,.5);color:#fff;font-size:clamp(28px,4vw,42px);display:flex;align-items:center;justify-content:center;font-weight:900;backdrop-filter:blur(8px);cursor:pointer;font-family:monospace;box-shadow:0 4px 20px rgba(0,0,0,.3)}
 .tch:active{background:rgba(255,200,100,.6);transform:scale(.92)}
 .tch.jump{background:rgba(255,200,100,.4);border-color:rgba(255,200,100,.8);width:clamp(85px,11vw,120px);height:clamp(85px,11vw,120px)}
 
-/* Screens */
 .screen{position:absolute;inset:0;background:rgba(26,21,48,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;z-index:30;letter-spacing:1px;overflow-y:auto}
 .screen h1{font-size:clamp(22px,4vw,40px);color:#ffc857;margin-bottom:14px;text-shadow:3px 3px 0 #000;font-weight:900}
 .screen h2{font-size:clamp(18px,3vw,28px);color:#fff;margin-bottom:12px;font-weight:900}
@@ -44,34 +52,32 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
 .screen button:active{transform:translateY(2px);box-shadow:0 2px 0 #c89a3a}
 .screen button.alt{background:#88c0e8;box-shadow:0 4px 0 #5a8eb3}
 .screen button.alt:active{box-shadow:0 2px 0 #5a8eb3}
-.screen button.quiz-opt{display:block;width:100%;max-width:520px;text-align:left;padding:18px 24px;background:#fff;color:#1a1530;font-size:clamp(15px,2.2vw,20px);line-height:1.5}
-.screen button.quiz-opt:hover{background:#fff5d6}
-.screen button.quiz-opt.correct{background:#7ed487;color:#fff;animation:pop .3s}
-.screen button.quiz-opt.wrong{background:#e88a8a;color:#fff;animation:shake .3s}
 .screen .credit{margin-top:20px;font-size:11px;opacity:.55;line-height:1.6}
 .screen.hide{display:none}
 
 @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
-.level-card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:640px;margin:14px 0 20px;width:100%}
-.lvl-card{background:#fff;color:#1a1530;border-radius:12px;padding:18px;cursor:pointer;text-align:left;border:3px solid transparent;transition:all .15s;box-shadow:0 4px 0 rgba(0,0,0,.3)}
+.level-card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:680px;margin:14px 0 20px;width:100%}
+.lvl-card{background:#fff;color:#1a1530;border-radius:12px;padding:18px;cursor:pointer;text-align:left;border:3px solid transparent;transition:all .15s;box-shadow:0 4px 0 rgba(0,0,0,.3);position:relative}
 .lvl-card:hover,.lvl-card:active{border-color:#ffc857;transform:translateY(-2px)}
+.lvl-card.done{border-color:#7ed487}
 .lvl-card .num{font-size:11px;color:#ffc857;background:#1a1530;display:inline-block;padding:3px 10px;border-radius:20px;font-weight:900;letter-spacing:1px}
 .lvl-card .name{font-size:clamp(15px,2vw,19px);font-weight:900;margin:6px 0 4px;color:#1a1530}
 .lvl-card .desc{font-size:11px;opacity:.7;line-height:1.5}
+.lvl-card .check{position:absolute;top:14px;right:14px;width:32px;height:32px;background:#7ed487;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px}
+.lvl-card .best{font-size:11px;color:#5e35b1;margin-top:4px;font-weight:700}
 
 .feedback-box{background:#fff5d6;color:#1a1530;border-radius:14px;padding:18px 22px;max-width:540px;margin:14px auto;font-size:clamp(13px,1.8vw,16px);line-height:1.7;border:3px solid #ffc857;text-align:left;font-weight:600}
 .feedback-box b{color:#d65f00}
 .feedback-emoji{font-size:42px;display:block;text-align:center;margin-bottom:6px}
 
-/* Flower quiz modal (in-game) */
 .flower-quiz{position:absolute;inset:0;background:rgba(26,21,48,.88);display:flex;align-items:center;justify-content:center;z-index:40;padding:20px;animation:fadeIn .25s}
 .flower-quiz.hide{display:none}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .fq-card{background:#fff;color:#1a1530;border-radius:20px;padding:24px;max-width:600px;width:100%;border:5px solid #ffc857;box-shadow:0 8px 0 rgba(0,0,0,.3);text-align:center}
 .fq-emoji{font-size:54px;margin-bottom:8px}
-.fq-q{font-size:clamp(16px,2.4vw,22px);font-weight:900;margin-bottom:18px;line-height:1.5;color:#1a1530}
+.fq-q{font-size:clamp(16px,2.4vw,22px);font-weight:900;margin-bottom:18px;line-height:1.5;color:#1a1530;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
 .fq-opts{display:flex;flex-direction:column;gap:10px}
 .fq-opt{background:#fff5d6;color:#1a1530;border:3px solid #ffc857;border-radius:12px;padding:14px 18px;font-size:clamp(14px,2vw,18px);font-weight:900;cursor:pointer;font-family:inherit;text-align:left;transition:transform .1s}
 .fq-opt:hover{background:#ffe8a8;transform:translateX(4px)}
@@ -81,14 +87,15 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
 .fq-feedback.on{display:block}
 .fq-next{margin-top:14px;display:none}
 .fq-next.on{display:inline-block}
+.fq-speaker{background:#fff;border:3px solid #ffc857;color:#ff8a65;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:20px;font-family:inherit;font-weight:900}
+.fq-speaker:hover{background:#fff5d6}
 
-/* Teacher tools tray */
-.teacher-tray{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:8px;padding:8px;background:rgba(0,0,0,.5);z-index:15;pointer-events:none;transform:translateY(110%);transition:transform .25s}
+.teacher-tray{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:8px;padding:8px;background:rgba(0,0,0,.5);z-index:15;pointer-events:none;transform:translateY(110%);transition:transform .25s;flex-wrap:wrap}
 .teacher-tray.on{transform:translateY(0)}
 .tt-btn{pointer-events:auto;background:#1a1530;color:#fff;border:2px solid rgba(255,255,255,.35);padding:6px 12px;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;font-weight:900}
 .tt-btn.on{background:#7ed487;color:#1a1530;border-color:#5fa84b}
+.tt-btn.danger{background:#5a2030;border-color:#e88a8a;color:#ffaaaa}
 
-/* Report card canvas */
 #reportCanvas{display:block;max-width:100%;border:3px solid #ffc857;border-radius:12px;margin:14px auto;box-shadow:0 6px 20px rgba(0,0,0,.4);background:#fff}
 
 @media(max-width:520px){
@@ -112,11 +119,13 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
       <div class="hud-left">
         <div class="hud-item"><span class="lbl">分數</span><span id="score">0</span></div>
         <div class="hud-item"><span class="lbl">星</span><span id="starCnt">0/0</span></div>
-        <div class="hud-item combo hide" id="comboBox">🔥 連擊 <span id="comboN">0</span> · ×<span id="comboX">1</span></div>
+        <div class="hud-item combo hide" id="comboBox">🔥 <span id="comboN">0</span> · ×<span id="comboX">1</span></div>
+        <div class="hud-item power hide" id="powerBox">⚡ 護盾 <span id="powerN">10</span>s</div>
       </div>
       <div class="hud-right">
         <div class="hud-item"><span class="lbl">愛心</span><span id="lives">3</span></div>
         <button class="btn-icon" id="btnTeacher" title="老師工具">🧑‍🏫</button>
+        <button class="btn-icon" id="btnVoice" title="語音念題">🗣</button>
         <button class="btn-icon" id="btnSound" title="音效">🔊</button>
         <button class="btn-icon" id="btnPause" title="暫停">⏸</button>
       </div>
@@ -124,15 +133,21 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
 
     <canvas id="game" width="480" height="270"></canvas>
 
-    <!-- 老師工具列 -->
+    <!-- HTML 浮層：清晰對話 -->
+    <div class="npc-bubble" id="npcBubble">
+      <span class="speaker">🌱 夥伴 小豆</span>
+      <span id="npcText"></span>
+    </div>
+    <div class="lesson-toast" id="lessonToast"></div>
+
     <div class="teacher-tray" id="teacherTray">
       <button class="tt-btn" id="ttSlow">🐢 慢動作</button>
       <button class="tt-btn" id="ttInvul">🛡 無敵模式</button>
       <button class="tt-btn" id="ttJump">🚀 高跳</button>
       <button class="tt-btn" id="ttSkip">⏭ 跳過此關</button>
+      <button class="tt-btn danger" id="ttReset">🗑 清進度</button>
     </div>
 
-    <!-- 觸控（永遠顯示） -->
     <div class="touch" id="touchControls">
       <div class="tch-group">
         <div class="tch" data-key="left">◀</div>
@@ -143,45 +158,45 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
       </div>
     </div>
 
-    <!-- 花朵問答 -->
     <div class="flower-quiz hide" id="flowerQuiz">
       <div class="fq-card">
         <div class="fq-emoji" id="fqEmoji">🌸</div>
-        <div class="fq-q" id="fqQ"></div>
+        <div class="fq-q">
+          <span id="fqQ"></span>
+          <button class="fq-speaker" id="fqSpeak" title="再念一次">🔊</button>
+        </div>
         <div class="fq-opts" id="fqOpts"></div>
         <div class="fq-feedback" id="fqFb"></div>
         <button class="fq-next" id="fqNext">繼續冒險 →</button>
       </div>
     </div>
 
-    <!-- 開始 -->
     <div class="screen" id="screenStart">
       <h1>🌈 豆豆冒險：我就是我</h1>
       <p class="sub">
-        一個關於「<b>性別平等</b>」的冒險遊戲，<br>
-        陪豆豆走完 <b>4 個世界</b>，學會「<b>我可以做我自己</b>」。
+        關於「<b>性別平等</b>」的冒險遊戲，<br>
+        陪豆豆走 <b>4 關</b>，學會「<b>我可以做我自己</b>」。
       </p>
-      <p class="sub" style="font-size:.9em">
-        <span class="key">← →</span> 移動 ・ <span class="key">↑ / 空白</span> 跳<br>
-        <small style="opacity:.7">📱 手機 / 大屏：點下方圓形按鈕</small><br>
-        <small style="opacity:.7">🌸 撞到花會出題，答對 → <b style="color:#ffc857">變大!跳更高!</b></small>
+      <p class="sub" style="font-size:.88em">
+        🌸 撞花會出題，答對 → <b style="color:#ffc857">變大！跳更高！</b><br>
+        ⚡ <b style="color:#ff8a65">變大時掉下去會被救回來！</b><br>
+        🗣 <b style="color:#88c0e8">畫面會語音念題（可隨時關）</b>
       </p>
-      <button id="btnStart">開始冒險</button>
+      <button id="btnContinue" class="hide">繼續上次 →</button>
+      <button id="btnStart">從頭開始</button>
       <button class="alt" id="btnLevelSelect">選關卡</button>
       <div class="credit">
         國中社會科·公民｜性別平等議題<br>
-        原創角色 · classtools1020 · Stacey 老師客製
+        原創 · classtools1020 · Stacey 老師客製
       </div>
     </div>
 
-    <!-- 選關 -->
     <div class="screen hide" id="screenSelect">
       <h1>選擇關卡</h1>
       <div class="level-card-grid" id="levelGrid"></div>
       <button class="alt" id="btnBackToStart">← 回首頁</button>
     </div>
 
-    <!-- 關卡介紹 -->
     <div class="screen hide" id="screenIntro">
       <h2 id="introTitle">第 1 關</h2>
       <h1 id="introName">我是誰</h1>
@@ -189,27 +204,24 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
       <button id="btnIntroGo">出發！</button>
     </div>
 
-    <!-- 暫停 -->
     <div class="screen hide" id="screenPause">
       <h1>⏸ 暫停</h1>
       <button id="btnResume">繼續</button>
       <button class="alt" id="btnBackHome">回首頁</button>
     </div>
 
-    <!-- 關卡勝利 + 學習卡 -->
     <div class="screen hide" id="screenLvlWin">
       <h1>🎉 過關啦！</h1>
       <p class="sub">
-        分數：<span id="lvlScore" style="color:#ffc857">0</span>　·
+        分數：<span id="lvlScore" style="color:#ffc857">0</span> ·
         星星：<span id="lvlStars" style="color:#ffc857">0/0</span>
       </p>
       <div id="lvlMessage" class="feedback-box"></div>
       <canvas id="reportCanvas" width="640" height="400"></canvas>
-      <p class="sub" style="font-size:.85em;opacity:.7">⬆ 長按圖片可儲存｜可截圖給家長看</p>
+      <p class="sub" style="font-size:.85em;opacity:.7">⬆ 長按可儲存｜截圖給家長看</p>
       <button id="btnNextLvl">下一關 →</button>
     </div>
 
-    <!-- 全破 -->
     <div class="screen hide" id="screenAllWin">
       <h1>🏆 全破啦！</h1>
       <p class="sub">
@@ -222,7 +234,6 @@ canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-ed
       <button id="btnPlayAgain">再玩一次</button>
     </div>
 
-    <!-- 失敗 -->
     <div class="screen hide" id="screenLose">
       <h1>😵 沒關係，再來一次</h1>
       <p class="sub" id="loseReason">愛心用完了…</p>
@@ -239,7 +250,7 @@ const ctx = cvs.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 const W = cvs.width, H = cvs.height;
 
-// ================ 音效合成 ================
+// ============ 音效 ============
 class Sound {
   constructor(){ this.enabled = true; this.actx = null; this.musicTimer = null; }
   init(){ if(this.actx) return; try{ this.actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
@@ -283,6 +294,7 @@ class Sound {
   flower(){ this.slide(523, 1047, 0.15, 'triangle', 0.14); }
   grow(){ [440, 554, 659, 880, 1100].forEach((f,i)=>setTimeout(()=>this.beep(f, 0.12, 'triangle', 0.13), i*70)); }
   shrink(){ this.slide(880, 220, 0.3, 'square', 0.12); }
+  rescue(){ this.slide(220, 1100, 0.4, 'triangle', 0.16); setTimeout(()=>this.slide(660, 1760, 0.3, 'triangle', 0.14), 200); setTimeout(()=>this.slide(1320, 2640, 0.2, 'triangle', 0.12), 400); }
   stomp(){ this.slide(300, 80, 0.18, 'square', 0.15); }
   hurt(){ this.slide(440, 110, 0.3, 'sawtooth', 0.16); this.noise(0.15, 0.08, 200); }
   click(){ this.beep(900, 0.04, 'square', 0.08); }
@@ -314,7 +326,53 @@ class Sound {
 }
 const SND = new Sound();
 
-// ================ 輸入 ================
+// ============ 語音念題 ============
+const SP = {
+  enabled: true,
+  voice: null,
+  init(){
+    if(!window.speechSynthesis) return;
+    const pick = () => {
+      const voices = speechSynthesis.getVoices();
+      if(voices.length === 0) return;
+      this.voice = voices.find(v => v.lang === 'zh-TW')
+                || voices.find(v => v.lang.startsWith('zh-Hant'))
+                || voices.find(v => v.lang.startsWith('zh'))
+                || null;
+    };
+    pick();
+    speechSynthesis.addEventListener('voiceschanged', pick);
+  },
+  speak(text){
+    if(!this.enabled || !window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const clean = text.replace(/<[^>]*>/g, '').replace(/[「」『』]/g, '').replace(/\s+/g, '');
+    const u = new SpeechSynthesisUtterance(clean);
+    if(this.voice) u.voice = this.voice;
+    u.lang = 'zh-TW';
+    u.rate = 0.85;
+    u.pitch = 1.05;
+    u.volume = 1;
+    try{ speechSynthesis.speak(u); }catch(e){}
+  },
+  stop(){ if(window.speechSynthesis) speechSynthesis.cancel(); },
+  toggle(){ this.enabled = !this.enabled; if(!this.enabled) this.stop(); return this.enabled; }
+};
+
+// ============ 存檔 ============
+const SAVE_KEY = 'beanAdventureSave_v4';
+function makeEmptySave(){
+  return { highScores: [0,0,0,0], starsBest: [0,0,0,0], completed: [false,false,false,false], lastLevel: 0, totalScore: 0, quizCorrect: 0 };
+}
+function loadSave(){
+  try{ const v = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); return v || makeEmptySave(); }
+  catch{ return makeEmptySave(); }
+}
+function saveData(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(SAVE)); }catch{} }
+function clearSave(){ try{ localStorage.removeItem(SAVE_KEY); }catch{} SAVE = makeEmptySave(); }
+let SAVE = loadSave();
+
+// ============ 輸入 ============
 const keys = { left:false, right:false, jump:false, jumpHeld:false };
 function setKey(k, v){
   if(k==='left') keys.left = v;
@@ -322,7 +380,7 @@ function setKey(k, v){
   if(k==='jump'){ if(v && !keys.jumpHeld) keys.jump = true; keys.jumpHeld = v; }
 }
 addEventListener('keydown', e=>{
-  SND.init();
+  SND.init(); SP.init();
   if(['ArrowLeft','a','A'].includes(e.key)) setKey('left', true);
   if(['ArrowRight','d','D'].includes(e.key)) setKey('right', true);
   if(['ArrowUp','w','W',' ','z','Z'].includes(e.key)){ setKey('jump', true); e.preventDefault(); }
@@ -334,7 +392,7 @@ addEventListener('keyup', e=>{
 });
 document.querySelectorAll('.tch').forEach(b => {
   const k = b.dataset.key;
-  const press = e => { e.preventDefault(); SND.init(); setKey(k, true); };
+  const press = e => { e.preventDefault(); SND.init(); SP.init(); setKey(k, true); };
   const release = e => { e.preventDefault(); setKey(k, false); };
   b.addEventListener('pointerdown', press);
   b.addEventListener('pointerup', release);
@@ -342,29 +400,29 @@ document.querySelectorAll('.tch').forEach(b => {
   b.addEventListener('pointercancel', release);
 });
 
-// ================ 關卡資料 ================
+// ============ 關卡 ============
 const LEVELS = [
   {
     name: '我是誰', desc: '<b>每個人都不一樣，都很棒。</b><br>幫豆豆收集「我的特質」星星，撞 🌸 答題會變大！',
     palette: 'sunset', width: 1600, start: [60, 200],
-    npc: { x: 100, y: 200, msg: '嗨！我是小豆！\n每個人都有自己的樣子，\n找找看你的特質吧！' },
+    npc: { x: 100, y: 200, msg: '嗨！我是小豆！每個人都有自己的樣子，找找看你的特質吧！' },
     ground: [[0,240,400,30],[460,240,320,30],[840,240,300,30],[1200,240,400,30]],
     platforms: [[180,180,60],[310,145,60],[490,180,60],[620,150,70],[740,200,60],[870,165,60],[970,135,50],[1060,175,60],[1250,180,60],[1360,145,70],[1470,175,60]],
     stars: [[110,200],[200,145],[320,110],[380,200],[510,145],[640,115],[760,165],[810,200],[890,130],[990,100],[1080,140],[1150,200],[1270,145],[1380,110],[1490,140],[1550,200]],
     flowers: [[420,220,0],[800,220,1],[1180,220,2]],
     snails: [[330,270,400],[690,460,780],[1000,840,1140],[1400,1200,1580]],
     blockers: [], goal: [1560,200],
-    winLesson: '🌟 豆豆學到：<b>每個人都有自己的特質。</b>有人安靜、有人活潑、有人愛畫畫、有人愛運動 ── 都很棒。',
+    winLesson: '🌟 豆豆學到：每個人都有自己的特質。有人安靜、有人活潑、有人愛畫畫、有人愛運動 ── 都很棒。',
     quizzes: [
-      { q:'你覺得哪個是「特質」？', opts:['很高很矮','男生女生','愛笑、勇敢、聰明、安靜'], correct:2, fb:'<b>對！</b>「特質」就是你的樣子，跟身高、性別沒關係。' },
-      { q:'男生喜歡畫畫，可以嗎？', opts:['可以！','不可以'], correct:0, fb:'<b>可以！</b>畫畫不分男生女生，喜歡就去畫。' },
-      { q:'女生喜歡踢足球，可以嗎？', opts:['可以！','不可以'], correct:0, fb:'<b>可以！</b>運動不分男生女生，誰都可以踢。' },
+      { q:'你覺得哪個是「特質」？', opts:['很高很矮','男生女生','愛笑、勇敢、聰明、安靜'], correct:2, fb:'對！特質就是你的樣子，跟身高、性別沒關係。' },
+      { q:'男生喜歡畫畫，可以嗎？', opts:['可以！','不可以'], correct:0, fb:'可以！畫畫不分男生女生，喜歡就去畫。' },
+      { q:'女生喜歡踢足球，可以嗎？', opts:['可以！','不可以'], correct:0, fb:'可以！運動不分男生女生，誰都可以踢。' },
     ],
   },
   {
     name: '都可以', desc: '<b>男生女生都可以。</b><br>路上有「不可以」的紅色看板，靠近 1 秒會破除！',
     palette: 'noon', width: 1700, start: [60, 200],
-    npc: { x: 100, y: 200, msg: '看到「男生不能」「女生不能」\n的看板都是錯的！\n我們一起去打破它～' },
+    npc: { x: 100, y: 200, msg: '看到「男生不能」「女生不能」的看板都是錯的！我們一起去打破它～' },
     ground: [[0,240,380,30],[440,240,360,30],[860,240,320,30],[1240,240,460,30]],
     platforms: [[150,180,60],[280,140,60],[470,175,60],[600,145,70],[730,195,60],[880,170,60],[990,135,50],[1090,165,60],[1280,175,60],[1400,140,70],[1530,170,60]],
     stars: [[100,200],[180,140],[300,100],[360,200],[490,140],[620,105],[740,155],[810,200],[900,130],[1010,95],[1110,130],[1180,200],[1300,140],[1420,100],[1550,135],[1650,200]],
@@ -372,17 +430,17 @@ const LEVELS = [
     snails: [[330,260,380],[680,440,800],[1000,860,1180],[1420,1240,1680]],
     blockers: [[430,200,'男生\n不能哭','男生也可以哭，難過就哭'],[840,200,'女生\n不能玩\n車車','女生也可以玩車車'],[1235,200,'只有男生\n可以當\n班長','誰都可以當班長']],
     goal: [1660,200],
-    winLesson: '🌟 豆豆學到：<b>「只有 ___ 才可以做 ___」都是錯的。</b>男生女生，都可以選自己喜歡的事。',
+    winLesson: '🌟 豆豆學到：只有 ___ 才可以做 ___ 都是錯的。男生女生都可以選自己喜歡的事。',
     quizzes: [
-      { q:'媽媽煮飯，爸爸可以煮飯嗎？', opts:['可以！','不可以'], correct:0, fb:'<b>當然可以！</b>家事不分男女，爸爸煮的菜也很好吃。' },
-      { q:'男生可以穿粉紅色嗎？', opts:['可以！','不可以'], correct:0, fb:'<b>可以！</b>顏色沒有性別，100 年前粉紅色還是男生的顏色呢！' },
-      { q:'警察、消防員，可以是女生嗎？', opts:['可以！','不可以'], correct:0, fb:'<b>可以！</b>很多女生是很厲害的警察、消防員。' },
+      { q:'媽媽煮飯，爸爸可以煮飯嗎？', opts:['可以！','不可以'], correct:0, fb:'當然可以！家事不分男女，爸爸煮的菜也很好吃。' },
+      { q:'男生可以穿粉紅色嗎？', opts:['可以！','不可以'], correct:0, fb:'可以！顏色沒有性別，100 年前粉紅色還是男生的顏色呢！' },
+      { q:'警察、消防員，可以是女生嗎？', opts:['可以！','不可以'], correct:0, fb:'可以！很多女生是很厲害的警察、消防員。' },
     ],
   },
   {
     name: '尊重不一樣', desc: '<b>跟我不一樣，也很棒。</b><br>蝸牛代表取笑別人的小怪，小心避開或踩它！',
     palette: 'dusk', width: 1800, start: [60, 200],
-    npc: { x: 100, y: 200, msg: '世界上有很多人，\n大家都不一樣 ──\n不一樣不是壞事喔。' },
+    npc: { x: 100, y: 200, msg: '世界上有很多人，大家都不一樣 ── 不一樣不是壞事喔。' },
     ground: [[0,240,380,30],[440,240,380,30],[880,240,320,30],[1260,240,540,30]],
     platforms: [[170,175,60],[290,140,60],[470,175,60],[600,140,70],[740,195,60],[890,165,60],[1000,130,50],[1110,165,60],[1290,175,60],[1410,140,70],[1550,165,60],[1680,130,60]],
     stars: [[100,200],[180,135],[300,100],[360,200],[490,135],[620,100],[760,155],[820,200],[910,125],[1020,90],[1130,125],[1200,200],[1310,135],[1430,100],[1570,125],[1700,90],[1780,200]],
@@ -390,33 +448,32 @@ const LEVELS = [
     snails: [[320,260,380],[680,440,820],[1020,880,1200],[1430,1260,1500],[1620,1500,1780]],
     blockers: [[435,200,'你穿\n粉紅色\n好奇怪','顏色沒有性別，喜歡就好'],[880,200,'男生\n為什麼\n要跳舞','男生也可以跳舞，超帥的'],[1255,200,'女生\n怎麼可以\n當警察','誰都可以當警察，公平勇敢就好']],
     goal: [1770,200],
-    winLesson: '🌟 豆豆學到：<b>跟你不一樣的人，不是「奇怪」，只是「不一樣」。</b>互相尊重，世界更好玩。',
+    winLesson: '🌟 豆豆學到：跟你不一樣的人，不是奇怪，只是不一樣。互相尊重，世界更好玩。',
     quizzes: [
-      { q:'看到同學穿的跟你不一樣，你會？', opts:['取笑他','說「你的衣服好特別」','不理他'], correct:1, fb:'<b>很棒！</b>欣賞別人的不一樣，就是尊重。' },
-      { q:'朋友哭了，你會？', opts:['叫他別哭','陪在旁邊','笑他愛哭'], correct:1, fb:'<b>對！</b>陪伴比任何話都重要。' },
-      { q:'同學說「你怎麼跟別人不一樣」，你可以說？', opts:['「不一樣才特別啊」','「對不起」','「我也覺得我很怪」'], correct:0, fb:'<b>沒錯！</b>不一樣不是錯，那是你的特別。' },
+      { q:'看到同學穿的跟你不一樣，你會？', opts:['取笑他','說「你的衣服好特別」','不理他'], correct:1, fb:'很棒！欣賞別人的不一樣，就是尊重。' },
+      { q:'朋友哭了，你會？', opts:['叫他別哭','陪在旁邊','笑他愛哭'], correct:1, fb:'對！陪伴比任何話都重要。' },
+      { q:'同學說你怎麼跟別人不一樣，你可以說？', opts:['不一樣才特別啊','對不起','我也覺得我很怪'], correct:0, fb:'沒錯！不一樣不是錯，那是你的特別。' },
     ],
   },
   {
     name: '我們的彩虹世界', desc: '<b>慶祝！</b>收齊彩虹星星，去拿到「<b>我就是我</b>」大彩虹旗！',
     palette: 'rainbow', width: 1900, start: [60, 200],
-    npc: { x: 100, y: 200, msg: '最後一關了！\n世界上每個人都是\n彩虹的一種顏色～' },
+    npc: { x: 100, y: 200, msg: '最後一關了！世界上每個人都是彩虹的一種顏色～' },
     ground: [[0,240,360,30],[420,240,360,30],[840,240,360,30],[1260,240,640,30]],
     platforms: [[140,175,60],[260,140,60],[370,105,50],[450,175,60],[580,140,70],[720,105,60],[870,175,60],[990,140,60],[1110,105,60],[1280,175,70],[1400,140,70],[1530,105,70],[1660,140,70],[1780,105,70]],
     stars: [[90,200],[160,135],[290,100],[390,65],[350,200],[470,135],[600,100],[740,65],[800,200],[890,135],[1010,100],[1130,65],[1200,200],[1300,135],[1420,100],[1550,65],[1680,100],[1800,65],[1850,200]],
     flowers: [[380,220,0],[800,220,1],[1230,220,2]],
     snails: [[320,260,360],[640,420,780],[990,840,1200],[1420,1260,1700]],
     blockers: [], goal: [1870,200],
-    winLesson: '🌈 豆豆學會了：<br><b>我可以做我自己。</b><br><b>男生女生，都可以。</b><br><b>不一樣，也很好。</b>',
+    winLesson: '🌈 豆豆學會了：我可以做我自己。男生女生都可以。不一樣也很好。',
     quizzes: [
-      { q:'「我可以做我自己」這句話對嗎？', opts:['對','不對'], correct:0, fb:'<b>對！</b>你就是你，最棒的就是你自己。' },
-      { q:'你能不能跟別人不一樣？', opts:['可以！','不可以'], correct:0, fb:'<b>當然可以！</b>世界因為不一樣才精彩。' },
-      { q:'最後一題：你最棒的特質是什麼？選一個你喜歡的', opts:['溫柔','勇敢','聰明、會關心人'], correct:-1, fb:'<b>太棒了！</b>你選的就是答案。你就是你的英雄。' },
+      { q:'「我可以做我自己」這句話對嗎？', opts:['對','不對'], correct:0, fb:'對！你就是你，最棒的就是你自己。' },
+      { q:'你能不能跟別人不一樣？', opts:['可以！','不可以'], correct:0, fb:'當然可以！世界因為不一樣才精彩。' },
+      { q:'最後一題：你最棒的特質是什麼？選一個你喜歡的', opts:['溫柔','勇敢','聰明、會關心人'], correct:-1, fb:'太棒了！你選的就是答案。你就是你的英雄。' },
     ],
   },
 ];
 
-// ================ 物理 ================
 const GRAV = 0.42, WALK = 1.6, ACCEL = 0.4, FRICTION = 0.78;
 const JUMP_V = -7.2, JUMP_CUT = 0.4, MAX_FALL = 9;
 
@@ -427,7 +484,6 @@ const PALETTES = {
   rainbow:{ sky:['#a8e0f0','#ffd4a3','#ffb0d4'], mtn1:'#8a6abe', mtn2:'#bea4d4', ground:'#9c6f3f', grass:'#7ec849' },
 };
 
-// ================ 狀態 ================
 let curLevel = 0, totalScore = 0, state = 'start';
 let camX = 0, score = 0, lives = 3, invul = 0;
 let player = null, stars = [], snails = [], blockers = [], flowers = [], sparkles = [], clouds = [], bubbles = [];
@@ -437,9 +493,8 @@ let frame = 0;
 let curPal = PALETTES.sunset;
 let combo = 0, comboTimer = 0;
 let teacher = { slow:false, invul:false, highJump:false };
-let npc = null, npcShown = 0;
-let starsPerLevel = [];
-let correctQuizzes = 0;
+let lastSafeX = 60, lastSafeY = 200;
+let curQuizIdx = -1;
 
 function initLevel(idx){
   const L = LEVELS[idx];
@@ -448,8 +503,9 @@ function initLevel(idx){
     x: L.start[0], y: L.start[1], vx: 0, vy: 0,
     w: 14, h: 16, baseW: 14, baseH: 16,
     grounded: false, facing: 1, walkAnim: 0,
-    superTime: 0, // 變大時間
+    superTime: 0,
   };
+  lastSafeX = L.start[0]; lastSafeY = L.start[1];
   stars = L.stars.map(([x,y], i) => ({x, y, taken:false, bob: Math.random()*Math.PI*2, kind: idx === 3 ? i % 6 : 0}));
   snails = L.snails.map(([x, lb, rb]) => ({ x, y: 224, vx: -0.6, w: 16, h: 12, leftBound: lb, rightBound: rb, alive: true, anim:0 }));
   blockers = (L.blockers || []).map(([x, y, text, lesson]) => ({ x, y, w: 26, h: 50, text, lesson, broken: false, shake: 0, _touched: 0, _sounded: false }));
@@ -466,10 +522,13 @@ function initLevel(idx){
   starsTaken = 0; starsTotal = L.stars.length;
   score = 0; lives = 3; invul = 0; camX = 0;
   combo = 0; comboTimer = 0;
-  npc = L.npc ? { ...L.npc, life: 240 } : null;
-  npcShown = 0;
   updateHUD();
   document.getElementById('levelLabel').textContent = `第 ${idx+1} 關 · ${L.name}`;
+
+  if(L.npc){
+    showNpcBubble(L.npc.msg);
+    SP.speak(L.npc.msg);
+  }
 }
 
 function updateHUD(){
@@ -482,10 +541,32 @@ function updateHUD(){
     document.getElementById('comboN').textContent = combo;
     document.getElementById('comboX').textContent = comboMult();
   } else cb.classList.add('hide');
+  const pb = document.getElementById('powerBox');
+  if(player && player.superTime > 0){
+    pb.classList.remove('hide');
+    document.getElementById('powerN').textContent = Math.ceil(player.superTime / 60);
+  } else pb.classList.add('hide');
 }
 function comboMult(){ return combo >= 10 ? 3 : (combo >= 5 ? 2 : 1); }
 
-// ================ 碰撞 ================
+let bubbleHideTimer = null;
+function showNpcBubble(msg){
+  const el = document.getElementById('npcBubble');
+  document.getElementById('npcText').innerHTML = msg.replace(/\n/g, '<br>');
+  el.classList.add('on');
+  if(bubbleHideTimer) clearTimeout(bubbleHideTimer);
+  bubbleHideTimer = setTimeout(() => el.classList.remove('on'), 6000);
+}
+let toastHideTimer = null;
+function showLessonToast(msg){
+  const el = document.getElementById('lessonToast');
+  el.innerHTML = '💡 ' + msg;
+  el.classList.add('on');
+  SP.speak(msg);
+  if(toastHideTimer) clearTimeout(toastHideTimer);
+  toastHideTimer = setTimeout(() => el.classList.remove('on'), 4500);
+}
+
 function collideX(p){
   for(const s of SOLIDS){
     if(s.oneWay) continue;
@@ -510,7 +591,25 @@ function collideY(p){
   }
 }
 
-// ================ 更新 ================
+function tryRescue(){
+  if(player.superTime > 0){
+    player.superTime = 0;
+    player.w = player.baseW;
+    player.h = player.baseH;
+    player.x = lastSafeX;
+    player.y = lastSafeY - 30;
+    player.vx = 0; player.vy = 0;
+    invul = 120;
+    SND.rescue();
+    spawnSpark(player.x + player.w/2, player.y + player.h/2, 30);
+    addBubble(player.x + player.w/2, player.y, '答對救命！💖');
+    showLessonToast('剛剛答對的能量救了你一命！');
+    updateHUD();
+    return true;
+  }
+  return false;
+}
+
 let inFlowerQuiz = false;
 function update(){
   if(state !== 'playing' || inFlowerQuiz) return;
@@ -547,14 +646,20 @@ function update(){
   player.y += player.vy;
   collideY(player);
 
-  if(player.y > H + 40) loseLife('掉下去了！');
+  if(player.grounded){
+    lastSafeX = player.x;
+    lastSafeY = player.y;
+  }
+
+  if(player.y > H + 40){
+    if(!tryRescue()) loseLife('掉下去了！');
+  }
 
   if(player.grounded && Math.abs(player.vx) > 0.5) player.walkAnim += 0.2;
 
   const targetCam = Math.max(0, Math.min(LEVELS[curLevel].width - W, player.x + player.w/2 - W/2));
   camX += (targetCam - camX) * 0.12;
 
-  // 變大計時
   if(player.superTime > 0){
     player.superTime--;
     if(player.superTime === 0){
@@ -562,9 +667,9 @@ function update(){
       SND.shrink();
       addBubble(player.x + player.w/2, player.y, '變小了…');
     }
+    if(player.superTime % 60 === 0) updateHUD();
   }
 
-  // 蝸牛
   for(const s of snails){
     if(!s.alive) continue;
     s.x += s.vx * slowFactor;
@@ -581,21 +686,22 @@ function update(){
         spawnSpark(s.x + s.w/2, s.y, 8);
         SND.stomp();
         updateHUD();
-      } else if(invul <= 0 && !teacher.invul && player.superTime <= 0){
-        loseLife('被撞到了！');
-      } else if(player.superTime > 0){
-        // 變大狀態：撞蝸牛也不痛，反而踢飛
-        s.alive = false;
-        score += 100;
-        spawnSpark(s.x + s.w/2, s.y, 6);
-        SND.stomp();
-        addBubble(player.x + player.w/2, player.y, '不怕！');
-        updateHUD();
+      } else if(invul <= 0 && !teacher.invul){
+        if(player.superTime > 0){
+          s.alive = false;
+          score += 100;
+          spawnSpark(s.x + s.w/2, s.y, 6);
+          SND.stomp();
+          addBubble(player.x + player.w/2, player.y, '不怕！');
+          updateHUD();
+        } else {
+          // 沒有 superTime 但 lives 還有 → 嘗試救命；沒法救只能扣血
+          loseLife('被撞到了！');
+        }
       }
     }
   }
 
-  // 星星 + 連擊
   for(const st of stars){
     if(st.taken) continue;
     st.bob += 0.08;
@@ -617,7 +723,6 @@ function update(){
     }
   }
 
-  // 花 → 出題
   for(const f of flowers){
     if(f.taken) continue;
     f.bob += 0.06;
@@ -630,23 +735,20 @@ function update(){
     }
   }
 
-  // 看板
   for(const b of blockers){
     if(b.broken) continue;
     if(player.x + player.w > b.x && player.x < b.x + b.w &&
        player.y + player.h > b.y && player.y < b.y + b.h){
-      // 變大狀態：直接破！
       if(player.superTime > 0){
         b.broken = true;
         spawnSpark(b.x + b.w/2, b.y + b.h/2, 18);
         SND.power();
         score += 500;
         addBubble(b.x + b.w/2, b.y, '哈！破！');
-        showBlockerLesson(b.lesson);
+        showLessonToast(b.lesson);
         updateHUD();
         continue;
       }
-      // 普通狀態：推回 + 按住 1 秒
       if(player.vx > 0) player.x = b.x - player.w;
       else if(player.vx < 0) player.x = b.x + b.w;
       player.vx = 0;
@@ -659,13 +761,12 @@ function update(){
         SND.power();
         score += 300;
         updateHUD();
-        showBlockerLesson(b.lesson);
+        showLessonToast(b.lesson);
       }
     } else if(b._touched > 0) b._touched = Math.max(0, b._touched - 2);
     if(b.shake > 0) b.shake--;
   }
 
-  // 終點
   const L = LEVELS[curLevel];
   const [gx, gy] = L.goal;
   if(player.x + player.w > gx && player.x < gx + 16 &&
@@ -680,7 +781,6 @@ function update(){
   for(const c of clouds){ c.x -= c.speed; if(c.x + c.w < 0) c.x = LEVELS[curLevel].width; }
 
   if(invul > 0) invul--;
-  if(npc) npc.life--;
 }
 
 function spawnSpark(x, y, n){
@@ -696,13 +796,12 @@ function loseLife(reason){
   if(lives <= 0){ lose(reason); return; }
   invul = 90; player.vx = -player.facing * 2; player.vy = -3;
 }
-let blockerToast = null;
-function showBlockerLesson(text){ blockerToast = { text, life: 180 }; }
 
 function lose(reason){
   state = 'lose'; SND.lose(); SND.stopMusic();
   document.getElementById('loseReason').textContent = reason;
   document.getElementById('screenLose').classList.remove('hide');
+  SP.speak('沒關係，再來一次');
 }
 
 function levelWin(){
@@ -711,18 +810,25 @@ function levelWin(){
   score += starsTaken * 50;
   score += lives * 300;
   totalScore += score;
-  starsPerLevel[curLevel] = `${starsTaken}/${starsTotal}`;
+  SAVE.completed[curLevel] = true;
+  SAVE.highScores[curLevel] = Math.max(SAVE.highScores[curLevel] || 0, score);
+  SAVE.starsBest[curLevel] = Math.max(SAVE.starsBest[curLevel] || 0, starsTaken);
+  SAVE.lastLevel = Math.min(curLevel + 1, 3);
+  SAVE.totalScore = (SAVE.totalScore || 0) + score;
+  saveData();
+
   document.getElementById('lvlScore').textContent = String(score).padStart(5,'0');
   document.getElementById('lvlStars').textContent = `${starsTaken}/${starsTotal}`;
   document.getElementById('lvlMessage').innerHTML = `<span class="feedback-emoji">${['🌟','💪','🌈','🏆'][curLevel]}</span>${LEVELS[curLevel].winLesson}`;
   drawReportCard();
   document.getElementById('btnNextLvl').textContent = curLevel >= LEVELS.length - 1 ? '看結局 →' : '下一關 →';
   document.getElementById('screenLvlWin').classList.remove('hide');
+  SP.speak('過關啦！' + LEVELS[curLevel].winLesson);
 }
 
-// ================ 花朵問答 ================
 function openFlowerQuiz(qIdx){
   inFlowerQuiz = true;
+  curQuizIdx = qIdx;
   SND.stopMusic();
   const L = LEVELS[curLevel];
   const q = L.quizzes[qIdx];
@@ -740,6 +846,8 @@ function openFlowerQuiz(qIdx){
   document.getElementById('fqFb').classList.remove('on');
   document.getElementById('fqNext').classList.remove('on');
   document.getElementById('flowerQuiz').classList.remove('hide');
+  const speakText = q.q + '。 ' + q.opts.map((o, i) => ['A','B','C'][i] + '：' + o).join('。 ');
+  SP.speak(speakText);
 }
 function answerFlowerQuiz(qIdx, ansIdx, btn){
   const q = LEVELS[curLevel].quizzes[qIdx];
@@ -752,7 +860,8 @@ function answerFlowerQuiz(qIdx, ansIdx, btn){
     SND.correct();
     growPlayer();
     score += 500 * comboMult();
-    correctQuizzes++;
+    SAVE.quizCorrect = (SAVE.quizCorrect || 0) + 1;
+    saveData();
   } else {
     SND.wrong();
   }
@@ -761,25 +870,33 @@ function answerFlowerQuiz(qIdx, ansIdx, btn){
   fb.classList.add('on');
   document.getElementById('fqNext').classList.add('on');
   updateHUD();
+  SP.speak(q.fb);
 }
 function closeFlowerQuiz(){
   document.getElementById('flowerQuiz').classList.add('hide');
   inFlowerQuiz = false;
+  SP.stop();
   SND.startMusic();
 }
 document.getElementById('fqNext').addEventListener('click', closeFlowerQuiz);
+document.getElementById('fqSpeak').addEventListener('click', () => {
+  if(curQuizIdx < 0) return;
+  const q = LEVELS[curLevel].quizzes[curQuizIdx];
+  const speakText = q.q + '。 ' + q.opts.map((o, i) => ['A','B','C'][i] + '：' + o).join('。 ');
+  SP.speak(speakText);
+});
 
 function growPlayer(){
   if(!player) return;
   player.w = player.baseW * 1.4;
   player.h = player.baseH * 1.4;
-  player.superTime = 600; // 10 秒
+  player.superTime = 600;
   SND.grow();
   addBubble(player.x + player.w/2, player.y, ['我可以！','我喜歡！','我就是我！'][Math.floor(Math.random()*3)]);
   spawnSpark(player.x + player.w/2, player.y + player.h/2, 20);
 }
 
-// ================ 繪圖 ================
+// ============ 繪圖 ============
 function drawSky(){
   const g = ctx.createLinearGradient(0, 0, 0, H);
   g.addColorStop(0, curPal.sky[0]); g.addColorStop(0.5, curPal.sky[1]); g.addColorStop(1, curPal.sky[2]);
@@ -865,22 +982,14 @@ function drawFlowers(){
     const sx = f.x - camX;
     if(sx < -10 || sx > W+10) continue;
     const off = Math.sin(f.bob) * 1.5;
-    // 莖
-    ctx.fillStyle = '#5fa84b';
-    ctx.fillRect(sx - 1, f.y + 6, 2, 14);
-    ctx.fillRect(sx - 4, f.y + 12, 3, 2);
-    // 花瓣
+    ctx.fillStyle = '#5fa84b'; ctx.fillRect(sx - 1, f.y + 6, 2, 14); ctx.fillRect(sx - 4, f.y + 12, 3, 2);
     const petalCol = ['#ff8aa3','#ffd96a','#88e0c8'][f.qIdx % 3];
     ctx.fillStyle = petalCol;
     [[-4,-2],[4,-2],[-4,4],[4,4],[0,-5],[0,5]].forEach(([dx,dy]) => {
       ctx.beginPath(); ctx.arc(sx+dx, f.y+dy+off, 3, 0, Math.PI*2); ctx.fill();
     });
-    // 中心
-    ctx.fillStyle = '#ffe680'; ctx.beginPath();
-    ctx.arc(sx, f.y + off, 2.5, 0, Math.PI*2); ctx.fill();
-    // ?
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#ffe680'; ctx.beginPath(); ctx.arc(sx, f.y + off, 2.5, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText('?', sx, f.y + 2 + off);
   }
 }
@@ -939,22 +1048,18 @@ function drawPlayer(){
   const w = player.w, h = player.h;
   const f = player.facing;
   const hop = (player.grounded && Math.abs(player.vx) > 0.5) ? Math.floor(player.walkAnim) % 2 : 0;
-  // 變大狀態光暈
   if(player.superTime > 0){
     ctx.globalAlpha = 0.3 + Math.sin(frame*0.2)*0.15;
     ctx.fillStyle = '#ffd96a';
     ctx.beginPath(); ctx.arc(px + w/2, py + h/2 - hop, w*0.9, 0, Math.PI*2); ctx.fill();
     ctx.globalAlpha = 1;
   }
-  // 影子
   ctx.fillStyle = 'rgba(0,0,0,.2)';
   ctx.beginPath(); ctx.ellipse(px + w/2, py + h + 2, w/2, 2, 0, 0, Math.PI*2); ctx.fill();
-  // 身體
   ctx.fillStyle = '#d4a878'; ctx.fillRect(px, py + h - hop, w, 1);
   ctx.fillStyle = player.superTime > 0 ? '#ffe8b0' : '#f4d4a8';
   if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(px, py - hop, w, h, w*0.35); ctx.fill(); }
   else ctx.fillRect(px, py - hop, w, h);
-  // 腮紅 + 眼睛 + 嘴（按比例縮放）
   const sx = w / player.baseW;
   const sy = h / player.baseH;
   ctx.fillStyle = '#ffaa9a';
@@ -981,62 +1086,34 @@ function drawBubbles(){
     if(sx < -30 || sx > W+30) continue;
     const alpha = Math.min(1, b.life / 20);
     ctx.globalAlpha = alpha;
-    const tw = ctx.measureText(b.text).width + 8;
+    ctx.font = 'bold 10px sans-serif';
+    const tw = ctx.measureText(b.text).width + 10;
     ctx.fillStyle = '#fff';
-    if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(sx - tw/2, b.y - 16, tw, 14, 6); ctx.fill(); }
-    else ctx.fillRect(sx - tw/2, b.y - 16, tw, 14);
+    if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(sx - tw/2, b.y - 18, tw, 15, 6); ctx.fill(); }
+    else ctx.fillRect(sx - tw/2, b.y - 18, tw, 15);
     ctx.fillStyle = '#1a1530';
-    ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(b.text, sx, b.y - 9);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(b.text, sx, b.y - 10);
     ctx.globalAlpha = 1;
   }
 }
 function drawNPC(){
-  if(!npc || npc.life <= 0) return;
-  const sx = npc.x - camX;
+  const L = LEVELS[curLevel];
+  if(!L.npc) return;
+  const sx = L.npc.x - camX;
   if(sx < -30 || sx > W+30) return;
-  // 夥伴豆豆
   ctx.fillStyle = '#a8e0c8';
-  ctx.beginPath(); ctx.arc(sx + 7, npc.y + 8, 7, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(sx + 7, L.npc.y + 8, 7, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = '#3a2820';
-  ctx.fillRect(sx + 4, npc.y + 6, 2, 2);
-  ctx.fillRect(sx + 9, npc.y + 6, 2, 2);
-  ctx.fillRect(sx + 6, npc.y + 10, 3, 1);
-  // 對話框
-  if(npc.life > 30){
-    const alpha = npc.life > 200 ? (240 - npc.life)/40 : (npc.life > 60 ? 1 : npc.life/30);
-    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
-    const lines = npc.msg.split('\n');
-    const bw = 110, bh = lines.length * 12 + 10;
-    const bx = sx + 16, by = npc.y - bh - 4;
+  ctx.fillRect(sx + 4, L.npc.y + 6, 2, 2);
+  ctx.fillRect(sx + 9, L.npc.y + 6, 2, 2);
+  ctx.fillRect(sx + 6, L.npc.y + 10, 3, 1);
+  const wave = Math.sin(frame * 0.1) > 0;
+  if(wave){
     ctx.fillStyle = '#fff';
-    if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(bx, by, bw, bh, 8); ctx.fill(); }
-    else ctx.fillRect(bx, by, bw, bh);
-    ctx.fillStyle = '#1a1530';
-    ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    for(let i=0;i<lines.length;i++) ctx.fillText(lines[i], bx + 5, by + 5 + i*12);
-    ctx.globalAlpha = 1;
+    ctx.fillRect(sx + 14, L.npc.y - 2, 2, 2);
+    ctx.fillRect(sx + 17, L.npc.y - 5, 2, 2);
   }
-}
-function drawToast(){
-  if(!blockerToast) return;
-  blockerToast.life--;
-  if(blockerToast.life <= 0){ blockerToast = null; return; }
-  const alpha = Math.min(1, blockerToast.life / 30);
-  ctx.globalAlpha = alpha;
-  ctx.fillStyle = '#1a1530'; ctx.fillRect(W/2 - 140, 30, 280, 38);
-  ctx.fillStyle = '#fff'; ctx.fillRect(W/2 - 138, 32, 276, 34);
-  ctx.fillStyle = '#1a1530'; ctx.font = 'bold 11px sans-serif';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  const maxw = 250;
-  const lines = []; let cur = '';
-  for(let i=0;i<blockerToast.text.length;i++){
-    cur += blockerToast.text[i];
-    if(ctx.measureText(cur).width > maxw){ lines.push(cur.slice(0,-1)); cur = blockerToast.text[i]; }
-  }
-  if(cur) lines.push(cur);
-  for(let i=0;i<lines.length;i++) ctx.fillText(lines[i], W/2, 42 + i*13);
-  ctx.globalAlpha = 1;
 }
 
 function render(){
@@ -1045,40 +1122,33 @@ function render(){
   drawStars(); drawFlowers(); drawBlockers(); drawGoal();
   drawSnails(); drawSparkles();
   drawNPC();
-  drawPlayer(); drawBubbles(); drawToast();
+  drawPlayer(); drawBubbles();
 }
 function loop(){ update(); render(); requestAnimationFrame(loop); }
 loop();
 
-// ================ 學習卡 ================
 function drawReportCard(){
   const c = document.getElementById('reportCanvas');
   const r = c.getContext('2d');
   const cw = c.width, ch = c.height;
-  // 背景
   const g = r.createLinearGradient(0, 0, 0, ch);
   g.addColorStop(0, '#fff8ef'); g.addColorStop(1, '#ffe8df');
   r.fillStyle = g; r.fillRect(0, 0, cw, ch);
-  // 邊框
   r.strokeStyle = '#ff8a65'; r.lineWidth = 8; r.strokeRect(8, 8, cw-16, ch-16);
-  // 標題
   r.fillStyle = '#5e35b1'; r.font = 'bold 32px sans-serif'; r.textAlign = 'center';
   r.fillText('🌈 今日學習卡 🌈', cw/2, 50);
   r.font = 'bold 20px sans-serif'; r.fillStyle = '#ff8a65';
   r.fillText(`第 ${curLevel+1} 關：${LEVELS[curLevel].name}`, cw/2, 82);
-  // 大豆豆
   const px = 60, py = 110;
   r.fillStyle = '#f4d4a8';
   r.beginPath(); r.arc(px+30, py+30, 32, 0, Math.PI*2); r.fill();
   r.fillStyle = '#ffaa9a'; r.fillRect(px+12, py+38, 8, 5); r.fillRect(px+40, py+38, 8, 5);
   r.fillStyle = '#3a2820'; r.fillRect(px+18, py+24, 5, 5); r.fillRect(px+37, py+24, 5, 5);
   r.fillRect(px+27, py+44, 6, 3);
-  // 資訊
   r.fillStyle = '#2c3e50'; r.textAlign = 'left'; r.font = 'bold 18px sans-serif';
   r.fillText(`分數：${String(score).padStart(5,'0')}`, 140, 130);
   r.fillText(`星星：${starsTaken} / ${starsTotal}`, 140, 158);
   r.fillText(`愛心：${'❤️'.repeat(lives)}`, 140, 186);
-  // 學習重點
   r.fillStyle = '#ffd96a'; r.fillRect(40, 220, cw-80, 130);
   r.strokeStyle = '#ff8a65'; r.lineWidth = 3; r.strokeRect(40, 220, cw-80, 130);
   r.fillStyle = '#5e35b1'; r.font = 'bold 18px sans-serif'; r.textAlign = 'left';
@@ -1087,7 +1157,6 @@ function drawReportCard(){
   const lesson = LEVELS[curLevel].winLesson.replace(/<[^>]*>/g, '').replace(/[🌟💪🌈🏆]/g, '').trim();
   const lines = wrapText(r, lesson, cw - 110);
   lines.forEach((line, i) => r.fillText(line, 55, 278 + i*22));
-  // 日期
   r.fillStyle = '#6b7280'; r.font = '13px sans-serif'; r.textAlign = 'right';
   const d = new Date();
   r.fillText(`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} · classtools1020`, cw-30, ch-20);
@@ -1103,17 +1172,32 @@ function wrapText(r, text, maxW){
   return out;
 }
 
-// ================ 流程 ================
+// ============ 流程 ============
 function hideAllScreens(){ document.querySelectorAll('.screen').forEach(s => s.classList.add('hide')); }
-function showStart(){ hideAllScreens(); document.getElementById('screenStart').classList.remove('hide'); state = 'start'; SND.stopMusic(); }
+function showStart(){
+  hideAllScreens();
+  document.getElementById('screenStart').classList.remove('hide');
+  state = 'start';
+  SND.stopMusic();
+  SP.stop();
+  document.getElementById('npcBubble').classList.remove('on');
+  document.getElementById('lessonToast').classList.remove('on');
+  const hasSave = SAVE.completed.some(x => x) || SAVE.totalScore > 0;
+  document.getElementById('btnContinue').classList.toggle('hide', !hasSave);
+  if(hasSave){
+    document.getElementById('btnContinue').textContent = `繼續：第 ${(SAVE.lastLevel || 0) + 1} 關 →`;
+  }
+}
 function showLevelSelect(){
   hideAllScreens();
   const grid = document.getElementById('levelGrid');
   grid.innerHTML = LEVELS.map((L, i) => `
-    <div class="lvl-card" data-lvl="${i}">
+    <div class="lvl-card ${SAVE.completed[i] ? 'done' : ''}" data-lvl="${i}">
+      ${SAVE.completed[i] ? '<div class="check">✓</div>' : ''}
       <span class="num">第 ${i+1} 關</span>
       <div class="name">${L.name}</div>
       <div class="desc">${L.desc.replace(/<[^>]*>/g,'').slice(0,40)}…</div>
+      ${SAVE.highScores[i] > 0 ? `<div class="best">⭐ 最高分 ${SAVE.highScores[i]} · 星 ${SAVE.starsBest[i] || 0}/${L.stars.length}</div>` : ''}
     </div>
   `).join('');
   grid.querySelectorAll('.lvl-card').forEach(c => {
@@ -1130,6 +1214,7 @@ function showLevelIntro(){
   document.getElementById('introName').textContent = L.name;
   document.getElementById('introDesc').innerHTML = L.desc;
   document.getElementById('screenIntro').classList.remove('hide');
+  SP.speak(`第 ${curLevel+1} 關：${L.name}。${L.desc.replace(/<[^>]*>/g, '')}`);
 }
 function startLevel(){
   hideAllScreens(); initLevel(curLevel); state = 'playing'; SND.startMusic();
@@ -1142,18 +1227,19 @@ function nextLevelClick(){
     state = 'allwin'; SND.bigWin(); setTimeout(()=>SND.bigWin(), 800);
     document.getElementById('totalScore').textContent = String(totalScore).padStart(6,'0');
     document.getElementById('screenAllWin').classList.remove('hide');
+    SP.speak('全破啦！恭喜你陪豆豆走完四個世界！');
   }
 }
-function pauseGame(){ if(state !== 'playing') return; state = 'paused'; SND.pause(); SND.stopMusic(); document.getElementById('screenPause').classList.remove('hide'); }
+function pauseGame(){ if(state !== 'playing') return; state = 'paused'; SND.pause(); SND.stopMusic(); SP.stop(); document.getElementById('screenPause').classList.remove('hide'); }
 function resumeGame(){ state = 'playing'; document.getElementById('screenPause').classList.add('hide'); SND.startMusic(); }
 
-// ================ 按鈕 ================
-document.getElementById('btnStart').addEventListener('click', () => { SND.init(); SND.click(); curLevel = 0; totalScore = 0; correctQuizzes = 0; showLevelIntro(); });
-document.getElementById('btnLevelSelect').addEventListener('click', () => { SND.init(); SND.click(); showLevelSelect(); });
+document.getElementById('btnStart').addEventListener('click', () => { SND.init(); SP.init(); SND.click(); curLevel = 0; totalScore = 0; showLevelIntro(); });
+document.getElementById('btnContinue').addEventListener('click', () => { SND.init(); SP.init(); SND.click(); curLevel = SAVE.lastLevel || 0; totalScore = 0; showLevelIntro(); });
+document.getElementById('btnLevelSelect').addEventListener('click', () => { SND.init(); SP.init(); SND.click(); showLevelSelect(); });
 document.getElementById('btnBackToStart').addEventListener('click', () => { SND.click(); showStart(); });
-document.getElementById('btnIntroGo').addEventListener('click', () => { SND.click(); startLevel(); });
-document.getElementById('btnNextLvl').addEventListener('click', () => { SND.click(); nextLevelClick(); });
-document.getElementById('btnPlayAgain').addEventListener('click', () => { SND.click(); curLevel = 0; totalScore = 0; correctQuizzes = 0; showLevelIntro(); });
+document.getElementById('btnIntroGo').addEventListener('click', () => { SND.click(); SP.stop(); startLevel(); });
+document.getElementById('btnNextLvl').addEventListener('click', () => { SND.click(); SP.stop(); nextLevelClick(); });
+document.getElementById('btnPlayAgain').addEventListener('click', () => { SND.click(); curLevel = 0; totalScore = 0; showLevelIntro(); });
 document.getElementById('btnRetry').addEventListener('click', () => { SND.click(); showLevelIntro(); });
 document.getElementById('btnLoseHome').addEventListener('click', () => { SND.click(); showStart(); });
 document.getElementById('btnBackHome').addEventListener('click', () => { SND.click(); showStart(); });
@@ -1165,7 +1251,12 @@ document.getElementById('btnSound').addEventListener('click', () => {
   document.getElementById('btnSound').textContent = on ? '🔊' : '🔇';
   if(on && state === 'playing') SND.startMusic();
 });
-// 老師工具
+document.getElementById('btnVoice').addEventListener('click', () => {
+  SP.init();
+  const on = SP.toggle();
+  document.getElementById('btnVoice').textContent = on ? '🗣' : '🤫';
+  document.getElementById('btnVoice').classList.toggle('off', !on);
+});
 document.getElementById('btnTeacher').addEventListener('click', () => {
   SND.click();
   document.getElementById('teacherTray').classList.toggle('on');
@@ -1181,12 +1272,20 @@ function toggleTeacherBtn(key, id){
 toggleTeacherBtn('slow', 'ttSlow');
 toggleTeacherBtn('invul', 'ttInvul');
 toggleTeacherBtn('highJump', 'ttJump');
-document.getElementById('ttSkip').addEventListener('click', () => {
+document.getElementById('ttSkip').addEventListener('click', () => { SND.click(); if(state === 'playing'){ levelWin(); } });
+document.getElementById('ttReset').addEventListener('click', () => {
   SND.click();
-  if(state === 'playing'){ levelWin(); }
+  if(confirm('確定清空進度？所有最高分、過關紀錄都會消失。')){
+    clearSave();
+    alert('進度已清空');
+    showStart();
+  }
 });
 
 document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+SP.init();
+showStart();
 </script>
 </body>
 </html>
