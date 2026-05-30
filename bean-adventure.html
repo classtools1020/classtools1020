@@ -495,6 +495,12 @@ let combo = 0, comboTimer = 0;
 let teacher = { slow:false, invul:false, highJump:false };
 let lastSafeX = 60, lastSafeY = 200;
 let curQuizIdx = -1;
+// ===== 救命系統 =====
+let balloon = null; // {phase, x, y, targetX, targetY, life, color}
+const MAX_LIVES = 5;
+let starsAtLastMilestone = 0;
+let consecHits = 0; // 連續被打中次數
+let consecProtect = 0; // 連敗保護倒數（frame）
 
 function initLevel(idx){
   const L = LEVELS[idx];
@@ -522,6 +528,11 @@ function initLevel(idx){
   starsTaken = 0; starsTotal = L.stars.length;
   score = 0; lives = 3; invul = 0; camX = 0;
   combo = 0; comboTimer = 0;
+  // 救命系統重置
+  balloon = null;
+  starsAtLastMilestone = 0;
+  consecHits = 0;
+  consecProtect = 0;
   updateHUD();
   document.getElementById('levelLabel').textContent = `第 ${idx+1} 關 · ${L.name}`;
 
@@ -610,6 +621,94 @@ function tryRescue(){
   return false;
 }
 
+// ⭐ 里程碑：每收 N 顆星給獎勵
+function checkMilestone(){
+  if(starsTaken === 5){
+    lives = Math.min(MAX_LIVES, lives + 1);
+    SND.grow();
+    addBubble(player.x + player.w/2, player.y, '⭐5 補心！');
+    showLessonToast('收集 5 顆星：愛心 +1 ❤️');
+  } else if(starsTaken === 10){
+    growPlayer();
+    SND.grow();
+    showLessonToast('收集 10 顆星：自動護盾 10 秒 ⚡');
+  } else if(starsTaken === 15){
+    lives = Math.min(MAX_LIVES, lives + 1);
+    SND.bigWin();
+    addBubble(player.x + player.w/2, player.y, '⭐15 超讚！');
+    showLessonToast('收集 15 顆星：再 +1 愛心 ❤️');
+  }
+  updateHUD();
+}
+
+// 🎈 熱氣球救命
+function startBalloonRescue(){
+  const colors = ['#ff6b9a','#88c0e8','#7ed487','#ffd96a','#b388e8','#ff8a65'];
+  balloon = {
+    phase: 'rising',
+    x: player.x,
+    y: H + 50,
+    targetX: lastSafeX,
+    targetY: lastSafeY - 20,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    life: 0,
+  };
+  player.vx = 0; player.vy = 0;
+  SND.flower();
+  setTimeout(() => SND.power(), 200);
+}
+
+function updateBalloon(){
+  if(!balloon) return;
+  balloon.life++;
+  if(balloon.phase === 'rising'){
+    // 從畫面下飄到玩家高度
+    balloon.y -= 2.5;
+    player.x = balloon.x;
+    player.y = balloon.y - 12; // 站在籃子上
+    player.vx = 0; player.vy = 0;
+    if(balloon.y < 140){
+      balloon.phase = 'flying';
+    }
+  } else if(balloon.phase === 'flying'){
+    // 飄向安全位置
+    const dx = balloon.targetX - balloon.x;
+    const dy = balloon.targetY - balloon.y;
+    const dist = Math.hypot(dx, dy);
+    if(dist < 3){
+      balloon.phase = 'landing';
+    } else {
+      balloon.x += dx / dist * 2.2;
+      balloon.y += dy / dist * 2.2;
+      player.x = balloon.x;
+      player.y = balloon.y - 12;
+      player.vx = 0; player.vy = 0;
+    }
+    if(balloon.life % 12 === 0) spawnSpark(balloon.x + 8, balloon.y + 25, 1);
+  } else if(balloon.phase === 'landing'){
+    // 緩降到地面
+    balloon.y += 0.8;
+    player.x = balloon.x;
+    player.y = balloon.y - 12;
+    player.vx = 0; player.vy = 0;
+    if(player.y >= lastSafeY){
+      player.y = lastSafeY;
+      player.vx = 0; player.vy = 0;
+      balloon.phase = 'done';
+      balloon.life = 30; // 還停 30 frame 緩慢飄走
+      invul = 60;
+      addBubble(player.x + player.w/2, player.y, '熱氣球救援！🎈');
+      updateHUD();
+    }
+  } else if(balloon.phase === 'done'){
+    // 飄走
+    balloon.y -= 1;
+    balloon.x += 0.3;
+    balloon.life--;
+    if(balloon.life <= 0) balloon = null;
+  }
+}
+
 let inFlowerQuiz = false;
 function update(){
   if(state !== 'playing' || inFlowerQuiz) return;
@@ -639,6 +738,12 @@ function update(){
 
   player.vy = Math.min(player.vy + GRAV*slowFactor, MAX_FALL);
 
+  // 🪂 滑翔翼：按住跳鍵下降緩慢（永遠可用）
+  if(!player.grounded && player.vy > 0.5 && keys.jumpHeld){
+    player.vy = Math.min(player.vy, 2.2);
+    if(frame % 6 === 0) spawnSpark(player.x + player.w/2, player.y + player.h, 1);
+  }
+
   player.x += player.vx;
   if(player.x < 0){ player.x = 0; player.vx = 0; }
   if(player.x + player.w > LEVELS[curLevel].width){ player.x = LEVELS[curLevel].width - player.w; player.vx = 0; }
@@ -651,9 +756,16 @@ function update(){
     lastSafeY = player.y;
   }
 
-  if(player.y > H + 40){
-    if(!tryRescue()) loseLife('掉下去了！');
+  if(player.y > H + 40 && !balloon){
+    // 🎈 熱氣球永遠接住，不扣愛心
+    startBalloonRescue();
   }
+
+  // 熱氣球動畫更新
+  if(balloon) updateBalloon();
+
+  // 連敗保護倒數
+  if(consecProtect > 0) consecProtect--;
 
   if(player.grounded && Math.abs(player.vx) > 0.5) player.walkAnim += 0.2;
 
@@ -694,9 +806,24 @@ function update(){
           SND.stomp();
           addBubble(player.x + player.w/2, player.y, '不怕！');
           updateHUD();
+        } else if(consecProtect > 0){
+          // 🛡 連敗保護中：不扣愛心，把蝸牛踢開
+          s.alive = false;
+          spawnSpark(s.x + s.w/2, s.y, 6);
+          SND.stomp();
+          addBubble(player.x + player.w/2, player.y, '保護中！');
         } else {
-          // 沒有 superTime 但 lives 還有 → 嘗試救命；沒法救只能扣血
           loseLife('被撞到了！');
+          consecHits++;
+          if(consecHits >= 2){
+            // 觸發 5 秒連敗保護
+            consecProtect = 300;
+            consecHits = 0;
+            invul = 60;
+            SND.power();
+            addBubble(player.x + player.w/2, player.y, '彩虹保護 5 秒！');
+            showLessonToast('連續受傷，給你 5 秒保護 🛡');
+          }
         }
       }
     }
@@ -713,6 +840,8 @@ function update(){
       comboTimer = 180;
       const pts = 100 * comboMult();
       score += pts;
+      // ⭐ 里程碑獎勵
+      checkMilestone();
       spawnSpark(st.x, st.y, 10);
       SND.star();
       if(combo >= 3 && combo % 5 === 0){
@@ -1041,9 +1170,68 @@ function drawGoal(){
     for(let i=0;i<colors.length;i++){ ctx.fillStyle = colors[i]; ctx.fillRect(sx + 3, gy - 30 + i*1.8, 20, 1.8); }
   }
 }
+function drawBalloon(){
+  if(!balloon) return;
+  const bx = balloon.x - camX + 7, by = balloon.y;
+  // 線
+  ctx.strokeStyle = '#3a2820';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(bx - 6, by + 4);
+  ctx.lineTo(bx - 2, by - 8);
+  ctx.moveTo(bx + 6, by + 4);
+  ctx.lineTo(bx + 2, by - 8);
+  ctx.stroke();
+  // 籃子（小竹籃）
+  ctx.fillStyle = '#a06a3a';
+  ctx.fillRect(bx - 8, by + 4, 16, 8);
+  ctx.fillStyle = '#7c5028';
+  for(let i = 0; i < 4; i++) ctx.fillRect(bx - 8 + i*4, by + 4, 1, 8);
+  // 氣球
+  ctx.fillStyle = balloon.color;
+  ctx.beginPath();
+  ctx.ellipse(bx, by - 20, 14, 18, 0, 0, Math.PI*2);
+  ctx.fill();
+  // 高光
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.beginPath();
+  ctx.ellipse(bx - 4, by - 25, 3, 6, 0, 0, Math.PI*2);
+  ctx.fill();
+  // 條紋
+  ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+  ctx.lineWidth = 1;
+  for(let i = -10; i <= 10; i += 5){
+    ctx.beginPath();
+    ctx.ellipse(bx, by - 20, Math.abs(i) < 10 ? Math.sqrt(196 - i*i*0.6) : 0, 18, 0, 0, Math.PI*2);
+    ctx.stroke();
+  }
+  // 笑臉
+  ctx.fillStyle = '#3a2820';
+  ctx.fillRect(bx - 4, by - 22, 2, 2);
+  ctx.fillRect(bx + 2, by - 22, 2, 2);
+  ctx.fillRect(bx - 2, by - 18, 4, 1);
+}
+
+function drawProtectionGlow(){
+  if(consecProtect <= 0 || !player) return;
+  const px = player.x - camX + player.w/2;
+  const py = player.y + player.h/2;
+  const radius = player.w * (1.2 + Math.sin(frame * 0.3) * 0.15);
+  const colors = ['#ff8a8a','#ffd96a','#88e08a','#88c0e8','#b388e8'];
+  for(let i = 0; i < colors.length; i++){
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.5;
+    ctx.beginPath();
+    ctx.arc(px, py, radius + i*1.5, 0, Math.PI*2);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
 function drawPlayer(){
   if(!player) return;
-  if(invul > 0 && Math.floor(invul/4) % 2) return;
+  if(invul > 0 && Math.floor(invul/4) % 2 && consecProtect <= 0 && !balloon) return;
   const px = Math.round(player.x - camX), py = Math.round(player.y);
   const w = player.w, h = player.h;
   const f = player.facing;
@@ -1122,6 +1310,8 @@ function render(){
   drawStars(); drawFlowers(); drawBlockers(); drawGoal();
   drawSnails(); drawSparkles();
   drawNPC();
+  drawProtectionGlow();
+  drawBalloon();
   drawPlayer(); drawBubbles();
 }
 function loop(){ update(); render(); requestAnimationFrame(loop); }
