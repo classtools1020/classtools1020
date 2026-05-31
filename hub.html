@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stacey 老師教室總覽｜classtools1020</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fdfaf5;
+  --card:#fff;
+  --ink:#2c3e50;
+  --soft:#6b7280;
+  --line:#efe9e0;
+  --primary:#7c4dff;
+  --primary-deep:#5e35b1;
+  --primary-soft:#ede7f6;
+  --warm:#ff8a65;
+  --warm-soft:#ffe8e0;
+  --green:#7ed487;
+  --blue:#88c0e8;
+  --amber:#ffc857;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans TC','PingFang TC',sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+
+/* Hero */
+.hero{padding:48px 24px 32px;background:linear-gradient(180deg,#ede7f6 0%,#ffe8df 60%,var(--bg) 100%);text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40px;left:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,138,101,.18),transparent 70%);border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(124,77,255,.18),transparent 70%);border-radius:50%}
+.hero-inner{position:relative;z-index:1;max-width:920px;margin:0 auto}
+.brand{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--primary-deep);padding:6px 16px;border-radius:30px;font-size:.85em;font-weight:700;margin-bottom:18px;border:1.5px solid #d1c4e9;box-shadow:0 4px 14px rgba(124,77,255,.08)}
+h1{font-size:clamp(1.8em,4vw,2.4em);font-weight:900;color:var(--primary-deep);letter-spacing:-.5px;margin-bottom:10px;line-height:1.3}
+.subtitle{color:var(--soft);font-size:1.05em;margin-bottom:24px}
+.subtitle b{color:var(--warm);font-weight:900}
+
+/* Search */
+.search-box{position:relative;max-width:560px;margin:0 auto}
+.search-box input{width:100%;padding:16px 22px 16px 52px;border:none;border-radius:32px;font-size:1.05em;font-family:inherit;background:#fff;box-shadow:0 6px 22px rgba(0,0,0,.08);outline:none;border:2px solid transparent;transition:border-color .15s}
+.search-box input:focus{border-color:var(--primary)}
+.search-box .ico{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:1.4em;pointer-events:none}
+.search-box .clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:#f0eee9;color:var(--soft);border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:none}
+.search-box.has-text .clear{display:block}
+
+/* Tabs */
+.tabs-wrap{padding:0 16px;margin-top:24px}
+.tabs{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.tab{padding:10px 18px;background:#fff;color:var(--ink);font-size:.95em;font-weight:700;border-radius:24px;cursor:pointer;border:2px solid var(--line);transition:all .15s;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+.tab:hover{border-color:var(--primary);color:var(--primary)}
+.tab.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 4px 14px rgba(124,77,255,.25)}
+.tab .cnt{background:rgba(0,0,0,.08);color:inherit;padding:2px 8px;border-radius:10px;font-size:.78em;font-weight:800;margin-left:2px}
+.tab.active .cnt{background:rgba(255,255,255,.25)}
+
+/* Container */
+.container{max-width:1100px;margin:0 auto;padding:24px}
+
+/* Section */
+.section{margin-bottom:32px}
+.section.hide{display:none}
+.section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:16px;padding-left:4px}
+.section-emoji{font-size:1.4em}
+.section-title{font-size:1.25em;font-weight:900;color:var(--ink)}
+.section-count{color:var(--soft);font-size:.92em;font-weight:600}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+
+/* Card */
+.card{background:var(--card);border-radius:14px;padding:18px 18px 16px;text-decoration:none;color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.05);border:2px solid var(--line);transition:all .2s;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.08);border-color:var(--primary)}
+.card-emoji{font-size:1.8em;line-height:1}
+.card-title{font-size:1.02em;font-weight:900;color:var(--ink);line-height:1.4}
+.card-sub{font-size:.85em;color:var(--soft);line-height:1.5;flex:1}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.card-tag{font-size:.7em;padding:2px 7px;border-radius:6px;background:var(--primary-soft);color:var(--primary-deep);font-weight:700}
+.card-tag.warm{background:var(--warm-soft);color:#c4360e}
+.card-tag.green{background:#e0f5e0;color:#2e7d32}
+.card-tag.blue{background:#e3f2fd;color:#0369a1}
+.card-tag.amber{background:#fff4d6;color:#a16207}
+.card-fav{position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;font-size:18px;opacity:.3;transition:opacity .15s;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.card-fav:hover{opacity:.7;background:rgba(0,0,0,.05)}
+.card-fav.on{opacity:1}
+
+.card.fav{border-color:var(--amber);background:linear-gradient(180deg,#fffbef,#fff)}
+.card.recent::after{content:'最近';position:absolute;bottom:8px;right:8px;background:var(--warm);color:#fff;padding:2px 8px;border-radius:6px;font-size:.65em;font-weight:900;letter-spacing:.5px}
+
+/* Empty state */
+.empty{text-align:center;padding:60px 20px;color:var(--soft);background:#fff;border-radius:14px;border:1px solid var(--line)}
+.empty .em{font-size:3em;display:block;margin-bottom:10px;opacity:.5}
+
+/* Footer */
+footer{padding:32px 24px 48px;text-align:center;color:var(--soft);font-size:.88em;line-height:1.8;border-top:1px solid var(--line);background:#fff;margin-top:40px}
+footer a{color:var(--primary);text-decoration:none;font-weight:700}
+
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr 1fr;gap:10px}
+  .card{padding:14px 12px 12px}
+  .card-emoji{font-size:1.5em}
+  .card-title{font-size:.92em}
+  .card-sub{font-size:.78em}
+  .tab{padding:8px 14px;font-size:.85em}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="brand">🏫 classtools1020 · Stacey 老師</div>
+    <h1>教室總覽 · 找東西就靠這頁</h1>
+    <p class="subtitle">62 份教材 · 點 ⭐ 釘選最常用 · 打字直接搜尋</p>
+    <div class="search-box" id="searchBox">
+      <span class="ico">🔍</span>
+      <input id="search" type="search" placeholder="搜尋…例如「平行」「會考」「IEP」">
+      <button class="clear" id="clearBtn" aria-label="清除">✕</button>
+    </div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs" id="tabs"></div>
+</div>
+
+<main class="container" id="main">
+  <!-- 動態渲染 -->
+</main>
+
+<footer>
+  整理：曾瓊瑩｜⭐ 釘選會儲存在你瀏覽器<br>
+  <a href="https://github.com/classtools1020/classtools1020" target="_blank">GitHub Repo ↗</a>
+</footer>
+
+<script>
+// ============ 資料 ============
+const ITEMS = [
+  // 🏠 入口 & 工具
+  { f:'index.html', e:'🏯', t:'傳說戰場：幾何特訓', s:'數學遊戲化學習主頁', cat:'tool', tags:['數學','遊戲','入口'] },
+  { f:'teacher-dashboard.html', e:'🎛', t:'老師管理後台', s:'學生報告、任務管理', cat:'tool', tags:['工具','後台'] },
+  { f:'teacher-guide.html', e:'📖', t:'老師使用指南', s:'網站工具說明', cat:'tool', tags:['工具'] },
+  { f:'setup-report.html', e:'⚙️', t:'系統設定', s:'報告系統初始化', cat:'tool', tags:['工具'] },
+
+  // 🌈 升學指引（給家長）
+  { f:'paths-2026-hsinchu.html', e:'🛤', t:'升學指引主頁', s:'兩條升學路說明（給家長）', cat:'college', tags:['升學','家長','115'] },
+  { f:'placement-2026-hsinchu.html', e:'📋', t:'高中科系一覽', s:'安置 22 校 · 577 名額', cat:'college', tags:['升學','家長','115'] },
+  { f:'special-class-2026-hsinchu.html', e:'🎯', t:'集中式特教班', s:'綜合職能科 4 校 70 名額', cat:'college', tags:['升學','特教','家長'] },
+
+  // 🎮 特教
+  { f:'bean-adventure.html', e:'🎮', t:'豆豆冒險', s:'性別平等公民遊戲 · 4 關', cat:'sped', tags:['特教','遊戲','社會','性平'] },
+  { f:'tea-roadmap-2026.html', e:'📚', t:'特教組長 65 天學習地圖', s:'法規 + 實務 + AI 工具進度', cat:'sped', tags:['特教','法規','個人'] },
+
+  // 📐 數學 · 全等三角形
+  { f:'congruence-lesson1-full.html', e:'📐', t:'全等 #1 SSS', s:'第 1 節 完整版', cat:'math', tags:['8a','全等'] },
+  { f:'congruence-sss-lesson1.html', e:'🔺', t:'全等 SSS 互動', s:'第 1 節 互動練習', cat:'math', tags:['8a','全等','互動'] },
+  { f:'congruence-lesson2-full.html', e:'📐', t:'全等 #2 SAS/ASA', s:'第 2 節 完整版', cat:'math', tags:['8a','全等'] },
+  { f:'congruence-sas-asa-lesson2.html', e:'🔺', t:'全等 SAS/ASA 互動', s:'第 2 節 互動練習', cat:'math', tags:['8a','全等','互動'] },
+  { f:'congruence-lesson3-full.html', e:'📐', t:'全等 #3 AAS/RHS', s:'第 3 節 完整版', cat:'math', tags:['8a','全等'] },
+  { f:'congruence-aas-rhs-lesson3.html', e:'🔺', t:'全等 AAS/RHS 互動', s:'第 3 節 互動練習', cat:'math', tags:['8a','全等','互動'] },
+  { f:'congruence-homework.html', e:'📝', t:'全等作業', s:'課後練習題', cat:'math', tags:['8a','全等','作業'] },
+  { f:'congruence-aas-rhs-homework.html', e:'📝', t:'全等 AAS/RHS 作業', s:'課後練習題', cat:'math', tags:['8a','全等','作業'] },
+  { f:'congruence-teacher.html', e:'👨‍🏫', t:'全等 老師端', s:'老師管理介面', cat:'math', tags:['8a','全等','老師'] },
+
+  // 📏 數學 · 平行 / 平行四邊形
+  { f:'parallel-line-quest.html', e:'📏', t:'平行線冒險', s:'平行線判定遊戲', cat:'math', tags:['8a','平行','遊戲'] },
+  { f:'parallel-line-quest-teacher.html', e:'👨‍🏫', t:'平行線冒險 老師端', s:'', cat:'math', tags:['8a','平行','老師'] },
+  { f:'parallel-line-master-0527.html', e:'🏆', t:'平行線大師 5/27', s:'進階挑戰', cat:'math', tags:['8a','平行'] },
+  { f:'parallel-line-master-0527-teacher.html', e:'👨‍🏫', t:'平行線大師 老師端', s:'', cat:'math', tags:['8a','平行','老師'] },
+  { f:'parallelogram-lab.html', e:'🔬', t:'平行四邊形實驗室', s:'探索性質', cat:'math', tags:['8a','平行四邊形'] },
+  { f:'parallelogram-quest-lesson1.html', e:'🎯', t:'平行四邊形冒險 第 1 課', s:'入門', cat:'math', tags:['8a','平行四邊形'] },
+  { f:'parallelogram-master-0528.html', e:'🏆', t:'平行四邊形大師 5/28', s:'進階版', cat:'math', tags:['8a','平行四邊形'] },
+  { f:'parallelogram-master-0528-teacher.html', e:'👨‍🏫', t:'平四 大師 老師端', s:'', cat:'math', tags:['8a','平行四邊形','老師'] },
+  { f:'parallelogram-heroes-0529.html', e:'🦸', t:'平四 五英雄 5/29', s:'6 關闖關（少年漫畫風）', cat:'math', tags:['8a','平行四邊形','遊戲'] },
+  { f:'parallelogram-heroes-0529-teacher.html', e:'👨‍🏫', t:'平四 五英雄 老師端', s:'', cat:'math', tags:['8a','平行四邊形','老師'] },
+  { f:'isosceles-equilateral-lesson5.html', e:'△', t:'等腰/等邊三角形 第 5 課', s:'', cat:'math', tags:['8a','三角形'] },
+
+  // 📐 數學 · 角度與多邊形
+  { f:'triangle-angle-sum.html', e:'△', t:'三角形內角和', s:'180° 探究', cat:'math', tags:['8a','角度'] },
+  { f:'triangle-island-quest.html', e:'🏝', t:'三角形島冒險', s:'闖關遊戲', cat:'math', tags:['8a','角度','遊戲'] },
+  { f:'triangle-island-teacher.html', e:'👨‍🏫', t:'三角形島 老師端', s:'', cat:'math', tags:['8a','角度','老師'] },
+  { f:'exterior-angles.html', e:'⊿', t:'外角和', s:'多邊形外角', cat:'math', tags:['8a','角度'] },
+  { f:'quadrilateral-angle-sum.html', e:'⬜', t:'四邊形內角和', s:'360° 探究', cat:'math', tags:['8a','角度'] },
+  { f:'pentagon-angle-sum.html', e:'⬠', t:'五邊形內角和', s:'540° 探究', cat:'math', tags:['8a','角度'] },
+  { f:'perpendicular-bisector-angle-bisector-lesson4.html', e:'✂️', t:'中垂線/角平分線 第 4 課', s:'', cat:'math', tags:['8a','幾何'] },
+  { f:'perpendicular-bisector-lesson4-full.html', e:'✂️', t:'中垂線 完整版', s:'第 4 課', cat:'math', tags:['8a','幾何'] },
+  { f:'pb-application-perimeter.html', e:'📏', t:'周長應用', s:'中垂線實際應用', cat:'math', tags:['8a','幾何'] },
+
+  // 📝 8 年級 其他
+  { f:'8a-3-4-quest.html', e:'🎯', t:'8a 3-4 冒險', s:'學生版', cat:'math', tags:['8a'] },
+  { f:'8a-3-4-teacher.html', e:'👨‍🏫', t:'8a 3-4 老師端', s:'', cat:'math', tags:['8a','老師'] },
+  { f:'8a-3-5-conquest.html', e:'⚔️', t:'8a 3-5 征服', s:'進階挑戰', cat:'math', tags:['8a'] },
+  { f:'8a-hw-may4.html', e:'📝', t:'8a 5/4 作業', s:'', cat:'math', tags:['8a','作業'] },
+  { f:'8a-kirby-quest.html', e:'🌟', t:'8a Kirby 冒險', s:'卡比風格', cat:'math', tags:['8a','遊戲'] },
+  { f:'8a-exam-may7-A.html', e:'📄', t:'8a 5/7 考試 A 卷', s:'', cat:'math', tags:['8a','考試'] },
+  { f:'8a-exam-may7-B.html', e:'📄', t:'8a 5/7 考試 B 卷', s:'', cat:'math', tags:['8a','考試'] },
+  { f:'lesson4-guide.html', e:'📖', t:'第 4 課 指南', s:'', cat:'math', tags:['8a'] },
+
+  // 🇬🇧 英文
+  { f:'eng9.html', e:'🇬🇧', t:'9 年級英文', s:'主入口', cat:'eng', tags:['9a','英文'] },
+  { f:'grammar-practice.html', e:'📚', t:'文法練習', s:'', cat:'eng', tags:['英文'] },
+  { f:'listening-practice.html', e:'🎧', t:'聽力練習', s:'', cat:'eng', tags:['英文'] },
+  { f:'listening-battle-pass.html', e:'🏅', t:'聽力戰鬥通行證', s:'會考聽力特訓', cat:'eng', tags:['英文','會考'] },
+  { f:'vocab-practice.html', e:'🔤', t:'單字練習', s:'', cat:'eng', tags:['英文','單字'] },
+  { f:'vocab-adventure.html', e:'🗺', t:'單字冒險', s:'遊戲化單字學習', cat:'eng', tags:['英文','單字','遊戲'] },
+
+  // 🍵 代課 / 主題日
+  { f:'sub.html', e:'🎒', t:'代課總入口', s:'', cat:'sub', tags:['代課'] },
+  { f:'sub-9a-0428.html', e:'📅', t:'4/28 9A 代課', s:'', cat:'sub', tags:['代課','9a'] },
+  { f:'day5-sub-9b-0424.html', e:'📅', t:'4/24 9B 代課', s:'Day 5', cat:'sub', tags:['代課','9b'] },
+  { f:'day6-sub-9b.html', e:'📅', t:'Day 6 · 9B 代課', s:'', cat:'sub', tags:['代課','9b'] },
+  { f:'day6-sub.html', e:'📅', t:'Day 6 · 代課', s:'', cat:'sub', tags:['代課'] },
+  { f:'day7-money-onepiece.html', e:'💰', t:'Day 7 · 金錢主題', s:'海賊王融入', cat:'sub', tags:['代課','主題'] },
+  { f:'day8-weather-memes.html', e:'☁️', t:'Day 8 · 天氣主題', s:'迷因融入', cat:'sub', tags:['代課','主題'] },
+
+  // 🏛 行政
+  { f:'iep-meeting-2026spring.html', e:'📋', t:'春季 IEP 期末會議', s:'2026 春 IEP 紀錄', cat:'admin', tags:['行政','IEP','特教'] },
+];
+
+const CATS = [
+  { id:'all', label:'🌐 全部' },
+  { id:'fav', label:'⭐ 釘選' },
+  { id:'sped', label:'🌈 特教' },
+  { id:'college', label:'🎓 升學' },
+  { id:'math', label:'📐 數學' },
+  { id:'eng', label:'🇬🇧 英文' },
+  { id:'sub', label:'🍵 代課' },
+  { id:'admin', label:'🏛 行政' },
+  { id:'tool', label:'🛠 工具' },
+];
+
+const CAT_LABELS = {
+  sped:'🌈 特教', college:'🎓 升學', math:'📐 數學',
+  eng:'🇬🇧 英文', sub:'🍵 代課', admin:'🏛 行政', tool:'🛠 工具',
+};
+
+// ============ 釘選 ============
+const FAV_KEY = 'classtools_favs_v1';
+let favs = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]'));
+function toggleFav(f){
+  if(favs.has(f)) favs.delete(f); else favs.add(f);
+  localStorage.setItem(FAV_KEY, JSON.stringify([...favs]));
+  render();
+}
+
+// ============ Render ============
+let activeCat = 'all';
+let query = '';
+
+function tabClass(id){ return id === activeCat ? 'active' : ''; }
+function countOf(id){
+  if(id === 'all') return ITEMS.length;
+  if(id === 'fav') return favs.size;
+  return ITEMS.filter(x => x.cat === id).length;
+}
+
+function renderTabs(){
+  const wrap = document.getElementById('tabs');
+  wrap.innerHTML = CATS.map(c => `
+    <button class="tab ${tabClass(c.id)}" data-cat="${c.id}">
+      ${c.label} <span class="cnt">${countOf(c.id)}</span>
+    </button>
+  `).join('');
+  wrap.querySelectorAll('.tab').forEach(b => {
+    b.addEventListener('click', () => { activeCat = b.dataset.cat; render(); });
+  });
+}
+
+function matchSearch(it){
+  if(!query) return true;
+  const q = query.toLowerCase();
+  return [it.t, it.s, it.f, ...(it.tags || [])].some(x => (x||'').toLowerCase().includes(q));
+}
+
+function cardHTML(it){
+  const isFav = favs.has(it.f);
+  const tags = (it.tags || []).slice(0, 3).map((t, i) => {
+    const cls = ['','warm','green','blue','amber'][i % 5];
+    return `<span class="card-tag ${cls}">${t}</span>`;
+  }).join('');
+  return `
+    <a class="card ${isFav ? 'fav' : ''}" href="${it.f}" target="_blank">
+      <button class="card-fav ${isFav ? 'on' : ''}" data-file="${it.f}" title="${isFav?'取消釘選':'釘選'}" onclick="event.preventDefault();event.stopPropagation();toggleFav('${it.f}');">${isFav?'⭐':'☆'}</button>
+      <div class="card-emoji">${it.e}</div>
+      <div class="card-title">${it.t}</div>
+      <div class="card-sub">${it.s || ''}</div>
+      <div class="card-tags">${tags}</div>
+    </a>
+  `;
+}
+
+function render(){
+  renderTabs();
+  const main = document.getElementById('main');
+
+  // 篩選邏輯
+  let items;
+  if(activeCat === 'fav'){
+    items = ITEMS.filter(x => favs.has(x.f)).filter(matchSearch);
+  } else if(activeCat === 'all'){
+    items = ITEMS.filter(matchSearch);
+  } else {
+    items = ITEMS.filter(x => x.cat === activeCat).filter(matchSearch);
+  }
+
+  if(items.length === 0){
+    main.innerHTML = `
+      <div class="empty">
+        <span class="em">🔍</span>
+        ${query ? `沒有找到「${query}」相關的東西` : (activeCat === 'fav' ? '還沒釘選任何卡片，點 ☆ 加到釘選' : '這個分類目前沒有東西')}
+      </div>
+    `;
+    return;
+  }
+
+  // 全部模式：按分類分組
+  if(activeCat === 'all' && !query){
+    const groups = {};
+    for(const it of items){
+      if(!groups[it.cat]) groups[it.cat] = [];
+      groups[it.cat].push(it);
+    }
+    // 釘選優先區塊
+    let html = '';
+    if(favs.size > 0){
+      const favItems = items.filter(x => favs.has(x.f));
+      if(favItems.length){
+        html += `
+          <section class="section">
+            <div class="section-head">
+              <span class="section-emoji">⭐</span>
+              <span class="section-title">我釘選的</span>
+              <span class="section-count">· ${favItems.length} 個</span>
+            </div>
+            <div class="grid">${favItems.map(cardHTML).join('')}</div>
+          </section>
+        `;
+      }
+    }
+    // 各分類
+    const order = ['sped','college','math','eng','sub','admin','tool'];
+    for(const cat of order){
+      if(!groups[cat]) continue;
+      html += `
+        <section class="section">
+          <div class="section-head">
+            <span class="section-emoji">${CAT_LABELS[cat].split(' ')[0]}</span>
+            <span class="section-title">${CAT_LABELS[cat].split(' ')[1]}</span>
+            <span class="section-count">· ${groups[cat].length} 個</span>
+          </div>
+          <div class="grid">${groups[cat].map(cardHTML).join('')}</div>
+        </section>
+      `;
+    }
+    main.innerHTML = html;
+  } else {
+    // 單一分類或搜尋結果
+    const head = query
+      ? `<div class="section-head"><span class="section-emoji">🔍</span><span class="section-title">搜尋「${query}」</span><span class="section-count">· 找到 ${items.length} 個</span></div>`
+      : '';
+    main.innerHTML = `<section class="section">${head}<div class="grid">${items.map(cardHTML).join('')}</div></section>`;
+  }
+}
+
+// ============ 搜尋 ============
+const searchInput = document.getElementById('search');
+const searchBox = document.getElementById('searchBox');
+const clearBtn = document.getElementById('clearBtn');
+searchInput.addEventListener('input', e => {
+  query = e.target.value.trim();
+  searchBox.classList.toggle('has-text', !!query);
+  render();
+});
+clearBtn.addEventListener('click', () => {
+  query = ''; searchInput.value = '';
+  searchBox.classList.remove('has-text');
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
