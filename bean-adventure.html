@@ -42,9 +42,9 @@ canvas#game{width:100%;height:100%;image-rendering:pixelated;image-rendering:cri
 
 .touch{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:14px 18px;z-index:20;pointer-events:none}
 .tch-group{display:flex;gap:14px;pointer-events:auto}
-.tch{width:clamp(70px,9vw,100px);height:clamp(70px,9vw,100px);border-radius:50%;background:rgba(255,255,255,.18);border:4px solid rgba(255,255,255,.5);color:#fff;font-size:clamp(28px,4vw,42px);display:flex;align-items:center;justify-content:center;font-weight:900;backdrop-filter:blur(8px);cursor:pointer;font-family:monospace;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-.tch:active{background:rgba(255,200,100,.6);transform:scale(.92)}
-.tch.jump{background:rgba(255,200,100,.4);border-color:rgba(255,200,100,.8);width:clamp(85px,11vw,120px);height:clamp(85px,11vw,120px)}
+.tch{width:clamp(82px,11vw,118px);height:clamp(82px,11vw,118px);border-radius:50%;background:rgba(40,30,70,.55);border:5px solid rgba(255,255,255,.7);color:#fff;font-size:clamp(34px,5vw,50px);display:flex;align-items:center;justify-content:center;font-weight:900;cursor:pointer;font-family:monospace;box-shadow:0 4px 18px rgba(0,0,0,.4);user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.tch:active{background:rgba(255,200,100,.75);transform:scale(.9)}
+.tch.jump{background:rgba(255,170,60,.6);border-color:rgba(255,210,120,.95);width:clamp(100px,14vw,150px);height:clamp(100px,14vw,150px)}
 
 .screen{position:absolute;inset:0;background:rgba(26,21,48,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;z-index:30;letter-spacing:1px;overflow-y:auto}
 .screen h1{font-size:clamp(22px,4vw,40px);color:#ffc857;margin-bottom:14px;text-shadow:3px 3px 0 #000;font-weight:900}
@@ -479,8 +479,9 @@ const LEVELS = [
   },
 ];
 
-const GRAV = 0.42, WALK = 1.6, ACCEL = 0.4, FRICTION = 0.78;
-const JUMP_V = -7.2, JUMP_CUT = 0.4, MAX_FALL = 9;
+const GRAV = 0.40, WALK = 1.9, ACCEL = 0.5, FRICTION = 0.80;
+const JUMP_V = -9.6, JUMP_CUT = 0.55, MAX_FALL = 9;
+const COYOTE_MAX = 9, JUMPBUF_MAX = 9;  // 容錯：離開邊緣仍可跳 + 提前按也算
 
 const PALETTES = {
   sunset: { sky:['#8db4d4','#ffa9b9','#ffd4a3'], mtn1:'#6b5b8c', mtn2:'#9b8bb4', ground:'#7a4f2c', grass:'#5fa84b' },
@@ -498,6 +499,7 @@ let frame = 0;
 let curPal = PALETTES.sunset;
 let combo = 0, comboTimer = 0;
 let teacher = { slow:false, invul:false, highJump:false };
+let coyoteTime = 0, jumpBuffer = 0;
 let lastSafeX = 60, lastSafeY = 200;
 let curQuizIdx = -1;
 // ===== 救命系統 =====
@@ -517,6 +519,7 @@ function initLevel(idx){
     superTime: 0,
   };
   lastSafeX = L.start[0]; lastSafeY = L.start[1];
+  coyoteTime = 0; jumpBuffer = 0;
   stars = L.stars.map(([x,y], i) => ({x, y, taken:false, bob: Math.random()*Math.PI*2, kind: idx === 3 ? i % 6 : 0}));
   snails = L.snails.map(([x, lb, rb]) => ({ x, y: 224, vx: -0.6, w: 16, h: 12, leftBound: lb, rightBound: rb, alive: true, anim:0 }));
   blockers = (L.blockers || []).map(([x, y, text, lesson]) => ({ x, y, w: 26, h: 50, text, lesson, broken: false, shake: 0, _touched: 0, _sounded: false }));
@@ -740,14 +743,19 @@ function update(){
   if(player.vx > 0) player.facing = 1;
   if(player.vx < 0) player.facing = -1;
 
-  if(keys.jump && player.grounded){
-    const jv = teacher.highJump ? JUMP_V * 1.4 : (player.superTime > 0 ? JUMP_V * 1.15 : JUMP_V);
+  // 跳躍預存：玩家一按就記住（提前按、連按都算數）
+  if(keys.jump) jumpBuffer = JUMPBUF_MAX;
+  keys.jump = false;
+  // coyote time：剛走出邊緣的短時間內仍可起跳，大幅減少「掉進洞」的挫折
+  if(jumpBuffer > 0 && (player.grounded || coyoteTime > 0)){
+    const jv = teacher.highJump ? JUMP_V * 1.35 : (player.superTime > 0 ? JUMP_V * 1.12 : JUMP_V);
     player.vy = jv;
     player.grounded = false;
+    coyoteTime = 0; jumpBuffer = 0;
     spawnSpark(player.x + player.w/2, player.y + player.h, 4);
     player.superTime > 0 ? SND.superJump() : SND.jump();
   }
-  keys.jump = false;
+  if(jumpBuffer > 0) jumpBuffer--;
   if(!keys.jumpHeld && player.vy < 0) player.vy *= JUMP_CUT;
 
   player.vy = Math.min(player.vy + GRAV*slowFactor, MAX_FALL);
@@ -768,6 +776,9 @@ function update(){
   if(player.grounded){
     lastSafeX = player.x;
     lastSafeY = player.y;
+    coyoteTime = COYOTE_MAX;
+  } else if(coyoteTime > 0){
+    coyoteTime--;
   }
 
   if(player.y > H + 40 && !balloon){
@@ -1040,9 +1051,14 @@ function growPlayer(){
 }
 
 // ============ 繪圖 ============
+const _skyGradCache = {};
 function drawSky(){
-  const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, curPal.sky[0]); g.addColorStop(0.5, curPal.sky[1]); g.addColorStop(1, curPal.sky[2]);
+  let g = _skyGradCache[curLevel];
+  if(!g){
+    g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, curPal.sky[0]); g.addColorStop(0.5, curPal.sky[1]); g.addColorStop(1, curPal.sky[2]);
+    _skyGradCache[curLevel] = g;
+  }
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   if(LEVELS[curLevel].palette === 'rainbow'){
     const colors = ['#ff8a8a','#ffb86a','#ffe066','#88e08a','#88c0e8','#b388e8'];

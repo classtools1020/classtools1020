@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>掃我玩 · 豆豆冒險</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Noto Sans TC','PingFang TC',sans-serif}
+body{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 30%,#3a2f6e,#1a1530);color:#fff;text-align:center;padding:24px;gap:14px}
+.title{font-size:clamp(28px,6vw,52px);font-weight:900;letter-spacing:2px}
+.title .rb{background:linear-gradient(90deg,#ff8a8a,#ffb86a,#ffe066,#88e08a,#88c0e8,#b388e8);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:clamp(15px,2.4vw,22px);opacity:.92;line-height:1.8;font-weight:700}
+.qr-card{background:#fff;border-radius:28px;padding:22px;box-shadow:0 14px 50px rgba(0,0,0,.5);border:6px solid #ffc857}
+.qr-card img{display:block;width:min(62vmin,420px);height:auto;image-rendering:pixelated}
+.steps{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:6px;max-width:760px}
+.step{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.3);border-radius:16px;
+  padding:12px 18px;font-size:clamp(13px,1.9vw,18px);font-weight:700;min-width:150px}
+.step b{color:#ffd96a;font-size:1.4em;display:block;margin-bottom:2px}
+.link{margin-top:8px;font-size:clamp(12px,1.6vw,16px);opacity:.8;word-break:break-all}
+.link a{color:#88c0e8}
+.foot{margin-top:4px;font-size:12px;opacity:.5}
+.tip{background:rgba(126,212,135,.18);border:2px solid #7ed487;border-radius:14px;padding:10px 18px;
+  font-size:clamp(13px,1.9vw,17px);font-weight:700;max-width:680px;line-height:1.7}
+</style>
+</head>
+<body>
+  <div class="title">📱 掃我玩 <span class="rb">豆豆冒險</span></div>
+  <div class="sub">用 iPad 對準下面的 QR，<br>一起幫豆豆闖過 4 關，找到「我就是我」！</div>
+  <div class="qr-card"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAkcAAAJHAQMAAACgjWC0AAAABlBMVEUtJFb////EzFCPAAAEk0lEQVR42u2dO47jQAxEOTuBQx/BR/HRxkfTUXwEhwoM9VrNT7PlCTZwsACfgoWglSsQpkBW8dPSPnRtAhJIIIEEEkiO9BS/LvZ07fi315Prqv9zjqft8aUvPeXnEb/8adsf+dQFEkj/J1Jny4/+/Stbtp0inUNnfXz/7hRZdjoZRU6tUyQRB7aAVIUtxoDLTpEXW1rcvp7qCy+2nDpxbvLVw8xd2eIcgi0gFWTLeNqJs/PiRRG91aRs6y8cIg5sAakaW1rnhd02DSj6Wg8oplD0Zw22gFRct/RESzOxLktW1f4uVvYwMzQOugWkemzx6xIK5R9v45ewBaQabJmum3rFexSx0JGSsmDW6Rcvmi8OUhG2bCPRGkbY69/lPQ696LSYsNHajBnPfHGQamRiyoCQMKvkKGKemLgRNmdtonEItoBUJLaEtNfbRdznOtRbwmJWDjULPnhiIFVii6dfoVu8+Oi28aF8uUpwCJUPUrFMbASU/bqa4BcJXphIMQ4tpnH0Z6h8kKqp/KuTIWSJvNljKmEs/UpZG2wBqZLK1+Yw+Y4e5Lt4xHGL2PS8Cf5020kGW0AqwhZTKB5brm8d++mFqXlf34UtIJWKLcncmsxkUyjWEeY9yItVJx+Db7AFpCqxZXjFItMIWG/Tl2gkk6Rb1BzwARjYAlIttqSKY4gVZYtxSGNL2ADRdklsAakKW6zzZbLH3BPzkqSHme/wz3zoeCUTA6kWW1SuH/qKxackLaD4eLF4T1n4yqh8kOqwJZR7sCXCzBrS3qZeelLWYkZsoToJUslMzK/ZNo4rDbUMNeNPYQtIldhinphN4F9C5cfspPUgp7p/a9TyQarFlmcOElF8TMRJO19i0cvxFraAVCa2REnSCpV5RsxiS3LKwjZOBRnYAlIhlT8/tfGVNvR880aybaj8iE6wBaQybDlbDcXq89H7Nea+fnvB1vN1RwC2gFQlE7NEK8/lN1+5l+qQ0fkyzbfAFpBqscUKJ8/YbXyfRl1i4diILblhBk8MpCpsmckwRPx+zT0uscxSJLrH2L4HUi22iMRS8JaWvMqYKc4UGY6ALeGHLSBVYss5fC5fc3yXbCbfRoOljYslCYODDFIp3aJF+ZhkWeea5XjBtyk5W7RhBt0CUimVL6PdZfM2sIODLJIbLMNMJhMDqbZuEdGG/Ojjl7eFY6pbiC0gFczEYgQsZWLTsqRx2pFMI/q+0AK2gFQktsTqinRK63x2a+qqTJ3JU6rGFwepSOdLO5xrlMSK5lxTAf9wZIXgiYFUiC0y6pAttMgt7eR7jK2UgyJpcB+2gFRJ5WcGqMq/paciwymbT3UhEwOpmsqPorzX5z0TS/MtI/1aTsxOglQ3tpieH2ZyWn7sBXxTKIcjKIV9YiCVYsvxTOPhFWftP8/lj6P2yMRAKsWWcZhRWn581C2Si/1Zt1DLBwm2DGnvB4LNm13nURe+OEi12JIOPkpHuaTSS7T0v5EMtoBUULeMoWOJpeDmlP0yI7YoCmwBqQpbsixJ5xr59bbZNSRMIxMDqRZbPnNtIIEEEkgggaRIfwH+zM1k2gJHDAAAAABJRU5ErkJggg==" alt="豆豆冒險 QR code"></div>
+  <div class="steps">
+    <div class="step"><b>1</b>打開 iPad 相機</div>
+    <div class="step"><b>2</b>對準 QR 掃一下</div>
+    <div class="step"><b>3</b>點出現的網址</div>
+    <div class="step"><b>4</b>用手指 ◀ ▶ ↑ 玩！</div>
+  </div>
+  <div class="tip">🍀 用手指點左下 ◀ ▶ 移動、右下大顆 ↑ 跳。豆豆現在跳更高，輕鬆跨過洞洞！掉下去會有熱氣球接住，不扣愛心。</div>
+  <div class="link">遊戲網址：<a href="https://classtools1020.github.io/classtools1020/bean-adventure.html">classtools1020.github.io/classtools1020/bean-adventure.html</a></div>
+  <div class="foot">原創 · classtools1020 · Stacey 老師教材</div>
+</body>
+</html>
