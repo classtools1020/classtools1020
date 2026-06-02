@@ -162,6 +162,16 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
 .end-next-step{font-size:18px;color:#fff;background:rgba(255,217,61,.1);border:1px solid #FFD93D;border-radius:14px;padding:16px;margin-bottom:24px;line-height:1.6}
 .end-next-step strong{color:#FFD93D;font-size:22px}
 
+.race-car{position:fixed;top:38%;left:-340px;z-index:200;width:300px;height:130px;pointer-events:none;opacity:0;filter:drop-shadow(0 10px 20px rgba(255,63,142,.5))}
+.race-car.go{animation:zoomRace 1.4s cubic-bezier(.2,0,.4,1) forwards}
+.race-car.go.mega{animation:zoomRaceMega 2.2s cubic-bezier(.2,0,.4,1) forwards}
+@keyframes zoomRace{0%{left:-340px;opacity:0;transform:translateY(0) rotate(-3deg)}15%{opacity:1;transform:translateY(-8px) rotate(2deg)}50%{transform:translateY(0) rotate(-2deg)}85%{opacity:1}100%{left:100vw;opacity:0;transform:translateY(-6px) rotate(3deg)}}
+@keyframes zoomRaceMega{0%{left:-340px;opacity:0;transform:scale(1.4) translateY(0) rotate(-5deg)}10%{opacity:1}50%{transform:scale(1.4) translateY(-12px) rotate(3deg)}90%{opacity:1}100%{left:100vw;opacity:0;transform:scale(1.4) translateY(0) rotate(5deg)}}
+
+.floating-plus{position:fixed;font-family:'Orbitron',sans-serif;font-weight:900;font-size:64px;color:#FFD93D;text-shadow:0 0 30px rgba(255,217,61,.8),0 4px 16px rgba(0,0,0,.5);z-index:201;pointer-events:none;opacity:0}
+.floating-plus.fly{animation:floatPlus 1.4s ease-out forwards}
+@keyframes floatPlus{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}25%{opacity:1;transform:translate(-50%,-80%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
+
 .floating-restart{position:fixed;bottom:20px;right:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 18px;border-radius:999px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;backdrop-filter:blur(10px);z-index:50}
 .floating-restart:hover{background:rgba(255,255,255,.2)}
 
@@ -277,6 +287,34 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
   </div>
 </div>
 
+<div class="race-car" id="race-car" aria-hidden="true">
+  <svg viewBox="0 0 300 130">
+    <defs>
+      <linearGradient id="carBody" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#FF3F8E"/>
+        <stop offset="1" stop-color="#7B61FF"/>
+      </linearGradient>
+    </defs>
+    <g stroke-linecap="round">
+      <line x1="0" y1="40" x2="50" y2="40" stroke="#FFD93D" stroke-width="5"/>
+      <line x1="0" y1="65" x2="65" y2="65" stroke="#FF6BB0" stroke-width="4"/>
+      <line x1="25" y1="95" x2="65" y2="95" stroke="#27D7FF" stroke-width="4"/>
+    </g>
+    <path d="M65,62 L30,52 L52,72 L30,90 L65,80 Z" fill="#FF6BB0"/>
+    <path d="M65,67 L40,58 L55,72 L40,84 L65,76 Z" fill="#FFD93D"/>
+    <rect x="70" y="62" width="200" height="42" rx="16" fill="url(#carBody)"/>
+    <path d="M100,62 L140,32 L220,32 L250,62 Z" fill="#27D7FF" stroke="#fff" stroke-width="2"/>
+    <circle cx="185" cy="42" r="9" fill="#FFD93D" stroke="#fff" stroke-width="2"/>
+    <rect x="70" y="78" width="200" height="6" fill="#FFD93D"/>
+    <circle cx="108" cy="106" r="17" fill="#1a0b3d"/>
+    <circle cx="108" cy="106" r="10" fill="#444"/>
+    <circle cx="108" cy="106" r="3.5" fill="#FFD93D"/>
+    <circle cx="240" cy="106" r="17" fill="#1a0b3d"/>
+    <circle cx="240" cy="106" r="10" fill="#444"/>
+    <circle cx="240" cy="106" r="3.5" fill="#FFD93D"/>
+  </svg>
+</div>
+<div class="floating-plus" id="floating-plus">+1</div>
 <button class="floating-restart" id="floating-restart" hidden>換玩家</button>
 </div>
 
@@ -609,6 +647,72 @@ function saveSession(){
   } catch(e){ console.warn('Firebase save error:',e); }
 }
 
+/* ---------- AUDIO (Web Audio API, no external files) ---------- */
+let audioCtx = null;
+function initAudio(){
+  if(!audioCtx){
+    try { audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){ return; }
+  }
+  if(audioCtx.state==='suspended') audioCtx.resume();
+}
+function tone(freq,dur,delay=0,type='sine',vol=0.18){
+  if(!audioCtx) return;
+  const t = audioCtx.currentTime+delay;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq,t);
+  gain.gain.setValueAtTime(vol,t);
+  gain.gain.exponentialRampToValueAtTime(0.001,t+dur);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(t);
+  osc.stop(t+dur);
+}
+function playCorrect(){
+  tone(659,0.08,0,'sine',0.2);
+  tone(988,0.25,0.08,'sine',0.22);
+}
+function playWrong(){
+  tone(220,0.12,0,'triangle',0.13);
+  tone(180,0.18,0.06,'triangle',0.1);
+}
+function playVroom(){
+  if(!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type='sawtooth';
+  osc.frequency.setValueAtTime(80,t);
+  osc.frequency.linearRampToValueAtTime(260,t+0.25);
+  osc.frequency.linearRampToValueAtTime(60,t+0.9);
+  gain.gain.setValueAtTime(0.06,t);
+  gain.gain.exponentialRampToValueAtTime(0.001,t+0.9);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(t); osc.stop(t+0.9);
+}
+function playVictory(){
+  const notes=[[523,.18,0],[659,.18,.16],[784,.18,.32],[1047,.4,.48],[1047,.16,.92],[1319,.7,1.1]];
+  notes.forEach(([f,d,t])=>tone(f,d,t,'sine',0.22));
+}
+
+/* ---------- RACE CAR ---------- */
+function fireRaceCar(mega=false){
+  const car = document.getElementById('race-car');
+  car.classList.remove('go','mega');
+  void car.offsetWidth; // reflow
+  if(mega) car.classList.add('go','mega'); else car.classList.add('go');
+  playVroom();
+}
+
+function floatPlusOne(x,y){
+  const el = document.getElementById('floating-plus');
+  el.style.left = x+'px';
+  el.style.top = y+'px';
+  el.classList.remove('fly');
+  void el.offsetWidth;
+  el.classList.add('fly');
+}
+
 /* ---------- STARFIELD ---------- */
 const canvas = document.getElementById('starfield');
 const ctx = canvas.getContext('2d');
@@ -652,12 +756,19 @@ function switchView(name){
 
 /* ---------- START VIEW ---------- */
 document.getElementById('btn-go-pick').addEventListener('click',()=>{
+  initAudio(); // unlock audio on first user gesture
   const sessions = loadSessions();
   state.playerName = '玩家 '+(sessions.length+1);
   state.sessionId = 'sess_'+Date.now()+'_'+Math.floor(Math.random()*1000);
   state.startTime = Date.now();
-  renderHeroCards();
-  switchView('pick');
+  // Skip hero pick: auto-assign a random hero (kept for HUD flavour)
+  state.hero = HEROES[Math.floor(Math.random()*HEROES.length)];
+  setupGameHUD();
+  renderGemMap();
+  saveSession();
+  switchView('game');
+  // Auto-open first gem after short delay
+  setTimeout(()=>openGemModal(GEMS[0]),400);
 });
 
 /* ---------- HERO PICK ---------- */
@@ -855,10 +966,15 @@ function onOptionClick(idx,btn){
   state.attempts.push({gemId:gem.id,correct,timeMs,optionChosen:idx});
   if(correct){
     btn.classList.add('correct');
+    playCorrect();
+    // floating +1 from button position
+    const r = btn.getBoundingClientRect();
+    floatPlusOne(r.left+r.width/2, r.top+r.height/2);
     setTimeout(()=>showResult(true),650);
   } else {
     btn.classList.add('wrong');
     btn.disabled = true;
+    playWrong();
     setTimeout(()=>btn.classList.remove('wrong'),400);
     // small message
     const grid = document.getElementById('options-grid');
@@ -893,18 +1009,25 @@ function showResult(success){
   if(!state.gemsCollected.includes(gem.id)){
     state.gemsCollected.push(gem.id);
   }
-  // confetti
+  // confetti + race car (mega if this is the final / 10th gem)
   triggerSkillEffect(state.hero.skillKind,gem.color);
+  const isFinal = state.gemsCollected.length===10;
+  fireRaceCar(isFinal);
   saveSession();
 }
 
 document.getElementById('btn-result-next').addEventListener('click',()=>{
-  closeGemModal();
   updateProgress();
-  // refresh map
   renderGemMap();
-  if(state.gemsCollected.length===10){
+  const nextIdx = state.gemsCollected.length;
+  if(nextIdx>=10){
+    closeGemModal();
     setTimeout(showEndView,500);
+  } else {
+    // auto-advance to next gem in same modal (smooth transition)
+    document.getElementById('stage-result').hidden = true;
+    document.getElementById('stage-play').hidden = false;
+    openGemModal(GEMS[nextIdx]);
   }
 });
 
@@ -953,15 +1076,22 @@ function showEndView(){
     display.appendChild(div);
   });
   switchView('end');
-  // big confetti finale
+  // EPIC finale: confetti bursts + victory melody + race car parade
   setTimeout(()=>{
-    const colors = ['#FFD93D','#FF6BB0','#27D7FF','#9B5BFF','#fff'];
-    confetti({particleCount:200,spread:160,origin:{y:.4},colors});
-    setTimeout(()=>confetti({particleCount:120,spread:100,angle:60,origin:{x:0,y:.6},colors}),300);
-    setTimeout(()=>confetti({particleCount:120,spread:100,angle:120,origin:{x:1,y:.6},colors}),600);
+    const colors = ['#FFD93D','#FF6BB0','#27D7FF','#9B5BFF','#fff','#FFB300'];
+    confetti({particleCount:260,spread:170,origin:{y:.35},colors});
+    playVictory();
+    setTimeout(()=>confetti({particleCount:160,spread:120,angle:60,origin:{x:0,y:.6},colors}),250);
+    setTimeout(()=>confetti({particleCount:160,spread:120,angle:120,origin:{x:1,y:.6},colors}),500);
+    setTimeout(()=>confetti({particleCount:200,spread:360,startVelocity:35,origin:{y:.5},colors,scalar:1.2}),900);
+    setTimeout(()=>fireRaceCar(true),300);
+    setTimeout(()=>fireRaceCar(false),1500);
+    setTimeout(()=>confetti({particleCount:140,spread:140,origin:{y:.4},colors}),1800);
   },200);
-  gsap.fromTo('.end-stat',{y:30,opacity:0},{y:0,opacity:1,duration:.5,stagger:.15,delay:.3});
-  gsap.fromTo('.end-next-step',{scale:.9,opacity:0},{scale:1,opacity:1,duration:.5,delay:1});
+  if(typeof gsap!=='undefined'){
+    gsap.fromTo('.end-stat',{y:30},{y:0,duration:.5,stagger:.15,delay:.3});
+    gsap.fromTo('.end-next-step',{scale:.9},{scale:1,duration:.5,delay:1});
+  }
 }
 
 /* ---------- RESTART ---------- */
