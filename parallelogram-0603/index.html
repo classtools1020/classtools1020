@@ -888,7 +888,8 @@ function renderGemMap(){
     }
     map.appendChild(node);
     // entrance animation
-    if(typeof gsap!=='undefined') gsap.fromTo(node,{scale:0},{scale:1,duration:.5,delay:.05*i,ease:'back.out(1.6)'});
+    // No fromTo scale animation — caused stuck-invisible gems on slow rendering
+    if(typeof gsap!=='undefined') gsap.fromTo(node,{y:20},{y:0,duration:.45,delay:.04*i,ease:'back.out(1.6)'});
   });
   // pulse first uncollected
   const firstIdx = GEMS.findIndex(g=>!state.gemsCollected.includes(g.id));
