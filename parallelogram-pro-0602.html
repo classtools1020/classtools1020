@@ -5,384 +5,358 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>平行四邊形 PRO · 賽車寶箱大冒險 (6/2)</title>
 <style>
-  /* === CYBERPUNK 2077 風格 === */
-  /* 純黑 + 霓虹粉青紫綠 + scanline + glitch + 切角邊框 */
+  /* === 角落生物動森療癒風 === */
+  /* 奶油白 + 粉藍黃綠 + Q 彈動畫 + 不刺激不閃爍 */
   :root {
-    --bg: #0A0A14;
-    --bg-grid: #14142B;
-    --neon-pink: #FF0080;
-    --neon-cyan: #00F5FF;
-    --neon-purple: #B026FF;
-    --neon-green: #00FF88;
-    --neon-yellow: #F9F002;
-    --silver: #E8E8F5;
-    --text: #E8E8F5;
-    --text-dim: #8888AA;
-    --ink: #0A0A14;
-    --paper: #14142B;
-    /* 兼容舊變數 */
-    --primary: #00F5FF;
-    --primary-soft: #4DC9FF;
-    --gold: #F9F002;
-    --gold-soft: #FFEB3B;
-    --accent: #FF0080;
-    --success: #00FF88;
-    --success-soft: #80FFB4;
-    --warning: #FFAB00;
-    --danger: #FF0044;
-    --L1-color: #00F5FF;
-    --L2-color: #FF0080;
+    --bg: #FFF8F0;              /* 奶油白底 */
+    --paper: #FFFFFF;
+    --primary: #FFB3C7;         /* 草莓粉 */
+    --primary-soft: #FFD6E0;
+    --accent: #A5D8FF;          /* 天空藍 */
+    --accent-soft: #CCE7FF;
+    --gold: #FFE066;            /* 鵝黃 */
+    --gold-soft: #FFF3B8;
+    --mint: #B8E6B8;            /* 薄荷綠 */
+    --lavender: #D0BFFF;        /* 薰衣草紫 */
+    --orange: #FFA94D;          /* 暖橘 */
+    --success: #95D5B2;
+    --success-soft: #C6E9CF;
+    --warning: #FFD23F;
+    --danger: #FFA8A8;          /* 柔粉紅取代正紅 */
+    --text: #4A4458;            /* 深紫灰，不用純黑 */
+    --text-dim: #918CA1;
+    --ink: #4A4458;
+    /* 兼容 */
+    --bg-dark: #FFF8F0;
+    --bg-mid: #FFEFE0;
+    --L1-color: #6B9DD9;
+    --L2-color: #FF9FAE;
+    --text-soft: #918CA1;
   }
 
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
   html,body{
-    font-family:'Rajdhani','Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif;
+    font-family:'M PLUS Rounded 1c','Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif;
     background:var(--bg);color:var(--text);
     min-height:100vh;overflow-x:hidden;
   }
-  /* 純黑 + grid 網格 + scanline 掃描線 */
+  /* 奶油白 + 點點紋路 + 柔光（不會閃） */
   body{
     background:
-      repeating-linear-gradient(0deg, transparent 0, transparent 2px, rgba(0,245,255,0.025) 2px, rgba(0,245,255,0.025) 3px),
-      linear-gradient(rgba(176,38,255,0.07) 1px, transparent 1px) 0 0 / 40px 40px,
-      linear-gradient(90deg, rgba(176,38,255,0.07) 1px, transparent 1px) 0 0 / 40px 40px,
-      radial-gradient(ellipse at top, #1A0A2E 0%, #0A0A14 80%);
+      radial-gradient(circle at 15% 20%, rgba(255,179,199,0.15) 0, transparent 28%),
+      radial-gradient(circle at 85% 75%, rgba(165,216,255,0.15) 0, transparent 30%),
+      radial-gradient(circle at 50% 50%, rgba(208,191,255,0.08) 0, transparent 40%),
+      radial-gradient(circle, rgba(255,224,102,0.06) 1.5px, transparent 1.5px) 0 0 / 24px 24px,
+      var(--bg);
     background-attachment:fixed;
-    position:relative;
-  }
-  /* CRT 掃描線 overlay */
-  body::after{
-    content:'';position:fixed;inset:0;
-    background:repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(0,0,0,0.15) 3px, rgba(0,0,0,0.15) 4px);
-    pointer-events:none;z-index:9999;
-    animation:scanline 8s linear infinite;
-  }
-  @keyframes scanline{
-    0%{transform:translateY(0)}
-    100%{transform:translateY(4px)}
   }
 
   .app{max-width:820px;margin:0 auto;padding:16px;min-height:100vh;position:relative;z-index:1}
 
-  /* === HUD：賽博朋克 status bar === */
+  /* === HUD：可愛圓潤橫條 === */
   .hud{
     display:flex;justify-content:space-between;align-items:center;
-    background:rgba(20,20,43,0.85);color:var(--text);
-    border:1px solid var(--neon-cyan);
-    padding:10px 16px;margin-bottom:14px;
-    backdrop-filter:blur(8px);
-    clip-path:polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
-    box-shadow:0 0 20px rgba(0,245,255,0.3), inset 0 0 20px rgba(0,245,255,0.05);
+    background:white;color:var(--text);
+    border:none;border-radius:24px;
+    padding:10px 18px;margin-bottom:14px;
+    box-shadow:0 4px 0 var(--primary-soft), 0 8px 20px rgba(255,179,199,0.25);
   }
   .hud-left{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
   .hud-nick{
-    font-weight:900;color:var(--neon-cyan);font-size:15px;letter-spacing:2px;
-    text-shadow:0 0 8px var(--neon-cyan);
-    text-transform:uppercase;
+    font-weight:900;color:var(--primary);font-size:15px;letter-spacing:1px;
   }
-  .hud-stat{display:flex;align-items:center;gap:4px;font-size:14px;color:var(--silver);font-weight:700;letter-spacing:1px}
+  .hud-stat{display:flex;align-items:center;gap:4px;font-size:14px;color:var(--text);font-weight:800}
   .hud-stat .icon{font-size:18px}
-  .hud-coins{color:var(--neon-yellow);text-shadow:0 0 6px var(--neon-yellow)}
+  .hud-coins{color:var(--orange)}
 
-  /* === 進度條：霓虹圓 === */
-  .progress{display:flex;gap:7px}
+  /* === 進度條：圓圓的彩色 dot === */
+  .progress{display:flex;gap:8px}
   .pdot{
-    width:30px;height:30px;border-radius:50%;
-    background:rgba(20,20,43,0.6);
-    border:2px solid var(--neon-purple);
+    width:34px;height:34px;border-radius:50%;background:white;
+    border:2.5px solid var(--primary-soft);
     display:flex;align-items:center;justify-content:center;
-    font-size:12px;font-weight:900;color:var(--neon-purple);
-    box-shadow:0 0 6px rgba(176,38,255,0.5);
+    font-size:13px;font-weight:900;color:var(--text-dim);
+    box-shadow:0 2px 0 var(--primary-soft);
+    transition:transform 0.3s;
   }
   .pdot.done{
-    background:var(--neon-green);color:var(--bg);border-color:var(--neon-green);
-    box-shadow:0 0 12px var(--neon-green);
+    background:var(--success);color:white;border-color:var(--success);
+    box-shadow:0 2px 0 #6FB68A;
   }
   .pdot.active{
-    background:var(--neon-pink);color:white;border-color:var(--neon-pink);
+    background:var(--primary);color:white;border-color:var(--primary);
     transform:scale(1.18);
-    box-shadow:0 0 18px var(--neon-pink), 0 0 30px var(--neon-pink);
-    animation:neon-pulse 1.5s infinite;
+    box-shadow:0 3px 0 #FF8FA8;
+    animation:gentle-bounce 2s ease-in-out infinite;
   }
-  @keyframes neon-pulse{
-    0%,100%{box-shadow:0 0 18px var(--neon-pink), 0 0 30px var(--neon-pink)}
-    50%{box-shadow:0 0 25px var(--neon-pink), 0 0 50px var(--neon-pink)}
+  @keyframes gentle-bounce{
+    0%,100%{transform:scale(1.18) translateY(0)}
+    50%{transform:scale(1.18) translateY(-3px)}
   }
 
-  /* === 主卡片：霓虹邊框 + 切角 === */
+  /* === 主卡片：白底大圓角 + 柔影 + 角落生物貼紙 === */
   .card{
-    background:rgba(20,20,43,0.85);
-    border:1px solid var(--neon-cyan);
+    background:white;
+    border:none;
+    border-radius:28px;
     padding:24px;
-    backdrop-filter:blur(10px);
-    box-shadow:0 0 30px rgba(0,245,255,0.2), inset 0 0 30px rgba(176,38,255,0.05);
-    animation:cardIn 0.4s ease;
+    box-shadow:0 6px 0 var(--primary-soft), 0 12px 28px rgba(255,179,199,0.2);
+    animation:cardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     position:relative;
-    clip-path:polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
   }
-  /* 卡片左上 + 右下霓虹角 */
+  /* 卡片右上小白熊（角落生物）— 緩慢可預測彈跳 */
   .card::before{
-    content:'◤';position:absolute;top:-2px;left:-2px;
-    color:var(--neon-pink);font-size:24px;
-    text-shadow:0 0 10px var(--neon-pink);
+    content:'🐻';position:absolute;top:-22px;right:-6px;
+    font-size:44px;
+    animation:bear-float 3s ease-in-out infinite;
+    transform-origin:center bottom;
   }
+  /* 卡片左下小企鵝 */
   .card::after{
-    content:'◢';position:absolute;bottom:-2px;right:-2px;
-    color:var(--neon-cyan);font-size:24px;
-    text-shadow:0 0 10px var(--neon-cyan);
+    content:'🐧';position:absolute;bottom:-18px;left:-8px;
+    font-size:36px;
+    animation:peng-float 3.5s ease-in-out infinite;
+  }
+  @keyframes bear-float{
+    0%,100%{transform:translateY(0) rotate(0)}
+    50%{transform:translateY(-6px) rotate(-4deg)}
+  }
+  @keyframes peng-float{
+    0%,100%{transform:translateY(0) rotate(0)}
+    50%{transform:translateY(-5px) rotate(4deg)}
   }
   @keyframes cardIn{
-    from{opacity:0;transform:translateY(15px)}
-    to{opacity:1;transform:translateY(0)}
+    from{opacity:0;transform:translateY(20px) scale(0.95)}
+    to{opacity:1;transform:translateY(0) scale(1)}
   }
 
-  /* === 標題：故障 GLITCH 效果（RGB 分離） === */
+  /* === 標題：粉橘漸層字 + 圓潤厚重 === */
   h1{
-    font-size:clamp(26px,6.5vw,40px);
-    color:var(--silver);text-align:center;
-    letter-spacing:3px;margin-bottom:6px;
-    font-weight:900;text-transform:uppercase;
-    text-shadow:
-      2px 0 var(--neon-pink),
-      -2px 0 var(--neon-cyan),
-      0 0 30px rgba(176,38,255,0.6);
-    animation:glitch 4s infinite;
+    font-size:clamp(28px,7vw,42px);
+    background:linear-gradient(135deg, #FFB3C7 0%, #FFA94D 50%, #FFD23F 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-align:center;
+    letter-spacing:2px;margin-bottom:8px;
+    font-weight:900;
+    padding:4px 0;
+    filter:drop-shadow(0 3px 0 rgba(74,68,88,0.15));
   }
-  @keyframes glitch{
-    0%,90%,100%{text-shadow:2px 0 var(--neon-pink), -2px 0 var(--neon-cyan), 0 0 30px rgba(176,38,255,0.6)}
-    91%{text-shadow:3px 0 var(--neon-pink), -3px 0 var(--neon-cyan)}
-    92%{text-shadow:-3px 0 var(--neon-pink), 3px 0 var(--neon-cyan)}
-    93%{text-shadow:2px 2px var(--neon-pink), -2px -2px var(--neon-cyan)}
-  }
-  h2{
-    font-size:clamp(20px,5vw,26px);color:var(--neon-cyan);
-    margin-bottom:10px;font-weight:900;letter-spacing:2px;
-    text-shadow:0 0 10px var(--neon-cyan);
-  }
-  h3{font-size:clamp(16px,4vw,19px);color:var(--silver);margin-bottom:8px;font-weight:800;letter-spacing:1px}
-  .subtitle{text-align:center;color:var(--text-dim);font-size:14px;margin-bottom:14px;letter-spacing:1px}
+  h2{font-size:clamp(20px,5vw,26px);color:var(--primary);margin-bottom:10px;font-weight:900}
+  h3{font-size:clamp(16px,4vw,19px);color:var(--text);margin-bottom:8px;font-weight:800}
+  .subtitle{text-align:center;color:var(--text-dim);font-size:15px;margin-bottom:14px;font-weight:700}
 
-  /* === 按鈕：霓虹 outline + glow === */
+  /* === 按鈕：糖果 Q 彈，按下會塌（療癒感）=== */
   .btn{
-    min-height:54px;padding:14px 26px;
-    background:transparent;color:var(--neon-cyan);
-    border:2px solid var(--neon-cyan);
-    font-size:16px;font-weight:900;letter-spacing:2px;
+    min-height:56px;padding:14px 28px;
+    background:linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color:white;border:none;
+    font-size:17px;font-weight:900;letter-spacing:1px;
     cursor:pointer;font-family:inherit;
-    text-transform:uppercase;
-    box-shadow:0 0 12px rgba(0,245,255,0.3), inset 0 0 12px rgba(0,245,255,0.1);
-    transition:all 0.2s;
+    border-radius:28px;
+    box-shadow:0 5px 0 #B89BB3, 0 8px 20px rgba(255,179,199,0.4);
+    transition:transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
     min-width:120px;
-    text-shadow:0 0 6px currentColor;
-    clip-path:polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    text-shadow:0 1px 0 rgba(0,0,0,0.1);
   }
   .btn:hover{
-    background:var(--neon-cyan);color:var(--bg);
-    box-shadow:0 0 25px var(--neon-cyan);
-    transform:translateY(-2px);
+    transform:translateY(-3px);
+    box-shadow:0 8px 0 #B89BB3, 0 12px 24px rgba(255,179,199,0.5);
   }
-  .btn:active{transform:translateY(0)}
-  .btn:disabled{opacity:0.3;cursor:not-allowed;transform:none;box-shadow:none}
-  .btn-gold{color:var(--neon-yellow);border-color:var(--neon-yellow);box-shadow:0 0 12px rgba(249,240,2,0.4)}
-  .btn-gold:hover{background:var(--neon-yellow);color:var(--bg);box-shadow:0 0 25px var(--neon-yellow)}
-  .btn-ghost{color:var(--text-dim);border-color:var(--text-dim);box-shadow:none}
-  .btn-ghost:hover{background:var(--text-dim);color:var(--bg)}
-  .btn-warning{color:var(--neon-pink);border-color:var(--neon-pink);box-shadow:0 0 12px rgba(255,0,128,0.4)}
-  .btn-warning:hover{background:var(--neon-pink);color:white;box-shadow:0 0 25px var(--neon-pink)}
+  .btn:active{transform:translateY(5px);box-shadow:0 0 0 #B89BB3, 0 2px 8px rgba(0,0,0,0.1)}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:0 5px 0 #B89BB3, 0 8px 20px rgba(255,179,199,0.4)}
+  .btn-gold{background:linear-gradient(135deg, var(--gold) 0%, var(--orange) 100%);box-shadow:0 5px 0 #B88A1F, 0 8px 20px rgba(255,224,102,0.5);color:white}
+  .btn-gold:hover{box-shadow:0 8px 0 #B88A1F, 0 12px 24px rgba(255,224,102,0.6)}
+  .btn-gold:active{box-shadow:0 0 0 #B88A1F, 0 2px 8px rgba(0,0,0,0.1)}
+  .btn-ghost{background:white;color:var(--text);box-shadow:0 4px 0 var(--text-dim), 0 6px 14px rgba(0,0,0,0.06)}
+  .btn-ghost:hover{box-shadow:0 6px 0 var(--text-dim), 0 8px 18px rgba(0,0,0,0.1)}
+  .btn-ghost:active{box-shadow:0 0 0 var(--text-dim)}
+  .btn-warning{background:linear-gradient(135deg, var(--gold) 0%, #FFAD3D 100%);box-shadow:0 5px 0 #B88A1F, 0 8px 20px rgba(255,210,63,0.5);color:white}
 
-  /* === Input：終端機輸入 === */
+  /* === Input：療癒筆記本感 === */
   .input{
-    width:100%;padding:16px 20px;
-    background:rgba(0,0,0,0.5);
-    border:2px solid var(--neon-purple);
-    font-size:20px;color:var(--neon-cyan);font-family:'Rajdhani',monospace;
-    text-align:center;font-weight:800;letter-spacing:2px;
-    box-shadow:0 0 15px rgba(176,38,255,0.4), inset 0 0 15px rgba(176,38,255,0.1);
-    text-shadow:0 0 6px var(--neon-cyan);
-    clip-path:polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    width:100%;padding:16px 22px;
+    background:#FFFEF7;
+    border:3px solid var(--primary-soft);
+    border-radius:20px;
+    box-shadow:0 4px 0 var(--primary-soft), inset 0 2px 4px rgba(0,0,0,0.03);
+    font-size:20px;color:var(--text);font-family:inherit;
+    text-align:center;font-weight:800;letter-spacing:1px;
   }
-  .input:focus{outline:none;border-color:var(--neon-pink);box-shadow:0 0 20px var(--neon-pink)}
-  .input::placeholder{color:var(--text-dim);font-weight:600;letter-spacing:1px}
+  .input:focus{outline:none;border-color:var(--primary);background:white;box-shadow:0 4px 0 var(--primary)}
+  .input::placeholder{color:var(--text-dim);font-weight:600}
 
-  /* === 題目標題：HUD 訊息面板 === */
+  /* === 題目：可愛對話框 === */
   .qtitle{
     font-size:clamp(18px,4.6vw,22px);
-    font-weight:700;line-height:1.6;color:var(--silver);
+    font-weight:800;line-height:1.7;color:var(--text);
     margin:18px 0 8px;text-align:left;
-    background:rgba(10,10,20,0.8);
-    border-left:4px solid var(--neon-cyan);
-    padding:14px 18px;
-    box-shadow:0 0 15px rgba(0,245,255,0.15), -4px 0 0 var(--neon-cyan);
+    background:#FFFEF5;
+    border:none;
+    border-left:6px solid var(--accent);
+    border-radius:16px;
+    padding:16px 20px;
+    box-shadow:0 4px 0 var(--accent-soft), 0 6px 18px rgba(165,216,255,0.2);
     position:relative;
   }
-  .qtitle::before{
-    content:'>';position:absolute;top:14px;left:-22px;
-    color:var(--neon-cyan);font-size:18px;font-weight:900;
-    text-shadow:0 0 8px var(--neon-cyan);
-    animation:blink 1s infinite;
-  }
-  @keyframes blink{50%{opacity:0}}
   .qhint{
-    font-size:14px;color:var(--neon-purple);text-align:center;
-    margin-bottom:14px;margin-top:14px;
-    font-weight:600;letter-spacing:1px;
-    background:rgba(176,38,255,0.08);
-    border:1px solid var(--neon-purple);
-    padding:8px 14px;
-    text-shadow:0 0 4px var(--neon-purple);
+    font-size:14px;color:var(--text);text-align:center;
+    margin-bottom:14px;margin-top:16px;
+    font-weight:700;
+    background:linear-gradient(135deg, var(--gold-soft) 0%, rgba(255,228,142,0.5) 100%);
+    border:2px dashed var(--orange);
+    padding:10px 16px;border-radius:14px;
   }
 
-  /* === 幾何圖區：白底（保留圖形可讀性） === */
+  /* === 幾何圖區：白底圓角（保留圖形可讀性）=== */
   .stage-wrap{
-    background:rgba(232,232,245,0.95);
-    border:2px solid var(--neon-cyan);
-    box-shadow:0 0 20px rgba(0,245,255,0.3);
+    background:white;
+    border:3px solid var(--accent-soft);
+    box-shadow:0 4px 0 var(--accent-soft), 0 8px 20px rgba(165,216,255,0.2);
     padding:14px;margin:14px 0;overflow:hidden;
-    clip-path:polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    border-radius:20px;
   }
   .stage{width:100%;height:auto;display:block}
 
-  /* === 選項：霓虹卡片 === */
+  /* === 選項：可愛糖果按鈕 === */
   .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:18px}
   .opt{
-    min-height:62px;padding:14px 16px;
-    background:rgba(20,20,43,0.7);color:var(--silver);
-    border:2px solid var(--neon-purple);
+    min-height:62px;padding:14px 18px;
+    background:white;color:var(--text);
+    border:3px solid var(--primary-soft);
+    border-radius:20px;
+    box-shadow:0 4px 0 var(--primary-soft);
     font-size:16px;font-weight:800;
     cursor:pointer;font-family:inherit;
-    text-align:center;line-height:1.4;letter-spacing:1px;
-    transition:all 0.2s;
-    box-shadow:0 0 10px rgba(176,38,255,0.2);
-    clip-path:polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    text-align:center;line-height:1.4;
+    transition:all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .opt:hover{
-    background:rgba(176,38,255,0.2);
-    border-color:var(--neon-cyan);color:var(--neon-cyan);
-    box-shadow:0 0 20px var(--neon-cyan);
-    transform:translateY(-2px);
+    background:var(--primary-soft);
+    border-color:var(--primary);
+    transform:translateY(-3px);
+    box-shadow:0 7px 0 var(--primary);
   }
   .opt.correct{
-    background:var(--neon-green);color:var(--bg);
-    border-color:var(--neon-green);
-    box-shadow:0 0 30px var(--neon-green);
+    background:var(--success);color:white;
+    border-color:var(--success);
+    box-shadow:0 4px 0 #6FB68A;
     font-weight:900;
-    animation:hit 0.5s, correct-flash 1s !important;
+    animation:bounce-correct 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .opt.wrong{
-    background:rgba(255,0,68,0.2);color:var(--danger);
+    background:var(--primary-soft);color:#B85C7C;
     border-color:var(--danger);
-    box-shadow:0 0 20px var(--danger);
+    box-shadow:0 4px 0 var(--danger);
+    opacity:0.85;
   }
   .opt.show-correct{
-    background:var(--neon-green);color:var(--bg);
-    border-color:var(--neon-green);
-    box-shadow:0 0 20px var(--neon-green);
-    font-weight:900;
+    background:var(--success);color:white;
+    border-color:var(--success);
+    box-shadow:0 4px 0 #6FB68A;font-weight:900;
   }
-  @keyframes hit{
+  @keyframes bounce-correct{
     0%{transform:scale(1)}
-    30%{transform:scale(1.12)}
-    60%{transform:scale(0.97)}
+    20%{transform:scale(1.15)}
+    40%{transform:scale(0.95)}
+    60%{transform:scale(1.08)}
+    80%{transform:scale(0.98)}
     100%{transform:scale(1)}
   }
-  @keyframes correct-flash{
-    0%,100%{box-shadow:0 0 30px var(--neon-green)}
-    50%{box-shadow:0 0 60px var(--neon-green), 0 0 100px var(--neon-green)}
-  }
 
-  /* === 回饋框：訊息中斷 === */
+  /* === 回饋：療癒對白 === */
   .fb{
     margin-top:16px;padding:14px 18px;
-    border:1px solid;
-    font-size:15px;line-height:1.6;font-weight:600;letter-spacing:0.5px;
-    display:none;animation:cardIn 0.3s;
+    border:none;border-radius:18px;
+    font-size:15px;line-height:1.7;font-weight:700;
+    display:none;animation:cardIn 0.4s;
   }
   .fb.show{display:block}
   .fb.win{
-    background:rgba(0,255,136,0.1);color:var(--neon-green);
-    border-color:var(--neon-green);
-    box-shadow:0 0 20px rgba(0,255,136,0.3);
+    background:linear-gradient(135deg, var(--success-soft) 0%, #DDF4E2 100%);
+    color:#3E8E5E;
+    box-shadow:0 3px 0 var(--success), 0 6px 14px rgba(149,213,178,0.3);
   }
-  .fb.win::before{content:'[ SUCCESS ] ';font-weight:900;color:var(--neon-green);text-shadow:0 0 4px var(--neon-green)}
+  .fb.win::before{content:'🌟 ';font-size:22px}
   .fb.gentle{
-    background:rgba(255,171,0,0.1);color:var(--warning);
-    border-color:var(--warning);
-    box-shadow:0 0 20px rgba(255,171,0,0.3);
+    background:linear-gradient(135deg, var(--gold-soft) 0%, #FFF3CC 100%);
+    color:#A1751C;
+    box-shadow:0 3px 0 var(--gold), 0 6px 14px rgba(255,224,102,0.3);
   }
-  .fb.gentle::before{content:'[ RETRY ] ';font-weight:900;text-shadow:0 0 4px var(--warning)}
+  .fb.gentle::before{content:'💭 ';font-size:22px}
 
-  /* === 提示卡：終端機紀錄 === */
+  /* === 提示：粉色便條紙 + 角落生物角色 === */
   .hints{display:none;margin-top:14px}
-  .hints.show{display:block;animation:cardIn 0.3s}
+  .hints.show{display:block;animation:cardIn 0.4s}
   .hint{
-    background:rgba(20,20,43,0.8);
-    color:var(--text);
-    border-left:3px solid var(--neon-yellow);
-    padding:12px 14px;margin-bottom:8px;
-    font-size:14px;line-height:1.6;
-    font-family:'Rajdhani',monospace;letter-spacing:0.5px;
-    box-shadow:0 0 10px rgba(249,240,2,0.15);
+    background:#FFF0F5;color:var(--text);
+    border:none;border-left:5px solid var(--primary);
+    border-radius:14px;
+    box-shadow:0 3px 0 var(--primary-soft), 0 6px 14px rgba(255,179,199,0.15);
+    padding:12px 14px 12px 18px;margin-bottom:10px;
+    font-size:14px;line-height:1.7;font-weight:600;
+    transform:rotate(-0.3deg);
+    position:relative;
   }
-  .hint::before{content:'$ ';color:var(--neon-yellow);font-weight:900}
-  .hint strong{color:var(--neon-pink);text-shadow:0 0 4px var(--neon-pink)}
+  .hint:nth-child(2){transform:rotate(0.3deg);background:#FFFBE5;border-left-color:var(--gold)}
+  .hint:nth-child(3){transform:rotate(-0.4deg);background:#E5F2FF;border-left-color:var(--accent)}
+  .hint strong{color:var(--orange);font-weight:900}
 
   .stage text{user-select:none}
 
-  /* === Nav 按鈕 === */
+  /* === Nav === */
   .nav{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
   .nav .btn{flex:1;min-width:130px}
 
   /* === 金幣彈跳 === */
   @keyframes coinPop{
-    0%{transform:translateY(0) scale(1);opacity:1}
-    100%{transform:translateY(-60px) scale(1.6) rotate(360deg);opacity:0}
+    0%{transform:translateY(0) scale(1) rotate(0);opacity:1}
+    100%{transform:translateY(-50px) scale(1.6) rotate(360deg);opacity:0}
   }
-  .coin-pop{position:fixed;font-size:36px;pointer-events:none;animation:coinPop 1s ease-out forwards;z-index:9999;filter:drop-shadow(0 0 8px var(--neon-yellow))}
+  .coin-pop{position:fixed;font-size:36px;pointer-events:none;animation:coinPop 1s ease-out forwards;z-index:9999}
 
   /* === 勝利畫面 === */
   .victory{text-align:center;padding:28px}
-  .victory .emoji{font-size:80px;margin-bottom:8px;animation:hit 1.5s infinite;filter:drop-shadow(0 0 15px var(--neon-pink))}
-  .victory h1{font-size:40px;margin-bottom:14px}
+  .victory .emoji{font-size:80px;margin-bottom:8px;animation:gentle-bounce 1.5s infinite;display:inline-block}
+  .victory h1{font-size:42px;margin-bottom:14px}
   .score-display{
-    background:rgba(10,10,20,0.9);color:var(--neon-yellow);
-    border:2px solid var(--neon-yellow);
-    box-shadow:0 0 40px var(--neon-yellow), inset 0 0 20px rgba(249,240,2,0.1);
+    background:linear-gradient(135deg, var(--gold-soft) 0%, var(--primary-soft) 50%, var(--accent-soft) 100%);
+    color:var(--text);
+    border:none;border-radius:24px;
+    box-shadow:0 6px 0 var(--primary), 0 12px 28px rgba(255,179,199,0.3);
     padding:24px;margin:20px 0;
-    clip-path:polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
   }
   .score-display .num{
-    font-size:72px;font-weight:900;letter-spacing:4px;
-    text-shadow:0 0 20px var(--neon-yellow), 0 0 40px var(--neon-yellow);
+    font-size:72px;font-weight:900;color:var(--orange);
+    text-shadow:0 4px 0 rgba(74,68,88,0.15);
+    letter-spacing:2px;
   }
-  .score-display .label{font-size:14px;margin-top:4px;font-weight:700;letter-spacing:3px;color:var(--silver);text-transform:uppercase}
+  .score-display .label{font-size:15px;margin-top:4px;font-weight:800;color:var(--text)}
 
   /* === 送出狀態 === */
   .submit-status{
-    padding:14px 18px;border:1px solid;
+    padding:14px 18px;border:none;border-radius:16px;
     text-align:center;font-weight:800;margin:14px 0;
-    letter-spacing:1px;text-transform:uppercase;
+    box-shadow:0 3px 0 rgba(0,0,0,0.05);
   }
-  .submit-status.pending{background:rgba(176,38,255,0.1);color:var(--neon-purple);border-color:var(--neon-purple);box-shadow:0 0 12px rgba(176,38,255,0.3)}
-  .submit-status.success{background:rgba(0,255,136,0.1);color:var(--neon-green);border-color:var(--neon-green);box-shadow:0 0 12px rgba(0,255,136,0.3)}
-  .submit-status.error{background:rgba(255,0,68,0.1);color:var(--danger);border-color:var(--danger);box-shadow:0 0 12px rgba(255,0,68,0.3)}
+  .submit-status.pending{background:var(--accent-soft);color:#3676B2}
+  .submit-status.success{background:var(--success-soft);color:#3E8E5E}
+  .submit-status.error{background:var(--primary-soft);color:#B85C7C}
 
-  .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,0.2);border-top-color:var(--neon-cyan);border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
+  .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(0,0,0,0.1);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* === 裝飾粒子（飄浮霓虹點） === */
+  /* === 飄浮角落生物（背景裝飾） === */
   .deco-stars{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden;z-index:0}
   .star{
-    position:absolute;font-size:14px;font-weight:900;
-    color:var(--neon-cyan);opacity:0.6;
-    animation:float-particle 8s infinite linear;
-    text-shadow:0 0 6px var(--neon-cyan);
+    position:absolute;font-size:24px;
+    opacity:0.4;
+    animation:cute-float 6s ease-in-out infinite;
   }
-  .star:nth-child(3n){color:var(--neon-pink);text-shadow:0 0 6px var(--neon-pink)}
-  .star:nth-child(5n){color:var(--neon-purple);text-shadow:0 0 6px var(--neon-purple)}
-  @keyframes float-particle{
-    0%{transform:translateY(0) translateX(0);opacity:0.3}
-    50%{transform:translateY(-30px) translateX(20px);opacity:0.7}
-    100%{transform:translateY(0) translateX(0);opacity:0.3}
+  @keyframes cute-float{
+    0%,100%{transform:translateY(0) rotate(0);opacity:0.3}
+    50%{transform:translateY(-15px) rotate(10deg);opacity:0.5}
   }
 
   /* === Start 畫面 === */
@@ -390,154 +364,165 @@
   .start-screen .crown{
     font-size:80px;margin-bottom:10px;
     display:inline-block;
-    filter:drop-shadow(0 0 20px var(--neon-yellow));
-    animation:float-crown 3s ease-in-out infinite;
+    animation:crown-float 3s ease-in-out infinite;
   }
-  @keyframes float-crown{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(-10px)}
+  @keyframes crown-float{
+    0%,100%{transform:translateY(0) rotate(0)}
+    50%{transform:translateY(-8px) rotate(-3deg)}
   }
   .start-screen h1{font-size:44px;margin-bottom:8px}
   .start-screen .tagline{
-    color:var(--neon-cyan);font-size:16px;margin-bottom:24px;
-    font-weight:700;line-height:1.6;letter-spacing:1px;
-    text-shadow:0 0 8px var(--neon-cyan);
+    color:var(--text);font-size:16px;margin-bottom:24px;
+    font-weight:800;line-height:1.6;
+    background:linear-gradient(135deg, var(--primary-soft) 0%, var(--gold-soft) 100%);
+    border:none;border-radius:24px;
+    padding:10px 20px;display:inline-block;
+    box-shadow:0 4px 0 var(--primary), 0 6px 14px rgba(255,179,199,0.3);
   }
   .stage-info{
-    background:rgba(10,10,20,0.7);
-    border:1px solid var(--neon-purple);
-    box-shadow:0 0 20px rgba(176,38,255,0.2);
-    padding:18px;margin:20px 0;
-    font-size:15px;color:var(--silver);line-height:1.8;
-    font-weight:600;letter-spacing:1px;
-    text-align:left;
-    clip-path:polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    background:#FFFEF7;
+    border:none;border-radius:20px;
+    box-shadow:0 5px 0 var(--accent-soft), 0 8px 20px rgba(165,216,255,0.15);
+    padding:20px;margin:20px 0;
+    font-size:15px;color:var(--text);line-height:1.9;
+    font-weight:700;text-align:left;
   }
 
   /* === 難度標籤 === */
   .lvl-badge{
-    display:inline-block;padding:6px 16px;
-    border:1px solid;
+    display:inline-block;padding:6px 14px;
+    border:none;border-radius:14px;
+    box-shadow:0 3px 0 rgba(0,0,0,0.1);
     font-size:13px;font-weight:900;margin-bottom:12px;
-    letter-spacing:2px;text-transform:uppercase;
-    clip-path:polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    letter-spacing:1px;
   }
-  .lvl-base{background:rgba(0,255,136,0.15);color:var(--neon-green);border-color:var(--neon-green);box-shadow:0 0 10px rgba(0,255,136,0.3)}
-  .lvl-mid{background:rgba(249,240,2,0.15);color:var(--neon-yellow);border-color:var(--neon-yellow);box-shadow:0 0 10px rgba(249,240,2,0.3)}
-  .lvl-boss{background:rgba(255,0,128,0.15);color:var(--neon-pink);border-color:var(--neon-pink);box-shadow:0 0 10px rgba(255,0,128,0.3)}
+  .lvl-base{background:var(--success);color:white;box-shadow:0 3px 0 #6FB68A}
+  .lvl-mid{background:var(--gold);color:white;box-shadow:0 3px 0 #B88A1F}
+  .lvl-boss{background:var(--primary);color:white;box-shadow:0 3px 0 #B85C7C}
 
-  .crystal{font-size:24px;animation:hit 2s infinite ease-in-out;display:inline-block;filter:drop-shadow(0 0 6px var(--neon-yellow))}
+  .crystal{font-size:24px;animation:gentle-bounce 2s infinite ease-in-out;display:inline-block}
 
-  /* === PRO 升級樣式（保留：賽車跑道、寶箱、灑花、COMBO） === */
-  /* 賽車跑道 → 電競賽道（純黑+霓虹） */
+  /* === PRO 升級樣式（療癒重做） === */
+  /* 彩虹小徑 + 白熊在跑 */
   .race-track{
     position:relative;
-    background:linear-gradient(to bottom, #050510 0%, #14142B 100%);
-    border:1px solid var(--neon-cyan);
-    height:50px;margin-bottom:14px;
+    background:linear-gradient(to right, #FFB3C7 0%, #FFD6E0 20%, #FFE066 40%, #B8E6B8 60%, #A5D8FF 80%, #D0BFFF 100%);
+    border:none;border-radius:30px;
+    height:54px;margin-bottom:14px;
     overflow:hidden;
-    box-shadow:0 0 25px rgba(0,245,255,0.4), inset 0 0 30px rgba(0,0,0,0.7);
-    clip-path:polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+    box-shadow:0 5px 0 var(--primary), inset 0 -4px 12px rgba(255,255,255,0.5);
   }
+  /* 跑道閃星（靜態，不會閃，視覺豐富） */
   .race-track::before{
-    content:'';position:absolute;top:50%;left:0;right:0;
-    height:2px;
-    background:repeating-linear-gradient(to right, var(--neon-cyan) 0, var(--neon-cyan) 14px, transparent 14px, transparent 28px);
-    transform:translateY(-50%);opacity:0.7;
-    box-shadow:0 0 8px var(--neon-cyan);
+    content:'✨   ⭐   ✨   ⭐   ✨   ⭐';
+    position:absolute;top:50%;left:0;right:0;text-align:center;
+    transform:translateY(-50%);
+    color:rgba(255,255,255,0.6);
+    font-size:18px;letter-spacing:8px;
   }
   .race-car{
     position:absolute;top:50%;
     transform:translateY(-50%);
-    font-size:32px;
-    transition:left 0.6s cubic-bezier(0.34,1.56,0.64,1);
-    filter:drop-shadow(0 0 8px var(--neon-pink));
+    font-size:38px;
+    transition:left 0.8s cubic-bezier(0.34,1.56,0.64,1);
     z-index:2;
+    filter:drop-shadow(0 4px 6px rgba(0,0,0,0.2));
   }
   .race-flag{
     position:absolute;top:50%;right:8px;
     transform:translateY(-50%);
-    font-size:24px;z-index:1;
-    filter:drop-shadow(0 0 6px var(--neon-yellow));
+    font-size:28px;z-index:1;
   }
 
-  /* COMBO 飛字 */
+  /* COMBO 飛字（療癒版） */
   .combo-counter{
-    display:inline-block;background:var(--neon-pink);color:white;
-    padding:2px 10px;border:1px solid var(--neon-pink);
-    box-shadow:0 0 12px var(--neon-pink);
-    font-weight:900;font-size:14px;letter-spacing:2px;
+    display:inline-block;background:var(--primary);color:white;
+    padding:3px 12px;border:none;border-radius:14px;
+    box-shadow:0 2px 0 #B85C7C;
+    font-weight:900;font-size:14px;letter-spacing:1px;
     margin-left:8px;animation:combo-pulse 0.5s;
-    text-transform:uppercase;
   }
-  @keyframes combo-pulse{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
+  @keyframes combo-pulse{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
   .combo-fly{
     position:fixed;font-size:56px;font-weight:900;
-    color:var(--neon-pink);
-    text-shadow:0 0 20px var(--neon-pink), 0 0 40px var(--neon-pink), 2px 0 var(--neon-cyan), -2px 0 var(--neon-yellow);
-    letter-spacing:3px;text-transform:uppercase;
+    color:var(--primary);
+    text-shadow:0 4px 0 var(--text), 0 6px 20px rgba(255,179,199,0.6);
+    letter-spacing:3px;
     pointer-events:none;z-index:9999;
-    animation:combo-fly 1.5s ease-out forwards;
+    animation:combo-fly 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
   @keyframes combo-fly{
-    0%{opacity:0;transform:translate(-50%,-50%) scale(0.5)}
-    30%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}
-    100%{opacity:0;transform:translate(-50%,-100%) scale(1.2)}
+    0%{opacity:0;transform:translate(-50%,-50%) scale(0.5) rotate(-15deg)}
+    30%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(5deg)}
+    100%{opacity:0;transform:translate(-50%,-120%) scale(1) rotate(0)}
   }
 
-  /* 寶箱 modal */
+  /* 禮物盒 modal */
   .treasure-overlay{
-    position:fixed;inset:0;background:rgba(5,5,16,0.92);
+    position:fixed;inset:0;background:rgba(255,248,240,0.95);
     display:none;align-items:center;justify-content:center;
-    z-index:9000;animation:fade-in 0.3s;
-    backdrop-filter:blur(8px);
+    z-index:9000;animation:fade-in 0.4s;
+    backdrop-filter:blur(6px);
   }
   .treasure-overlay.show{display:flex}
   @keyframes fade-in{from{opacity:0}to{opacity:1}}
   .treasure-card{
-    background:rgba(20,20,43,0.95);
-    border:2px solid var(--neon-yellow);
-    box-shadow:0 0 50px var(--neon-yellow), inset 0 0 30px rgba(249,240,2,0.1);
-    padding:30px 40px;
+    background:white;
+    border:none;border-radius:32px;
+    box-shadow:0 8px 0 var(--primary), 0 16px 40px rgba(255,179,199,0.4);
+    padding:32px 40px;
     text-align:center;max-width:380px;width:90%;
-    clip-path:polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+    animation:treasure-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes treasure-in{
+    0%{transform:scale(0.7);opacity:0}
+    100%{transform:scale(1);opacity:1}
   }
   .treasure-chest{
     font-size:90px;cursor:pointer;display:inline-block;
     transition:transform 0.2s;
-    filter:drop-shadow(0 0 20px var(--neon-yellow));
+    filter:drop-shadow(0 6px 8px rgba(0,0,0,0.15));
+    animation:gift-shake 1s ease-in-out infinite;
+  }
+  @keyframes gift-shake{
+    0%,100%{transform:rotate(0)}
+    20%{transform:rotate(-8deg)}
+    40%{transform:rotate(8deg)}
+    60%{transform:rotate(-5deg)}
+    80%{transform:rotate(5deg)}
   }
   .treasure-chest:hover{transform:scale(1.15)}
-  .treasure-chest.opened{animation:chest-open 0.6s ease-out forwards}
+  .treasure-chest.opened{animation:chest-open 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards}
   @keyframes chest-open{
-    0%{transform:scale(1)}
-    30%{transform:scale(1.3) rotate(-10deg)}
-    60%{transform:scale(1.4) rotate(10deg)}
-    100%{transform:scale(1.2)}
+    0%{transform:scale(1) rotate(0)}
+    30%{transform:scale(1.3) rotate(-15deg)}
+    60%{transform:scale(1.4) rotate(15deg)}
+    100%{transform:scale(1.2) rotate(0)}
   }
   .treasure-prize{
-    font-size:42px;font-weight:900;color:var(--neon-yellow);
-    text-shadow:0 0 25px var(--neon-yellow), 0 0 50px var(--neon-yellow);
-    letter-spacing:3px;
-    margin:14px 0;animation:prize-pop 0.5s 0.5s both;
+    font-size:46px;font-weight:900;color:var(--orange);
+    text-shadow:0 4px 0 rgba(74,68,88,0.15);
+    letter-spacing:2px;
+    margin:14px 0;
+    animation:prize-pop 0.6s 0.5s both cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   @keyframes prize-pop{
     0%{opacity:0;transform:scale(0.5)}
-    50%{opacity:1;transform:scale(1.4)}
+    60%{opacity:1;transform:scale(1.4)}
     100%{opacity:1;transform:scale(1)}
   }
-  .treasure-msg{font-size:14px;color:var(--text-dim);margin-bottom:12px;letter-spacing:1px;text-transform:uppercase}
+  .treasure-msg{font-size:14px;color:var(--text-dim);margin-bottom:14px;font-weight:700}
 
-  /* 灑花 confetti（霓虹色） */
+  /* 灑花 confetti（療癒色） */
   .confetti{
-    position:fixed;width:10px;height:10px;
+    position:fixed;width:14px;height:14px;
     top:-20px;pointer-events:none;z-index:9500;
     animation:confetti-fall linear forwards;
-    box-shadow:0 0 6px currentColor;
+    border-radius:50%;
   }
   @keyframes confetti-fall{
     0%{transform:translateY(0) rotate(0)}
-    100%{transform:translateY(110vh) rotate(720deg)}
+    100%{transform:translateY(110vh) rotate(540deg)}
   }
 </style>
 </head>
@@ -582,8 +567,8 @@
   <section id="screen-quest" style="display:none">
     <!-- 賽車跑道 -->
     <div class="race-track">
-      <span class="race-car" id="race-car" style="left:0%">🏎️</span>
-      <span class="race-flag">🏁</span>
+      <span class="race-car" id="race-car" style="left:0%">🐻</span>
+      <span class="race-flag">🎀</span>
     </div>
     <div class="hud">
       <div class="hud-left">
@@ -649,7 +634,7 @@ const FIREBASE_NODE = `${FIREBASE_URL}/submissions/${HOMEWORK_ID}.json`;
   for (let i = 0; i < 25; i++) {
     const s = document.createElement('span');
     s.className = 'star';
-    s.textContent = '✦';
+    s.textContent = ['🐻','🐧','🐱','🍤','💖','✨','🌸','⭐'][Math.floor(Math.random()*8)];
     s.style.left = Math.random() * 100 + '%';
     s.style.top = Math.random() * 100 + '%';
     s.style.animationDelay = Math.random() * 3 + 's';
@@ -1073,7 +1058,7 @@ function buildPlg(opts) {
 
 /* === PRO 升級：賽車進度、寶箱、灑花、COMBO 系統 === */
 function spawnConfetti(count = 80) {
-  const colors = ['#FF0080', '#00F5FF', '#B026FF', '#00FF88', '#F9F002', '#E8E8F5'];
+  const colors = ['#FFB3C7', '#FFE066', '#A5D8FF', '#95D5B2', '#D0BFFF', '#FFA94D'];
   for (let i = 0; i < count; i++) {
     const c = document.createElement('div');
     c.className = 'confetti';
