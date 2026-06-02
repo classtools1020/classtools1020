@@ -91,14 +91,14 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
 .gem-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .gem-map{position:absolute;inset:0;width:100%;height:100%}
 .gem-node{position:absolute;transform:translate(-50%,-50%);cursor:pointer;text-align:center}
-.gem-node-shape{width:96px;height:96px;display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}
+.gem-node-shape{width:96px;height:96px;display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4));transform:rotate(var(--gem-rot,0deg));transition:transform .25s}
+.gem-node:not(.collected):hover .gem-node-shape{transform:rotate(calc(var(--gem-rot,0deg) + 6deg)) scale(1.15)}
 .row-label .row-num{font-family:'Orbitron',sans-serif;font-size:24px;letter-spacing:2px;text-shadow:0 0 12px currentColor}
 .row-label .row-hint{font-size:11px;opacity:.7;margin-top:4px;font-weight:700}
 .gem-node-shape svg{width:100%;height:100%;overflow:visible}
 .gem-node-label{margin-top:6px;font-size:11px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(0,0,0,.5);padding:2px 8px;border-radius:8px;backdrop-filter:blur(6px);white-space:nowrap}
 .gem-node.collected .gem-node-shape{animation:gemPulse 2s ease-in-out infinite}
 .gem-node.collected .gem-node-shape::after{content:"★";position:absolute;top:-8px;right:-8px;background:#FFD93D;color:#1a0b3d;width:22px;height:22px;border-radius:50%;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(255,217,61,.7)}
-.gem-node:not(.collected):hover .gem-node-shape{transform:scale(1.15) rotate(6deg);transition:transform .25s}
 .gem-node.collected{opacity:.85}
 @keyframes gemPulse{0%,100%{filter:drop-shadow(0 4px 12px rgba(0,0,0,.4)) brightness(1)}50%{filter:drop-shadow(0 4px 18px var(--gem-glow,rgba(255,255,255,.5))) brightness(1.2)}}
 .gem-node.pulse-hint .gem-node-shape{animation:hintPulse 1.6s ease-in-out infinite}
@@ -605,10 +605,10 @@ const GEMS = [
   }
 ];
 
-/* ---------- GEM MAP POSITIONS (2 rows: properties on top, determinations bottom) ---------- */
+/* ---------- GEM MAP POSITIONS (wave layout — order 1→10 left-to-right, varied heights) ---------- */
 const GEM_POSITIONS = [
-  {x:14,y:32},{x:30,y:32},{x:46,y:32},{x:62,y:32},{x:78,y:32}, // 性質 1-5
-  {x:14,y:72},{x:30,y:72},{x:46,y:72},{x:62,y:72},{x:78,y:72}  // 判別 1-5 (gem id 6-10)
+  {x:14,y:28,rot:-6},{x:28,y:44,rot:4},{x:46,y:24,rot:-3},{x:62,y:42,rot:5},{x:78,y:30,rot:-4}, // 性質 1-5
+  {x:14,y:78,rot:5},{x:30,y:62,rot:-4},{x:48,y:80,rot:3},{x:64,y:64,rot:-5},{x:80,y:78,rot:4}   // 判別 6-10
 ];
 
 /* ---------- STATE ---------- */
@@ -875,19 +875,35 @@ function renderGemMap(){
   const propLabel = document.createElement('div');
   propLabel.className = 'row-label row-label-p';
   propLabel.innerHTML = '<div class="row-num">性質</div><div class="row-hint">1～5 號</div>';
-  propLabel.style.cssText = 'position:absolute;left:2%;top:32%;transform:translateY(-50%);text-align:center;color:#27D7FF;font-weight:900';
+  propLabel.style.cssText = 'position:absolute;left:2%;top:33%;transform:translateY(-50%);text-align:center;color:#27D7FF;font-weight:900';
   map.appendChild(propLabel);
   const determLabel = document.createElement('div');
   determLabel.className = 'row-label row-label-d';
   determLabel.innerHTML = '<div class="row-num">判別</div><div class="row-hint">6～10 號</div>';
-  determLabel.style.cssText = 'position:absolute;left:2%;top:72%;transform:translateY(-50%);text-align:center;color:#FF6BB0;font-weight:900';
+  determLabel.style.cssText = 'position:absolute;left:2%;top:73%;transform:translateY(-50%);text-align:center;color:#FF6BB0;font-weight:900';
   map.appendChild(determLabel);
+  // Treasure-map path lines: 1→2→3→4→5 (cyan), 6→7→8→9→10 (pink)
+  function pathLine(fromIdx,toIdx,color){
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',GEM_POSITIONS[fromIdx].x+'%');
+    line.setAttribute('y1',GEM_POSITIONS[fromIdx].y+'%');
+    line.setAttribute('x2',GEM_POSITIONS[toIdx].x+'%');
+    line.setAttribute('y2',GEM_POSITIONS[toIdx].y+'%');
+    line.setAttribute('stroke',color);
+    line.setAttribute('stroke-width','2');
+    line.setAttribute('stroke-dasharray','6 6');
+    line.setAttribute('opacity','0.35');
+    linesSvg.appendChild(line);
+  }
+  for(let i=0;i<4;i++) pathLine(i,i+1,'#27D7FF');
+  for(let i=5;i<9;i++) pathLine(i,i+1,'#FF6BB0');
   GEMS.forEach((gem,i)=>{
     const pos = GEM_POSITIONS[i];
     const node = document.createElement('div');
     node.className = 'gem-node';
     node.style.left = pos.x+'%';
     node.style.top = pos.y+'%';
+    if(pos.rot) node.style.setProperty('--gem-rot',pos.rot+'deg');
     node.style.setProperty('--gem-glow',gem.color+'AA');
     if(state.gemsCollected.includes(gem.id)) node.classList.add('collected');
     const isNext = !state.gemsCollected.includes(gem.id) && state.gemsCollected.length>0 && state.gemsCollected.length<10;
