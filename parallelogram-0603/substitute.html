@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>4-2 平行四邊形</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans TC',sans-serif;background:#F7F4EE;color:#2A2438;line-height:1.7;padding:40px 16px;-webkit-font-smoothing:antialiased;min-height:100vh}
+.page{max-width:680px;margin:0 auto;background:#fff;border-radius:24px;box-shadow:0 20px 60px rgba(42,36,56,.08),0 2px 8px rgba(42,36,56,.04);overflow:hidden}
+
+.banner{background:linear-gradient(135deg,#7B61FF 0%,#FF6BB0 100%);color:#fff;padding:36px 40px;text-align:center}
+.banner h1{font-size:34px;font-weight:900;letter-spacing:1px}
+
+.section{padding:28px 40px;border-bottom:1px solid #EFEAE0}
+.section:last-of-type{border-bottom:none}
+.section-head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.step-num{flex-shrink:0;width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:#fff}
+.step-1 .step-num{background:linear-gradient(135deg,#27D7FF,#7B61FF)}
+.step-2 .step-num{background:linear-gradient(135deg,#FF8B3D,#FF6BB0)}
+.step-3 .step-num{background:linear-gradient(135deg,#FFB300,#FFD93D);color:#5A4500}
+.section-title{font-size:22px;font-weight:900;color:#2A2438;flex:1}
+
+.section-body{padding-left:58px}
+.section-body p{margin-bottom:8px;color:#3A3252;font-size:16px}
+
+.link-box{display:flex;align-items:center;gap:14px;background:#F7F4EE;border:2px solid #EFEAE0;border-radius:14px;padding:14px 18px;margin:10px 0;transition:border-color .2s,transform .2s;text-decoration:none;color:inherit}
+.link-box:hover{border-color:#7B61FF;transform:translateY(-2px)}
+.link-icon{flex-shrink:0;width:42px;height:42px;border-radius:10px;background:#7B61FF;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px}
+.link-text{flex:1;min-width:0}
+.link-title{font-weight:900;font-size:16px}
+.link-arrow{color:#7B61FF;font-weight:900;font-size:22px}
+
+.thanks-section{padding:36px 40px;text-align:center;background:linear-gradient(135deg,#FFF8E5 0%,#FFE8F0 100%)}
+.thanks-title{font-size:22px;font-weight:900;color:#2A2438}
+
+@media print{
+  body{background:#fff;padding:0}
+  .page{box-shadow:none;border-radius:0}
+}
+@media (max-width:600px){
+  body{padding:16px 8px}
+  .banner,.section,.thanks-section{padding-left:24px;padding-right:24px}
+  .section-body{padding-left:0}
+  .banner h1{font-size:26px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="banner">
+    <h1>4-2 平行四邊形</h1>
+  </div>
+
+  <div class="section step-1">
+    <div class="section-head">
+      <div class="step-num">1</div>
+      <div class="section-title">開場複習網站</div>
+    </div>
+    <div class="section-body">
+      <a class="link-box" href="index.html" target="_blank">
+        <div class="link-icon">▶</div>
+        <div class="link-text">
+          <div class="link-title">平四寶石獵人</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section step-2">
+    <div class="section-head">
+      <div class="step-num">2</div>
+      <div class="section-title">課本進度 P.213－214 自我評量</div>
+    </div>
+    <div class="section-body">
+      <p>打開翰林電子書做自我評量，<strong>進度由您決定</strong>。</p>
+      <a class="link-box" href="https://edisc3.hle.com.tw/edisc_v3/ebook_v2023.html#degree=%E5%9C%8B%E4%B8%AD&cat=%E6%95%B8%E5%AD%B8&prd=JMA&year=114%E4%B8%8B&grade=%E5%85%A8%E5%B9%B4%E7%B4%9A&tab=tab2" target="_blank">
+        <div class="link-icon" style="background:#FF6BB0">課本</div>
+        <div class="link-text">
+          <div class="link-title">翰林電子書</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="section step-3">
+    <div class="section-head">
+      <div class="step-num">3</div>
+      <div class="section-title">回家作業</div>
+    </div>
+    <div class="section-body">
+      <p style="font-size:20px;font-weight:900;color:#FF6BB0">今天沒有作業</p>
+    </div>
+  </div>
+
+  <div class="thanks-section">
+    <div class="thanks-title">辛苦你了，謝謝你 😊</div>
+  </div>
+
+</div>
+</body>
+</html>

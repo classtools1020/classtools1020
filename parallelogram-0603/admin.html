@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>平四寶石獵人 · 老師後臺</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans TC',sans-serif;background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 100%);color:#fff;min-height:100vh;padding:24px;-webkit-font-smoothing:antialiased}
+.container{max-width:1200px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+h1{font-size:32px;font-weight:900;background:linear-gradient(135deg,#FFD93D,#FF6BB0,#27D7FF);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:rgba(255,255,255,.55);font-size:13px;margin-top:4px;letter-spacing:1px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.18);padding:10px 18px;border-radius:10px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:background .2s}
+.btn:hover{background:rgba(255,255,255,.16)}
+.btn-warn{background:rgba(255,107,176,.15);border-color:#FF6BB0;color:#FF6BB0}
+.btn-warn:hover{background:rgba(255,107,176,.25)}
+.btn-go{background:linear-gradient(135deg,#7B61FF,#27D7FF);border:none;color:#fff}
+
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}
+.summary-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px}
+.summary-label{font-size:12px;color:rgba(255,255,255,.55);letter-spacing:2px;margin-bottom:4px}
+.summary-value{font-size:28px;font-weight:900;color:#FFD93D;font-family:'Orbitron',sans-serif}
+
+.sessions{display:grid;gap:16px;margin-bottom:28px}
+.session{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:18px;display:grid;grid-template-columns:1fr;gap:14px}
+.session-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.session-name{font-size:22px;font-weight:900}
+.hero-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:700;border:1px solid currentColor}
+.session-meta{margin-left:auto;font-size:12px;color:rgba(255,255,255,.55);text-align:right}
+.session-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.stat-box{background:rgba(0,0,0,.25);border-radius:10px;padding:10px 12px}
+.stat-box-label{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:1px}
+.stat-box-value{font-size:18px;font-weight:900;color:#fff;margin-top:2px}
+.gem-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.gem-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-family:'Orbitron',sans-serif;font-weight:900;font-size:13px;position:relative}
+.gem-cell.collected{background:linear-gradient(135deg,#27D7FF33,#9B5BFF33);border:1px solid #27D7FF;color:#fff}
+.gem-cell.collected::after{content:"★";position:absolute;top:-4px;right:-2px;font-size:10px;color:#FFD93D}
+.gem-cell.uncollected{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3)}
+.gem-cell.type-D.collected{background:linear-gradient(135deg,#FF6BB033,#FFD93D33);border-color:#FF6BB0}
+.gem-attempts{font-size:9px;color:rgba(255,255,255,.5);position:absolute;bottom:2px;right:3px}
+
+.no-data{text-align:center;padding:60px 20px;color:rgba(255,255,255,.5);background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.15);border-radius:18px}
+.no-data h3{font-size:20px;margin-bottom:10px;color:rgba(255,255,255,.8)}
+
+.hardest-gems{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:20px;margin-bottom:28px}
+.hardest-gems h2{font-size:18px;margin-bottom:14px;color:#FFD93D;letter-spacing:1px}
+.hardest-list{display:grid;gap:8px}
+.hardest-row{display:flex;align-items:center;gap:12px;padding:8px 10px;background:rgba(0,0,0,.2);border-radius:8px}
+.hardest-rank{font-family:'Orbitron',sans-serif;font-weight:900;width:24px;text-align:center;color:#FFD93D}
+.hardest-label{flex:1;font-weight:700}
+.hardest-type{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700;letter-spacing:1px}
+.hardest-type.P{background:rgba(39,215,255,.2);color:#27D7FF}
+.hardest-type.D{background:rgba(255,107,176,.2);color:#FF6BB0}
+.hardest-bar{width:120px;height:8px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden}
+.hardest-fill{height:100%;background:linear-gradient(90deg,#FFD93D,#FF6BB0)}
+.hardest-num{font-family:'Orbitron',sans-serif;font-weight:900;font-size:14px;min-width:30px;text-align:right;color:#fff}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div>
+    <h1>平四寶石獵人 · 老師後臺</h1>
+    <div class="subtitle">CHAPTER 4-2 · 6/3 · 即時答題紀錄</div>
+  </div>
+  <div class="toolbar">
+    <a class="btn btn-go" href="index.html">前往學生網站 →</a>
+    <button class="btn" id="btn-refresh">重新整理</button>
+    <button class="btn btn-warn" id="btn-clear">清空所有紀錄</button>
+  </div>
+</header>
+
+<div class="summary" id="summary"></div>
+<div class="hardest-gems" id="hardest-gems" hidden>
+  <h2>本日「最考倒大家」前三名</h2>
+  <div class="hardest-list" id="hardest-list"></div>
+</div>
+<div class="sessions" id="sessions"></div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'parallelogramGemHunter_v1';
+const HERO_PALETTE = {
+  blade:{main:'#9B5BFF',name:'疾風刃'},
+  rider:{main:'#FF3F8E',name:'流光騎手'},
+  blaster:{main:'#FFB300',name:'轟雷砲手'},
+  mochi:{main:'#FF9EC4',name:'棉花糖'},
+  starcat:{main:'#7C8BFF',name:'星空喵'}
+};
+const GEM_INFO = [
+  {id:1,type:'P',num:1,label:'對角全等'},
+  {id:2,type:'P',num:2,label:'對邊等長'},
+  {id:3,type:'P',num:3,label:'對角相等'},
+  {id:4,type:'P',num:4,label:'對角線互平分'},
+  {id:5,type:'P',num:5,label:'面積四等分'},
+  {id:6,type:'D',num:1,label:'對邊平行→平四'},
+  {id:7,type:'D',num:2,label:'對邊等長→平四'},
+  {id:8,type:'D',num:3,label:'對角相等→平四'},
+  {id:9,type:'D',num:4,label:'對角線互平分→平四'},
+  {id:10,type:'D',num:5,label:'一組對邊平行又等長→平四'}
+];
+
+function loadSessions(){
+  try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch(e){return [];}
+}
+
+function fmtTime(ts){
+  if(!ts) return '-';
+  const d = new Date(ts);
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function fmtDuration(ms){
+  if(!ms||ms<0) return '-';
+  const s = Math.floor(ms/1000);
+  const m = Math.floor(s/60);
+  return m>0 ? `${m}分${s%60}秒` : `${s}秒`;
+}
+
+function render(){
+  const sessions = loadSessions();
+  // summary
+  const total = sessions.length;
+  const completed = sessions.filter(s=>s.completed).length;
+  const totalAttempts = sessions.reduce((a,s)=>a+(s.totalAttempts||0),0);
+  const totalCorrect = sessions.reduce((a,s)=>a+(s.attempts||[]).filter(a=>a.correct).length,0);
+  const accuracy = totalAttempts>0 ? Math.round(totalCorrect*100/totalAttempts) : 0;
+  // MVP: most attempts (effort award)
+  let mvpName = '-';
+  if(sessions.length>0){
+    const sorted = [...sessions].sort((a,b)=>(b.totalAttempts||0)-(a.totalAttempts||0));
+    mvpName = sorted[0].name;
+  }
+  document.getElementById('summary').innerHTML = `
+    <div class="summary-card"><div class="summary-label">本日玩家</div><div class="summary-value">${total}</div></div>
+    <div class="summary-card"><div class="summary-label">完成蒐集</div><div class="summary-value">${completed}</div></div>
+    <div class="summary-card"><div class="summary-label">總答題數</div><div class="summary-value">${totalAttempts}</div></div>
+    <div class="summary-card"><div class="summary-label">總正確率</div><div class="summary-value">${accuracy}%</div></div>
+    <div class="summary-card"><div class="summary-label">最努力獎</div><div class="summary-value" style="font-size:20px">${mvpName}</div></div>
+  `;
+  // hardest gems aggregate
+  const hardestBox = document.getElementById('hardest-gems');
+  if(sessions.length>0){
+    const wrongCounts = Array(10).fill(0);
+    sessions.forEach(s=>(s.attempts||[]).forEach(a=>{ if(!a.correct) wrongCounts[a.gemId-1]++; }));
+    const ranked = GEM_INFO.map((g,i)=>({...g,wrong:wrongCounts[i]})).sort((a,b)=>b.wrong-a.wrong).slice(0,3);
+    if(ranked[0].wrong>0){
+      hardestBox.hidden = false;
+      const max = ranked[0].wrong;
+      document.getElementById('hardest-list').innerHTML = ranked.map((g,i)=>`
+        <div class="hardest-row">
+          <div class="hardest-rank">${i+1}</div>
+          <div class="hardest-type ${g.type}">${g.type==='P'?'性質':'判別'} ${g.num}</div>
+          <div class="hardest-label">${g.label}</div>
+          <div class="hardest-bar"><div class="hardest-fill" style="width:${(g.wrong/max)*100}%"></div></div>
+          <div class="hardest-num">${g.wrong} 次</div>
+        </div>`).join('');
+    } else {
+      hardestBox.hidden = true;
+    }
+  } else {
+    hardestBox.hidden = true;
+  }
+  // sessions
+  const wrap = document.getElementById('sessions');
+  if(sessions.length===0){
+    wrap.innerHTML = `<div class="no-data"><h3>還沒有玩家紀錄</h3><div>請學生先在<a href="index.html" style="color:#27D7FF">學生網站</a>輸入名字、開始挑戰</div></div>`;
+    return;
+  }
+  const sorted = [...sessions].sort((a,b)=>(b.startTime||0)-(a.startTime||0));
+  wrap.innerHTML = sorted.map(s=>{
+    const hero = HERO_PALETTE[s.hero]||{main:'#fff',name:s.heroName||'?'};
+    const duration = s.endTime ? s.endTime-s.startTime : 0;
+    const gemAttempts = {};
+    (s.attempts||[]).forEach(a=>{
+      gemAttempts[a.gemId] = (gemAttempts[a.gemId]||0)+1;
+    });
+    const gemCells = GEM_INFO.map(g=>{
+      const got = (s.gemsCollected||[]).includes(g.id);
+      const att = gemAttempts[g.id]||0;
+      return `<div class="gem-cell ${got?'collected':'uncollected'} type-${g.type}" title="${g.label}">${g.type==='P'?'性':'判'}${g.num}${att>0?`<span class="gem-attempts">${att}試</span>`:''}</div>`;
+    }).join('');
+    const wrongCount = (s.attempts||[]).filter(a=>!a.correct).length;
+    return `
+      <div class="session">
+        <div class="session-head">
+          <div class="session-name">${s.name}</div>
+          <div class="hero-pill" style="color:${hero.main}">${hero.name}</div>
+          <div class="session-meta">
+            開始 ${fmtTime(s.startTime)}<br>
+            ${s.endTime?`結束 ${fmtTime(s.endTime)} · 耗時 ${fmtDuration(duration)}`:'進行中...'}
+          </div>
+        </div>
+        <div class="session-stats">
+          <div class="stat-box"><div class="stat-box-label">寶石</div><div class="stat-box-value">${(s.gemsCollected||[]).length}/10</div></div>
+          <div class="stat-box"><div class="stat-box-label">挑戰次數</div><div class="stat-box-value">${s.totalAttempts||0}</div></div>
+          <div class="stat-box"><div class="stat-box-label">答錯次數</div><div class="stat-box-value">${wrongCount}</div></div>
+          <div class="stat-box"><div class="stat-box-label">狀態</div><div class="stat-box-value" style="color:${s.completed?'#FFD93D':'#27D7FF'}">${s.completed?'完成':'進行中'}</div></div>
+        </div>
+        <div class="gem-grid">${gemCells}</div>
+      </div>`;
+  }).join('');
+}
+
+document.getElementById('btn-refresh').addEventListener('click',render);
+document.getElementById('btn-clear').addEventListener('click',()=>{
+  if(!confirm('確定要清空所有玩家紀錄嗎？（這個動作無法復原）')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  render();
+});
+
+// auto-refresh every 4 seconds while open
+render();
+setInterval(render,4000);
+</script>
+</body>
+</html>

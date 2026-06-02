@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>平四寶石獵人</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans TC',sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 100%);position:relative}
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
+#app{position:relative;z-index:1;height:100vh;width:100vw;overflow:hidden}
+.view{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s}
+.view.active{opacity:1;pointer-events:auto}
+.btn-primary{background:linear-gradient(135deg,#7B61FF,#27D7FF);color:#fff;border:none;padding:18px 42px;border-radius:999px;font-family:inherit;font-weight:900;font-size:22px;cursor:pointer;letter-spacing:.5px;box-shadow:0 12px 32px rgba(123,97,255,.4),inset 0 -4px 0 rgba(0,0,0,.2);transition:transform .15s,box-shadow .15s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(123,97,255,.55),inset 0 -4px 0 rgba(0,0,0,.2)}
+.btn-primary:active{transform:translateY(1px)}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn-secondary{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2);padding:10px 22px;border-radius:999px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;backdrop-filter:blur(10px)}
+.btn-secondary:hover{background:rgba(255,255,255,.16)}
+
+/* ====== START VIEW ====== */
+.start-container{text-align:center;max-width:560px;width:100%}
+.title-badge{display:inline-block;padding:6px 18px;background:linear-gradient(90deg,#FFD93D,#FF6BB0);color:#1a0b3d;border-radius:999px;font-family:'Orbitron',sans-serif;font-weight:900;font-size:14px;letter-spacing:3px;margin-bottom:18px}
+.game-title{font-size:80px;font-weight:900;letter-spacing:-2px;line-height:1;background:linear-gradient(180deg,#fff 30%,#9B5BFF 90%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 8px 24px rgba(155,91,255,.5));margin-bottom:12px}
+.game-title .accent{background:linear-gradient(180deg,#FFD93D 30%,#FF6BB0 90%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:20px;color:rgba(255,255,255,.75);margin-bottom:48px;letter-spacing:1px}
+.name-block{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:32px;margin-bottom:24px}
+.name-block label{display:block;font-size:16px;color:rgba(255,255,255,.7);margin-bottom:12px;letter-spacing:1px}
+#player-name{width:100%;background:rgba(0,0,0,.3);border:2px solid rgba(255,255,255,.15);color:#fff;padding:16px 20px;border-radius:14px;font-family:inherit;font-weight:700;font-size:22px;text-align:center;margin-bottom:20px;outline:none;transition:border-color .2s}
+#player-name:focus{border-color:#27D7FF}
+.start-footer{color:rgba(255,255,255,.4);font-size:13px;margin-top:8px}
+
+/* ====== PICK VIEW ====== */
+.pick-header{text-align:center;margin-bottom:32px}
+.pick-header h2{font-size:42px;font-weight:900;margin-bottom:8px;background:linear-gradient(135deg,#fff,#FFD93D);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.pick-header p{color:rgba(255,255,255,.65);font-size:16px}
+.hero-row{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-bottom:32px;max-width:1100px}
+.hero-card{position:relative;width:170px;height:240px;perspective:1000px;cursor:pointer;transition:transform .2s}
+.hero-card:hover{transform:translateY(-4px)}
+.hero-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.4,0,.2,1)}
+.hero-card.flipped .hero-card-inner{transform:rotateY(180deg)}
+.hero-card-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;flex-direction:column;overflow:hidden}
+.hero-card-back{background:linear-gradient(135deg,#2c1854,#1a0b3d);border:2px solid rgba(155,91,255,.4);align-items:center;justify-content:center;text-align:center}
+.hero-card-back::before{content:"?";font-family:'Orbitron',sans-serif;font-size:120px;font-weight:900;color:rgba(155,91,255,.5);text-shadow:0 0 30px rgba(155,91,255,.6)}
+.hero-card-back::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,transparent 40%,rgba(155,91,255,.15) 70%);pointer-events:none}
+.hero-card-front{transform:rotateY(180deg);align-items:center;padding:14px;border:2px solid var(--hero-main);background:linear-gradient(180deg,var(--hero-bg-1),var(--hero-bg-2))}
+.hero-avatar{width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin:8px 0 12px;box-shadow:0 0 24px var(--hero-glow);overflow:hidden}
+.hero-avatar svg{width:100%;height:100%}
+.hero-name{font-weight:900;font-size:20px;margin-bottom:6px;text-align:center}
+.hero-tag{font-size:11px;text-align:center;color:rgba(255,255,255,.85);line-height:1.4;min-height:32px}
+.hero-card.selected{transform:translateY(-12px) scale(1.05)}
+.hero-card.selected .hero-card-front{box-shadow:0 0 40px var(--hero-glow),0 20px 50px rgba(0,0,0,.5)}
+.hero-card.dim{opacity:.35;transform:scale(.95)}
+
+/* ====== GAME VIEW ====== */
+.view-game{justify-content:flex-start;padding:0}
+.game-hud{width:100%;display:flex;align-items:center;gap:16px;padding:14px 24px;background:linear-gradient(180deg,rgba(0,0,0,.5),transparent);backdrop-filter:blur(8px);position:relative;z-index:5}
+.hud-hero-card{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.08);padding:8px 16px 8px 8px;border-radius:14px;border:1px solid var(--hero-main,#7B61FF)}
+.hud-hero-avatar{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);overflow:hidden;flex-shrink:0}
+.hud-hero-avatar svg{width:100%;height:100%}
+.hud-hero-name{font-weight:900;font-size:16px;color:var(--hero-main,#fff)}
+.hud-player-name{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px}
+.hud-center{flex:1;max-width:480px}
+.hud-progress-label{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:2px;margin-bottom:4px;text-align:center}
+.hud-progress-bar{position:relative;width:100%;height:24px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
+.hud-progress-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#27D7FF,#9B5BFF,#FF6BB0);border-radius:999px;box-shadow:0 0 16px rgba(155,91,255,.6);transition:width .8s cubic-bezier(.4,0,.2,1)}
+.hud-progress-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.hud-stars{font-weight:900;font-size:18px;color:#FFD93D;text-shadow:0 0 12px rgba(255,217,61,.5);min-width:60px;text-align:right}
+
+.gem-map-wrap{flex:1;width:100%;position:relative;display:flex;align-items:center;justify-content:center}
+.gem-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.gem-map{position:absolute;inset:0;width:100%;height:100%}
+.gem-node{position:absolute;transform:translate(-50%,-50%);cursor:pointer;text-align:center}
+.gem-node-shape{width:64px;height:64px;display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}
+.gem-node-shape svg{width:100%;height:100%;overflow:visible}
+.gem-node-label{margin-top:6px;font-size:11px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(0,0,0,.5);padding:2px 8px;border-radius:8px;backdrop-filter:blur(6px);white-space:nowrap}
+.gem-node.collected .gem-node-shape{animation:gemPulse 2s ease-in-out infinite}
+.gem-node.collected .gem-node-shape::after{content:"★";position:absolute;top:-8px;right:-8px;background:#FFD93D;color:#1a0b3d;width:22px;height:22px;border-radius:50%;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(255,217,61,.7)}
+.gem-node:not(.collected):hover .gem-node-shape{transform:scale(1.15) rotate(6deg);transition:transform .25s}
+.gem-node.collected{opacity:.85}
+@keyframes gemPulse{0%,100%{filter:drop-shadow(0 4px 12px rgba(0,0,0,.4)) brightness(1)}50%{filter:drop-shadow(0 4px 18px var(--gem-glow,rgba(255,255,255,.5))) brightness(1.2)}}
+.gem-node.pulse-hint .gem-node-shape{animation:hintPulse 1.6s ease-in-out infinite}
+@keyframes hintPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.gem-hint{position:absolute;bottom:24px;color:rgba(255,255,255,.55);font-size:14px;letter-spacing:2px}
+
+/* ====== GEM MODAL ====== */
+.gem-modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay{position:absolute;inset:0;background:rgba(2,1,15,.85);backdrop-filter:blur(8px)}
+.modal-content{position:relative;width:min(620px,100%);max-height:92vh;overflow:hidden;border-radius:28px;background:linear-gradient(180deg,#1a0b3d,#0a0625);border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 40px var(--gem-glow,rgba(155,91,255,.3));display:flex;flex-direction:column}
+.modal-close{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;border:none;font-size:22px;cursor:pointer;z-index:2;line-height:1}
+.modal-close:hover{background:rgba(255,255,255,.2)}
+.modal-stage{padding:32px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.gem-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:2px;margin-bottom:8px;font-family:'Orbitron',sans-serif}
+.gem-badge.type-P{background:rgba(39,215,255,.15);color:#27D7FF;border:1px solid #27D7FF}
+.gem-badge.type-D{background:rgba(255,107,176,.15);color:#FF6BB0;border:1px solid #FF6BB0}
+.gem-rarity{padding:2px 10px;border-radius:8px;font-size:10px;letter-spacing:1px;margin-left:6px}
+.rarity-common{background:rgba(255,255,255,.15)}
+.rarity-rare{background:rgba(39,215,255,.3);color:#27D7FF}
+.rarity-epic{background:rgba(155,91,255,.3);color:#B47BFF}
+.rarity-legendary{background:linear-gradient(90deg,#FFD93D,#FF6BB0);color:#1a0b3d}
+.gem-title{font-size:32px;font-weight:900;margin-bottom:16px;letter-spacing:1px}
+.gem-svg-area{width:100%;max-width:440px;aspect-ratio:5/3;background:rgba(0,0,0,.4);border-radius:16px;padding:14px;margin-bottom:18px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.08)}
+.gem-svg-area svg{width:100%;height:100%}
+.gem-plain{font-size:22px;font-weight:700;color:#FFD93D;margin-bottom:14px;line-height:1.4;padding:0 12px}
+.gem-life{font-size:14px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.15);padding:10px 18px;border-radius:12px;margin-bottom:20px;max-width:420px}
+.gem-life::before{content:"生活實例 · ";color:#27D7FF;font-weight:700}
+
+.question-prompt{font-size:22px;font-weight:700;margin-bottom:24px;line-height:1.5;padding:0 12px;max-width:520px}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:520px}
+.option-btn{background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);color:#fff;padding:18px 16px;border-radius:14px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer;text-align:left;display:flex;gap:12px;align-items:center;transition:all .2s}
+.option-btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);transform:translateY(-2px)}
+.option-letter{flex-shrink:0;width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:900;font-family:'Orbitron',sans-serif;font-size:14px}
+.option-btn.correct{background:rgba(39,215,255,.2);border-color:#27D7FF;animation:correctPop .4s ease}
+.option-btn.correct .option-letter{background:#27D7FF;color:#1a0b3d}
+.option-btn.wrong{background:rgba(255,107,176,.15);border-color:#FF6BB0;animation:wrongShake .35s ease}
+@keyframes correctPop{0%{transform:scale(1)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}}
+
+.result-icon{font-size:84px;margin-bottom:14px;font-family:'Orbitron',sans-serif;font-weight:900}
+.result-text{font-size:26px;font-weight:900;margin-bottom:8px}
+.result-skill{font-size:14px;color:rgba(255,255,255,.7);margin-bottom:24px;font-style:italic}
+
+/* ====== END VIEW ====== */
+.end-container{text-align:center;max-width:640px}
+.end-title{font-size:48px;font-weight:900;background:linear-gradient(135deg,#FFD93D,#FF6BB0,#27D7FF);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px;filter:drop-shadow(0 4px 16px rgba(255,217,61,.4))}
+.end-gem-display{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:28px;max-width:520px;margin-left:auto;margin-right:auto}
+.end-gem{width:48px;height:48px;animation:gemSpin 4s linear infinite}
+@keyframes gemSpin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.end-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;width:100%}
+.end-stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px}
+.end-stat-label{font-size:12px;color:rgba(255,255,255,.5);letter-spacing:2px;margin-bottom:6px}
+.end-stat-value{font-size:24px;font-weight:900;color:#FFD93D}
+.end-next-step{font-size:18px;color:#fff;background:rgba(255,217,61,.1);border:1px solid #FFD93D;border-radius:14px;padding:16px;margin-bottom:24px;line-height:1.6}
+.end-next-step strong{color:#FFD93D;font-size:22px}
+
+.floating-restart{position:fixed;bottom:20px;right:20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 18px;border-radius:999px;font-family:inherit;font-weight:700;font-size:13px;cursor:pointer;backdrop-filter:blur(10px);z-index:50}
+.floating-restart:hover{background:rgba(255,255,255,.2)}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width:768px){
+  .game-title{font-size:54px}
+  .subtitle{font-size:16px;margin-bottom:32px}
+  .hero-row{gap:10px}
+  .hero-card{width:120px;height:180px}
+  .hero-card-back::before{font-size:80px}
+  .hero-avatar{width:80px;height:80px}
+  .hero-name{font-size:16px}
+  .hero-tag{font-size:10px}
+  .gem-node-shape{width:54px;height:54px}
+  .gem-title{font-size:24px}
+  .gem-plain{font-size:18px}
+  .question-prompt{font-size:18px}
+  .options-grid{grid-template-columns:1fr}
+  .end-title{font-size:32px}
+  .end-stats{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .end-stat{padding:12px}
+  .end-stat-value{font-size:18px}
+  .hud-hero-name{font-size:14px}
+  .hud-hero-avatar{width:36px;height:36px}
+}
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+<div id="app">
+
+<section class="view view-start active" id="view-start">
+  <div class="start-container">
+    <div class="title-block">
+      <div class="title-badge">CHAPTER 4-2 · 0603</div>
+      <h1 class="game-title">平四<span class="accent">寶石獵人</span></h1>
+      <p class="subtitle">10 顆寶石，等你來蒐藏</p>
+    </div>
+    <div class="name-block">
+      <button class="btn-primary" id="btn-go-pick">開始挑戰 →</button>
+    </div>
+    <div class="start-footer">5 位玩家輪流，每人約 5～8 分鐘</div>
+  </div>
+</section>
+
+<section class="view view-pick" id="view-pick">
+  <div class="pick-header">
+    <h2>抽英雄盲盒</h2>
+    <p>點任一張卡片，揭曉你的英雄</p>
+  </div>
+  <div class="hero-row" id="hero-row"></div>
+  <button class="btn-primary" id="btn-confirm-hero" disabled>就決定是你了 →</button>
+</section>
+
+<section class="view view-game" id="view-game">
+  <header class="game-hud">
+    <div class="hud-hero-card" id="hud-hero-card">
+      <div class="hud-hero-avatar" id="hud-hero-avatar"></div>
+      <div>
+        <div class="hud-hero-name" id="hud-hero-name"></div>
+        <div class="hud-player-name" id="hud-player-name"></div>
+      </div>
+    </div>
+    <div class="hud-center">
+      <div class="hud-progress-label">寶石蒐集</div>
+      <div class="hud-progress-bar">
+        <div class="hud-progress-fill" id="hud-progress-fill"></div>
+        <div class="hud-progress-text" id="hud-progress-text">0 / 10</div>
+      </div>
+    </div>
+    <div class="hud-stars" id="hud-stars">★ 0</div>
+  </header>
+
+  <div class="gem-map-wrap">
+    <svg class="gem-lines" id="gem-lines" preserveAspectRatio="none"></svg>
+    <div class="gem-map" id="gem-map"></div>
+  </div>
+  <div class="gem-hint" id="gem-hint">點任一顆寶石開始挑戰</div>
+</section>
+
+<section class="view view-end" id="view-end">
+  <div class="end-container">
+    <h2 class="end-title">10 顆寶石全部到手！</h2>
+    <div class="end-gem-display" id="end-gem-display"></div>
+    <div class="end-stats">
+      <div class="end-stat"><div class="end-stat-label">你的英雄</div><div class="end-stat-value" id="end-hero-name">-</div></div>
+      <div class="end-stat"><div class="end-stat-label">寶石</div><div class="end-stat-value" id="end-stars">10/10</div></div>
+      <div class="end-stat"><div class="end-stat-label">挑戰次數</div><div class="end-stat-value" id="end-attempts">0</div></div>
+    </div>
+    <p class="end-next-step">下一步：翻開課本 <strong>P.213</strong>，老師會帶你們挑戰自我評量！</p>
+    <button class="btn-primary" id="btn-restart">換下一位玩家 →</button>
+  </div>
+</section>
+
+<div class="gem-modal" id="gem-modal" hidden>
+  <div class="modal-overlay"></div>
+  <div class="modal-content" id="modal-content">
+    <button class="modal-close" id="modal-close">×</button>
+    <div class="modal-stage stage-reveal" id="stage-reveal">
+      <div class="gem-badge" id="gem-badge"></div>
+      <h3 class="gem-title" id="gem-title"></h3>
+      <div class="gem-svg-area" id="gem-svg-area"></div>
+      <p class="gem-plain" id="gem-plain"></p>
+      <div class="gem-life" id="gem-life"></div>
+      <button class="btn-primary" id="btn-to-question">開始挑戰 →</button>
+    </div>
+    <div class="modal-stage stage-question" id="stage-question" hidden>
+      <div class="gem-badge" id="gem-badge-q"></div>
+      <p class="question-prompt" id="question-prompt"></p>
+      <div class="options-grid" id="options-grid"></div>
+    </div>
+    <div class="modal-stage stage-result" id="stage-result" hidden>
+      <div class="result-icon" id="result-icon">★</div>
+      <div class="result-text" id="result-text"></div>
+      <div class="result-skill" id="result-skill"></div>
+      <button class="btn-primary" id="btn-result-next">收下寶石 →</button>
+    </div>
+  </div>
+</div>
+
+<button class="floating-restart" id="floating-restart" hidden>換玩家</button>
+</div>
+
+<script>
+/* ============================================================
+   平四寶石獵人 · 遊戲核心
+   ============================================================ */
+
+const STORAGE_KEY = 'parallelogramGemHunter_v1';
+
+/* ---------- HERO DATA ---------- */
+const HEROES = [
+  {
+    id:'blade',name:'疾風刃',tag:'對角永不背叛！',
+    palette:{main:'#9B5BFF',accent:'#27D7FF',glow:'rgba(155,91,255,.7)',bg1:'#2c1854',bg2:'#0d0428'},
+    skillName:'紫光斜斬',skillKind:'slash',
+    avatar:`<svg viewBox="0 0 120 120"><defs><linearGradient id="bld" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9B5BFF"/><stop offset="1" stop-color="#27D7FF"/></linearGradient></defs><circle cx="60" cy="60" r="50" fill="#1a0b3d"/><path d="M60 28 L48 50 L48 76 Q60 86 72 76 L72 50 Z" fill="url(#bld)"/><circle cx="60" cy="58" r="8" fill="#02010f"/><path d="M82 30 L102 50 L52 100 L32 80 Z" fill="#27D7FF" opacity=".7"/><path d="M82 30 L102 50" stroke="#fff" stroke-width="2"/></svg>`
+  },
+  {
+    id:'rider',name:'流光騎手',tag:'兩條交叉，極速通關！',
+    palette:{main:'#FF3F8E',accent:'#00E5FF',glow:'rgba(255,63,142,.7)',bg1:'#4a0d36',bg2:'#1a0420'},
+    skillName:'光速衝刺',skillKind:'speedline',
+    avatar:`<svg viewBox="0 0 120 120"><defs><linearGradient id="rdr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF3F8E"/><stop offset="1" stop-color="#00E5FF"/></linearGradient></defs><circle cx="60" cy="60" r="50" fill="#1a0b3d"/><path d="M30 60 Q30 30 60 30 Q90 30 90 60 L90 80 Q60 96 30 80 Z" fill="url(#rdr)"/><rect x="36" y="52" width="48" height="16" rx="2" fill="#02010f"/><rect x="38" y="54" width="44" height="12" fill="#00E5FF" opacity=".6"/><circle cx="48" cy="60" r="3" fill="#fff"/><circle cx="72" cy="60" r="3" fill="#fff"/></svg>`
+  },
+  {
+    id:'blaster',name:'轟雷砲手',tag:'一發入魂，邊邊全等！',
+    palette:{main:'#FFB300',accent:'#FF5C00',glow:'rgba(255,179,0,.7)',bg1:'#4a2a05',bg2:'#1a0c00'},
+    skillName:'爆裂衝擊',skillKind:'explosion',
+    avatar:`<svg viewBox="0 0 120 120"><defs><radialGradient id="blt"><stop offset="0" stop-color="#FFD24A"/><stop offset="1" stop-color="#FF5C00"/></radialGradient></defs><circle cx="60" cy="60" r="50" fill="#1a0b3d"/><circle cx="60" cy="60" r="34" fill="url(#blt)"/><rect x="58" y="22" width="20" height="40" fill="#3a1900" transform="rotate(20 68 42)"/><rect x="60" y="22" width="14" height="36" fill="#FF5C00" transform="rotate(20 68 42)"/><circle cx="60" cy="60" r="10" fill="#02010f"/><circle cx="60" cy="60" r="6" fill="#FFD24A"/></svg>`
+  },
+  {
+    id:'mochi',name:'棉花糖',tag:'呼～四個邊邊抱抱～',
+    palette:{main:'#FF9EC4',accent:'#FFE8B3',glow:'rgba(255,158,196,.7)',bg1:'#4a2238',bg2:'#1a0a18'},
+    skillName:'軟綿綿光波',skillKind:'hearts',
+    avatar:`<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="#1a0b3d"/><ellipse cx="42" cy="36" rx="10" ry="20" fill="#FFC8DD" transform="rotate(-15 42 36)"/><ellipse cx="78" cy="36" rx="10" ry="20" fill="#FFC8DD" transform="rotate(15 78 36)"/><ellipse cx="42" cy="38" rx="5" ry="12" fill="#FF9EC4" transform="rotate(-15 42 38)"/><ellipse cx="78" cy="38" rx="5" ry="12" fill="#FF9EC4" transform="rotate(15 78 38)"/><circle cx="60" cy="68" r="30" fill="#FFE8F0"/><circle cx="50" cy="64" r="3" fill="#1a0b3d"/><circle cx="70" cy="64" r="3" fill="#1a0b3d"/><circle cx="46" cy="72" r="4" fill="#FFB3D1"/><circle cx="74" cy="72" r="4" fill="#FFB3D1"/><path d="M54 76 Q60 80 66 76" stroke="#1a0b3d" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`
+  },
+  {
+    id:'starcat',name:'星空喵',tag:'對角的角一樣大喵！',
+    palette:{main:'#7C8BFF',accent:'#FFD93D',glow:'rgba(124,139,255,.7)',bg1:'#1d2370',bg2:'#080a30'},
+    skillName:'星塵旋舞',skillKind:'stardust',
+    avatar:`<svg viewBox="0 0 120 120"><defs><radialGradient id="sct"><stop offset="0" stop-color="#7C8BFF"/><stop offset="1" stop-color="#1a0b3d"/></radialGradient></defs><circle cx="60" cy="60" r="50" fill="url(#sct)"/><polygon points="38,28 46,46 32,46" fill="#4D5DFA"/><polygon points="82,28 74,46 88,46" fill="#4D5DFA"/><circle cx="60" cy="62" r="28" fill="#3a4280"/><circle cx="60" cy="62" r="24" fill="#1d2370"/><ellipse cx="50" cy="58" rx="3" ry="5" fill="#FFD93D"/><ellipse cx="70" cy="58" rx="3" ry="5" fill="#FFD93D"/><path d="M54 70 Q60 74 66 70" stroke="#FFD93D" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="30" cy="40" r="2" fill="#FFD93D"/><circle cx="92" cy="48" r="1.5" fill="#FFD93D"/><circle cx="86" cy="84" r="2" fill="#FFD93D"/><circle cx="26" cy="78" r="1.5" fill="#FFD93D"/></svg>`
+  }
+];
+
+/* ---------- PARALLELOGRAM VERTICES (consistent across gems) ---------- */
+const PG = {A:{x:90,y:62},B:{x:300,y:62},C:{x:330,y:200},D:{x:120,y:200}};
+const pgPath = `M${PG.A.x},${PG.A.y} L${PG.B.x},${PG.B.y} L${PG.C.x},${PG.C.y} L${PG.D.x},${PG.D.y} Z`;
+
+function gemSVG(opts){
+  return `<svg viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1a0b3d" stop-opacity=".3"/>
+        <stop offset="1" stop-color="#02010f" stop-opacity=".1"/>
+      </linearGradient>
+      <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <rect width="420" height="260" fill="url(#bg)"/>
+    ${opts.content}
+    <g font-family="Orbitron,sans-serif" font-size="14" font-weight="900" fill="#fff" opacity=".85">
+      <text x="${PG.A.x-12}" y="${PG.A.y-6}">A</text>
+      <text x="${PG.B.x+4}" y="${PG.B.y-6}">B</text>
+      <text x="${PG.C.x+4}" y="${PG.C.y+18}">C</text>
+      <text x="${PG.D.x-16}" y="${PG.D.y+18}">D</text>
+    </g>
+  </svg>`;
+}
+
+function basePG(strokeOpts=''){
+  return `<path d="${pgPath}" fill="rgba(155,91,255,.06)" stroke="rgba(255,255,255,.35)" stroke-width="2" ${strokeOpts}/>`;
+}
+
+/* ---------- GEM DATA (10 gems) ---------- */
+const GEMS = [
+  {
+    id:1,type:'P',num:1,label:'對角全等',rarity:'common',color:'#27D7FF',
+    plain:'斜切一刀，兩塊一模一樣',
+    life:'像把一張長方形紙斜對角折一下，兩塊三角形完全重合。',
+    drawSVG:()=>gemSVG({content:`
+      ${basePG()}
+      <polygon points="${PG.A.x},${PG.A.y} ${PG.B.x},${PG.B.y} ${PG.C.x},${PG.C.y}" fill="rgba(39,215,255,.25)" stroke="#27D7FF" stroke-width="2.5">
+        <animate attributeName="opacity" values="0;1;1" dur="1.4s" begin="0s" fill="freeze"/>
+      </polygon>
+      <polygon points="${PG.A.x},${PG.A.y} ${PG.C.x},${PG.C.y} ${PG.D.x},${PG.D.y}" fill="rgba(155,91,255,.25)" stroke="#9B5BFF" stroke-width="2.5">
+        <animate attributeName="opacity" values="0;0;1" dur="2.2s" begin="0s" fill="freeze"/>
+      </polygon>
+      <line x1="${PG.A.x}" y1="${PG.A.y}" x2="${PG.C.x}" y2="${PG.C.y}" stroke="#FFD93D" stroke-width="3" stroke-dasharray="6 4" filter="url(#glow)">
+        <animate attributeName="stroke-dashoffset" from="60" to="0" dur="1.2s" fill="freeze"/>
+      </line>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">△ABC ≅ △ACD</text>
+    `}),
+    q:{prompt:'平四 ABCD 被對角線 AC 切開，△ABC 和 △ACD 的關係是？',
+       opts:['一模一樣（全等）','大小不同','左右相反不同','看角度而定'],correct:0}
+  },
+  {
+    id:2,type:'P',num:2,label:'對邊等長',rarity:'common',color:'#27D7FF',
+    plain:'上下一樣長、左右一樣長',
+    life:'卡車後面的尾門打開，看起來就是個平四—兩根橫桿一樣長、兩根斜桿也一樣長。',
+    drawSVG:()=>gemSVG({content:`
+      ${basePG()}
+      <line x1="${PG.A.x}" y1="${PG.A.y}" x2="${PG.B.x}" y2="${PG.B.y}" stroke="#27D7FF" stroke-width="5">
+        <animate attributeName="stroke-dasharray" values="0,300;300,0" dur=".8s" fill="freeze"/>
+      </line>
+      <line x1="${PG.D.x}" y1="${PG.D.y}" x2="${PG.C.x}" y2="${PG.C.y}" stroke="#27D7FF" stroke-width="5">
+        <animate attributeName="stroke-dasharray" values="0,300;300,0" dur=".8s" begin=".1s" fill="freeze"/>
+      </line>
+      <line x1="${PG.A.x}" y1="${PG.A.y}" x2="${PG.D.x}" y2="${PG.D.y}" stroke="#FF6BB0" stroke-width="5">
+        <animate attributeName="stroke-dasharray" values="0,300;300,0" dur=".8s" begin=".7s" fill="freeze"/>
+      </line>
+      <line x1="${PG.B.x}" y1="${PG.B.y}" x2="${PG.C.x}" y2="${PG.C.y}" stroke="#FF6BB0" stroke-width="5">
+        <animate attributeName="stroke-dasharray" values="0,300;300,0" dur=".8s" begin=".9s" fill="freeze"/>
+      </line>
+      <g font-size="14" font-weight="900">
+        <text x="195" y="50" fill="#27D7FF" text-anchor="middle">＝</text>
+        <text x="225" y="222" fill="#27D7FF" text-anchor="middle">＝</text>
+        <text x="92" y="135" fill="#FF6BB0" text-anchor="middle">∥</text>
+        <text x="328" y="135" fill="#FF6BB0" text-anchor="middle">∥</text>
+      </g>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">AB=DC, AD=BC</text>
+    `}),
+    q:{prompt:'平四 ABCD 中，AB＝8 公分，那 DC＝？',opts:['4 公分','6 公分','8 公分','10 公分'],correct:2}
+  },
+  {
+    id:3,type:'P',num:3,label:'對角相等',rarity:'rare',color:'#27D7FF',
+    plain:'斜對面的角，一樣大',
+    life:'拉門上下打開時，兩個對角永遠保持一樣大。',
+    drawSVG:()=>gemSVG({content:`
+      ${basePG()}
+      <path d="M ${PG.A.x+10},${PG.A.y+6} A 20,20 0 0 1 ${PG.A.x+22},${PG.A.y+18}" stroke="#27D7FF" stroke-width="3" fill="none"/>
+      <path d="M ${PG.C.x-10},${PG.C.y-6} A 20,20 0 0 1 ${PG.C.x-22},${PG.C.y-18}" stroke="#27D7FF" stroke-width="3" fill="none"/>
+      <path d="M ${PG.B.x-10},${PG.B.y+6} A 16,16 0 0 0 ${PG.B.x-22},${PG.B.y+14}" stroke="#FF6BB0" stroke-width="3" fill="none"/>
+      <path d="M ${PG.D.x+10},${PG.D.y-6} A 16,16 0 0 0 ${PG.D.x+22},${PG.D.y-14}" stroke="#FF6BB0" stroke-width="3" fill="none"/>
+      <g font-size="14" font-weight="900">
+        <text x="${PG.A.x+24}" y="${PG.A.y+22}" fill="#27D7FF">∠A</text>
+        <text x="${PG.C.x-44}" y="${PG.C.y-22}" fill="#27D7FF">∠C</text>
+        <text x="${PG.B.x-44}" y="${PG.B.y+22}" fill="#FF6BB0">∠B</text>
+        <text x="${PG.D.x+24}" y="${PG.D.y-18}" fill="#FF6BB0">∠D</text>
+      </g>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">∠A=∠C, ∠B=∠D</text>
+    `}),
+    q:{prompt:'平四 ABCD 中，∠A＝70°，那 ∠C＝？',opts:['70°','110°','90°','180°'],correct:0}
+  },
+  {
+    id:4,type:'P',num:4,label:'對角線互平分',rarity:'rare',color:'#27D7FF',
+    plain:'對角線交叉的點，剛好在正中間',
+    life:'剪刀的兩片刀，交叉處剛好在「軸心」—兩邊一樣長。',
+    drawSVG:()=>{
+      const Ox=(PG.A.x+PG.C.x)/2, Oy=(PG.A.y+PG.C.y)/2;
+      return gemSVG({content:`
+        ${basePG()}
+        <line x1="${PG.A.x}" y1="${PG.A.y}" x2="${PG.C.x}" y2="${PG.C.y}" stroke="#27D7FF" stroke-width="2.5"/>
+        <line x1="${PG.B.x}" y1="${PG.B.y}" x2="${PG.D.x}" y2="${PG.D.y}" stroke="#FF6BB0" stroke-width="2.5"/>
+        <circle cx="${Ox}" cy="${Oy}" r="7" fill="#FFD93D" filter="url(#glow)">
+          <animate attributeName="r" values="0;10;7" dur="1s" fill="freeze"/>
+        </circle>
+        <text x="${Ox+10}" y="${Oy-10}" fill="#FFD93D" font-size="16" font-weight="900">O</text>
+        <text x="${(PG.A.x+Ox)/2-8}" y="${(PG.A.y+Oy)/2-6}" fill="#27D7FF" font-size="12" font-weight="700">AO</text>
+        <text x="${(PG.C.x+Ox)/2+4}" y="${(PG.C.y+Oy)/2+12}" fill="#27D7FF" font-size="12" font-weight="700">OC</text>
+        <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">AO=OC, BO=OD</text>
+      `});
+    },
+    q:{prompt:'平四對角線 AC＝10，O 為交點，AO＝？',opts:['4','5','8','10'],correct:1}
+  },
+  {
+    id:5,type:'P',num:5,label:'面積四等分',rarity:'epic',color:'#27D7FF',
+    plain:'對角線切成 4 塊三角形，一樣大',
+    life:'披薩用兩條對角線切成 4 塊，每塊面積相同。',
+    drawSVG:()=>{
+      const Ox=(PG.A.x+PG.C.x)/2, Oy=(PG.A.y+PG.C.y)/2;
+      return gemSVG({content:`
+        ${basePG()}
+        <polygon points="${PG.A.x},${PG.A.y} ${PG.B.x},${PG.B.y} ${Ox},${Oy}" fill="rgba(39,215,255,.3)" stroke="#27D7FF" stroke-width="1.5"/>
+        <polygon points="${PG.B.x},${PG.B.y} ${PG.C.x},${PG.C.y} ${Ox},${Oy}" fill="rgba(155,91,255,.3)" stroke="#9B5BFF" stroke-width="1.5"/>
+        <polygon points="${PG.C.x},${PG.C.y} ${PG.D.x},${PG.D.y} ${Ox},${Oy}" fill="rgba(255,107,176,.3)" stroke="#FF6BB0" stroke-width="1.5"/>
+        <polygon points="${PG.D.x},${PG.D.y} ${PG.A.x},${PG.A.y} ${Ox},${Oy}" fill="rgba(255,217,61,.3)" stroke="#FFD93D" stroke-width="1.5"/>
+        <text x="${(PG.A.x+PG.B.x)/2}" y="${PG.A.y+30}" text-anchor="middle" fill="#fff" font-size="14" font-weight="900">¼</text>
+        <text x="${(PG.B.x+PG.C.x)/2+10}" y="${(PG.B.y+PG.C.y)/2}" text-anchor="middle" fill="#fff" font-size="14" font-weight="900">¼</text>
+        <text x="${(PG.C.x+PG.D.x)/2}" y="${PG.C.y-12}" text-anchor="middle" fill="#fff" font-size="14" font-weight="900">¼</text>
+        <text x="${(PG.D.x+PG.A.x)/2-10}" y="${(PG.D.y+PG.A.y)/2}" text-anchor="middle" fill="#fff" font-size="14" font-weight="900">¼</text>
+      `});
+    },
+    q:{prompt:'平四面積＝20，對角線切成 4 個三角形，每個面積＝？',opts:['4','5','10','20'],correct:1}
+  },
+  {
+    id:6,type:'D',num:1,label:'對邊平行 → 平四',rarity:'common',color:'#FF6BB0',
+    plain:'上下平行 + 左右平行 → 是平四！',
+    life:'樓梯扶手的兩根長條，永遠平行向上。',
+    drawSVG:()=>gemSVG({content:`
+      ${basePG()}
+      <path d="M${PG.A.x+50},${PG.A.y-22} L${PG.A.x+80},${PG.A.y-22}" stroke="#27D7FF" stroke-width="3" marker-end="url(#arr1)"/>
+      <path d="M${PG.D.x+50},${PG.D.y+22} L${PG.D.x+80},${PG.D.y+22}" stroke="#27D7FF" stroke-width="3" marker-end="url(#arr1)"/>
+      <path d="M${PG.A.x-26},${PG.A.y+44} L${PG.A.x-12},${PG.A.y+58}" stroke="#FF6BB0" stroke-width="3" marker-end="url(#arr2)"/>
+      <path d="M${PG.B.x-26},${PG.B.y+44} L${PG.B.x-12},${PG.B.y+58}" stroke="#FF6BB0" stroke-width="3" marker-end="url(#arr2)"/>
+      <defs>
+        <marker id="arr1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#27D7FF"/></marker>
+        <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#FF6BB0"/></marker>
+      </defs>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AB∥DC 且 AD∥BC ⇒ 平四</text>
+    `}),
+    q:{prompt:'四邊形「上下兩邊平行、左右兩邊也平行」，它一定是？',opts:['平行四邊形','梯形','三角形','圓形'],correct:0}
+  },
+  {
+    id:7,type:'D',num:2,label:'對邊等長 → 平四',rarity:'common',color:'#FF6BB0',
+    plain:'上下等長 + 左右等長 → 是平四！',
+    life:'兩根一樣長的鐵柱，配兩根一樣長的橫桿，圍出來就是平四。',
+    drawSVG:()=>gemSVG({content:`
+      ${basePG()}
+      <line x1="${(PG.A.x+PG.B.x)/2-8}" y1="${PG.A.y}" x2="${(PG.A.x+PG.B.x)/2+8}" y2="${PG.A.y}" stroke="#27D7FF" stroke-width="3"/>
+      <line x1="${(PG.D.x+PG.C.x)/2-8}" y1="${PG.D.y}" x2="${(PG.D.x+PG.C.x)/2+8}" y2="${PG.D.y}" stroke="#27D7FF" stroke-width="3"/>
+      <g stroke="#FF6BB0" stroke-width="3">
+        <line x1="${(PG.A.x+PG.D.x)/2-4}" y1="${(PG.A.y+PG.D.y)/2-6}" x2="${(PG.A.x+PG.D.x)/2+4}" y2="${(PG.A.y+PG.D.y)/2-2}"/>
+        <line x1="${(PG.A.x+PG.D.x)/2-4}" y1="${(PG.A.y+PG.D.y)/2+2}" x2="${(PG.A.x+PG.D.x)/2+4}" y2="${(PG.A.y+PG.D.y)/2+6}"/>
+        <line x1="${(PG.B.x+PG.C.x)/2-4}" y1="${(PG.B.y+PG.C.y)/2-6}" x2="${(PG.B.x+PG.C.x)/2+4}" y2="${(PG.B.y+PG.C.y)/2-2}"/>
+        <line x1="${(PG.B.x+PG.C.x)/2-4}" y1="${(PG.B.y+PG.C.y)/2+2}" x2="${(PG.B.x+PG.C.x)/2+4}" y2="${(PG.B.y+PG.C.y)/2+6}"/>
+      </g>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AB=DC 且 AD=BC ⇒ 平四</text>
+    `}),
+    q:{prompt:'四邊形 AB＝DC＝8，AD＝BC＝5，它是平四嗎？',opts:['一定是','不一定','一定不是','看角度才知道'],correct:0}
+  },
+  {
+    id:8,type:'D',num:3,label:'對角相等 → 平四',rarity:'rare',color:'#FF6BB0',
+    plain:'兩組對角都相等 → 是平四！',
+    life:'看一個風箏型的框架：如果對角恰好相等，就會變成平四。',
+    drawSVG:()=>gemSVG({content:`
+      ${basePG()}
+      <path d="M ${PG.A.x+10},${PG.A.y+6} A 18,18 0 0 1 ${PG.A.x+20},${PG.A.y+16}" stroke="#27D7FF" stroke-width="2.5" fill="none"/>
+      <path d="M ${PG.C.x-10},${PG.C.y-6} A 18,18 0 0 1 ${PG.C.x-20},${PG.C.y-16}" stroke="#27D7FF" stroke-width="2.5" fill="none"/>
+      <path d="M ${PG.B.x-10},${PG.B.y+6} A 14,14 0 0 0 ${PG.B.x-20},${PG.B.y+14}" stroke="#FF6BB0" stroke-width="2.5" fill="none"/>
+      <path d="M ${PG.D.x+10},${PG.D.y-6} A 14,14 0 0 0 ${PG.D.x+20},${PG.D.y-12}" stroke="#FF6BB0" stroke-width="2.5" fill="none"/>
+      <text x="${PG.A.x+24}" y="${PG.A.y+22}" fill="#27D7FF" font-size="14" font-weight="900">70°</text>
+      <text x="${PG.C.x-50}" y="${PG.C.y-20}" fill="#27D7FF" font-size="14" font-weight="900">70°</text>
+      <text x="${PG.B.x-50}" y="${PG.B.y+24}" fill="#FF6BB0" font-size="14" font-weight="900">110°</text>
+      <text x="${PG.D.x+24}" y="${PG.D.y-16}" fill="#FF6BB0" font-size="14" font-weight="900">110°</text>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">∠A=∠C 且 ∠B=∠D ⇒ 平四</text>
+    `}),
+    q:{prompt:'四邊形 ∠A＝∠C＝70°，∠B＝∠D＝110°，它是平四嗎？',opts:['一定是','不一定','一定不是','資料不足'],correct:0}
+  },
+  {
+    id:9,type:'D',num:4,label:'對角線互平分 → 平四',rarity:'rare',color:'#FF6BB0',
+    plain:'兩條對角線從中間切 → 是平四！',
+    life:'體育館的 X 型撐架，兩根橫桿在中間交叉、兩邊一樣長 → 形成平四。',
+    drawSVG:()=>{
+      const Ox=(PG.A.x+PG.C.x)/2, Oy=(PG.A.y+PG.C.y)/2;
+      return gemSVG({content:`
+        ${basePG()}
+        <line x1="${PG.A.x}" y1="${PG.A.y}" x2="${PG.C.x}" y2="${PG.C.y}" stroke="#27D7FF" stroke-width="3"/>
+        <line x1="${PG.B.x}" y1="${PG.B.y}" x2="${PG.D.x}" y2="${PG.D.y}" stroke="#FF6BB0" stroke-width="3"/>
+        <circle cx="${Ox}" cy="${Oy}" r="8" fill="#FFD93D" filter="url(#glow)"/>
+        <text x="${Ox+10}" y="${Oy-12}" fill="#FFD93D" font-size="16" font-weight="900">O</text>
+        <line x1="${(PG.A.x+Ox)/2-4}" y1="${(PG.A.y+Oy)/2-2}" x2="${(PG.A.x+Ox)/2+4}" y2="${(PG.A.y+Oy)/2+2}" stroke="#27D7FF" stroke-width="3"/>
+        <line x1="${(PG.C.x+Ox)/2-4}" y1="${(PG.C.y+Oy)/2-2}" x2="${(PG.C.x+Ox)/2+4}" y2="${(PG.C.y+Oy)/2+2}" stroke="#27D7FF" stroke-width="3"/>
+        <line x1="${(PG.B.x+Ox)/2-4}" y1="${(PG.B.y+Oy)/2-2}" x2="${(PG.B.x+Ox)/2+4}" y2="${(PG.B.y+Oy)/2+2}" stroke="#FF6BB0" stroke-width="3"/>
+        <line x1="${(PG.D.x+Ox)/2-4}" y1="${(PG.D.y+Oy)/2-2}" x2="${(PG.D.x+Ox)/2+4}" y2="${(PG.D.y+Oy)/2+2}" stroke="#FF6BB0" stroke-width="3"/>
+        <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AO=OC 且 BO=OD ⇒ 平四</text>
+      `});
+    },
+    q:{prompt:'四邊形對角線在 O 點互相平分（AO=OC, BO=OD），它是？',opts:['平行四邊形','梯形','三角形','不一定'],correct:0}
+  },
+  {
+    id:10,type:'D',num:5,label:'一組對邊平行又等長 → 平四',rarity:'legendary',color:'#FFD93D',
+    plain:'只要有一組對邊「又平行又等長」 → 就是平四！',
+    life:'課本第 203 頁的「飛天魔毯」，靠的就是這條判別！',
+    drawSVG:()=>gemSVG({content:`
+      ${basePG()}
+      <line x1="${PG.A.x}" y1="${PG.A.y}" x2="${PG.B.x}" y2="${PG.B.y}" stroke="#FFD93D" stroke-width="5">
+        <animate attributeName="stroke-dasharray" values="0,300;300,0" dur=".7s" fill="freeze"/>
+      </line>
+      <line x1="${PG.D.x}" y1="${PG.D.y}" x2="${PG.C.x}" y2="${PG.C.y}" stroke="#FFD93D" stroke-width="5">
+        <animate attributeName="stroke-dasharray" values="0,300;300,0" dur=".7s" begin=".2s" fill="freeze"/>
+      </line>
+      <path d="M${PG.A.x+60},${PG.A.y-18} L${PG.A.x+90},${PG.A.y-18}" stroke="#FFD93D" stroke-width="2.5" marker-end="url(#arr3)"/>
+      <path d="M${PG.D.x+60},${PG.D.y+18} L${PG.D.x+90},${PG.D.y+18}" stroke="#FFD93D" stroke-width="2.5" marker-end="url(#arr3)"/>
+      <defs>
+        <marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#FFD93D"/></marker>
+      </defs>
+      <text x="195" y="50" fill="#FFD93D" font-size="18" font-weight="900">＝</text>
+      <text x="225" y="222" fill="#FFD93D" font-size="18" font-weight="900">＝</text>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AB∥DC 且 AB=DC ⇒ 平四</text>
+    `}),
+    q:{prompt:'四邊形 AB∥DC 且 AB=DC，它一定是？',opts:['平行四邊形','梯形','不一定','資料不足'],correct:0}
+  }
+];
+
+/* ---------- GEM MAP POSITIONS (constellation) ---------- */
+const GEM_POSITIONS = [
+  {x:14,y:30},{x:30,y:18},{x:18,y:58},{x:32,y:72},{x:48,y:50},
+  {x:62,y:24},{x:80,y:38},{x:70,y:62},{x:52,y:80},{x:88,y:78}
+];
+
+/* ---------- STATE ---------- */
+let state = {
+  view:'start',
+  sessionId:null,
+  playerName:'',
+  hero:null,
+  startTime:null,
+  endTime:null,
+  gemsCollected:[],
+  attempts:[],
+  currentGem:null,
+  modalStage:'reveal'
+};
+
+function resetState(){
+  state = {view:'start',sessionId:null,playerName:'',hero:null,startTime:null,endTime:null,
+    gemsCollected:[],attempts:[],currentGem:null,modalStage:'reveal'};
+}
+
+/* ---------- STORAGE ---------- */
+function loadSessions(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch(e){return [];}}
+function saveSession(){
+  const sessions = loadSessions();
+  const idx = sessions.findIndex(s=>s.id===state.sessionId);
+  const record = {
+    id:state.sessionId,name:state.playerName,hero:state.hero?.id,heroName:state.hero?.name,
+    startTime:state.startTime,endTime:state.endTime,
+    gemsCollected:[...state.gemsCollected],
+    attempts:[...state.attempts],
+    totalAttempts:state.attempts.length,
+    totalStars:state.gemsCollected.length,
+    completed:state.gemsCollected.length===10
+  };
+  if(idx>=0) sessions[idx]=record; else sessions.push(record);
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(sessions));
+}
+
+/* ---------- STARFIELD ---------- */
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resizeStarfield(){
+  canvas.width = window.innerWidth*devicePixelRatio;
+  canvas.height = window.innerHeight*devicePixelRatio;
+  canvas.style.width = window.innerWidth+'px';
+  canvas.style.height = window.innerHeight+'px';
+  stars = Array.from({length:120},()=>({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+    r:Math.random()*1.5+.4, a:Math.random()*.6+.2,
+    s:Math.random()*.01+.003
+  }));
+}
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    s.a += s.s*(Math.random()>.5?1:-1);
+    if(s.a>.9)s.a=.9; if(s.a<.1)s.a=.1;
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r*devicePixelRatio,0,Math.PI*2);
+    ctx.fillStyle = `rgba(255,255,255,${s.a})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+window.addEventListener('resize',resizeStarfield);
+resizeStarfield();
+drawStars();
+
+/* ---------- VIEW SWITCHING ---------- */
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const v = document.getElementById('view-'+name);
+  v.classList.add('active');
+  state.view = name;
+  // restart button visible during game/end
+  document.getElementById('floating-restart').hidden = !(name==='game'||name==='end');
+}
+
+/* ---------- START VIEW ---------- */
+document.getElementById('btn-go-pick').addEventListener('click',()=>{
+  const sessions = loadSessions();
+  state.playerName = '玩家 '+(sessions.length+1);
+  state.sessionId = 'sess_'+Date.now()+'_'+Math.floor(Math.random()*1000);
+  state.startTime = Date.now();
+  renderHeroCards();
+  switchView('pick');
+});
+
+/* ---------- HERO PICK ---------- */
+function renderHeroCards(){
+  const row = document.getElementById('hero-row');
+  row.innerHTML = '';
+  HEROES.forEach((h,i)=>{
+    const card = document.createElement('div');
+    card.className = 'hero-card';
+    card.dataset.idx = i;
+    card.style.setProperty('--hero-main',h.palette.main);
+    card.style.setProperty('--hero-glow',h.palette.glow);
+    card.style.setProperty('--hero-bg-1',h.palette.bg1);
+    card.style.setProperty('--hero-bg-2',h.palette.bg2);
+    card.innerHTML = `
+      <div class="hero-card-inner">
+        <div class="hero-card-face hero-card-back"></div>
+        <div class="hero-card-face hero-card-front">
+          <div class="hero-avatar">${h.avatar}</div>
+          <div class="hero-name" style="color:${h.palette.main}">${h.name}</div>
+          <div class="hero-tag">${h.tag}</div>
+        </div>
+      </div>`;
+    card.addEventListener('click',()=>onHeroClick(i,card));
+    row.appendChild(card);
+  });
+  // entrance animation
+  gsap.fromTo('.hero-card',{y:60,opacity:0,rotateY:180},{y:0,opacity:1,rotateY:0,duration:.6,stagger:.08,ease:'back.out(1.4)'});
+  document.getElementById('btn-confirm-hero').disabled = true;
+  state.hero = null;
+}
+
+function onHeroClick(idx,card){
+  // if already selected, unselect
+  if(card.classList.contains('selected')){
+    card.classList.remove('selected');
+    document.querySelectorAll('.hero-card').forEach(c=>c.classList.remove('dim'));
+    document.getElementById('btn-confirm-hero').disabled = true;
+    state.hero = null;
+    return;
+  }
+  // first time clicking this card - flip and select
+  document.querySelectorAll('.hero-card').forEach(c=>{
+    c.classList.remove('selected');
+    c.classList.add('dim');
+  });
+  card.classList.remove('dim');
+  if(!card.classList.contains('flipped')){
+    card.classList.add('flipped');
+  }
+  setTimeout(()=>card.classList.add('selected'),300);
+  state.hero = HEROES[idx];
+  document.getElementById('btn-confirm-hero').disabled = false;
+}
+
+document.getElementById('btn-confirm-hero').addEventListener('click',()=>{
+  if(!state.hero) return;
+  setupGameHUD();
+  renderGemMap();
+  saveSession();
+  switchView('game');
+});
+
+/* ---------- GAME HUD ---------- */
+function setupGameHUD(){
+  const h = state.hero;
+  document.getElementById('hud-hero-avatar').innerHTML = h.avatar;
+  document.getElementById('hud-hero-name').textContent = h.name;
+  document.getElementById('hud-player-name').textContent = state.playerName;
+  document.getElementById('hud-hero-card').style.setProperty('--hero-main',h.palette.main);
+  updateProgress();
+}
+
+function updateProgress(){
+  const collected = state.gemsCollected.length;
+  document.getElementById('hud-progress-fill').style.width = (collected*10)+'%';
+  document.getElementById('hud-progress-text').textContent = `${collected} / 10`;
+  document.getElementById('hud-stars').textContent = '★ '+collected;
+}
+
+/* ---------- GEM MAP ---------- */
+function renderGemMap(){
+  const map = document.getElementById('gem-map');
+  const linesSvg = document.getElementById('gem-lines');
+  map.innerHTML = '';
+  linesSvg.innerHTML = '';
+  // draw connecting lines first (constellation)
+  const linkPairs = [[0,1],[0,2],[1,4],[2,3],[3,4],[4,5],[5,6],[5,7],[6,7],[7,8],[8,9],[6,9]];
+  linkPairs.forEach(([a,b])=>{
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',GEM_POSITIONS[a].x+'%');
+    line.setAttribute('y1',GEM_POSITIONS[a].y+'%');
+    line.setAttribute('x2',GEM_POSITIONS[b].x+'%');
+    line.setAttribute('y2',GEM_POSITIONS[b].y+'%');
+    line.setAttribute('stroke','rgba(255,255,255,.1)');
+    line.setAttribute('stroke-width','1');
+    line.setAttribute('stroke-dasharray','4 4');
+    linesSvg.appendChild(line);
+  });
+  GEMS.forEach((gem,i)=>{
+    const pos = GEM_POSITIONS[i];
+    const node = document.createElement('div');
+    node.className = 'gem-node';
+    node.style.left = pos.x+'%';
+    node.style.top = pos.y+'%';
+    node.style.setProperty('--gem-glow',gem.color+'AA');
+    if(state.gemsCollected.includes(gem.id)) node.classList.add('collected');
+    const isNext = !state.gemsCollected.includes(gem.id) && state.gemsCollected.length>0 && state.gemsCollected.length<10;
+    // gentle pulse hint on the first uncollected one
+    node.innerHTML = `
+      <div class="gem-node-shape">${gemIconSVG(gem)}</div>
+      <div class="gem-node-label">${gem.label}</div>`;
+    if(!state.gemsCollected.includes(gem.id)){
+      node.addEventListener('click',()=>openGemModal(gem));
+    }
+    map.appendChild(node);
+    // entrance animation
+    gsap.fromTo(node,{scale:0,opacity:0},{scale:1,opacity:1,duration:.5,delay:.05*i,ease:'back.out(1.6)'});
+  });
+  // pulse first uncollected
+  const firstIdx = GEMS.findIndex(g=>!state.gemsCollected.includes(g.id));
+  if(firstIdx>=0){
+    map.children[firstIdx].classList.add('pulse-hint');
+  }
+}
+
+function gemIconSVG(gem){
+  const c = gem.color;
+  if(gem.type==='P'){
+    return `<svg viewBox="0 0 60 60"><defs><linearGradient id="gp${gem.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#1a0b3d"/></linearGradient></defs><polygon points="30,4 56,30 30,56 4,30" fill="url(#gp${gem.id})" stroke="${c}" stroke-width="2"/><polygon points="30,12 48,30 30,48 12,30" fill="${c}" opacity=".3"/><text x="30" y="36" text-anchor="middle" fill="#fff" font-size="14" font-weight="900" font-family="Orbitron,sans-serif">${gem.num}</text></svg>`;
+  } else {
+    return `<svg viewBox="0 0 60 60"><defs><radialGradient id="gd${gem.id}"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#1a0b3d"/></radialGradient></defs><circle cx="30" cy="30" r="26" fill="url(#gd${gem.id})" stroke="${c}" stroke-width="2"/><circle cx="30" cy="30" r="14" fill="${c}" opacity=".35"/><text x="30" y="36" text-anchor="middle" fill="#fff" font-size="14" font-weight="900" font-family="Orbitron,sans-serif">${gem.num}</text></svg>`;
+  }
+}
+
+/* ---------- GEM MODAL ---------- */
+const modal = document.getElementById('gem-modal');
+const modalContent = document.getElementById('modal-content');
+let currentAttemptStart = 0;
+
+function openGemModal(gem){
+  state.currentGem = gem;
+  state.modalStage = 'reveal';
+  // populate
+  const badge = document.getElementById('gem-badge');
+  const typeLabel = gem.type==='P'?`性質 ${gem.num}`:`判別 ${gem.num}`;
+  const rarityCN = {common:'普通',rare:'稀有',epic:'史詩',legendary:'傳說'}[gem.rarity];
+  badge.className = 'gem-badge type-'+gem.type;
+  badge.innerHTML = `${typeLabel}<span class="gem-rarity rarity-${gem.rarity}">${rarityCN}</span>`;
+  document.getElementById('gem-title').textContent = gem.label;
+  document.getElementById('gem-svg-area').innerHTML = gem.drawSVG();
+  document.getElementById('gem-plain').textContent = gem.plain;
+  document.getElementById('gem-life').textContent = gem.life;
+  modalContent.style.setProperty('--gem-glow',gem.color+'66');
+
+  // show stages
+  document.getElementById('stage-reveal').hidden = false;
+  document.getElementById('stage-question').hidden = true;
+  document.getElementById('stage-result').hidden = true;
+
+  modal.hidden = false;
+  gsap.fromTo(modalContent,{scale:.85,opacity:0,y:30},{scale:1,opacity:1,y:0,duration:.45,ease:'back.out(1.4)'});
+}
+
+function closeGemModal(){
+  gsap.to(modalContent,{scale:.85,opacity:0,duration:.25,onComplete:()=>{modal.hidden=true;}});
+}
+
+document.getElementById('modal-close').addEventListener('click',closeGemModal);
+document.querySelector('.modal-overlay').addEventListener('click',closeGemModal);
+
+document.getElementById('btn-to-question').addEventListener('click',()=>{
+  state.modalStage='question';
+  document.getElementById('stage-reveal').hidden = true;
+  document.getElementById('stage-question').hidden = false;
+  // populate question
+  const gem = state.currentGem;
+  const badgeQ = document.getElementById('gem-badge-q');
+  const typeLabel = gem.type==='P'?`性質 ${gem.num}`:`判別 ${gem.num}`;
+  badgeQ.className = 'gem-badge type-'+gem.type;
+  badgeQ.textContent = typeLabel;
+  document.getElementById('question-prompt').textContent = gem.q.prompt;
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  gem.q.opts.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<div class="option-letter">${letters[i]}</div><div>${opt}</div>`;
+    btn.addEventListener('click',()=>onOptionClick(i,btn));
+    grid.appendChild(btn);
+  });
+  gsap.fromTo('.option-btn',{y:20,opacity:0},{y:0,opacity:1,duration:.4,stagger:.06});
+  currentAttemptStart = Date.now();
+});
+
+function onOptionClick(idx,btn){
+  if(btn.disabled) return;
+  const gem = state.currentGem;
+  const correct = idx===gem.q.correct;
+  const timeMs = Date.now()-currentAttemptStart;
+  state.attempts.push({gemId:gem.id,correct,timeMs,optionChosen:idx});
+  if(correct){
+    btn.classList.add('correct');
+    setTimeout(()=>showResult(true),650);
+  } else {
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    setTimeout(()=>btn.classList.remove('wrong'),400);
+    // small message
+    const grid = document.getElementById('options-grid');
+    let msg = grid.querySelector('.retry-msg');
+    if(!msg){
+      msg = document.createElement('div');
+      msg.className = 'retry-msg';
+      msg.style.cssText = 'grid-column:1/-1;text-align:center;color:#FF6BB0;font-size:14px;margin-top:4px;font-weight:700';
+      msg.textContent = '差一點點！再試一次 →';
+      grid.appendChild(msg);
+    }
+    gsap.fromTo(msg,{y:-5,opacity:0},{y:0,opacity:1,duration:.3});
+    currentAttemptStart = Date.now();
+  }
+}
+
+function showResult(success){
+  state.modalStage='result';
+  document.getElementById('stage-question').hidden = true;
+  document.getElementById('stage-result').hidden = false;
+  const gem = state.currentGem;
+  document.getElementById('result-icon').textContent = '★';
+  document.getElementById('result-icon').style.color = gem.color;
+  document.getElementById('result-icon').style.textShadow = `0 0 24px ${gem.color}`;
+  document.getElementById('result-text').textContent = `寶石「${gem.label}」入庫！`;
+  document.getElementById('result-skill').textContent = `${state.hero.name} 使出「${state.hero.skillName}」`;
+  gsap.fromTo('#result-icon',{scale:0,rotate:-180},{scale:1,rotate:0,duration:.7,ease:'back.out(2)'});
+  gsap.fromTo('#result-text',{y:20,opacity:0},{y:0,opacity:1,duration:.5,delay:.2});
+  gsap.fromTo('#result-skill',{opacity:0},{opacity:1,duration:.5,delay:.4});
+  // collect
+  if(!state.gemsCollected.includes(gem.id)){
+    state.gemsCollected.push(gem.id);
+  }
+  // confetti
+  triggerSkillEffect(state.hero.skillKind,gem.color);
+  saveSession();
+}
+
+document.getElementById('btn-result-next').addEventListener('click',()=>{
+  closeGemModal();
+  updateProgress();
+  // refresh map
+  renderGemMap();
+  if(state.gemsCollected.length===10){
+    setTimeout(showEndView,500);
+  }
+});
+
+/* ---------- SKILL EFFECTS ---------- */
+function triggerSkillEffect(kind,color){
+  // base confetti for all
+  const opts = {particleCount:80,spread:90,origin:{y:.5},colors:[color,'#FFD93D','#fff']};
+  switch(kind){
+    case 'slash':
+      confetti({...opts,particleCount:60,angle:135,spread:30,startVelocity:55,origin:{x:.1,y:.1}});
+      confetti({...opts,particleCount:60,angle:45,spread:30,startVelocity:55,origin:{x:.9,y:.9}});
+      break;
+    case 'speedline':
+      confetti({...opts,particleCount:100,angle:0,spread:20,startVelocity:60,origin:{x:0,y:.5}});
+      confetti({...opts,particleCount:100,angle:180,spread:20,startVelocity:60,origin:{x:1,y:.5}});
+      break;
+    case 'explosion':
+      confetti({...opts,particleCount:140,spread:160,startVelocity:50});
+      break;
+    case 'hearts':
+      confetti({...opts,particleCount:60,spread:60,gravity:.6,scalar:1.2,shapes:['circle']});
+      confetti({...opts,particleCount:40,spread:120,startVelocity:25,gravity:.3,scalar:.9,colors:['#FFB3D1','#FFE8F0','#FFD93D']});
+      break;
+    case 'stardust':
+      confetti({...opts,particleCount:100,spread:360,startVelocity:30,gravity:.4,colors:['#FFD93D','#7C8BFF','#fff']});
+      break;
+  }
+}
+
+/* ---------- END VIEW ---------- */
+function showEndView(){
+  state.endTime = Date.now();
+  saveSession();
+  // populate
+  document.getElementById('end-hero-name').textContent = state.hero.name;
+  document.getElementById('end-hero-name').style.color = state.hero.palette.main;
+  document.getElementById('end-stars').textContent = `${state.gemsCollected.length}/10`;
+  document.getElementById('end-attempts').textContent = state.attempts.length;
+  // gem display
+  const display = document.getElementById('end-gem-display');
+  display.innerHTML = '';
+  GEMS.forEach(gem=>{
+    const div = document.createElement('div');
+    div.className = 'end-gem';
+    div.innerHTML = gemIconSVG(gem);
+    display.appendChild(div);
+  });
+  switchView('end');
+  // big confetti finale
+  setTimeout(()=>{
+    const colors = ['#FFD93D','#FF6BB0','#27D7FF','#9B5BFF','#fff'];
+    confetti({particleCount:200,spread:160,origin:{y:.4},colors});
+    setTimeout(()=>confetti({particleCount:120,spread:100,angle:60,origin:{x:0,y:.6},colors}),300);
+    setTimeout(()=>confetti({particleCount:120,spread:100,angle:120,origin:{x:1,y:.6},colors}),600);
+  },200);
+  gsap.fromTo('.end-stat',{y:30,opacity:0},{y:0,opacity:1,duration:.5,stagger:.15,delay:.3});
+  gsap.fromTo('.end-next-step',{scale:.9,opacity:0},{scale:1,opacity:1,duration:.5,delay:1});
+}
+
+/* ---------- RESTART ---------- */
+function restartForNextPlayer(){
+  if(state.gemsCollected.length>0 && state.gemsCollected.length<10){
+    if(!confirm('還沒蒐集完，確定要換下一位玩家嗎？')) return;
+    state.endTime = Date.now();
+    saveSession();
+  }
+  resetState();
+  switchView('start');
+}
+
+document.getElementById('btn-restart').addEventListener('click',restartForNextPlayer);
+document.getElementById('floating-restart').addEventListener('click',restartForNextPlayer);
+
+/* ---------- INIT ---------- */
+window.addEventListener('load',()=>{
+  // entrance
+  gsap.fromTo('.title-block',{y:-30,opacity:0},{y:0,opacity:1,duration:.7,ease:'power2.out'});
+  gsap.fromTo('.name-block',{y:30,opacity:0},{y:0,opacity:1,duration:.7,delay:.2,ease:'power2.out'});
+});
+</script>
+</body>
+</html>
