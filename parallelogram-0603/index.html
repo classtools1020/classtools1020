@@ -952,7 +952,14 @@ function openGemModal(gem){
 }
 
 function closeGemModal(){
-  gsap.to(modalContent,{scale:.85,opacity:0,duration:.25,onComplete:()=>{modal.hidden=true;}});
+  if(typeof gsap!=='undefined') gsap.to(modalContent,{scale:.85,opacity:0,duration:.22});
+  // Guaranteed hide via setTimeout, regardless of whether GSAP onComplete fires
+  setTimeout(()=>{
+    modal.hidden=true;
+    // Reset modal-content style for next open
+    modalContent.style.opacity='';
+    modalContent.style.transform='';
+  },240);
 }
 
 document.getElementById('modal-close').addEventListener('click',closeGemModal);
