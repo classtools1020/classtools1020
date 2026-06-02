@@ -106,7 +106,16 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
 /* ====== GEM MODAL ====== */
 .gem-modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
 .modal-overlay{position:absolute;inset:0;background:rgba(2,1,15,.85);backdrop-filter:blur(8px)}
-.modal-content{position:relative;width:min(620px,100%);max-height:92vh;overflow:hidden;border-radius:28px;background:linear-gradient(180deg,#1a0b3d,#0a0625);border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 40px var(--gem-glow,rgba(155,91,255,.3));display:flex;flex-direction:column}
+.modal-content{position:relative;width:min(620px,100%);max-height:92vh;overflow-y:auto;overflow-x:hidden;border-radius:28px;background:linear-gradient(180deg,#1a0b3d,#0a0625);border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 40px var(--gem-glow,rgba(155,91,255,.3));display:flex;flex-direction:column}
+.modal-content::-webkit-scrollbar{width:8px}
+.modal-content::-webkit-scrollbar-thumb{background:rgba(155,91,255,.4);border-radius:4px}
+.gem-svg-area{flex-shrink:0}
+.modal-stage{padding:24px 28px}
+.gem-title{font-size:26px;margin-bottom:12px}
+.gem-svg-area{aspect-ratio:5/3;max-width:380px;margin-left:auto;margin-right:auto;margin-bottom:14px}
+.gem-plain{font-size:20px;margin-bottom:10px}
+.gem-life{margin-bottom:16px;font-size:13px}
+.question-prompt{font-size:18px;margin-top:8px;margin-bottom:14px;padding:14px 16px;background:rgba(255,217,61,.08);border:2px solid rgba(255,217,61,.4);border-radius:14px;width:100%}
 .modal-close{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;border:none;font-size:22px;cursor:pointer;z-index:2;line-height:1}
 .modal-close:hover{background:rgba(255,255,255,.2)}
 .modal-stage{padding:32px;display:flex;flex-direction:column;align-items:center;text-align:center}
@@ -194,7 +203,6 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
     <div class="name-block">
       <button class="btn-primary" id="btn-go-pick">開始挑戰 →</button>
     </div>
-    <div class="start-footer">5 位玩家輪流，每人約 5～8 分鐘</div>
   </div>
 </section>
 
@@ -251,16 +259,12 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
   <div class="modal-overlay"></div>
   <div class="modal-content" id="modal-content">
     <button class="modal-close" id="modal-close">×</button>
-    <div class="modal-stage stage-reveal" id="stage-reveal">
+    <div class="modal-stage stage-play" id="stage-play">
       <div class="gem-badge" id="gem-badge"></div>
       <h3 class="gem-title" id="gem-title"></h3>
       <div class="gem-svg-area" id="gem-svg-area"></div>
       <p class="gem-plain" id="gem-plain"></p>
       <div class="gem-life" id="gem-life"></div>
-      <button class="btn-primary" id="btn-to-question">開始挑戰 →</button>
-    </div>
-    <div class="modal-stage stage-question" id="stage-question" hidden>
-      <div class="gem-badge" id="gem-badge-q"></div>
       <p class="question-prompt" id="question-prompt"></p>
       <div class="options-grid" id="options-grid"></div>
     </div>
@@ -798,8 +802,8 @@ let currentAttemptStart = 0;
 
 function openGemModal(gem){
   state.currentGem = gem;
-  state.modalStage = 'reveal';
-  // populate
+  state.modalStage = 'play';
+  // populate gem visual
   const badge = document.getElementById('gem-badge');
   const typeLabel = gem.type==='P'?`性質 ${gem.num}`:`判別 ${gem.num}`;
   const rarityCN = {common:'普通',rare:'稀有',epic:'史詩',legendary:'傳說'}[gem.rarity];
@@ -811,33 +815,7 @@ function openGemModal(gem){
   document.getElementById('gem-life').textContent = gem.life;
   modalContent.style.setProperty('--gem-glow',gem.color+'66');
 
-  // show stages
-  document.getElementById('stage-reveal').hidden = false;
-  document.getElementById('stage-question').hidden = true;
-  document.getElementById('stage-result').hidden = true;
-
-  modal.hidden = false;
-  if(typeof gsap!=='undefined') gsap.fromTo(modalContent,{scale:.85,y:30},{scale:1,y:0,opacity:1,duration:.45,ease:'back.out(1.4)'});
-  else modalContent.style.opacity='1';
-}
-
-function closeGemModal(){
-  gsap.to(modalContent,{scale:.85,opacity:0,duration:.25,onComplete:()=>{modal.hidden=true;}});
-}
-
-document.getElementById('modal-close').addEventListener('click',closeGemModal);
-document.querySelector('.modal-overlay').addEventListener('click',closeGemModal);
-
-document.getElementById('btn-to-question').addEventListener('click',()=>{
-  state.modalStage='question';
-  document.getElementById('stage-reveal').hidden = true;
-  document.getElementById('stage-question').hidden = false;
-  // populate question
-  const gem = state.currentGem;
-  const badgeQ = document.getElementById('gem-badge-q');
-  const typeLabel = gem.type==='P'?`性質 ${gem.num}`:`判別 ${gem.num}`;
-  badgeQ.className = 'gem-badge type-'+gem.type;
-  badgeQ.textContent = typeLabel;
+  // populate question + options (visible together with gem visual)
   document.getElementById('question-prompt').textContent = gem.q.prompt;
   const grid = document.getElementById('options-grid');
   grid.innerHTML = '';
@@ -849,9 +827,25 @@ document.getElementById('btn-to-question').addEventListener('click',()=>{
     btn.addEventListener('click',()=>onOptionClick(i,btn));
     grid.appendChild(btn);
   });
-  if(typeof gsap!=='undefined') gsap.fromTo('.option-btn',{y:20},{y:0,duration:.4,stagger:.06});
+
+  // show stages
+  document.getElementById('stage-play').hidden = false;
+  document.getElementById('stage-result').hidden = true;
+
+  modal.hidden = false;
   currentAttemptStart = Date.now();
-});
+  if(typeof gsap!=='undefined') gsap.fromTo(modalContent,{scale:.85,y:30},{scale:1,y:0,opacity:1,duration:.45,ease:'back.out(1.4)'});
+  else modalContent.style.opacity='1';
+}
+
+function closeGemModal(){
+  gsap.to(modalContent,{scale:.85,opacity:0,duration:.25,onComplete:()=>{modal.hidden=true;}});
+}
+
+document.getElementById('modal-close').addEventListener('click',closeGemModal);
+document.querySelector('.modal-overlay').addEventListener('click',closeGemModal);
+
+// (Question populated inside openGemModal — no intermediate stage transition.)
 
 function onOptionClick(idx,btn){
   if(btn.disabled) return;
@@ -883,7 +877,7 @@ function onOptionClick(idx,btn){
 
 function showResult(success){
   state.modalStage='result';
-  document.getElementById('stage-question').hidden = true;
+  document.getElementById('stage-play').hidden = true;
   document.getElementById('stage-result').hidden = false;
   const gem = state.currentGem;
   document.getElementById('result-icon').textContent = '★';
