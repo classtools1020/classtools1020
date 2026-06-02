@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>平四寶石獵人</title>
+<title>平行四邊形寶石獵人</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
@@ -172,7 +172,7 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
   <div class="start-container">
     <div class="title-block">
       <div class="title-badge">CHAPTER 4-2 · 0603</div>
-      <h1 class="game-title">平四<span class="accent">寶石獵人</span></h1>
+      <h1 class="game-title">平行四邊形<span class="accent">寶石獵人</span></h1>
       <p class="subtitle">10 顆寶石，等你來蒐藏</p>
     </div>
     <div class="name-block">
@@ -262,7 +262,7 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
 
 <script>
 /* ============================================================
-   平四寶石獵人 · 遊戲核心
+   平行四邊形寶石獵人 · 遊戲核心
    ============================================================ */
 
 const STORAGE_KEY = 'parallelogramGemHunter_v1';
@@ -348,13 +348,13 @@ const GEMS = [
       </line>
       <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">△ABC ≅ △ACD</text>
     `}),
-    q:{prompt:'平四 ABCD 被對角線 AC 切開，△ABC 和 △ACD 的關係是？',
+    q:{prompt:'平行四邊形 ABCD 被對角線 AC 切開，△ABC 和 △ACD 的關係是？',
        opts:['一模一樣（全等）','大小不同','左右相反不同','看角度而定'],correct:0}
   },
   {
     id:2,type:'P',num:2,label:'對邊等長',rarity:'common',color:'#27D7FF',
     plain:'上下一樣長、左右一樣長',
-    life:'卡車後面的尾門打開，看起來就是個平四—兩根橫桿一樣長、兩根斜桿也一樣長。',
+    life:'卡車後面的尾門打開，看起來就是個平行四邊形—兩根橫桿一樣長、兩根斜桿也一樣長。',
     drawSVG:()=>gemSVG({content:`
       ${basePG()}
       <line x1="${PG.A.x}" y1="${PG.A.y}" x2="${PG.B.x}" y2="${PG.B.y}" stroke="#27D7FF" stroke-width="5">
@@ -377,7 +377,7 @@ const GEMS = [
       </g>
       <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">AB=DC, AD=BC</text>
     `}),
-    q:{prompt:'平四 ABCD 中，AB＝8 公分，那 DC＝？',opts:['4 公分','6 公分','8 公分','10 公分'],correct:2}
+    q:{prompt:'平行四邊形 ABCD 中，AB＝8 公分，那 DC＝？',opts:['4 公分','6 公分','8 公分','10 公分'],correct:2}
   },
   {
     id:3,type:'P',num:3,label:'對角相等',rarity:'rare',color:'#27D7FF',
@@ -397,7 +397,7 @@ const GEMS = [
       </g>
       <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">∠A=∠C, ∠B=∠D</text>
     `}),
-    q:{prompt:'平四 ABCD 中，∠A＝70°，那 ∠C＝？',opts:['70°','110°','90°','180°'],correct:0}
+    q:{prompt:'平行四邊形 ABCD 中，∠A＝70°，那 ∠C＝？',opts:['70°','110°','90°','180°'],correct:0}
   },
   {
     id:4,type:'P',num:4,label:'對角線互平分',rarity:'rare',color:'#27D7FF',
@@ -418,7 +418,7 @@ const GEMS = [
         <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">AO=OC, BO=OD</text>
       `});
     },
-    q:{prompt:'平四對角線 AC＝10，O 為交點，AO＝？',opts:['4','5','8','10'],correct:1}
+    q:{prompt:'平行四邊形對角線 AC＝10，O 為交點，AO＝？',opts:['4','5','8','10'],correct:1}
   },
   {
     id:5,type:'P',num:5,label:'面積四等分',rarity:'epic',color:'#27D7FF',
@@ -438,11 +438,11 @@ const GEMS = [
         <text x="${(PG.D.x+PG.A.x)/2-10}" y="${(PG.D.y+PG.A.y)/2}" text-anchor="middle" fill="#fff" font-size="14" font-weight="900">¼</text>
       `});
     },
-    q:{prompt:'平四面積＝20，對角線切成 4 個三角形，每個面積＝？',opts:['4','5','10','20'],correct:1}
+    q:{prompt:'平行四邊形面積＝20，對角線切成 4 個三角形，每個面積＝？',opts:['4','5','10','20'],correct:1}
   },
   {
-    id:6,type:'D',num:1,label:'對邊平行 → 平四',rarity:'common',color:'#FF6BB0',
-    plain:'上下平行 + 左右平行 → 是平四！',
+    id:6,type:'D',num:1,label:'對邊平行 → 平行四邊形',rarity:'common',color:'#FF6BB0',
+    plain:'上下平行 + 左右平行 → 是平行四邊形！',
     life:'樓梯扶手的兩根長條，永遠平行向上。',
     drawSVG:()=>gemSVG({content:`
       ${basePG()}
@@ -454,14 +454,14 @@ const GEMS = [
         <marker id="arr1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#27D7FF"/></marker>
         <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#FF6BB0"/></marker>
       </defs>
-      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AB∥DC 且 AD∥BC ⇒ 平四</text>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AB∥DC 且 AD∥BC ⇒ 平行四邊形</text>
     `}),
     q:{prompt:'四邊形「上下兩邊平行、左右兩邊也平行」，它一定是？',opts:['平行四邊形','梯形','三角形','圓形'],correct:0}
   },
   {
-    id:7,type:'D',num:2,label:'對邊等長 → 平四',rarity:'common',color:'#FF6BB0',
-    plain:'上下等長 + 左右等長 → 是平四！',
-    life:'兩根一樣長的鐵柱，配兩根一樣長的橫桿，圍出來就是平四。',
+    id:7,type:'D',num:2,label:'對邊等長 → 平行四邊形',rarity:'common',color:'#FF6BB0',
+    plain:'上下等長 + 左右等長 → 是平行四邊形！',
+    life:'兩根一樣長的鐵柱，配兩根一樣長的橫桿，圍出來就是平行四邊形。',
     drawSVG:()=>gemSVG({content:`
       ${basePG()}
       <line x1="${(PG.A.x+PG.B.x)/2-8}" y1="${PG.A.y}" x2="${(PG.A.x+PG.B.x)/2+8}" y2="${PG.A.y}" stroke="#27D7FF" stroke-width="3"/>
@@ -472,14 +472,14 @@ const GEMS = [
         <line x1="${(PG.B.x+PG.C.x)/2-4}" y1="${(PG.B.y+PG.C.y)/2-6}" x2="${(PG.B.x+PG.C.x)/2+4}" y2="${(PG.B.y+PG.C.y)/2-2}"/>
         <line x1="${(PG.B.x+PG.C.x)/2-4}" y1="${(PG.B.y+PG.C.y)/2+2}" x2="${(PG.B.x+PG.C.x)/2+4}" y2="${(PG.B.y+PG.C.y)/2+6}"/>
       </g>
-      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AB=DC 且 AD=BC ⇒ 平四</text>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AB=DC 且 AD=BC ⇒ 平行四邊形</text>
     `}),
-    q:{prompt:'四邊形 AB＝DC＝8，AD＝BC＝5，它是平四嗎？',opts:['一定是','不一定','一定不是','看角度才知道'],correct:0}
+    q:{prompt:'四邊形 AB＝DC＝8，AD＝BC＝5，它是平行四邊形嗎？',opts:['一定是','不一定','一定不是','看角度才知道'],correct:0}
   },
   {
-    id:8,type:'D',num:3,label:'對角相等 → 平四',rarity:'rare',color:'#FF6BB0',
-    plain:'兩組對角都相等 → 是平四！',
-    life:'看一個風箏型的框架：如果對角恰好相等，就會變成平四。',
+    id:8,type:'D',num:3,label:'對角相等 → 平行四邊形',rarity:'rare',color:'#FF6BB0',
+    plain:'兩組對角都相等 → 是平行四邊形！',
+    life:'看一個風箏型的框架：如果對角恰好相等，就會變成平行四邊形。',
     drawSVG:()=>gemSVG({content:`
       ${basePG()}
       <path d="M ${PG.A.x+10},${PG.A.y+6} A 18,18 0 0 1 ${PG.A.x+20},${PG.A.y+16}" stroke="#27D7FF" stroke-width="2.5" fill="none"/>
@@ -490,14 +490,14 @@ const GEMS = [
       <text x="${PG.C.x-50}" y="${PG.C.y-20}" fill="#27D7FF" font-size="14" font-weight="900">70°</text>
       <text x="${PG.B.x-50}" y="${PG.B.y+24}" fill="#FF6BB0" font-size="14" font-weight="900">110°</text>
       <text x="${PG.D.x+24}" y="${PG.D.y-16}" fill="#FF6BB0" font-size="14" font-weight="900">110°</text>
-      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">∠A=∠C 且 ∠B=∠D ⇒ 平四</text>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">∠A=∠C 且 ∠B=∠D ⇒ 平行四邊形</text>
     `}),
-    q:{prompt:'四邊形 ∠A＝∠C＝70°，∠B＝∠D＝110°，它是平四嗎？',opts:['一定是','不一定','一定不是','資料不足'],correct:0}
+    q:{prompt:'四邊形 ∠A＝∠C＝70°，∠B＝∠D＝110°，它是平行四邊形嗎？',opts:['一定是','不一定','一定不是','資料不足'],correct:0}
   },
   {
-    id:9,type:'D',num:4,label:'對角線互平分 → 平四',rarity:'rare',color:'#FF6BB0',
-    plain:'兩條對角線從中間切 → 是平四！',
-    life:'體育館的 X 型撐架，兩根橫桿在中間交叉、兩邊一樣長 → 形成平四。',
+    id:9,type:'D',num:4,label:'對角線互平分 → 平行四邊形',rarity:'rare',color:'#FF6BB0',
+    plain:'兩條對角線從中間切 → 是平行四邊形！',
+    life:'體育館的 X 型撐架，兩根橫桿在中間交叉、兩邊一樣長 → 形成平行四邊形。',
     drawSVG:()=>{
       const Ox=(PG.A.x+PG.C.x)/2, Oy=(PG.A.y+PG.C.y)/2;
       return gemSVG({content:`
@@ -510,14 +510,14 @@ const GEMS = [
         <line x1="${(PG.C.x+Ox)/2-4}" y1="${(PG.C.y+Oy)/2-2}" x2="${(PG.C.x+Ox)/2+4}" y2="${(PG.C.y+Oy)/2+2}" stroke="#27D7FF" stroke-width="3"/>
         <line x1="${(PG.B.x+Ox)/2-4}" y1="${(PG.B.y+Oy)/2-2}" x2="${(PG.B.x+Ox)/2+4}" y2="${(PG.B.y+Oy)/2+2}" stroke="#FF6BB0" stroke-width="3"/>
         <line x1="${(PG.D.x+Ox)/2-4}" y1="${(PG.D.y+Oy)/2-2}" x2="${(PG.D.x+Ox)/2+4}" y2="${(PG.D.y+Oy)/2+2}" stroke="#FF6BB0" stroke-width="3"/>
-        <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AO=OC 且 BO=OD ⇒ 平四</text>
+        <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AO=OC 且 BO=OD ⇒ 平行四邊形</text>
       `});
     },
     q:{prompt:'四邊形對角線在 O 點互相平分（AO=OC, BO=OD），它是？',opts:['平行四邊形','梯形','三角形','不一定'],correct:0}
   },
   {
-    id:10,type:'D',num:5,label:'一組對邊平行又等長 → 平四',rarity:'legendary',color:'#FFD93D',
-    plain:'只要有一組對邊「又平行又等長」 → 就是平四！',
+    id:10,type:'D',num:5,label:'一組對邊平行又等長 → 平行四邊形',rarity:'legendary',color:'#FFD93D',
+    plain:'只要有一組對邊「又平行又等長」 → 就是平行四邊形！',
     life:'課本第 203 頁的「飛天魔毯」，靠的就是這條判別！',
     drawSVG:()=>gemSVG({content:`
       ${basePG()}
@@ -534,7 +534,7 @@ const GEMS = [
       </defs>
       <text x="195" y="50" fill="#FFD93D" font-size="18" font-weight="900">＝</text>
       <text x="225" y="222" fill="#FFD93D" font-size="18" font-weight="900">＝</text>
-      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AB∥DC 且 AB=DC ⇒ 平四</text>
+      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="15" font-weight="900">AB∥DC 且 AB=DC ⇒ 平行四邊形</text>
     `}),
     q:{prompt:'四邊形 AB∥DC 且 AB=DC，它一定是？',opts:['平行四邊形','梯形','不一定','資料不足'],correct:0}
   }
@@ -960,9 +960,11 @@ document.getElementById('floating-restart').addEventListener('click',restartForN
 
 /* ---------- INIT ---------- */
 window.addEventListener('load',()=>{
-  // entrance
-  gsap.fromTo('.title-block',{y:-30,opacity:0},{y:0,opacity:1,duration:.7,ease:'power2.out'});
-  gsap.fromTo('.name-block',{y:30,opacity:0},{y:0,opacity:1,duration:.7,delay:.2,ease:'power2.out'});
+  // entrance: animate position only, NEVER touch opacity (so elements stay visible even if GSAP fails)
+  if(typeof gsap !== 'undefined'){
+    gsap.fromTo('.title-block',{y:-20},{y:0,duration:.5,ease:'power2.out'});
+    gsap.fromTo('.name-block',{y:20},{y:0,duration:.5,delay:.1,ease:'power2.out'});
+  }
 });
 </script>
 </body>
