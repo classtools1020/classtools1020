@@ -7,8 +7,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB27uSUnTSYkKJ5u5FqOqEnSbuA9br4lmE",
+  authDomain: "classtools1019.firebaseapp.com",
+  databaseURL: "https://classtools1019-default-rtdb.firebaseio.com",
+  projectId: "classtools1019",
+  storageBucket: "classtools1019.firebasestorage.app",
+  messagingSenderId: "402119556579",
+  appId: "1:402119556579:web:e0bace85a3454fb88eb4d6"
+};
+try { firebase.initializeApp(firebaseConfig); } catch(e) { console.warn('Firebase init failed:',e); }
+const FB_PATH = 'submissions/parallelogram_0603';
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
 html,body{height:100%;overflow:hidden;font-family:'Noto Sans TC',sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
 body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 100%);position:relative}
 #starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
@@ -572,7 +588,7 @@ function saveSession(){
   const idx = sessions.findIndex(s=>s.id===state.sessionId);
   const record = {
     id:state.sessionId,name:state.playerName,hero:state.hero?.id,heroName:state.hero?.name,
-    startTime:state.startTime,endTime:state.endTime,
+    startTime:state.startTime,endTime:state.endTime||null,
     gemsCollected:[...state.gemsCollected],
     attempts:[...state.attempts],
     totalAttempts:state.attempts.length,
@@ -581,6 +597,12 @@ function saveSession(){
   };
   if(idx>=0) sessions[idx]=record; else sessions.push(record);
   localStorage.setItem(STORAGE_KEY,JSON.stringify(sessions));
+  // Also push to Firebase Realtime DB (non-blocking, fails silently if offline)
+  try {
+    if(typeof firebase!=='undefined' && firebase.database){
+      firebase.database().ref(FB_PATH+'/'+state.sessionId).set(record);
+    }
+  } catch(e){ console.warn('Firebase save error:',e); }
 }
 
 /* ---------- STARFIELD ---------- */
