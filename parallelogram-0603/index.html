@@ -680,8 +680,10 @@ function renderHeroCards(){
     card.addEventListener('click',()=>onHeroClick(i,card));
     row.appendChild(card);
   });
-  // entrance animation
-  gsap.fromTo('.hero-card',{y:60,opacity:0,rotateY:180},{y:0,opacity:1,rotateY:0,duration:.6,stagger:.08,ease:'back.out(1.4)'});
+  // entrance animation (y only, no opacity manipulation to avoid stuck-invisible bug)
+  if(typeof gsap !== 'undefined'){
+    gsap.fromTo('.hero-card',{y:40},{y:0,duration:.5,stagger:.08,ease:'back.out(1.4)'});
+  }
   document.getElementById('btn-confirm-hero').disabled = true;
   state.hero = null;
 }
@@ -771,7 +773,7 @@ function renderGemMap(){
     }
     map.appendChild(node);
     // entrance animation
-    gsap.fromTo(node,{scale:0,opacity:0},{scale:1,opacity:1,duration:.5,delay:.05*i,ease:'back.out(1.6)'});
+    if(typeof gsap!=='undefined') gsap.fromTo(node,{scale:0},{scale:1,duration:.5,delay:.05*i,ease:'back.out(1.6)'});
   });
   // pulse first uncollected
   const firstIdx = GEMS.findIndex(g=>!state.gemsCollected.includes(g.id));
@@ -815,7 +817,8 @@ function openGemModal(gem){
   document.getElementById('stage-result').hidden = true;
 
   modal.hidden = false;
-  gsap.fromTo(modalContent,{scale:.85,opacity:0,y:30},{scale:1,opacity:1,y:0,duration:.45,ease:'back.out(1.4)'});
+  if(typeof gsap!=='undefined') gsap.fromTo(modalContent,{scale:.85,y:30},{scale:1,y:0,opacity:1,duration:.45,ease:'back.out(1.4)'});
+  else modalContent.style.opacity='1';
 }
 
 function closeGemModal(){
@@ -846,7 +849,7 @@ document.getElementById('btn-to-question').addEventListener('click',()=>{
     btn.addEventListener('click',()=>onOptionClick(i,btn));
     grid.appendChild(btn);
   });
-  gsap.fromTo('.option-btn',{y:20,opacity:0},{y:0,opacity:1,duration:.4,stagger:.06});
+  if(typeof gsap!=='undefined') gsap.fromTo('.option-btn',{y:20},{y:0,duration:.4,stagger:.06});
   currentAttemptStart = Date.now();
 });
 
@@ -888,9 +891,10 @@ function showResult(success){
   document.getElementById('result-icon').style.textShadow = `0 0 24px ${gem.color}`;
   document.getElementById('result-text').textContent = `寶石「${gem.label}」入庫！`;
   document.getElementById('result-skill').textContent = `${state.hero.name} 使出「${state.hero.skillName}」`;
-  gsap.fromTo('#result-icon',{scale:0,rotate:-180},{scale:1,rotate:0,duration:.7,ease:'back.out(2)'});
-  gsap.fromTo('#result-text',{y:20,opacity:0},{y:0,opacity:1,duration:.5,delay:.2});
-  gsap.fromTo('#result-skill',{opacity:0},{opacity:1,duration:.5,delay:.4});
+  if(typeof gsap!=='undefined'){
+    gsap.fromTo('#result-icon',{scale:0,rotate:-180},{scale:1,rotate:0,duration:.7,ease:'back.out(2)'});
+    gsap.fromTo('#result-text',{y:20},{y:0,duration:.5,delay:.2});
+  }
   // collect
   if(!state.gemsCollected.includes(gem.id)){
     state.gemsCollected.push(gem.id);
