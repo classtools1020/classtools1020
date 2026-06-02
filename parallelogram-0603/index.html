@@ -164,6 +164,9 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
 .end-next-step{font-size:18px;color:#fff;background:rgba(255,217,61,.1);border:1px solid #FFD93D;border-radius:14px;padding:16px;margin-bottom:24px;line-height:1.6}
 .end-next-step strong{color:#FFD93D;font-size:22px}
 
+.toast{position:fixed;top:90px;left:50%;transform:translateX(-50%) translateY(-30px);background:linear-gradient(135deg,#27D7FF,#9B5BFF);color:#fff;padding:16px 32px;border-radius:999px;font-weight:900;font-size:18px;z-index:300;opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;box-shadow:0 12px 32px rgba(155,91,255,.5),0 0 24px rgba(39,215,255,.4);letter-spacing:1px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
 .race-car{position:fixed;top:38%;left:-340px;z-index:200;width:300px;height:130px;pointer-events:none;opacity:0;filter:drop-shadow(0 10px 20px rgba(255,63,142,.5))}
 .race-car.go{animation:zoomRace 1.4s cubic-bezier(.2,0,.4,1) forwards}
 .race-car.go.mega{animation:zoomRaceMega 2.2s cubic-bezier(.2,0,.4,1) forwards}
@@ -317,6 +320,7 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
   </svg>
 </div>
 <div class="floating-plus" id="floating-plus">+1</div>
+<div class="toast" id="toast"></div>
 <button class="floating-restart" id="floating-restart" hidden>換玩家</button>
 </div>
 
@@ -716,6 +720,14 @@ function floatPlusOne(x,y){
   el.classList.add('fly');
 }
 
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'),3200);
+}
+
 /* ---------- STARFIELD ---------- */
 const canvas = document.getElementById('starfield');
 const ctx = canvas.getContext('2d');
@@ -1026,13 +1038,16 @@ function showResult(success){
 }
 
 document.getElementById('btn-result-next').addEventListener('click',()=>{
+  const justCollected = state.gemsCollected[state.gemsCollected.length-1];
   closeGemModal();
   updateProgress();
   renderGemMap();
   if(state.gemsCollected.length>=10){
     setTimeout(showEndView,500);
+  } else {
+    // Clear visual cue: "you returned to map, teacher calls next student"
+    setTimeout(()=>showToast(`✓ 寶石 ${justCollected} 入手！下一位請選寶石`),350);
   }
-  // else: stay on map, teacher calls next student
 });
 
 /* ---------- SKILL EFFECTS ---------- */
