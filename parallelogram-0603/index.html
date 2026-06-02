@@ -91,7 +91,9 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
 .gem-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .gem-map{position:absolute;inset:0;width:100%;height:100%}
 .gem-node{position:absolute;transform:translate(-50%,-50%);cursor:pointer;text-align:center}
-.gem-node-shape{width:64px;height:64px;display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}
+.gem-node-shape{width:96px;height:96px;display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}
+.row-label .row-num{font-family:'Orbitron',sans-serif;font-size:24px;letter-spacing:2px;text-shadow:0 0 12px currentColor}
+.row-label .row-hint{font-size:11px;opacity:.7;margin-top:4px;font-weight:700}
 .gem-node-shape svg{width:100%;height:100%;overflow:visible}
 .gem-node-label{margin-top:6px;font-size:11px;font-weight:700;color:rgba(255,255,255,.85);background:rgba(0,0,0,.5);padding:2px 8px;border-radius:8px;backdrop-filter:blur(6px);white-space:nowrap}
 .gem-node.collected .gem-node-shape{animation:gemPulse 2s ease-in-out infinite}
@@ -430,12 +432,13 @@ const GEMS = [
       <g font-size="14" font-weight="900">
         <text x="195" y="50" fill="#27D7FF" text-anchor="middle">＝</text>
         <text x="225" y="222" fill="#27D7FF" text-anchor="middle">＝</text>
-        <text x="92" y="135" fill="#FF6BB0" text-anchor="middle">∥</text>
-        <text x="328" y="135" fill="#FF6BB0" text-anchor="middle">∥</text>
       </g>
-      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">AB=DC, AD=BC</text>
+      <rect x="170" y="32" width="60" height="22" rx="6" fill="#FFD93D"/>
+      <text x="200" y="49" text-anchor="middle" fill="#1a0b3d" font-size="16" font-weight="900">AB＝8</text>
+      <rect x="195" y="208" width="60" height="22" rx="6" fill="#fff" stroke="#27D7FF" stroke-width="2"/>
+      <text x="225" y="225" text-anchor="middle" fill="#27D7FF" font-size="16" font-weight="900">DC＝?</text>
     `}),
-    q:{prompt:'平行四邊形 ABCD 中，AB＝8 公分，那 DC＝？',opts:['4 公分','6 公分','8 公分','10 公分'],correct:2}
+    q:{prompt:'看圖：AB＝8 公分，那 DC＝？',opts:['4 公分','6 公分','8 公分','10 公分'],correct:2}
   },
   {
     id:3,type:'P',num:3,label:'對角相等',rarity:'rare',color:'#27D7FF',
@@ -447,15 +450,12 @@ const GEMS = [
       <path d="M ${PG.C.x-10},${PG.C.y-6} A 20,20 0 0 1 ${PG.C.x-22},${PG.C.y-18}" stroke="#27D7FF" stroke-width="3" fill="none"/>
       <path d="M ${PG.B.x-10},${PG.B.y+6} A 16,16 0 0 0 ${PG.B.x-22},${PG.B.y+14}" stroke="#FF6BB0" stroke-width="3" fill="none"/>
       <path d="M ${PG.D.x+10},${PG.D.y-6} A 16,16 0 0 0 ${PG.D.x+22},${PG.D.y-14}" stroke="#FF6BB0" stroke-width="3" fill="none"/>
-      <g font-size="14" font-weight="900">
-        <text x="${PG.A.x+24}" y="${PG.A.y+22}" fill="#27D7FF">∠A</text>
-        <text x="${PG.C.x-44}" y="${PG.C.y-22}" fill="#27D7FF">∠C</text>
-        <text x="${PG.B.x-44}" y="${PG.B.y+22}" fill="#FF6BB0">∠B</text>
-        <text x="${PG.D.x+24}" y="${PG.D.y-18}" fill="#FF6BB0">∠D</text>
-      </g>
-      <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">∠A=∠C, ∠B=∠D</text>
+      <rect x="${PG.A.x+18}" y="${PG.A.y+14}" width="68" height="22" rx="6" fill="#FFD93D"/>
+      <text x="${PG.A.x+52}" y="${PG.A.y+31}" text-anchor="middle" fill="#1a0b3d" font-size="15" font-weight="900">∠A＝70°</text>
+      <rect x="${PG.C.x-86}" y="${PG.C.y-36}" width="68" height="22" rx="6" fill="#fff" stroke="#27D7FF" stroke-width="2"/>
+      <text x="${PG.C.x-52}" y="${PG.C.y-19}" text-anchor="middle" fill="#27D7FF" font-size="15" font-weight="900">∠C＝?</text>
     `}),
-    q:{prompt:'平行四邊形 ABCD 中，∠A＝70°，那 ∠C＝？',opts:['70°','110°','90°','180°'],correct:0}
+    q:{prompt:'看圖：∠A＝70°，那 ∠C＝？',opts:['70°','110°','90°','180°'],correct:0}
   },
   {
     id:4,type:'P',num:4,label:'對角線互平分',rarity:'rare',color:'#27D7FF',
@@ -471,12 +471,13 @@ const GEMS = [
           <animate attributeName="r" values="0;10;7" dur="1s" fill="freeze"/>
         </circle>
         <text x="${Ox+10}" y="${Oy-10}" fill="#FFD93D" font-size="16" font-weight="900">O</text>
-        <text x="${(PG.A.x+Ox)/2-8}" y="${(PG.A.y+Oy)/2-6}" fill="#27D7FF" font-size="12" font-weight="700">AO</text>
-        <text x="${(PG.C.x+Ox)/2+4}" y="${(PG.C.y+Oy)/2+12}" fill="#27D7FF" font-size="12" font-weight="700">OC</text>
-        <text x="210" y="245" text-anchor="middle" fill="#FFD93D" font-size="16" font-weight="900">AO=OC, BO=OD</text>
+        <rect x="${(PG.A.x+Ox)/2-32}" y="${(PG.A.y+Oy)/2-22}" width="62" height="22" rx="6" fill="#fff" stroke="#27D7FF" stroke-width="2"/>
+        <text x="${(PG.A.x+Ox)/2-1}" y="${(PG.A.y+Oy)/2-5}" text-anchor="middle" fill="#27D7FF" font-size="14" font-weight="900">AO＝?</text>
+        <rect x="40" y="232" width="160" height="22" rx="6" fill="#FFD93D"/>
+        <text x="120" y="249" text-anchor="middle" fill="#1a0b3d" font-size="14" font-weight="900">整條 AC＝10</text>
       `});
     },
-    q:{prompt:'平行四邊形對角線 AC＝10，O 為交點，AO＝？',opts:['4','5','8','10'],correct:1}
+    q:{prompt:'看圖：對角線 AC＝10，那 AO＝？',opts:['4','5','8','10'],correct:1}
   },
   {
     id:5,type:'P',num:5,label:'面積四等分',rarity:'epic',color:'#27D7FF',
@@ -490,13 +491,15 @@ const GEMS = [
         <polygon points="${PG.B.x},${PG.B.y} ${PG.C.x},${PG.C.y} ${Ox},${Oy}" fill="rgba(155,91,255,.3)" stroke="#9B5BFF" stroke-width="1.5"/>
         <polygon points="${PG.C.x},${PG.C.y} ${PG.D.x},${PG.D.y} ${Ox},${Oy}" fill="rgba(255,107,176,.3)" stroke="#FF6BB0" stroke-width="1.5"/>
         <polygon points="${PG.D.x},${PG.D.y} ${PG.A.x},${PG.A.y} ${Ox},${Oy}" fill="rgba(255,217,61,.3)" stroke="#FFD93D" stroke-width="1.5"/>
-        <text x="${(PG.A.x+PG.B.x)/2}" y="${PG.A.y+30}" text-anchor="middle" fill="#fff" font-size="14" font-weight="900">¼</text>
-        <text x="${(PG.B.x+PG.C.x)/2+10}" y="${(PG.B.y+PG.C.y)/2}" text-anchor="middle" fill="#fff" font-size="14" font-weight="900">¼</text>
-        <text x="${(PG.C.x+PG.D.x)/2}" y="${PG.C.y-12}" text-anchor="middle" fill="#fff" font-size="14" font-weight="900">¼</text>
-        <text x="${(PG.D.x+PG.A.x)/2-10}" y="${(PG.D.y+PG.A.y)/2}" text-anchor="middle" fill="#fff" font-size="14" font-weight="900">¼</text>
+        <text x="${(PG.A.x+PG.B.x)/2}" y="${PG.A.y+30}" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">?</text>
+        <text x="${(PG.B.x+PG.C.x)/2+10}" y="${(PG.B.y+PG.C.y)/2}" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">?</text>
+        <text x="${(PG.C.x+PG.D.x)/2}" y="${PG.C.y-12}" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">?</text>
+        <text x="${(PG.D.x+PG.A.x)/2-10}" y="${(PG.D.y+PG.A.y)/2}" text-anchor="middle" fill="#fff" font-size="18" font-weight="900">?</text>
+        <rect x="135" y="232" width="150" height="22" rx="6" fill="#FFD93D"/>
+        <text x="210" y="249" text-anchor="middle" fill="#1a0b3d" font-size="14" font-weight="900">總面積＝20</text>
       `});
     },
-    q:{prompt:'平行四邊形面積＝20，對角線切成 4 個三角形，每個面積＝？',opts:['4','5','10','20'],correct:1}
+    q:{prompt:'看圖：整個面積是 20，切成 4 塊一樣大，每塊是？',opts:['4','5','10','20'],correct:1}
   },
   {
     id:6,type:'D',num:1,label:'對邊平行 → 平行四邊形',rarity:'common',color:'#FF6BB0',
@@ -598,10 +601,10 @@ const GEMS = [
   }
 ];
 
-/* ---------- GEM MAP POSITIONS (constellation) ---------- */
+/* ---------- GEM MAP POSITIONS (2 rows: properties on top, determinations bottom) ---------- */
 const GEM_POSITIONS = [
-  {x:14,y:30},{x:30,y:18},{x:18,y:58},{x:32,y:72},{x:48,y:50},
-  {x:62,y:24},{x:80,y:38},{x:70,y:62},{x:52,y:80},{x:88,y:78}
+  {x:14,y:32},{x:30,y:32},{x:46,y:32},{x:62,y:32},{x:78,y:32}, // 性質 1-5
+  {x:14,y:72},{x:30,y:72},{x:46,y:72},{x:62,y:72},{x:78,y:72}  // 判別 1-5 (gem id 6-10)
 ];
 
 /* ---------- STATE ---------- */
@@ -767,8 +770,7 @@ document.getElementById('btn-go-pick').addEventListener('click',()=>{
   renderGemMap();
   saveSession();
   switchView('game');
-  // Auto-open first gem after short delay
-  setTimeout(()=>openGemModal(GEMS[0]),400);
+  // No auto-open: teacher picks who clicks which gem
 });
 
 /* ---------- HERO PICK ---------- */
@@ -857,19 +859,17 @@ function renderGemMap(){
   const linesSvg = document.getElementById('gem-lines');
   map.innerHTML = '';
   linesSvg.innerHTML = '';
-  // draw connecting lines first (constellation)
-  const linkPairs = [[0,1],[0,2],[1,4],[2,3],[3,4],[4,5],[5,6],[5,7],[6,7],[7,8],[8,9],[6,9]];
-  linkPairs.forEach(([a,b])=>{
-    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1',GEM_POSITIONS[a].x+'%');
-    line.setAttribute('y1',GEM_POSITIONS[a].y+'%');
-    line.setAttribute('x2',GEM_POSITIONS[b].x+'%');
-    line.setAttribute('y2',GEM_POSITIONS[b].y+'%');
-    line.setAttribute('stroke','rgba(255,255,255,.1)');
-    line.setAttribute('stroke-width','1');
-    line.setAttribute('stroke-dasharray','4 4');
-    linesSvg.appendChild(line);
-  });
+  // Row labels (左側標題)
+  const propLabel = document.createElement('div');
+  propLabel.className = 'row-label row-label-p';
+  propLabel.innerHTML = '<div class="row-num">性質</div><div class="row-hint">1～5 號</div>';
+  propLabel.style.cssText = 'position:absolute;left:2%;top:32%;transform:translateY(-50%);text-align:center;color:#27D7FF;font-weight:900';
+  map.appendChild(propLabel);
+  const determLabel = document.createElement('div');
+  determLabel.className = 'row-label row-label-d';
+  determLabel.innerHTML = '<div class="row-num">判別</div><div class="row-hint">6～10 號</div>';
+  determLabel.style.cssText = 'position:absolute;left:2%;top:72%;transform:translateY(-50%);text-align:center;color:#FF6BB0;font-weight:900';
+  map.appendChild(determLabel);
   GEMS.forEach((gem,i)=>{
     const pos = GEM_POSITIONS[i];
     const node = document.createElement('div');
@@ -899,10 +899,11 @@ function renderGemMap(){
 
 function gemIconSVG(gem){
   const c = gem.color;
+  const displayNum = gem.id;
   if(gem.type==='P'){
-    return `<svg viewBox="0 0 60 60"><defs><linearGradient id="gp${gem.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#1a0b3d"/></linearGradient></defs><polygon points="30,4 56,30 30,56 4,30" fill="url(#gp${gem.id})" stroke="${c}" stroke-width="2"/><polygon points="30,12 48,30 30,48 12,30" fill="${c}" opacity=".3"/><text x="30" y="36" text-anchor="middle" fill="#fff" font-size="14" font-weight="900" font-family="Orbitron,sans-serif">${gem.num}</text></svg>`;
+    return `<svg viewBox="0 0 60 60"><defs><linearGradient id="gp${gem.id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#1a0b3d"/></linearGradient></defs><polygon points="30,3 57,30 30,57 3,30" fill="url(#gp${gem.id})" stroke="${c}" stroke-width="2.5"/><polygon points="30,12 48,30 30,48 12,30" fill="${c}" opacity=".35"/><text x="30" y="38" text-anchor="middle" fill="#fff" font-size="22" font-weight="900" font-family="Orbitron,sans-serif">${displayNum}</text></svg>`;
   } else {
-    return `<svg viewBox="0 0 60 60"><defs><radialGradient id="gd${gem.id}"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#1a0b3d"/></radialGradient></defs><circle cx="30" cy="30" r="26" fill="url(#gd${gem.id})" stroke="${c}" stroke-width="2"/><circle cx="30" cy="30" r="14" fill="${c}" opacity=".35"/><text x="30" y="36" text-anchor="middle" fill="#fff" font-size="14" font-weight="900" font-family="Orbitron,sans-serif">${gem.num}</text></svg>`;
+    return `<svg viewBox="0 0 60 60"><defs><radialGradient id="gd${gem.id}"><stop offset="0" stop-color="${c}"/><stop offset="1" stop-color="#1a0b3d"/></radialGradient></defs><circle cx="30" cy="30" r="27" fill="url(#gd${gem.id})" stroke="${c}" stroke-width="2.5"/><circle cx="30" cy="30" r="15" fill="${c}" opacity=".4"/><text x="30" y="38" text-anchor="middle" fill="#fff" font-size="22" font-weight="900" font-family="Orbitron,sans-serif">${displayNum}</text></svg>`;
   }
 }
 
@@ -1017,18 +1018,13 @@ function showResult(success){
 }
 
 document.getElementById('btn-result-next').addEventListener('click',()=>{
+  closeGemModal();
   updateProgress();
   renderGemMap();
-  const nextIdx = state.gemsCollected.length;
-  if(nextIdx>=10){
-    closeGemModal();
+  if(state.gemsCollected.length>=10){
     setTimeout(showEndView,500);
-  } else {
-    // auto-advance to next gem in same modal (smooth transition)
-    document.getElementById('stage-result').hidden = true;
-    document.getElementById('stage-play').hidden = false;
-    openGemModal(GEMS[nextIdx]);
   }
+  // else: stay on map, teacher calls next student
 });
 
 /* ---------- SKILL EFFECTS ---------- */
