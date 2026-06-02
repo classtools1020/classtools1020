@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>平行四邊形 PRO · 賽車寶箱大冒險 (6/2)</title>
+<style>
+  /* === 漫畫熱血少年風 (Manga Shonen Style) === */
+  /* 跟之前暗藍 RPG 完全不同：白底紙感 + 火焰橘 + 電光藍 + 黑粗邊 + 漫畫網點 */
+  :root {
+    --bg-dark: #FFF8E7;          /* 漫畫紙黃白底（不再是暗黑） */
+    --bg-mid: #FFE9C4;
+    --primary: #0066FF;           /* 電光藍（招式光） */
+    --primary-soft: #4D9BFF;
+    --gold: #FF6600;              /* 火焰橘 */
+    --gold-soft: #FF9933;
+    --accent: #FF1744;            /* 警示紅 */
+    --success: #00C853;           /* 過關綠 */
+    --success-soft: #B9F6CA;
+    --warning: #FFAB00;           /* 警告黃 */
+    --danger: #D50000;
+    --text: #0D0D14;              /* 漫畫線稿黑 */
+    --text-dim: #4A5568;
+    --ink: #0D0D14;
+    --paper: #FFF8E7;
+    --L1-color: #0066FF;
+    --L2-color: #FF1744;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+  html,body{font-family:'Bangers','Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+  /* 漫畫紙感背景：奶黃底 + 細網點 + 對角線速度線 */
+  body{
+    background:
+      repeating-linear-gradient(45deg, transparent 0, transparent 40px, rgba(0,102,255,0.025) 40px, rgba(0,102,255,0.025) 41px),
+      radial-gradient(circle, rgba(13,13,20,0.04) 1px, transparent 1px) 0 0 / 12px 12px,
+      var(--paper);
+    background-attachment:fixed;
+  }
+
+  .app{max-width:820px;margin:0 auto;padding:16px;min-height:100vh;position:relative;z-index:1}
+
+  /* === HUD：漫畫條形 banner === */
+  .hud{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--ink);color:white;
+    border:3px solid var(--ink);
+    padding:8px 14px;margin-bottom:16px;
+    box-shadow:5px 5px 0 0 var(--gold);
+    transform:skew(-2deg);
+  }
+  .hud > * { transform:skew(2deg); }
+  .hud-left{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .hud-nick{font-weight:900;color:#FFD970;font-size:16px;letter-spacing:1px}
+  .hud-stat{display:flex;align-items:center;gap:4px;font-size:14px;color:white;font-weight:800}
+  .hud-stat .icon{font-size:18px}
+  .hud-coins{color:var(--gold-soft)}
+
+  /* === 進度條：漫畫氣泡圓 === */
+  .progress{display:flex;gap:7px}
+  .pdot{
+    width:32px;height:32px;border-radius:50%;background:white;
+    border:3px solid var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:900;color:var(--ink);
+    box-shadow:2px 2px 0 0 var(--ink);
+  }
+  .pdot.done{background:var(--success);color:white}
+  .pdot.active{background:var(--gold);color:white;transform:scale(1.18) rotate(-8deg);box-shadow:3px 3px 0 0 var(--accent)}
+
+  /* === 主卡片：白底厚黑邊 + 偏移陰影（漫畫格） === */
+  .card{
+    background:white;
+    border:4px solid var(--ink);
+    padding:22px;
+    box-shadow:8px 8px 0 0 var(--ink);
+    animation:cardIn 0.4s ease;
+    position:relative;
+  }
+  /* 卡片右上角貼紙 */
+  .card::before{
+    content:'🔥';position:absolute;top:-18px;right:-12px;
+    font-size:36px;transform:rotate(15deg);
+    filter:drop-shadow(2px 2px 0 var(--ink));
+  }
+  @keyframes cardIn{
+    from{opacity:0;transform:translateY(15px) rotate(-1deg)}
+    to{opacity:1;transform:translateY(0) rotate(0)}
+  }
+
+  /* === 標題：漫畫聲效感（雙描邊 + 陰影） === */
+  h1{
+    font-size:clamp(26px,6.5vw,38px);
+    color:var(--accent);text-align:center;
+    letter-spacing:2px;margin-bottom:6px;
+    font-weight:900;
+    -webkit-text-stroke:2px var(--ink);
+    text-shadow:4px 4px 0 var(--gold), 4px 4px 0 var(--ink);
+    transform:rotate(-1.5deg);
+  }
+  h2{font-size:clamp(20px,5vw,26px);color:var(--primary);margin-bottom:10px;font-weight:900;-webkit-text-stroke:1px var(--ink)}
+  h3{font-size:clamp(16px,4vw,19px);color:var(--ink);margin-bottom:8px;font-weight:800}
+  .subtitle{text-align:center;color:var(--ink);font-size:15px;margin-bottom:14px;font-weight:700}
+
+  /* === 按鈕：漫畫聲效按鈕（厚黑邊 + 偏移陰影 + 按下塌陷） === */
+  .btn{
+    min-height:54px;padding:12px 24px;
+    border:3px solid var(--ink);
+    background:var(--primary);color:white;
+    font-size:17px;font-weight:900;letter-spacing:1px;
+    cursor:pointer;font-family:inherit;
+    box-shadow:4px 4px 0 0 var(--ink);
+    transition:transform 0.1s, box-shadow 0.1s;
+    min-width:120px;
+    text-shadow:1px 1px 0 rgba(0,0,0,0.3);
+  }
+  .btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 0 var(--ink)}
+  .btn:active{transform:translate(4px,4px);box-shadow:0 0 0 0 var(--ink)}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:4px 4px 0 0 var(--ink)}
+  .btn-gold{background:var(--gold);color:white}
+  .btn-ghost{background:white;color:var(--ink)}
+  .btn-warning{background:var(--warning);color:var(--ink)}
+
+  /* === Input：手寫筆記本感 === */
+  .input{
+    width:100%;padding:14px 18px;
+    background:white;
+    border:3px solid var(--ink);
+    box-shadow:4px 4px 0 0 var(--ink);
+    font-size:20px;color:var(--ink);font-family:inherit;
+    text-align:center;font-weight:800;
+    letter-spacing:1px;
+  }
+  .input:focus{outline:none;background:#FFFEF5;box-shadow:4px 4px 0 0 var(--gold)}
+  .input::placeholder{color:#9CA3AF;font-weight:600}
+
+  /* === 題目標題：漫畫對白框 === */
+  .qtitle{
+    font-size:clamp(18px,4.6vw,22px);
+    font-weight:900;line-height:1.6;color:var(--ink);
+    margin:18px 0 8px;text-align:left;
+    background:#FFFEF5;
+    border:3px solid var(--ink);
+    border-radius:8px;
+    padding:14px 18px;
+    position:relative;
+    box-shadow:3px 3px 0 0 var(--ink);
+  }
+  /* 對話框小尖角 */
+  .qtitle::after{
+    content:'';position:absolute;bottom:-15px;left:30px;
+    width:0;height:0;
+    border:12px solid transparent;
+    border-top-color:var(--ink);
+    border-bottom:0;
+  }
+  .qhint{
+    font-size:14px;color:var(--ink);text-align:center;
+    margin-bottom:14px;margin-top:20px;
+    font-weight:600;font-style:italic;
+    background:rgba(255,171,0,0.15);
+    border-left:4px solid var(--warning);
+    padding:8px 14px;border-radius:4px;
+  }
+
+  /* === 幾何圖區：白底 + 黑粗邊（漫畫圖格） === */
+  .stage-wrap{
+    background:white;
+    border:3px solid var(--ink);
+    box-shadow:4px 4px 0 0 var(--primary);
+    padding:14px;margin:14px 0;overflow:hidden;
+    border-radius:6px;
+  }
+  .stage{width:100%;height:auto;display:block}
+
+  /* === 選項按鈕：漫畫貼紙風 === */
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:18px}
+  .opt{
+    min-height:62px;padding:14px 16px;
+    background:white;color:var(--ink);
+    border:3px solid var(--ink);
+    box-shadow:4px 4px 0 0 var(--ink);
+    font-size:16px;font-weight:800;
+    cursor:pointer;font-family:inherit;
+    text-align:center;line-height:1.4;
+    transition:transform 0.1s, box-shadow 0.1s, background 0.15s;
+  }
+  .opt:hover{
+    background:var(--gold);color:white;
+    transform:translate(-1px,-1px) rotate(-1deg);
+    box-shadow:5px 5px 0 0 var(--ink);
+  }
+  .opt.correct{
+    background:var(--success);color:white;
+    border-color:var(--ink);
+    box-shadow:4px 4px 0 0 var(--ink);
+    animation:hit 0.5s;
+  }
+  .opt.wrong{
+    background:#FFE0E0;color:var(--danger);
+    box-shadow:4px 4px 0 0 var(--ink);opacity:0.85;
+  }
+  .opt.show-correct{
+    background:var(--success);color:white;
+    box-shadow:4px 4px 0 0 var(--ink);font-weight:900;
+  }
+  @keyframes hit{
+    0%{transform:scale(1)}
+    30%{transform:scale(1.15) rotate(-3deg)}
+    60%{transform:scale(0.95) rotate(2deg)}
+    100%{transform:scale(1)}
+  }
+
+  /* === 回饋框：漫畫對白 === */
+  .fb{
+    margin-top:16px;padding:14px 18px;
+    border:3px solid var(--ink);
+    font-size:15px;line-height:1.6;
+    font-weight:700;
+    display:none;animation:cardIn 0.3s;
+    box-shadow:4px 4px 0 0 var(--ink);
+  }
+  .fb.show{display:block}
+  .fb.win{background:#D4FFE0;color:var(--success);border-color:var(--success)}
+  .fb.win::before{content:'💥 ';font-size:22px}
+  .fb.gentle{background:#FFF5D6;color:#B45309;border-color:var(--warning)}
+  .fb.gentle::before{content:'💡 ';font-size:22px}
+
+  /* === 提示卡：螢光便條紙 === */
+  .hints{display:none;margin-top:14px}
+  .hints.show{display:block;animation:cardIn 0.3s}
+  .hint{
+    background:#FFF59D;color:var(--ink);
+    border:2px solid var(--ink);
+    box-shadow:3px 3px 0 0 var(--ink);
+    padding:12px 14px;margin-bottom:10px;
+    font-size:14px;line-height:1.6;font-weight:600;
+    transform:rotate(-0.5deg);
+  }
+  .hint:nth-child(even){transform:rotate(0.5deg);background:#FFE4B5}
+  .hint strong{color:var(--accent);font-weight:900}
+
+  .stage text{user-select:none}
+
+  /* === Nav 按鈕列 === */
+  .nav{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+  .nav .btn{flex:1;min-width:130px}
+
+  /* === 金幣彈跳（保留 emoji 樣式但加描邊） === */
+  @keyframes coinPop{
+    0%{transform:translateY(0) scale(1) rotate(0);opacity:1}
+    100%{transform:translateY(-60px) scale(1.8) rotate(360deg);opacity:0}
+  }
+  .coin-pop{position:fixed;font-size:36px;pointer-events:none;animation:coinPop 1s ease-out forwards;z-index:9999}
+
+  /* === 勝利畫面 === */
+  .victory{text-align:center;padding:28px}
+  .victory .emoji{font-size:80px;margin-bottom:8px;animation:hit 1.5s infinite;filter:drop-shadow(3px 3px 0 var(--ink))}
+  .victory h1{font-size:38px;margin-bottom:14px}
+  .score-display{
+    background:var(--gold);color:white;
+    border:4px solid var(--ink);
+    box-shadow:6px 6px 0 0 var(--ink);
+    padding:24px;margin:20px 0;
+    transform:rotate(-1.5deg);
+  }
+  .score-display .num{font-size:64px;font-weight:900;text-shadow:3px 3px 0 var(--ink);letter-spacing:2px}
+  .score-display .label{font-size:16px;margin-top:4px;font-weight:800;-webkit-text-stroke:0.5px var(--ink)}
+
+  /* === 送出狀態 === */
+  .submit-status{
+    padding:14px 18px;border:3px solid var(--ink);
+    text-align:center;font-weight:800;margin:14px 0;
+    box-shadow:3px 3px 0 0 var(--ink);
+  }
+  .submit-status.pending{background:#FFF59D;color:var(--ink)}
+  .submit-status.success{background:var(--success);color:white}
+  .submit-status.error{background:#FFE0E0;color:var(--danger);border-color:var(--danger)}
+
+  .spinner{display:inline-block;width:18px;height:18px;border:3px solid rgba(0,0,0,0.2);border-top-color:var(--ink);border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* === 速度線裝飾（替代原本星星） === */
+  .deco-stars{position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden;z-index:0}
+  .star{
+    position:absolute;color:var(--accent);opacity:0.5;font-size:18px;
+    animation:zoom 4s infinite;font-weight:900;
+  }
+  @keyframes zoom{
+    0%,100%{opacity:0.1;transform:scale(0.8) rotate(0)}
+    50%{opacity:0.5;transform:scale(1.2) rotate(45deg)}
+  }
+
+  /* === 入場畫面：起手式 === */
+  .start-screen{text-align:center;padding:30px 18px;position:relative}
+  .start-screen .crown{
+    font-size:72px;margin-bottom:10px;
+    display:inline-block;
+    animation:hit 2s infinite;
+    filter:drop-shadow(3px 3px 0 var(--ink));
+  }
+  .start-screen h1{font-size:42px;margin-bottom:8px}
+  .start-screen .tagline{
+    color:var(--ink);font-size:17px;margin-bottom:24px;
+    font-weight:700;line-height:1.6;
+    background:var(--gold-soft);
+    border:3px solid var(--ink);
+    padding:8px 16px;display:inline-block;
+    transform:rotate(-1deg);
+    box-shadow:3px 3px 0 0 var(--ink);
+  }
+  .stage-info{
+    background:#FFFEF5;
+    border:3px solid var(--ink);
+    box-shadow:5px 5px 0 0 var(--primary);
+    padding:18px;margin:20px 0;
+    font-size:15px;color:var(--ink);line-height:1.8;
+    font-weight:600;
+    text-align:left;
+  }
+
+  /* === 難度標籤（彩色 sticker） === */
+  .lvl-badge{
+    display:inline-block;padding:6px 14px;
+    border:2.5px solid var(--ink);
+    box-shadow:3px 3px 0 0 var(--ink);
+    font-size:13px;font-weight:900;margin-bottom:12px;
+    letter-spacing:1px;
+    transform:rotate(-2deg);
+  }
+  .lvl-base{background:var(--success);color:white}
+  .lvl-mid{background:var(--gold);color:white}
+  .lvl-boss{background:var(--accent);color:white}
+
+  .crystal{font-size:24px;animation:hit 2s infinite ease-in-out;display:inline-block}
+
+  /* === 額外漫畫聲效裝飾 === */
+  .manga-burst{
+    position:absolute;font-size:14px;font-weight:900;
+    color:var(--accent);background:var(--gold);
+    border:2px solid var(--ink);
+    padding:4px 10px;
+    box-shadow:2px 2px 0 0 var(--ink);
+    transform:rotate(-8deg);
+    pointer-events:none;
+  }
+
+  /* === BOSS 演示動畫（自閉症友善：可預測、可重複、可重置） === */
+  .boss-demo-panel{
+    background:#FFF59D;
+    border:3px solid var(--ink);
+    box-shadow:4px 4px 0 0 var(--accent);
+    padding:14px;margin-top:16px;
+    border-radius:4px;
+  }
+  .boss-demo-title{
+    text-align:center;font-weight:900;
+    color:var(--accent);margin-bottom:12px;
+    font-size:14px;line-height:1.5;
+  }
+  .boss-demo-btns{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+    gap:8px;margin-bottom:12px;
+  }
+  .boss-demo-btns .btn{
+    min-height:54px;padding:8px 10px;
+    font-size:13px;min-width:0;line-height:1.3;
+  }
+  .demo-caption{
+    text-align:center;font-weight:900;
+    color:var(--accent);font-size:16px;
+    min-height:26px;background:white;
+    border:2px solid var(--ink);
+    padding:8px 12px;border-radius:4px;
+  }
+  .demo-caption strong{color:var(--gold);font-size:20px;-webkit-text-stroke:0.5px var(--ink)}
+
+  /* SVG 演示高亮樣式 */
+  .demo-edge-on{
+    stroke:#FF1744 !important;stroke-width:8 !important;
+    filter:drop-shadow(0 0 8px rgba(255,23,68,0.7));
+    animation:demo-pulse 1s infinite;
+  }
+  .demo-diag-on{
+    stroke:#FF6600 !important;stroke-width:4 !important;
+    stroke-dasharray:none !important;opacity:1 !important;
+    filter:drop-shadow(0 0 6px rgba(255,102,0,0.6));
+  }
+  .demo-seg-on{
+    stroke:#FF1744 !important;stroke-width:6 !important;opacity:1 !important;
+    filter:drop-shadow(0 0 8px rgba(255,23,68,0.7));
+    animation:demo-pulse 1s infinite;
+  }
+  .demo-label-pop{
+    fill:#FF1744 !important;font-size:22px !important;font-weight:900 !important;
+    animation:demo-bounce 0.6s;
+  }
+  @keyframes demo-pulse{0%,100%{opacity:1}50%{opacity:0.55}}
+  @keyframes demo-bounce{
+    0%{transform:scale(1);transform-origin:center}
+    50%{transform:scale(1.4);transform-origin:center}
+    100%{transform:scale(1);transform-origin:center}
+  }
+
+  /* === PRO 版升級樣式 === */
+  /* 賽車跑道 */
+  .race-track{
+    position:relative;
+    background:linear-gradient(to bottom, #1a1a2e 0%, #16213e 100%);
+    border:3px solid var(--ink);
+    border-radius:30px;
+    height:46px;margin-bottom:14px;
+    overflow:hidden;
+    box-shadow:5px 5px 0 0 var(--gold), inset 0 0 12px rgba(0,0,0,0.5);
+  }
+  .race-track::before{
+    content:'';position:absolute;top:50%;left:0;right:0;
+    height:3px;background:repeating-linear-gradient(to right, white 0, white 16px, transparent 16px, transparent 32px);
+    transform:translateY(-50%);opacity:0.6;
+  }
+  .race-car{
+    position:absolute;top:50%;
+    transform:translateY(-50%);
+    font-size:30px;
+    transition:left 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    filter:drop-shadow(2px 2px 0 var(--ink));
+    z-index:2;
+  }
+  .race-flag{
+    position:absolute;top:50%;right:6px;
+    transform:translateY(-50%);
+    font-size:24px;z-index:1;
+  }
+
+  /* COMBO 計數器 */
+  .combo-counter{
+    display:inline-block;background:var(--accent);color:white;
+    padding:2px 10px;border:2px solid var(--ink);
+    box-shadow:2px 2px 0 0 var(--ink);
+    font-weight:900;font-size:14px;letter-spacing:1px;
+    margin-left:8px;animation:combo-pulse 0.5s;
+  }
+  @keyframes combo-pulse{
+    0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}
+  }
+  .combo-fly{
+    position:fixed;font-size:48px;font-weight:900;
+    color:var(--accent);-webkit-text-stroke:3px var(--ink);
+    text-shadow:5px 5px 0 var(--gold);
+    pointer-events:none;z-index:9999;
+    animation:combo-fly 1.5s ease-out forwards;
+  }
+  @keyframes combo-fly{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(0.5) rotate(-20deg)}
+    30%{opacity:1;transform:translate(-50%,-50%) scale(1.3) rotate(5deg)}
+    100%{opacity:0;transform:translate(-50%,-100%) scale(1) rotate(0)}
+  }
+
+  /* 寶箱 modal */
+  .treasure-overlay{
+    position:fixed;inset:0;background:rgba(13,13,20,0.85);
+    display:none;align-items:center;justify-content:center;
+    z-index:9000;animation:fade-in 0.3s;
+  }
+  .treasure-overlay.show{display:flex}
+  @keyframes fade-in{from{opacity:0}to{opacity:1}}
+  .treasure-card{
+    background:white;border:5px solid var(--gold);
+    box-shadow:10px 10px 0 0 var(--accent);
+    padding:30px 40px;border-radius:14px;
+    text-align:center;max-width:380px;width:90%;
+    transform:rotate(-2deg);
+  }
+  .treasure-chest{
+    font-size:80px;cursor:pointer;display:inline-block;
+    transition:transform 0.2s;
+    filter:drop-shadow(4px 4px 0 var(--ink));
+  }
+  .treasure-chest:hover{transform:scale(1.15) rotate(-5deg)}
+  .treasure-chest.opened{animation:chest-open 0.6s ease-out forwards}
+  @keyframes chest-open{
+    0%{transform:scale(1) rotate(0)}
+    20%{transform:scale(1.3) rotate(-10deg)}
+    40%{transform:scale(1.4) rotate(10deg)}
+    100%{transform:scale(1.2) rotate(0)}
+  }
+  .treasure-prize{
+    font-size:36px;font-weight:900;color:var(--gold);
+    -webkit-text-stroke:2px var(--ink);
+    text-shadow:3px 3px 0 var(--ink);
+    margin:14px 0;animation:prize-pop 0.5s 0.5s both;
+  }
+  @keyframes prize-pop{
+    0%{opacity:0;transform:scale(0.5)}
+    50%{opacity:1;transform:scale(1.4)}
+    100%{opacity:1;transform:scale(1)}
+  }
+  .treasure-msg{font-size:14px;color:var(--text-dim);margin-bottom:12px}
+
+  /* 灑花 confetti */
+  .confetti{
+    position:fixed;width:12px;height:12px;
+    top:-20px;pointer-events:none;z-index:9500;
+    animation:confetti-fall linear forwards;
+  }
+  @keyframes confetti-fall{
+    0%{transform:translateY(0) rotate(0)}
+    100%{transform:translateY(110vh) rotate(720deg)}
+  }
+
+  /* 答對閃爍效果 */
+  @keyframes correct-flash{
+    0%{box-shadow:4px 4px 0 0 var(--ink)}
+    50%{box-shadow:0 0 30px 10px var(--success),4px 4px 0 0 var(--ink)}
+    100%{box-shadow:4px 4px 0 0 var(--ink)}
+  }
+  .opt.correct{animation:hit 0.5s, correct-flash 1s !important}
+</style>
+</head>
+<body>
+
+<div class="deco-stars" id="stars"></div>
+
+<div class="app" id="app">
+
+  <!-- 寶箱 modal -->
+  <div class="treasure-overlay" id="treasure-overlay">
+    <div class="treasure-card">
+      <div id="treasure-card-inner"></div>
+    </div>
+  </div>
+
+
+  <!-- Start Screen -->
+  <section id="screen-start" class="card start-screen">
+    <div class="crown">👑</div>
+    <h1>🏎️ 平行四邊形 PRO 大冒險 🎁</h1>
+    <p class="tagline">🏁 7 賽道 + 寶箱 + 灑花 · 闖過去就是<strong style="color:var(--gold)">賽車王</strong> 🏆</p>
+
+    <div style="margin:20px 0">
+      <label style="display:block;margin-bottom:8px;color:var(--gold-soft);font-weight:600">請輸入你的召喚師暱稱</label>
+      <input id="nick-input" class="input" type="text" placeholder="例：小新、艾妲、神槍手" maxlength="12" autocomplete="off">
+    </div>
+
+    <div class="stage-info">
+      📜 任務內容：7 賽道（課本 P.205-208 判別法）<br>
+      ⏱️ 預計時間：20-25 分鐘<br>
+      🎁 每關過關開寶箱抽金幣！連對有 COMBO 倍率！<br>
+      🛡️ 答錯不扣分！可以看提示
+    </div>
+
+    <button id="start-btn" class="btn btn-gold" style="width:100%;font-size:18px;min-height:60px">
+      🚀 出發！進入王國
+    </button>
+  </section>
+
+  <!-- Quest Screen (HUD + Q) -->
+  <section id="screen-quest" style="display:none">
+    <!-- 賽車跑道 -->
+    <div class="race-track">
+      <span class="race-car" id="race-car" style="left:0%">🏎️</span>
+      <span class="race-flag">🏁</span>
+    </div>
+    <div class="hud">
+      <div class="hud-left">
+        <span class="hud-nick">👑 <span id="hud-name">召喚師</span></span>
+        <span class="hud-stat hud-coins"><span class="icon">💰</span><span id="hud-coins">0</span></span>
+      </div>
+      <div class="progress" id="hud-progress"></div>
+    </div>
+
+    <div class="card" id="quest-card">
+      <!-- 動態填入題目 -->
+    </div>
+  </section>
+
+  <!-- Victory Screen -->
+  <section id="screen-victory" style="display:none">
+    <div class="card victory">
+      <div class="emoji">🏆</div>
+      <h1>王國大冒險完成！</h1>
+      <p style="color:var(--primary-soft);margin-bottom:18px">召喚師 <strong style="color:var(--gold-soft)" id="vic-name">XXX</strong> 通過全部關卡！</p>
+
+      <div class="score-display">
+        <div class="num"><span id="vic-correct">0</span>/7</div>
+        <div class="label">答對題數</div>
+      </div>
+
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin:14px 0">
+        <div style="background:rgba(91,111,232,0.15);border-radius:12px;padding:12px 18px">
+          <div style="font-size:24px;font-weight:700;color:var(--gold)">💰 <span id="vic-coins">0</span></div>
+          <div style="font-size:12px;color:var(--text-dim)">金幣</div>
+        </div>
+        <div style="background:rgba(91,111,232,0.15);border-radius:12px;padding:12px 18px">
+          <div style="font-size:24px;font-weight:700;color:var(--gold)">⏱️ <span id="vic-time">0:00</span></div>
+          <div style="font-size:12px;color:var(--text-dim)">用時</div>
+        </div>
+      </div>
+
+      <div id="vic-status" class="submit-status pending"><span class="spinner"></span>正在送出成績給老師...</div>
+
+      <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:14px;margin:18px 0;font-size:13px;color:var(--text-dim);line-height:1.7">
+        💝 不管答對幾題，<strong style="color:var(--gold)">願意挑戰就是了不起</strong>。<br>
+        明天上課，老師會在後台看到你的成績喔！
+      </div>
+
+      <button class="btn btn-ghost" style="width:100%" onclick="restartGame()">🔄 再玩一次</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+'use strict';
+
+/* =============== Config =============== */
+// Firebase Realtime Database — 永久儲存、CORS 完美、不會 12 小時消失
+const FIREBASE_URL = 'https://classtools1019-default-rtdb.firebaseio.com';
+const HOMEWORK_ID = '8a_parallelogram_pro_2026_06_02';
+const FIREBASE_NODE = `${FIREBASE_URL}/submissions/${HOMEWORK_ID}.json`;
+
+/* =============== Stars =============== */
+(() => {
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 25; i++) {
+    const s = document.createElement('span');
+    s.className = 'star';
+    s.textContent = '✦';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = Math.random() * 3 + 's';
+    s.style.fontSize = (Math.random() * 16 + 8) + 'px';
+    c.appendChild(s);
+  }
+})();
+
+/* =============== Game State =============== */
+const state = {
+  nick: '',
+  startTime: 0,
+  currentQ: 0,
+  coins: 0,
+  correct: 0,
+  combo: 0,
+  answers: [],
+  hintsUsed: [],
+};
+
+/* =============== SVG Helpers =============== */
+// 角度弧（標準數學角度系：0°=右、90°=上、180°=左、270°=下）
+// SVG y 向下，自動翻轉處理
+function svgArc(cx, cy, fromDeg, toDeg, r, color = '#FFC93C', sw = 2.8) {
+  const PI = Math.PI;
+  const sx = cx + r * Math.cos(fromDeg * PI / 180);
+  const sy = cy - r * Math.sin(fromDeg * PI / 180);
+  const ex = cx + r * Math.cos(toDeg * PI / 180);
+  const ey = cy - r * Math.sin(toDeg * PI / 180);
+  let delta = toDeg - fromDeg;
+  while (delta > 180) delta -= 360;
+  while (delta < -180) delta += 360;
+  // SVG sweep=1 = 視覺順時針；數學 delta<0 (順時針) 對應 SVG y 翻轉後仍視覺順時針
+  const sweep = delta < 0 ? 1 : 0;
+  return `<path d="M ${sx.toFixed(2)} ${sy.toFixed(2)} A ${r} ${r} 0 0 ${sweep} ${ex.toFixed(2)} ${ey.toFixed(2)}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"/>`;
+}
+// 角度數字標籤（自動放在弧中間外側，處理 wrap-around）
+function svgAngleLabel(cx, cy, fromDeg, toDeg, r, text, color = '#FFC93C', size = 16) {
+  const PI = Math.PI;
+  let _from = fromDeg, _to = toDeg;
+  while (_to - _from > 180) _to -= 360;
+  while (_to - _from < -180) _to += 360;
+  const midDeg = (_from + _to) / 2;
+  const lr = r + 14;
+  const lx = cx + lr * Math.cos(midDeg * PI / 180);
+  const ly = cy - lr * Math.sin(midDeg * PI / 180);
+  return `<text x="${lx.toFixed(1)}" y="${(ly + size/3).toFixed(1)}" text-anchor="middle" fill="${color}" font-size="${size}" font-weight="800">${text}</text>`;
+}
+// 角度名稱標籤（∠1、∠2 等，放在更外側）
+function svgAngleName(cx, cy, fromDeg, toDeg, r, text, color = '#FFD970', size = 18) {
+  const PI = Math.PI;
+  let _from = fromDeg, _to = toDeg;
+  while (_to - _from > 180) _to -= 360;
+  while (_to - _from < -180) _to += 360;
+  const midDeg = (_from + _to) / 2;
+  const lr = r + 32;
+  const lx = cx + lr * Math.cos(midDeg * PI / 180);
+  const ly = cy - lr * Math.sin(midDeg * PI / 180);
+  return `<text x="${lx.toFixed(1)}" y="${(ly + size/3).toFixed(1)}" text-anchor="middle" fill="${color}" font-size="${size}" font-weight="800">${text}</text>`;
+}
+// 整合標籤：把 "∠A" + "30°" 合併成單一文字 "∠A=30°"（避免兩個標籤擠在同方向）
+function svgAngleFull(cx, cy, fromDeg, toDeg, r, name, value, color = '#FFD970', size = 17) {
+  const PI = Math.PI;
+  let _from = fromDeg, _to = toDeg;
+  while (_to - _from > 180) _to -= 360;
+  while (_to - _from < -180) _to += 360;
+  const midDeg = (_from + _to) / 2;
+  const lr = r + 22;
+  const lx = cx + lr * Math.cos(midDeg * PI / 180);
+  const ly = cy - lr * Math.sin(midDeg * PI / 180);
+  const text = value ? `${name}=${value}` : name;
+  return `<text x="${lx.toFixed(1)}" y="${(ly + size/3).toFixed(1)}" text-anchor="middle" fill="${color}" font-size="${size}" font-weight="800">${text}</text>`;
+}
+// 點圓 + 標籤
+function svgPoint(cx, cy, label, color = '#FFC93C', labelOffsetX = 0, labelOffsetY = -14, size = 16) {
+  return `<circle cx="${cx}" cy="${cy}" r="7" fill="${color}" stroke="#0D0D14" stroke-width="2.5"/>` +
+    (label ? `<text x="${cx + labelOffsetX}" y="${cy + labelOffsetY}" text-anchor="middle" fill="${color}" font-size="${size}" font-weight="800">${label}</text>` : '');
+}
+
+/* =============== Questions =============== */
+const QUESTIONS = [
+
+  /* ============ Q1 ⭐ 課本 P.206 對邊等長判別（3 圖選 1） ============ */
+  {
+    level: 1,
+    levelLabel: '🏁 賽道 1 · 對邊等長判別',
+    title: '🎒 蠟筆小新打開課本 P.206！下面 3 個四邊形，哪一個 100% 是「平行四邊形」？提示：兩組對邊都要等長（不只一組）',
+    hint: '🔑 看每個圖的「對邊」：上邊 vs 下邊、左邊 vs 右邊。兩組都相等才算！',
+    buildSvg() {
+      // 3 個小四邊形：(1) 菱形 6,6,6,6 ✓ (2) 5,5,6,6 ✓ (3) 風箏 5,5,6,6 (相鄰相等但對邊不等) ✗
+      return `
+      <svg class="stage" viewBox="0 0 660 280" xmlns="http://www.w3.org/2000/svg">
+        <!-- 圖(1) 菱形（4 邊都 6）✓ -->
+        <g transform="translate(60, 60)">
+          <polygon points="60,15 130,80 60,145 -10,80" fill="rgba(0,200,83,0.15)" stroke="#0066FF" stroke-width="3"/>
+          <text x="60" y="-2" text-anchor="middle" fill="#0D0D14" font-size="12" font-weight="800">6</text>
+          <text x="105" y="120" text-anchor="middle" fill="#0D0D14" font-size="12" font-weight="800">6</text>
+          <text x="60" y="170" text-anchor="middle" fill="#0D0D14" font-size="12" font-weight="800">6</text>
+          <text x="15" y="120" text-anchor="middle" fill="#0D0D14" font-size="12" font-weight="800">6</text>
+          <text x="60" y="200" text-anchor="middle" fill="#FF1744" font-size="18" font-weight="900">(1)</text>
+        </g>
+        <!-- 圖(2) 平行四邊形（5,5,6,6）✓ -->
+        <g transform="translate(280, 80)">
+          <polygon points="20,100 100,100 120,30 40,30" fill="rgba(0,200,83,0.15)" stroke="#0066FF" stroke-width="3"/>
+          <text x="70" y="120" text-anchor="middle" fill="#0D0D14" font-size="12" font-weight="800">6</text>
+          <text x="120" y="68" text-anchor="middle" fill="#0D0D14" font-size="12" font-weight="800">5</text>
+          <text x="70" y="22" text-anchor="middle" fill="#0D0D14" font-size="12" font-weight="800">6</text>
+          <text x="22" y="68" text-anchor="middle" fill="#0D0D14" font-size="12" font-weight="800">5</text>
+          <text x="70" y="180" text-anchor="middle" fill="#FF1744" font-size="18" font-weight="900">(2)</text>
+        </g>
+        <!-- 圖(3) 風箏（5,5,6,6 但相鄰相等）✗ -->
+        <g transform="translate(500, 60)">
+          <polygon points="60,15 110,80 60,145 10,80" fill="rgba(168,181,232,0.15)" stroke="#94A3B8" stroke-width="3"/>
+          <text x="95" y="40" fill="#0D0D14" font-size="12" font-weight="800">5</text>
+          <text x="95" y="120" fill="#0D0D14" font-size="12" font-weight="800">6</text>
+          <text x="20" y="120" fill="#0D0D14" font-size="12" font-weight="800">6</text>
+          <text x="20" y="40" fill="#0D0D14" font-size="12" font-weight="800">5</text>
+          <text x="60" y="200" text-anchor="middle" fill="#FF1744" font-size="18" font-weight="900">(3)</text>
+        </g>
+      </svg>`;
+    },
+    options: [
+      { text: '(1) 和 (2) 都是', correct: true },
+      { text: '只有 (1)', correct: false },
+      { text: '只有 (2)', correct: false },
+      { text: '(1)、(2)、(3) 都是', correct: false },
+    ],
+    explainCorrect: '答對！🎯 (1) 4 邊都 6 → 對邊都等 ✓。(2) 兩組對邊各 5+6 → 對邊都等 ✓。(3) 雖然 4 邊有 5、5、6、6，但「相鄰邊相等」(風箏) — 對邊「不」相等 ✗',
+    explainWrong: '判別法：「兩組對邊分別等長」→ 平行四邊形。(1) 菱形和 (2) 一般平行四邊形都符合；(3) 風箏的對邊不等！',
+    hints: [
+      '判別法：「兩組對邊都相等」才是平行四邊形',
+      '(1) 4 邊都 6，當然兩組對邊都等 ✓',
+      '(2) 上下=6、左右=5，兩組對邊都等 ✓',
+      '(3) 相鄰兩邊等（風箏型），但上=5 下=6，對邊不等 ✗',
+    ],
+  },
+
+  /* ============ Q2 ⭐ 課本 P.207 對角相等判別 ============ */
+  {
+    level: 1,
+    levelLabel: '🏁 賽道 2 · 對角相等判別',
+    title: '🌺 安妮亞的對角讀心術！四邊形 ABCD 中，∠A = ∠C = 120°、∠B = ∠D = 60°。請問這是平行四邊形嗎？',
+    hint: '🔑 課本 P.207：兩組對角分別相等的四邊形 → 平行四邊形',
+    buildSvg() {
+      return buildPlg({
+        angleA: '120°', angleC: '120°',
+        angleB: '60°', angleD: '60°',
+        highlight: ['angleA', 'angleC', 'angleB', 'angleD'],
+      });
+    },
+    options: [
+      { text: '✓ 是！（兩組對角都相等）', correct: true },
+      { text: '✗ 不是', correct: false },
+      { text: '需要看邊長才知道', correct: false },
+      { text: '需要看對角線才知道', correct: false },
+    ],
+    explainCorrect: '答對！🌺 ∠A=∠C ✓ + ∠B=∠D ✓ → 兩組對角都相等 → 平行四邊形！（驗證：∠A+∠B = 120+60 = 180° 也成立鄰角互補）',
+    explainWrong: '判別法：「兩組對角分別相等」→ 平行四邊形。∠A=∠C=120°、∠B=∠D=60° 完全符合！',
+    hints: [
+      '判別法：兩組對角分別相等 → 平行四邊形',
+      '∠A 跟 ∠C 是對角 → 都 120°，相等 ✓',
+      '∠B 跟 ∠D 是對角 → 都 60°，相等 ✓ → 平行四邊形！',
+    ],
+  },
+
+  /* ============ Q3 🌙 課本 P.208 例 4 對角線平分判別 ============ */
+  {
+    level: 2,
+    levelLabel: '🏁 賽道 3 · 對角線平分判別',
+    title: '⚡ 課本 P.208 例 4！四邊形 ABCD 中，O 是兩條對角線的交點，OA = OC = 5、OB = OD = 4。請問 ABCD 是平行四邊形嗎？',
+    hint: '🔑 判別法：兩條對角線「互相平分」→ 平行四邊形',
+    buildSvg() {
+      return buildPlg({
+        diagonals: true, O: true,
+        AO: '5', OC: '5', BO: '4', OD: '4',
+        highlight: ['AO', 'OC', 'BO', 'OD'],
+      });
+    },
+    options: [
+      { text: '✓ 是！（兩條對角線互相平分）', correct: true },
+      { text: '✗ 不是', correct: false },
+      { text: '需要看角度才知道', correct: false },
+      { text: '需要看邊長才知道', correct: false },
+    ],
+    explainCorrect: '答對！⚡ OA=OC → AC 被 O 平分 ✓；OB=OD → BD 被 O 平分 ✓ → 兩條對角線互相平分 → 平行四邊形！',
+    explainWrong: '判別法：「兩條對角線互相平分」→ 平行四邊形。OA=OC 表示 AC 被 O 切兩半；OB=OD 表示 BD 被 O 切兩半。',
+    hints: [
+      '判別法：兩條對角線互相平分 → 平行四邊形',
+      'OA = OC = 5 → 對角線 AC 被 O 切成兩半 ✓',
+      'OB = OD = 4 → 對角線 BD 也被 O 切成兩半 ✓ → 平行四邊形！',
+    ],
+  },
+
+  /* ============ Q4 🌙 課本 P.205 例 3 對角線面積四等分 ============ */
+  {
+    level: 2,
+    levelLabel: '🏁 賽道 4 · 對角線面積四等分',
+    title: '🍰 課本 P.205 例 3！平行四邊形 ABCD 中，兩條對角線交於 O。已知 △AOD 的面積 = 5。請問其他 3 個三角形面積加起來 = ?',
+    hint: '🔑 平行四邊形的對角線把面積「四等分」！4 個三角形面積都相等',
+    buildSvg() {
+      const Ax=130, Ay=240, Bx=430, By=240, Cx=540, Cy=100, Dx=240, Dy=100;
+      const Ox=(Ax+Cx)/2, Oy=(Ay+Cy)/2;
+      return `
+      <svg class="stage" viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="${Ax},${Ay} ${Bx},${By} ${Ox},${Oy}" fill="rgba(0,200,83,0.25)" stroke="#0D0D14" stroke-width="2"/>
+        <polygon points="${Bx},${By} ${Cx},${Cy} ${Ox},${Oy}" fill="rgba(255,201,60,0.25)" stroke="#0D0D14" stroke-width="2"/>
+        <polygon points="${Cx},${Cy} ${Dx},${Dy} ${Ox},${Oy}" fill="rgba(0,102,255,0.25)" stroke="#0D0D14" stroke-width="2"/>
+        <polygon points="${Dx},${Dy} ${Ax},${Ay} ${Ox},${Oy}" fill="rgba(255,143,163,0.5)" stroke="#FF1744" stroke-width="3"/>
+        <polygon points="${Ax},${Ay} ${Bx},${By} ${Cx},${Cy} ${Dx},${Dy}" fill="none" stroke="var(--L1-color)" stroke-width="4"/>
+        <line x1="${Ax}" y1="${Ay}" x2="${Cx}" y2="${Cy}" stroke="#0D0D14" stroke-width="2" stroke-dasharray="6 4"/>
+        <line x1="${Bx}" y1="${By}" x2="${Dx}" y2="${Dy}" stroke="#0D0D14" stroke-width="2" stroke-dasharray="6 4"/>
+        <text x="${(Ax+Bx+Ox)/3}" y="${(Ay+By+Oy)/3+6}" text-anchor="middle" fill="#0D0D14" font-size="20" font-weight="900">△AOB = ?</text>
+        <text x="${(Bx+Cx+Ox)/3}" y="${(By+Cy+Oy)/3+6}" text-anchor="middle" fill="#0D0D14" font-size="18" font-weight="900">△BOC = ?</text>
+        <text x="${(Cx+Dx+Ox)/3}" y="${(Cy+Dy+Oy)/3+6}" text-anchor="middle" fill="#0D0D14" font-size="18" font-weight="900">△COD = ?</text>
+        <text x="${(Dx+Ax+Ox)/3-5}" y="${(Dy+Ay+Oy)/3+6}" text-anchor="middle" fill="#FF1744" font-size="18" font-weight="900">△AOD=5</text>
+        ${[[Ax,Ay,'A',-16,6],[Bx,By,'B',16,6],[Cx,Cy,'C',16,-6],[Dx,Dy,'D',-16,-6]].map(([x,y,n,ox,oy])=>
+          `<circle cx="${x}" cy="${y}" r="9" fill="#FFC93C" stroke="#0D0D14" stroke-width="3"/><text x="${x+ox}" y="${y+oy}" text-anchor="middle" fill="#0D0D14" font-size="20" font-weight="900">${n}</text>`).join('')}
+        <circle cx="${Ox}" cy="${Oy}" r="7" fill="#FF1744" stroke="#0D0D14" stroke-width="3"/>
+        <text x="${Ox+14}" y="${Oy+4}" fill="#FF1744" font-size="17" font-weight="900">O</text>
+      </svg>`;
+    },
+    options: [
+      { text: '15（5 + 5 + 5）', correct: true },
+      { text: '20（4 個全部）', correct: false },
+      { text: '10', correct: false },
+      { text: '5', correct: false },
+    ],
+    explainCorrect: '答對！🍰 對角線「四等分」面積 → △AOB = △BOC = △COD = △AOD = 5。其他 3 個加起來 = 5 + 5 + 5 = 15 ✅',
+    explainWrong: '平行四邊形的對角線將面積四等分，所以 4 個三角形面積完全相等，都 = 5。其他 3 個加起來 = 15。',
+    hints: [
+      '平行四邊形的性質：對角線把面積「四等分」',
+      '所以 △AOB = △BOC = △COD = △AOD = 5',
+      '其他 3 個加起來 = 5 × 3 = 15 ✅',
+    ],
+  },
+
+  /* ============ Q5 🌙 課本 P.206 隨堂練習加強（摺紙判平行四邊形） ============ */
+  {
+    level: 2,
+    levelLabel: '🏁 賽道 5 · 摺紙找角度',
+    title: '📄 課本 P.206 隨堂練習加強！四邊形 ABCD 摺，已知 ∠B = 50°、∠DCF = ∠DFC = 65°。請算出 ∠D + ∠A = ?',
+    hint: '🔑 Step 1：算 ∠D（等腰三角形外角）→ Step 2：算 ∠A（鄰角互補）',
+    buildSvg() {
+      return buildPlg({
+        angleA: '?', angleB: '50°', angleD: '?',
+        highlight: ['angleA', 'angleB', 'angleD'],
+      });
+    },
+    options: [
+      { text: '∠D = 130°, ∠A = 130°', correct: true },
+      { text: '∠D = 65°, ∠A = 115°', correct: false },
+      { text: '∠D = 130°, ∠A = 50°', correct: false },
+      { text: '∠D = 100°, ∠A = 80°', correct: false },
+    ],
+    explainCorrect: '答對！📄 ∠DCF=∠DFC=65° → ∠D 是等腰三角形 DCF 的「外角」 = 65°+65° = 130°。再用鄰角互補：∠A = 180° - 50° = 130°！',
+    explainWrong: 'Step 1：∠D = ∠DCF + ∠DFC = 65° + 65° = 130°（三角形外角 = 兩個內角和）。Step 2：∠A = 180° - ∠B = 180° - 50° = 130°。',
+    hints: [
+      'Step 1：∠DCF = ∠DFC = 65° → △DCF 是等腰三角形',
+      'Step 2：∠D 是 △DCF 的外角 → ∠D = 65° + 65° = 130°',
+      'Step 3：ABCD 是平行四邊形 → ∠A + ∠B = 180° → ∠A = 180° - 50° = 130°',
+    ],
+  },
+
+  /* ============ Q6 ☀️ 課本 P.208 隨堂練習 三角形等面積判平行四邊形 ============ */
+  {
+    level: 3,
+    levelLabel: '☀️ 賽道 6 · 三角形等積判平行四邊形',
+    title: '🧩 課本 P.208 隨堂練習！四邊形 ABCD 中，△AOB = △BOC = △COD（三個三角形面積相等）。請問用什麼判別法可以證明 ABCD 是平行四邊形？',
+    hint: '🔑 三角形「同高」時，面積比 = 底邊比。仔細想：什麼樣的條件會讓對角線被平分？',
+    buildSvg() {
+      const Ax=130, Ay=240, Bx=430, By=240, Cx=540, Cy=100, Dx=240, Dy=100;
+      const Ox=(Ax+Cx)/2, Oy=(Ay+Cy)/2;
+      return `
+      <svg class="stage" viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="${Ax},${Ay} ${Bx},${By} ${Ox},${Oy}" fill="rgba(255,143,163,0.4)" stroke="#FF1744" stroke-width="2"/>
+        <polygon points="${Bx},${By} ${Cx},${Cy} ${Ox},${Oy}" fill="rgba(255,143,163,0.4)" stroke="#FF1744" stroke-width="2"/>
+        <polygon points="${Cx},${Cy} ${Dx},${Dy} ${Ox},${Oy}" fill="rgba(255,143,163,0.4)" stroke="#FF1744" stroke-width="2"/>
+        <polygon points="${Dx},${Dy} ${Ax},${Ay} ${Ox},${Oy}" fill="rgba(168,181,232,0.2)" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <polygon points="${Ax},${Ay} ${Bx},${By} ${Cx},${Cy} ${Dx},${Dy}" fill="none" stroke="var(--L1-color)" stroke-width="4"/>
+        <line x1="${Ax}" y1="${Ay}" x2="${Cx}" y2="${Cy}" stroke="#0D0D14" stroke-width="2" stroke-dasharray="6 4"/>
+        <line x1="${Bx}" y1="${By}" x2="${Dx}" y2="${Dy}" stroke="#0D0D14" stroke-width="2" stroke-dasharray="6 4"/>
+        <text x="${(Ax+Bx+Ox)/3}" y="${(Ay+By+Oy)/3+6}" text-anchor="middle" fill="#FF1744" font-size="18" font-weight="900">△AOB</text>
+        <text x="${(Bx+Cx+Ox)/3}" y="${(By+Cy+Oy)/3+6}" text-anchor="middle" fill="#FF1744" font-size="18" font-weight="900">△BOC</text>
+        <text x="${(Cx+Dx+Ox)/3}" y="${(Cy+Dy+Oy)/3+6}" text-anchor="middle" fill="#FF1744" font-size="18" font-weight="900">△COD</text>
+        <text x="${(Dx+Ax+Ox)/3-5}" y="${(Dy+Ay+Oy)/3+6}" text-anchor="middle" fill="#94A3B8" font-size="14" font-weight="800">△AOD</text>
+        <text x="330" y="30" text-anchor="middle" fill="#FF1744" font-size="16" font-weight="900">△AOB = △BOC = △COD</text>
+        ${[[Ax,Ay,'A',-16,6],[Bx,By,'B',16,6],[Cx,Cy,'C',16,-6],[Dx,Dy,'D',-16,-6]].map(([x,y,n,ox,oy])=>
+          `<circle cx="${x}" cy="${y}" r="9" fill="#FFC93C" stroke="#0D0D14" stroke-width="3"/><text x="${x+ox}" y="${y+oy}" text-anchor="middle" fill="#0D0D14" font-size="20" font-weight="900">${n}</text>`).join('')}
+        <circle cx="${Ox}" cy="${Oy}" r="7" fill="#FF1744" stroke="#0D0D14" stroke-width="3"/>
+        <text x="${Ox+14}" y="${Oy+4}" fill="#FF1744" font-size="17" font-weight="900">O</text>
+      </svg>`;
+    },
+    options: [
+      { text: '兩條對角線互相平分', correct: true },
+      { text: '兩組對邊分別相等', correct: false },
+      { text: '兩組對角分別相等', correct: false },
+      { text: '一組對邊平行且相等', correct: false },
+    ],
+    explainCorrect: '答對！🧩 △AOB = △BOC（共高）→ AO = OC（底邊相等）。△BOC = △COD（共高）→ BO = OD。兩條對角線都被平分 → 平行四邊形！',
+    explainWrong: '推導：△AOB=△BOC（共高在 B 點到 AC 的距離）→ AO=OC（底邊比 = 面積比）。同理 △BOC=△COD → BO=OD。所以「兩條對角線互相平分」！',
+    hints: [
+      '△AOB 和 △BOC 共用「B 點到 AC 的高」 → 面積相等 → 底邊 AO = OC',
+      '△BOC 和 △COD 共用「C 點到 BD 的高」 → 面積相等 → 底邊 BO = OD',
+      '兩條對角線都被平分 → 用判別法「對角線互相平分」 → 平行四邊形 ✅',
+    ],
+  },
+
+  /* ============ Q7 ☀️ BOSS 阿威老師木板（P.205 隨堂練習） ============ */
+  {
+    level: 3,
+    levelLabel: '🏆 FINAL BOSS · 阿威老師的木板',
+    title: '🪵 課本 P.205 隨堂練習 BOSS！阿威老師有一塊平行四邊形 ABCD 的木板，O 是兩條對角線交點。沿對角線切成 4 塊三角形。已知 △COD 的面積 = 300 cm²。請問 △ABO + △AOD = ?',
+    hint: '🔑 對角線把平行四邊形面積「四等分」！4 個三角形面積都相等',
+    buildSvg() {
+      const Ax=130, Ay=240, Bx=430, By=240, Cx=540, Cy=100, Dx=240, Dy=100;
+      const Ox=(Ax+Cx)/2, Oy=(Ay+Cy)/2;
+      return `
+      <svg class="stage" viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="${Ax},${Ay} ${Bx},${By} ${Ox},${Oy}" fill="rgba(255,143,163,0.4)" stroke="#FF1744" stroke-width="2"/>
+        <polygon points="${Bx},${By} ${Cx},${Cy} ${Ox},${Oy}" fill="rgba(0,200,83,0.2)" stroke="#0D0D14" stroke-width="2"/>
+        <polygon points="${Cx},${Cy} ${Dx},${Dy} ${Ox},${Oy}" fill="rgba(255,201,60,0.4)" stroke="#FF6600" stroke-width="3"/>
+        <polygon points="${Dx},${Dy} ${Ax},${Ay} ${Ox},${Oy}" fill="rgba(255,143,163,0.4)" stroke="#FF1744" stroke-width="2"/>
+        <polygon points="${Ax},${Ay} ${Bx},${By} ${Cx},${Cy} ${Dx},${Dy}" fill="none" stroke="var(--L1-color)" stroke-width="4"/>
+        <line x1="${Ax}" y1="${Ay}" x2="${Cx}" y2="${Cy}" stroke="#0D0D14" stroke-width="2" stroke-dasharray="6 4"/>
+        <line x1="${Bx}" y1="${By}" x2="${Dx}" y2="${Dy}" stroke="#0D0D14" stroke-width="2" stroke-dasharray="6 4"/>
+        <text x="${(Ax+Bx+Ox)/3}" y="${(Ay+By+Oy)/3+6}" text-anchor="middle" fill="#FF1744" font-size="18" font-weight="900">△ABO=?</text>
+        <text x="${(Bx+Cx+Ox)/3}" y="${(By+Cy+Oy)/3+6}" text-anchor="middle" fill="#94A3B8" font-size="14" font-weight="800">△BOC</text>
+        <text x="${(Cx+Dx+Ox)/3}" y="${(Cy+Dy+Oy)/3+6}" text-anchor="middle" fill="#FF6600" font-size="20" font-weight="900">△COD=300</text>
+        <text x="${(Dx+Ax+Ox)/3-5}" y="${(Dy+Ay+Oy)/3+6}" text-anchor="middle" fill="#FF1744" font-size="18" font-weight="900">△AOD=?</text>
+        ${[[Ax,Ay,'A',-16,6],[Bx,By,'B',16,6],[Cx,Cy,'C',16,-6],[Dx,Dy,'D',-16,-6]].map(([x,y,n,ox,oy])=>
+          `<circle cx="${x}" cy="${y}" r="9" fill="#FFC93C" stroke="#0D0D14" stroke-width="3"/><text x="${x+ox}" y="${y+oy}" text-anchor="middle" fill="#0D0D14" font-size="20" font-weight="900">${n}</text>`).join('')}
+        <circle cx="${Ox}" cy="${Oy}" r="7" fill="#FF1744" stroke="#0D0D14" stroke-width="3"/>
+        <text x="${Ox+14}" y="${Oy+4}" fill="#FF1744" font-size="17" font-weight="900">O</text>
+      </svg>`;
+    },
+    options: [
+      { text: '600 cm²（300 + 300）', correct: true },
+      { text: '300 cm²', correct: false },
+      { text: '900 cm²', correct: false },
+      { text: '1200 cm²', correct: false },
+    ],
+    explainCorrect: '答對！🏆 BOSS 破解！對角線四等分 → △ABO = △AOD = △COD = 300。△ABO + △AOD = 300 + 300 = 600 cm² ✅ 你是賽車王！👑',
+    explainWrong: '對角線把平行四邊形面積「四等分」！4 個三角形都 = 300。△ABO + △AOD = 300 + 300 = 600。',
+    hints: [
+      '平行四邊形性質：對角線把面積「四等分」',
+      '所以 △ABO = △BOC = △COD = △AOD = 300',
+      '△ABO + △AOD = 300 + 300 = 600 cm² ✅',
+    ],
+  },
+];
+
+/* === 平行四邊形 SVG builder === */
+function buildPlg(opts) {
+  const Ax=130, Ay=240, Bx=430, By=240, Cx=540, Cy=100, Dx=240, Dy=100;
+  const Ox = (Ax+Cx)/2, Oy = (Ay+Cy)/2;
+  const H = (s) => (opts.highlight || []).includes(s);
+  const HL_C = '#FF1744', NORM_C = '#0D0D14';
+  const parts = [];
+  parts.push(`<svg class="stage" viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg">`);
+
+  const edges = [
+    ['AB', Ax, Ay, Bx, By, opts.AB, 'mid-bottom'],
+    ['BC', Bx, By, Cx, Cy, opts.BC, 'mid-right'],
+    ['CD', Cx, Cy, Dx, Dy, opts.CD, 'mid-top'],
+    ['DA', Dx, Dy, Ax, Ay, opts.DA, 'mid-left'],
+  ];
+  for (const [name, x1, y1, x2, y2, label, pos] of edges) {
+    const isHL = H(name);
+    const col = isHL ? '#FF8FA3' : 'var(--L1-color)';
+    const w = isHL ? 5 : 4;
+    parts.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`);
+    if (label) {
+      const mx = (x1+x2)/2, my = (y1+y2)/2;
+      const ox = pos === 'mid-right' ? 18 : pos === 'mid-left' ? -18 : 0;
+      const oy = pos === 'mid-bottom' ? 22 : pos === 'mid-top' ? -10 : 4;
+      parts.push(`<text x="${mx+ox}" y="${my+oy}" text-anchor="middle" fill="${isHL ? HL_C : NORM_C}" font-size="18" font-weight="800">${label}</text>`);
+    }
+  }
+  if (opts.diagonals) {
+    parts.push(`<line x1="${Ax}" y1="${Ay}" x2="${Cx}" y2="${Cy}" stroke="#0D0D14" stroke-width="2" stroke-dasharray="7 5" opacity="0.5"/>`);
+    parts.push(`<line x1="${Bx}" y1="${By}" x2="${Dx}" y2="${Dy}" stroke="#0D0D14" stroke-width="2" stroke-dasharray="7 5" opacity="0.5"/>`);
+  }
+  if (opts.AC) parts.push(`<text x="${(Ox+Cx)/2 + 8}" y="${(Oy+Cy)/2 - 8}" fill="${H('AC') ? HL_C : NORM_C}" font-size="15" font-weight="800">AC=${opts.AC}</text>`);
+  if (opts.BD) parts.push(`<text x="${(Ox+Dx)/2 - 12}" y="${(Oy+Dy)/2 - 8}" text-anchor="end" fill="${H('BD') ? HL_C : NORM_C}" font-size="15" font-weight="800">BD=${opts.BD}</text>`);
+  if (opts.AO) parts.push(`<text x="${(Ax+Ox)/2 - 8}" y="${(Ay+Oy)/2 + 22}" text-anchor="end" fill="${H('AO') ? HL_C : NORM_C}" font-size="15" font-weight="800">AO=${opts.AO}</text>`);
+  if (opts.BO) parts.push(`<text x="${(Bx+Ox)/2 + 8}" y="${(By+Oy)/2 + 22}" fill="${H('BO') ? HL_C : NORM_C}" font-size="15" font-weight="800">BO=${opts.BO}</text>`);
+  if (opts.OC) parts.push(`<text x="${(Cx+Ox)/2 + 8}" y="${(Cy+Oy)/2 - 8}" fill="${H('OC') ? HL_C : NORM_C}" font-size="15" font-weight="800">OC=${opts.OC}</text>`);
+  if (opts.OD) parts.push(`<text x="${(Dx+Ox)/2 - 12}" y="${(Dy+Oy)/2 - 8}" text-anchor="end" fill="${H('OD') ? HL_C : NORM_C}" font-size="15" font-weight="800">OD=${opts.OD}</text>`);
+
+  const angles = [
+    ['angleA', Ax+18, Ay-12, opts.angleA, '∠A'],
+    ['angleB', Bx-22, By-12, opts.angleB, '∠B'],
+    ['angleC', Cx-22, Cy+22, opts.angleC, '∠C'],
+    ['angleD', Dx+18, Dy+22, opts.angleD, '∠D'],
+  ];
+  for (const [name, x, y, val, label] of angles) {
+    if (val !== undefined && val !== null) {
+      const isHL = H(name);
+      const col = isHL ? HL_C : NORM_C;
+      const text = val ? `${label}=${val}` : label;
+      parts.push(`<text x="${x}" y="${y}" fill="${col}" font-size="15" font-weight="800">${text}</text>`);
+    }
+  }
+  for (const [name, x, y, off_x, off_y] of [
+    ['A', Ax, Ay, -16, 6], ['B', Bx, By, 16, 6],
+    ['C', Cx, Cy, 16, -6], ['D', Dx, Dy, -16, -6],
+  ]) {
+    parts.push(`<circle cx="${x}" cy="${y}" r="9" fill="#FFC93C" stroke="#0D0D14" stroke-width="3"/>`);
+    parts.push(`<text x="${x+off_x}" y="${y+off_y}" text-anchor="middle" fill="#0D0D14" font-size="20" font-weight="900">${name}</text>`);
+  }
+  if (opts.O) {
+    parts.push(`<circle cx="${Ox}" cy="${Oy}" r="7" fill="#FF1744" stroke="#0D0D14" stroke-width="3"/>`);
+    parts.push(`<text x="${Ox+14}" y="${Oy+4}" fill="#FF1744" font-size="17" font-weight="900">O</text>`);
+  }
+  if (opts.title_extra) {
+    parts.push(`<text x="330" y="40" text-anchor="middle" fill="#0066FF" font-size="18" font-weight="900">${opts.title_extra}</text>`);
+  }
+  parts.push(`</svg>`);
+  return parts.join('\n');
+}
+
+/* === PRO 升級：賽車進度、寶箱、灑花、COMBO 系統 === */
+function spawnConfetti(count = 80) {
+  const colors = ['#FF6600', '#0066FF', '#FF1744', '#00C853', '#FFC93C', '#B026FF'];
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    c.style.animationDelay = (Math.random() * 0.4) + 's';
+    if (Math.random() > 0.5) c.style.borderRadius = '50%';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4000);
+  }
+}
+
+function showCombo(level) {
+  const el = document.createElement('div');
+  el.className = 'combo-fly';
+  el.textContent = `COMBO x${level}!`;
+  el.style.left = '50%';
+  el.style.top = '40%';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1600);
+}
+
+function openTreasureChest(callback) {
+  const ov = document.getElementById('treasure-overlay');
+  const card = document.getElementById('treasure-card-inner');
+  // 隨機獎勵（驚喜分數）
+  const prizes = [10, 20, 30, 50, 80, 100, 150];
+  const weights = [3, 4, 4, 3, 2, 1, 1];  // 加權，小金幣多、大金幣少
+  let totalW = weights.reduce((a, b) => a + b, 0);
+  let r = Math.random() * totalW;
+  let prize = 10;
+  for (let i = 0; i < prizes.length; i++) {
+    if (r < weights[i]) { prize = prizes[i]; break; }
+    r -= weights[i];
+  }
+  // 渲染
+  card.innerHTML = `
+    <div style="font-size:14px;font-weight:900;color:var(--accent);margin-bottom:10px">🎉 過關！開寶箱！</div>
+    <div class="treasure-chest" id="t-chest" onclick="window._openChest()">🎁</div>
+    <div id="t-prize" style="display:none">
+      <div class="treasure-prize">+${prize} 💰</div>
+      <div class="treasure-msg">${prize >= 100 ? '🌟 史詩級爆擊！' : prize >= 50 ? '✨ 稀有掉落！' : prize >= 30 ? '👍 不錯喔！' : '💪 繼續加油！'}</div>
+      <button class="btn btn-gold" onclick="window._closeChest()">下一題 →</button>
+    </div>
+  `;
+  ov.classList.add('show');
+  window._chestOpened = false;
+  window._currentPrize = prize;
+  window._chestCallback = callback;
+}
+
+window._openChest = function() {
+  if (window._chestOpened) return;
+  window._chestOpened = true;
+  const chest = document.getElementById('t-chest');
+  chest.textContent = '📦';
+  chest.classList.add('opened');
+  playSound('chest');
+  setTimeout(() => {
+    chest.textContent = '✨';
+    document.getElementById('t-prize').style.display = 'block';
+  }, 400);
+};
+
+window._closeChest = function() {
+  const ov = document.getElementById('treasure-overlay');
+  ov.classList.remove('show');
+  if (window._chestCallback) {
+    window._chestCallback(window._currentPrize);
+    window._chestCallback = null;
+  }
+};
+
+/* =============== UI rendering =============== */
+function showScreen(id) {
+  document.querySelectorAll('section[id^="screen-"]').forEach(s => s.style.display = 'none');
+  document.getElementById('screen-' + id).style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderProgress() {
+  const c = document.getElementById('hud-progress');
+  c.innerHTML = '';
+  for (let i = 0; i < QUESTIONS.length; i++) {
+    const d = document.createElement('div');
+    d.className = 'pdot';
+    if (i < state.currentQ) d.classList.add('done');
+    else if (i === state.currentQ) d.classList.add('active');
+    d.textContent = i + 1;
+    c.appendChild(d);
+  }
+  updateRaceCar();
+}
+
+function updateRaceCar() {
+  const car = document.getElementById('race-car');
+  if (!car) return;
+  const pct = (state.currentQ / QUESTIONS.length) * 92; // 0-92% (留 8% 給終點旗)
+  car.style.left = pct + '%';
+}
+
+function renderQuest() {
+  document.getElementById('hud-name').textContent = state.nick;
+  document.getElementById('hud-coins').textContent = state.coins;
+  renderProgress();
+
+  const q = QUESTIONS[state.currentQ];
+  const lvlClass = q.level === 1 ? 'lvl-base' : q.level === 2 ? 'lvl-mid' : 'lvl-boss';
+  const lvlIcon = q.level === 1 ? '⭐' : q.level === 2 ? '🌙' : '☀️';
+
+  const card = document.getElementById('quest-card');
+  card.innerHTML = `
+    <div style="text-align:center">
+      <span class="lvl-badge ${lvlClass}">${lvlIcon} ${q.levelLabel}</span>
+    </div>
+    <div class="qtitle">${q.title}</div>
+    <div class="qhint">${q.hint}</div>
+    <div class="stage-wrap">${q.buildSvg()}</div>
+    ${q.bossDemo ? `
+      <div class="boss-demo-panel">
+        <div class="boss-demo-title">🎬 看不懂沒關係！按下面按鈕看「逐步動畫演示」<br>（每個按鈕都可以重複按、有 🔄 重置）</div>
+        <div class="boss-demo-btns">
+          <button class="btn btn-warning" onclick="bossDemoStep(1)">📺 Step 1<br>對邊雙胞胎</button>
+          <button class="btn btn-warning" onclick="bossDemoStep(2)">📺 Step 2<br>對角線(左)</button>
+          <button class="btn btn-warning" onclick="bossDemoStep(3)">📺 Step 3<br>對角線(右)</button>
+          <button class="btn btn-gold" onclick="bossDemoStep(4)">🎯 Step 4<br>看完整答案</button>
+          <button class="btn btn-ghost" onclick="bossDemoReset()">🔄 重置</button>
+        </div>
+        <div id="demo-caption" class="demo-caption">👆 按上面 4 個按鈕看「逐步演示」</div>
+      </div>
+    ` : ''}
+    <div class="opts" id="q-opts">
+      ${q.options.map((o, i) => `<button class="opt" data-i="${i}">${o.text}</button>`).join('')}
+    </div>
+    <div class="fb" id="q-fb"></div>
+    <div class="hints" id="q-hints">
+      ${q.hints.map((h, i) => `<div class="hint"><strong>提示 ${i+1}：</strong> ${h}</div>`).join('')}
+    </div>
+    <div class="nav">
+      <button class="btn btn-warning" id="hint-btn" onclick="toggleHints()">💡 看提示</button>
+      <button class="btn btn-gold" id="next-btn" onclick="nextQuestion()" disabled>下一關 →</button>
+    </div>
+  `;
+
+  // Attach option clicks
+  card.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', () => answerOption(parseInt(btn.dataset.i), btn));
+  });
+
+  state.hintsUsed[state.currentQ] = state.hintsUsed[state.currentQ] || 0;
+}
+
+function toggleHints() {
+  const h = document.getElementById('q-hints');
+  h.classList.toggle('show');
+  state.hintsUsed[state.currentQ] = (state.hintsUsed[state.currentQ] || 0) + 1;
+}
+
+let answered = false;
+function answerOption(idx, btnEl) {
+  if (answered) return;
+  answered = true;
+  const q = QUESTIONS[state.currentQ];
+  const opt = q.options[idx];
+  const fb = document.getElementById('q-fb');
+  const optsContainer = document.getElementById('q-opts');
+
+  state.answers[state.currentQ] = {
+    pickedIndex: idx,
+    pickedText: opt.text,
+    correct: opt.correct,
+  };
+
+  if (opt.correct) {
+    btnEl.classList.add('correct');
+    fb.className = 'fb win show';
+    fb.innerHTML = q.explainCorrect;
+    state.correct++;
+    // COMBO 系統
+    state.combo = (state.combo || 0) + 1;
+    if (state.combo >= 2) showCombo(state.combo);
+    // 灑花 + 開寶箱
+    spawnConfetti(state.combo >= 3 ? 120 : 60);
+    playSound('correct');
+    setTimeout(() => {
+      openTreasureChest((prize) => {
+        // 加 COMBO 倍率
+        const mult = state.combo >= 3 ? 3 : state.combo >= 2 ? 2 : 1;
+        const total = prize * mult;
+        state.coins += total;
+        document.getElementById('hud-coins').textContent = state.coins;
+        if (mult > 1) {
+          // 爆擊飛字
+          const el = document.createElement('div');
+          el.className = 'combo-fly';
+          el.textContent = `+${total} 💰 (x${mult})`;
+          el.style.left = '50%'; el.style.top = '30%';
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 1500);
+        }
+      });
+    }, 600);
+  } else {
+    btnEl.classList.add('wrong');
+    state.combo = 0;
+    optsContainer.querySelectorAll('.opt').forEach((b, i) => {
+      if (q.options[i].correct) b.classList.add('show-correct');
+    });
+    fb.className = 'fb gentle show';
+    fb.innerHTML = q.explainWrong;
+    playSound('wrong');
+  }
+
+  document.getElementById('next-btn').disabled = false;
+  document.getElementById('hud-coins').textContent = state.coins;
+}
+
+function nextQuestion() {
+  state.currentQ++;
+  answered = false;
+  if (state.currentQ >= QUESTIONS.length) {
+    finishGame();
+  } else {
+    renderQuest();
+  }
+}
+
+/* =============== Sound (8-bit) =============== */
+let audioCtx;
+function playSound(type) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    if (type === 'correct') {
+      o.type = 'square';
+      o.frequency.setValueAtTime(523, audioCtx.currentTime); // C5
+      o.frequency.setValueAtTime(659, audioCtx.currentTime + 0.1); // E5
+      o.frequency.setValueAtTime(784, audioCtx.currentTime + 0.2); // G5
+      g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+      o.start(); o.stop(audioCtx.currentTime + 0.4);
+    } else if (type === 'wrong') {
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(220, audioCtx.currentTime);
+      o.frequency.linearRampToValueAtTime(110, audioCtx.currentTime + 0.3);
+      g.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      o.start(); o.stop(audioCtx.currentTime + 0.3);
+    } else if (type === 'chest') {
+      // 開寶箱：3 個短促上揚
+      [659, 784, 988].forEach((f, i) => {
+        const oo = audioCtx.createOscillator(); const gg = audioCtx.createGain();
+        oo.connect(gg); gg.connect(audioCtx.destination);
+        oo.type = 'square'; oo.frequency.value = f;
+        gg.gain.setValueAtTime(0.15, audioCtx.currentTime + i * 0.08);
+        gg.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.08 + 0.2);
+        oo.start(audioCtx.currentTime + i * 0.08);
+        oo.stop(audioCtx.currentTime + i * 0.08 + 0.2);
+      });
+    } else if (type === 'victory') {
+      [523, 659, 784, 1047].forEach((f, i) => {
+        const oo = audioCtx.createOscillator();
+        const gg = audioCtx.createGain();
+        oo.connect(gg); gg.connect(audioCtx.destination);
+        oo.type = 'square';
+        oo.frequency.value = f;
+        gg.gain.setValueAtTime(0.12, audioCtx.currentTime + i * 0.15);
+        gg.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + i * 0.15 + 0.3);
+        oo.start(audioCtx.currentTime + i * 0.15);
+        oo.stop(audioCtx.currentTime + i * 0.15 + 0.3);
+      });
+    }
+  } catch (e) {}
+}
+
+function popCoin(refEl) {
+  const r = refEl.getBoundingClientRect();
+  const coin = document.createElement('div');
+  coin.className = 'coin-pop';
+  coin.textContent = '💰';
+  coin.style.left = (r.left + r.width / 2 - 16) + 'px';
+  coin.style.top = (r.top - 10) + 'px';
+  document.body.appendChild(coin);
+  setTimeout(() => coin.remove(), 1100);
+}
+
+/* =============== Finish + Submit =============== */
+function finishGame() {
+  const elapsed = Math.round((Date.now() - state.startTime) / 1000);
+  // 超大灑花 + 連續 3 波
+  spawnConfetti(200);
+  setTimeout(() => spawnConfetti(150), 500);
+  setTimeout(() => spawnConfetti(150), 1000);
+  document.getElementById('vic-name').textContent = state.nick;
+  document.getElementById('vic-correct').textContent = state.correct;
+  document.getElementById('vic-coins').textContent = state.coins;
+  const m = Math.floor(elapsed / 60), s = elapsed % 60;
+  document.getElementById('vic-time').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  showScreen('victory');
+  playSound('victory');
+
+  submitToServer(elapsed);
+}
+
+async function submitToServer(elapsed) {
+  const status = document.getElementById('vic-status');
+  const payload = {
+    nick: state.nick,
+    hwId: HOMEWORK_ID,
+    correctCount: state.correct,
+    totalQuestions: QUESTIONS.length,
+    coins: state.coins,
+    elapsedSec: elapsed,
+    submittedAt: new Date().toISOString(),
+    answers: state.answers.map((a, i) => ({
+      q: i + 1,
+      level: QUESTIONS[i].levelLabel,
+      pickedText: a ? a.pickedText : null,
+      correct: a ? a.correct : false,
+      hintsUsed: state.hintsUsed[i] || 0,
+    })),
+  };
+
+  // Firebase Realtime Database POST — 永久儲存
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const res = await fetch(FIREBASE_NODE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('POST ' + res.status);
+
+      status.className = 'submit-status success';
+      status.innerHTML = '✅ 成績已送達老師後台！';
+      return;
+    } catch (err) {
+      if (attempt === 4) {
+        status.className = 'submit-status error';
+        status.innerHTML = '⚠️ 送出失敗，請告訴老師你的暱稱和成績：<br><strong>' + state.nick + ' — ' + state.correct + '/' + QUESTIONS.length + ' 分</strong>';
+        return;
+      }
+      await new Promise(r => setTimeout(r, 500 + Math.random() * 800));
+    }
+  }
+}
+
+/* =============== Restart =============== */
+function restartGame() {
+  state.nick = '';
+  state.startTime = 0;
+  state.currentQ = 0;
+  state.coins = 0;
+  state.correct = 0;
+  state.combo = 0;
+  state.answers = [];
+  state.hintsUsed = [];
+  answered = false;
+  document.getElementById('nick-input').value = '';
+  showScreen('start');
+}
+
+/* =============== Start =============== */
+document.getElementById('start-btn').addEventListener('click', () => {
+  const input = document.getElementById('nick-input');
+  const nick = input.value.trim();
+  if (!nick) {
+    input.focus();
+    input.style.borderColor = 'var(--danger)';
+    setTimeout(() => input.style.borderColor = '', 1500);
+    return;
+  }
+  state.nick = nick;
+  state.startTime = Date.now();
+  state.currentQ = 0;
+  state.coins = 0;
+  state.correct = 0;
+  state.combo = 0;
+  state.answers = [];
+  showScreen('quest');
+  renderQuest();
+});
+
+// Enter key in nick input
+document.getElementById('nick-input').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') document.getElementById('start-btn').click();
+});
+
+// Expose for inline onclick
+window.toggleHints = toggleHints;
+window.nextQuestion = nextQuestion;
+window.restartGame = restartGame;
+</script>
+
+</body>
+</html>
