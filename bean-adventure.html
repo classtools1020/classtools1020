@@ -866,11 +866,12 @@ function update(){
     }
   }
 
+  // 花 → 出題（全高觸發柱，不管玩家跳多高都會碰到）
   for(const f of flowers){
     if(f.taken) continue;
     f.bob += 0.06;
-    if(player.x + player.w > f.x - 8 && player.x < f.x + 8 &&
-       player.y + player.h > f.y - 12 && player.y < f.y + 12){
+    // 觸發條件：x 範圍對到就觸發（垂直方向全高）
+    if(player.x + player.w > f.x - 8 && player.x < f.x + 8){
       f.taken = true;
       SND.flower();
       openFlowerQuiz(f.qIdx);
@@ -1123,17 +1124,52 @@ function drawFlowers(){
   for(const f of flowers){
     if(f.taken) continue;
     const sx = f.x - camX;
-    if(sx < -10 || sx > W+10) continue;
+    if(sx < -20 || sx > W+20) continue;
     const off = Math.sin(f.bob) * 1.5;
-    ctx.fillStyle = '#5fa84b'; ctx.fillRect(sx - 1, f.y + 6, 2, 14); ctx.fillRect(sx - 4, f.y + 12, 3, 2);
-    const petalCol = ['#ff8aa3','#ffd96a','#88e0c8'][f.qIdx % 3];
-    ctx.fillStyle = petalCol;
+    const beamCol = ['#ff8aa3','#ffd96a','#88e0c8'][f.qIdx % 3];
+    const beamColRGB = [[255,138,163],[255,217,106],[136,224,200]][f.qIdx % 3];
+    const shimmer = 0.35 + Math.sin(frame * 0.1 + f.qIdx) * 0.18;
+
+    // 🌈 彩虹光柱（從地面到天頂，無法跳過）
+    const grad = ctx.createLinearGradient(sx, 0, sx, 240);
+    grad.addColorStop(0, `rgba(${beamColRGB[0]},${beamColRGB[1]},${beamColRGB[2]},0.05)`);
+    grad.addColorStop(0.4, `rgba(${beamColRGB[0]},${beamColRGB[1]},${beamColRGB[2]},${shimmer * 0.6})`);
+    grad.addColorStop(1, `rgba(${beamColRGB[0]},${beamColRGB[1]},${beamColRGB[2]},${shimmer})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(sx - 5, 0, 10, 240);
+    // 兩側邊光
+    ctx.fillStyle = `rgba(255,255,255,${shimmer * 0.4})`;
+    ctx.fillRect(sx - 6, 0, 1, 240);
+    ctx.fillRect(sx + 5, 0, 1, 240);
+
+    // 飄動小亮點
+    for(let i = 0; i < 4; i++){
+      const py = ((frame * 1.2 + i * 60) % 240);
+      ctx.fillStyle = `rgba(255,255,255,${0.6 - py / 400})`;
+      ctx.fillRect(sx - 2, py, 4, 2);
+    }
+
+    // ❓ 上方飄動問號
+    const qY = 24 + Math.sin(frame * 0.05 + f.qIdx) * 3;
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#1a1530';
+    ctx.lineWidth = 3;
+    ctx.font = 'bold 18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeText('?', sx, qY);
+    ctx.fillText('?', sx, qY);
+
+    // 🌸 底部花朵（裝飾，視覺辨識）
+    ctx.fillStyle = '#5fa84b';
+    ctx.fillRect(sx - 1, f.y + 6, 2, 14);
+    ctx.fillRect(sx - 4, f.y + 12, 3, 2);
+    ctx.fillStyle = beamCol;
     [[-4,-2],[4,-2],[-4,4],[4,4],[0,-5],[0,5]].forEach(([dx,dy]) => {
       ctx.beginPath(); ctx.arc(sx+dx, f.y+dy+off, 3, 0, Math.PI*2); ctx.fill();
     });
-    ctx.fillStyle = '#ffe680'; ctx.beginPath(); ctx.arc(sx, f.y + off, 2.5, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center';
-    ctx.fillText('?', sx, f.y + 2 + off);
+    ctx.fillStyle = '#ffe680';
+    ctx.beginPath(); ctx.arc(sx, f.y + off, 2.5, 0, Math.PI*2); ctx.fill();
   }
 }
 function drawSnails(){
