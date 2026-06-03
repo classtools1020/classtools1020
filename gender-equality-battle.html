@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>性別平等大作戰 · 騎士 ⚔ 法師 雙人打怪</title>
+<style>
+  /* ===== 主題色 ===== */
+  :root{
+    --bg:#0e1430;
+    --bg2:#161e44;
+    --p1:#36b3ff;          /* 玩家1 騎士：藍 */
+    --p1-soft:#7fd0ff;
+    --p2:#b06bff;          /* 玩家2 法師：紫 */
+    --p2-soft:#d3a8ff;
+    --gold:#ffd34d;
+    --green:#2ee6a6;
+    --red:#ff5d6c;
+    --hp:#ff4d6d;
+    --ink:#0b0f24;
+    --white:#f4f8ff;
+    --dim:#9fb0d8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;font-family:'Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif;color:var(--white);overflow:hidden;user-select:none}
+  body{
+    background:
+      radial-gradient(1200px 600px at 20% -10%, rgba(54,179,255,.18), transparent 60%),
+      radial-gradient(1200px 600px at 80% -10%, rgba(176,107,255,.18), transparent 60%),
+      linear-gradient(160deg,#0e1430,#161e44 60%,#0e1430);
+  }
+
+  /* ===== 通用按鈕 ===== */
+  button{font-family:inherit;cursor:pointer;border:none;font-weight:800}
+  .big-btn{
+    border-radius:18px;padding:18px 30px;font-size:clamp(18px,2.4vw,28px);
+    color:#06122a;background:linear-gradient(180deg,#ffe27a,var(--gold));
+    box-shadow:0 6px 0 #c79a17,0 10px 22px rgba(0,0,0,.35);
+    transition:transform .08s, box-shadow .08s;
+  }
+  .big-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #c79a17,0 4px 12px rgba(0,0,0,.35)}
+  .ghost-btn{
+    border-radius:14px;padding:12px 22px;font-size:clamp(15px,1.8vw,20px);
+    color:var(--white);background:rgba(255,255,255,.10);border:2px solid rgba(255,255,255,.22);
+  }
+  .ghost-btn:active{transform:translateY(2px)}
+
+  /* =========================================================
+     開始畫面
+  ========================================================= */
+  #startScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+  .start-card{
+    width:min(900px,94vw);max-height:94vh;overflow:auto;border-radius:28px;padding:clamp(22px,3.5vw,44px);
+    background:linear-gradient(160deg,rgba(30,40,86,.95),rgba(16,20,48,.97));
+    border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 80px rgba(0,0,0,.5);text-align:center;
+  }
+  .title-zh{font-size:clamp(30px,5.4vw,62px);font-weight:900;letter-spacing:2px;line-height:1.1;
+    background:linear-gradient(90deg,var(--p1-soft),var(--gold) 45%,var(--p2-soft));
+    -webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 0 rgba(0,0,0,.15)}
+  .title-sub{margin-top:8px;color:var(--dim);font-size:clamp(14px,2vw,20px);font-weight:700}
+  .badge-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0 6px}
+  .badge{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;
+    padding:7px 15px;font-size:clamp(12px,1.6vw,15px);font-weight:800;color:var(--p1-soft)}
+  .badge.p2{color:var(--p2-soft)}
+  .badge.g{color:var(--gold)}
+
+  .vs-wrap{display:flex;align-items:center;justify-content:center;gap:clamp(14px,4vw,50px);margin:22px 0}
+  .hero{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .hero .face{font-size:clamp(54px,9vw,96px);filter:drop-shadow(0 8px 14px rgba(0,0,0,.4))}
+  .hero .nm{font-weight:900;font-size:clamp(16px,2.2vw,24px)}
+  .hero.k .nm{color:var(--p1-soft)} .hero.m .nm{color:var(--p2-soft)}
+  .vs-txt{font-size:clamp(28px,5vw,54px);font-weight:900;color:var(--gold);transform:rotate(-8deg);text-shadow:0 3px 0 #00000055}
+
+  .rules{text-align:left;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    padding:clamp(16px,2.4vw,24px);margin:14px 0 22px;font-size:clamp(14px,1.9vw,18px);line-height:1.85;color:#dbe6ff}
+  .rules h3{color:var(--gold);font-size:clamp(16px,2.2vw,22px);margin-bottom:8px}
+  .rules .li{display:flex;gap:10px;align-items:flex-start;margin:4px 0}
+  .rules .li .ic{flex:0 0 auto;width:28px;text-align:center}
+  .start-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;align-items:center}
+
+  /* =========================================================
+     遊戲畫面
+  ========================================================= */
+  #gameScreen{display:none;position:fixed;inset:0;flex-direction:column}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;gap:10px;
+    background:rgba(0,0,0,.25);border-bottom:1px solid rgba(255,255,255,.08);flex:0 0 auto}
+  .topbar .gt{font-weight:900;font-size:clamp(15px,2vw,20px);color:var(--gold);letter-spacing:1px}
+  .topbar .tools{display:flex;gap:8px}
+  .tool{border-radius:12px;padding:8px 14px;font-size:clamp(13px,1.6vw,16px);color:var(--white);
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);font-weight:800}
+  .tool.on{background:var(--gold);color:#06122a;border-color:var(--gold)}
+
+  .arena{flex:1 1 auto;display:flex;min-height:0}
+  .divider{width:4px;background:linear-gradient(180deg,var(--p1),#fff5,var(--p2));opacity:.5}
+
+  .panel{flex:1 1 0;min-width:0;display:flex;flex-direction:column;padding:clamp(8px,1.4vw,16px);gap:clamp(8px,1.2vw,12px);position:relative;overflow:hidden}
+  .panel.P1{background:radial-gradient(700px 380px at 50% 0%,rgba(54,179,255,.16),transparent 65%)}
+  .panel.P2{background:radial-gradient(700px 380px at 50% 0%,rgba(176,107,255,.16),transparent 65%)}
+
+  /* 玩家標頭 */
+  .phead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:0 0 auto}
+  .who{display:flex;align-items:center;gap:10px}
+  .who .av{font-size:clamp(30px,4.4vw,46px);line-height:1}
+  .who .lbl{font-weight:900;font-size:clamp(15px,2vw,22px)}
+  .P1 .who .lbl{color:var(--p1-soft)} .P2 .who .lbl{color:var(--p2-soft)}
+  .stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .chip{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:5px 11px;font-weight:800;font-size:clamp(12px,1.5vw,16px)}
+  .chip .v{color:var(--gold)}
+  .chip.combo .v{color:var(--green)}
+
+  /* 戰場：怪獸 + HP */
+  .battlefield{flex:0 0 auto;display:flex;flex-direction:column;gap:8px;align-items:center;
+    background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:clamp(8px,1.4vw,14px)}
+  .monster-row{display:flex;align-items:center;justify-content:center;gap:clamp(10px,3vw,40px);width:100%}
+  .fighter{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+  .fighter .sprite{font-size:clamp(40px,7vw,78px);line-height:1;transition:transform .12s}
+  .fighter .role{font-size:clamp(11px,1.5vw,15px);font-weight:800;color:var(--dim)}
+  .swords{font-size:clamp(22px,3.6vw,40px);opacity:.85}
+
+  .barwrap{width:100%}
+  .barlbl{display:flex;justify-content:space-between;font-size:clamp(11px,1.5vw,15px);font-weight:800;margin-bottom:3px}
+  .bar{height:clamp(14px,2vw,22px);border-radius:999px;background:rgba(0,0,0,.45);overflow:hidden;border:1px solid rgba(255,255,255,.12);position:relative}
+  .bar > i{display:block;height:100%;border-radius:999px;transition:width .45s cubic-bezier(.3,1,.4,1)}
+  .bar.mon > i{background:linear-gradient(90deg,#ff7a59,#ff3b3b)}
+  .bar.php > i{background:linear-gradient(90deg,#42e695,#3bb2b8)}
+
+  /* 題目區 */
+  .qzone{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:clamp(8px,1.2vw,12px);
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:clamp(10px,1.6vw,18px)}
+  .qtop{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
+  .qno{font-weight:900;color:var(--gold);font-size:clamp(13px,1.7vw,17px)}
+  .qcat{font-size:clamp(11px,1.5vw,14px);font-weight:800;color:#cfe0ff;background:rgba(255,255,255,.1);padding:4px 10px;border-radius:999px}
+  .qtext{flex:0 0 auto;font-size:clamp(17px,2.5vw,27px);font-weight:900;line-height:1.5;text-align:center;
+    padding:clamp(6px,1.2vw,12px) 4px;color:#fff}
+  .speak-btn{border-radius:999px;width:clamp(34px,4.4vw,46px);height:clamp(34px,4.4vw,46px);font-size:clamp(16px,2.2vw,22px);
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center}
+
+  .opts{flex:1 1 auto;display:flex;flex-direction:column;gap:clamp(8px,1.4vw,12px);justify-content:center}
+  .opt{
+    border-radius:16px;padding:clamp(12px,1.8vw,18px) clamp(14px,2vw,20px);font-size:clamp(16px,2.3vw,24px);
+    font-weight:800;color:#fff;text-align:left;line-height:1.35;
+    background:rgba(255,255,255,.08);border:3px solid rgba(255,255,255,.16);
+    display:flex;align-items:center;gap:12px;transition:transform .08s,background .15s,border-color .15s;
+  }
+  .opt .key{flex:0 0 auto;width:clamp(28px,3.6vw,38px);height:clamp(28px,3.6vw,38px);border-radius:10px;
+    display:flex;align-items:center;justify-content:center;font-weight:900;background:rgba(255,255,255,.16);font-size:clamp(14px,1.9vw,19px)}
+  .P1 .opt:active{transform:scale(.99)}
+  .P1 .opt.sel{background:rgba(54,179,255,.30);border-color:var(--p1)}
+  .P2 .opt.sel{background:rgba(176,107,255,.30);border-color:var(--p2)}
+  .opt.correct{background:rgba(46,230,166,.30)!important;border-color:var(--green)!important}
+  .opt.wrong{background:rgba(255,93,108,.30)!important;border-color:var(--red)!important}
+  .opt.lock{pointer-events:none;opacity:.95}
+
+  /* 確定 / 取消 */
+  .confirm-row{flex:0 0 auto;display:flex;gap:10px}
+  .confirm-row button{flex:1 1 0;border-radius:16px;padding:clamp(11px,1.6vw,16px);font-size:clamp(15px,2vw,22px);font-weight:900}
+  .btn-cancel{background:rgba(255,255,255,.12);color:#fff;border:2px solid rgba(255,255,255,.25)}
+  .btn-confirm{background:linear-gradient(180deg,#7be3a0,var(--green));color:#06241a;box-shadow:0 5px 0 #1c9c72}
+  .btn-confirm:active{transform:translateY(3px);box-shadow:0 2px 0 #1c9c72}
+  .btn-confirm:disabled{filter:grayscale(.6);opacity:.55;box-shadow:none}
+
+  /* 回饋訊息 */
+  .feedback{flex:0 0 auto;min-height:clamp(28px,4vw,40px);text-align:center;font-weight:900;
+    font-size:clamp(14px,2vw,20px);display:flex;align-items:center;justify-content:center;gap:8px}
+  .feedback.ok{color:var(--green)} .feedback.no{color:var(--red)}
+
+  /* 浮動傷害字 */
+  .floater{position:absolute;font-weight:900;font-size:clamp(22px,4vw,44px);pointer-events:none;z-index:5;
+    text-shadow:0 2px 6px rgba(0,0,0,.5);animation:floatUp 1s ease forwards}
+  @keyframes floatUp{0%{transform:translateY(0) scale(.6);opacity:0}20%{opacity:1;transform:translateY(-10px) scale(1.15)}100%{transform:translateY(-70px) scale(1);opacity:0}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  .shake{animation:shake .35s}
+  @keyframes hitMon{0%,100%{transform:scale(1)}40%{transform:scale(1.18) rotate(6deg)}}
+  .hit{animation:hitMon .3s}
+  @keyframes pop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+
+  /* combo 火焰標記 */
+  .combo-flame{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:clamp(20px,3vw,32px);
+    opacity:0;transition:opacity .3s;pointer-events:none;z-index:6;text-shadow:0 0 12px #ffae00}
+  .combo-flame.show{opacity:1;animation:pop .4s}
+
+  /* =========================================================
+     勝負結算
+  ========================================================= */
+  #overScreen{display:none;position:fixed;inset:0;z-index:60;align-items:center;justify-content:center;padding:20px;
+    background:rgba(6,9,24,.85)}
+  .over-card{width:min(640px,94vw);border-radius:28px;padding:clamp(26px,4vw,46px);text-align:center;
+    background:linear-gradient(160deg,rgba(30,40,86,.96),rgba(16,20,48,.98));border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 30px 80px rgba(0,0,0,.55)}
+  .over-card .crown{font-size:clamp(54px,10vw,92px)}
+  .over-card .winner{font-size:clamp(26px,5vw,46px);font-weight:900;margin:6px 0}
+  .over-card .scoreline{font-size:clamp(16px,2.4vw,22px);color:var(--dim);font-weight:800;margin-bottom:18px}
+  .over-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+  /* 提示：橫向擺放 */
+  .rotate-hint{display:none;position:fixed;inset:0;z-index:70;background:var(--bg);align-items:center;justify-content:center;
+    text-align:center;padding:30px;font-size:22px;font-weight:800;color:var(--gold)}
+  @media (max-width:780px) and (orientation:portrait){ .rotate-hint{display:flex} }
+</style>
+</head>
+<body>
+
+<!-- ================= 開始畫面 ================= -->
+<div id="startScreen">
+  <div class="start-card">
+    <div class="title-zh">性別平等大作戰</div>
+    <div class="title-sub">騎士 ⚔ 法師 · 雙人打怪挑戰 ｜ 國中特教班・社會科・性別平等</div>
+
+    <div class="badge-row">
+      <span class="badge">⚔ 玩家1 騎士</span>
+      <span class="badge p2">🔮 玩家2 法師</span>
+      <span class="badge g">🖥 電子白板全屏</span>
+      <span class="badge g">🗣 語音念題</span>
+    </div>
+
+    <div class="vs-wrap">
+      <div class="hero k"><div class="face">🛡️</div><div class="nm">騎士</div></div>
+      <div class="vs-txt">VS</div>
+      <div class="hero m"><div class="face">🧙</div><div class="nm">法師</div></div>
+    </div>
+
+    <div class="rules">
+      <h3>📜 遊戲說明</h3>
+      <div class="li"><span class="ic">①</span><span>兩位同學左右分屏，各自打自己的怪獸，比誰先打贏！</span></div>
+      <div class="li"><span class="ic">②</span><span>先<b>點選</b>你覺得對的答案，答案會亮起來。</span></div>
+      <div class="li"><span class="ic">③</span><span>想改可以按 <b>「取消」</b> 重新選；確定好了按 <b style="color:var(--green)">「確定」</b> 才送出。</span></div>
+      <div class="li"><span class="ic">④</span><span><b style="color:var(--green)">答對</b> → 攻擊怪獸、扣牠的血！　<b style="color:var(--red)">答錯</b> → 自己扣血。</span></div>
+      <div class="li"><span class="ic">⑤</span><span>連續答對 <b style="color:var(--gold)">3 題</b> → 補血 ❤ + 攻擊力變強 🔥（連擊 Combo）！</span></div>
+      <div class="li"><span class="ic">⑥</span><span>把怪獸的血打到 0，就贏啦！🏆</span></div>
+    </div>
+
+    <div class="start-actions">
+      <button class="big-btn" id="btnStart">開始遊戲 ▶</button>
+      <button class="ghost-btn" id="btnFull1">🖥 全螢幕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 遊戲畫面 ================= -->
+<div id="gameScreen">
+  <div class="topbar">
+    <div class="gt">⚔ 性別平等大作戰</div>
+    <div class="tools">
+      <button class="tool on" id="btnVoice">🗣 念題：開</button>
+      <button class="tool" id="btnFull2">🖥 全螢幕</button>
+      <button class="tool" id="btnRestart">↻ 重新開始</button>
+    </div>
+  </div>
+
+  <div class="arena">
+    <!-- 玩家1 騎士 -->
+    <div class="panel P1" id="panelP1">
+      <div class="combo-flame" id="flameP1">🔥 連擊！</div>
+      <div class="phead">
+        <div class="who"><span class="av">🛡️</span><span class="lbl">玩家1 · 騎士</span></div>
+        <div class="stats">
+          <span class="chip">分數 <span class="v" id="scoreP1">0</span></span>
+          <span class="chip combo">Combo <span class="v" id="comboP1">0</span></span>
+        </div>
+      </div>
+
+      <div class="battlefield">
+        <div class="monster-row">
+          <div class="fighter"><div class="sprite" id="heroP1">🛡️</div><div class="role">騎士</div></div>
+          <div class="swords">⚔️</div>
+          <div class="fighter"><div class="sprite" id="monP1">👹</div><div class="role">怪獸</div></div>
+        </div>
+        <div class="barwrap">
+          <div class="barlbl"><span>👹 怪獸 HP</span><span id="monHpTxtP1">300 / 300</span></div>
+          <div class="bar mon"><i id="monHpP1" style="width:100%"></i></div>
+        </div>
+        <div class="barwrap">
+          <div class="barlbl"><span>🛡️ 玩家 HP</span><span id="phpTxtP1">150 / 150</span></div>
+          <div class="bar php"><i id="phpP1" style="width:100%"></i></div>
+        </div>
+      </div>
+
+      <div class="qzone">
+        <div class="qtop">
+          <span class="qno" id="qnoP1">第 1 題</span>
+          <span class="qcat" id="qcatP1">主題</span>
+          <button class="speak-btn" data-p="1">🔊</button>
+        </div>
+        <div class="qtext" id="qtextP1">題目</div>
+        <div class="opts" id="optsP1"></div>
+        <div class="confirm-row">
+          <button class="btn-cancel" data-p="1">取消</button>
+          <button class="btn-confirm" data-p="1" disabled>確定送出</button>
+        </div>
+        <div class="feedback" id="fbP1"></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 玩家2 法師 -->
+    <div class="panel P2" id="panelP2">
+      <div class="combo-flame" id="flameP2">🔥 連擊！</div>
+      <div class="phead">
+        <div class="who"><span class="av">🧙</span><span class="lbl">玩家2 · 法師</span></div>
+        <div class="stats">
+          <span class="chip">分數 <span class="v" id="scoreP2">0</span></span>
+          <span class="chip combo">Combo <span class="v" id="comboP2">0</span></span>
+        </div>
+      </div>
+
+      <div class="battlefield">
+        <div class="monster-row">
+          <div class="fighter"><div class="sprite" id="heroP2">🧙</div><div class="role">法師</div></div>
+          <div class="swords">✨</div>
+          <div class="fighter"><div class="sprite" id="monP2">👺</div><div class="role">怪獸</div></div>
+        </div>
+        <div class="barwrap">
+          <div class="barlbl"><span>👺 怪獸 HP</span><span id="monHpTxtP2">300 / 300</span></div>
+          <div class="bar mon"><i id="monHpP2" style="width:100%"></i></div>
+        </div>
+        <div class="barwrap">
+          <div class="barlbl"><span>🧙 玩家 HP</span><span id="phpTxtP2">150 / 150</span></div>
+          <div class="bar php"><i id="phpP2" style="width:100%"></i></div>
+        </div>
+      </div>
+
+      <div class="qzone">
+        <div class="qtop">
+          <span class="qno" id="qnoP2">第 1 題</span>
+          <span class="qcat" id="qcatP2">主題</span>
+          <button class="speak-btn" data-p="2">🔊</button>
+        </div>
+        <div class="qtext" id="qtextP2">題目</div>
+        <div class="opts" id="optsP2"></div>
+        <div class="confirm-row">
+          <button class="btn-cancel" data-p="2">取消</button>
+          <button class="btn-confirm" data-p="2" disabled>確定送出</button>
+        </div>
+        <div class="feedback" id="fbP2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 結算 ================= -->
+<div id="overScreen">
+  <div class="over-card">
+    <div class="crown" id="overCrown">🏆</div>
+    <div class="winner" id="overWinner">玩家1 騎士 獲勝！</div>
+    <div class="scoreline" id="overScore"></div>
+    <div class="over-actions">
+      <button class="big-btn" id="btnAgain">再玩一次 ▶</button>
+      <button class="ghost-btn" id="btnHome">回開始畫面</button>
+    </div>
+  </div>
+</div>
+
+<div class="rotate-hint">📱➡️🖥️<br><br>請把畫面轉成<b>橫向</b>，<br>或用電子白板/電腦全螢幕遊玩！</div>
+
+<script>
+/* ============================================================
+   30 題 · 國中特教班 性別平等題庫
+   每題：q 題目, opts 選項, correct 正解 index, cat 主題, fb 回饋
+============================================================ */
+const QUESTIONS = [
+  {cat:'特質', q:'下面哪一個是一個人的「特質」？', opts:['很高或很矮','是男生還是女生','勇敢、愛笑、會關心人'], correct:2, fb:'對！特質是你的樣子，跟身高、性別沒關係。'},
+  {cat:'興趣', q:'男生喜歡畫畫、跳舞，可以嗎？', opts:['可以，喜歡就好','不可以，那是女生的'], correct:0, fb:'可以！興趣不分男女，喜歡就去做。'},
+  {cat:'運動', q:'女生喜歡踢足球、打籃球，可以嗎？', opts:['可以！','不可以'], correct:0, fb:'可以！運動不分男女，誰都能踢、能打。'},
+  {cat:'家事', q:'家裡的家事應該誰來做？', opts:['只有媽媽做','全家人一起分工'], correct:1, fb:'對！家事是大家的事，爸爸、媽媽、小孩都可以做。'},
+  {cat:'家事', q:'爸爸煮飯、洗碗，可以嗎？', opts:['可以，很棒','不行，那是媽媽的工作'], correct:0, fb:'當然可以！爸爸做家事很厲害也很顧家。'},
+  {cat:'職業', q:'女生可以當警察、消防員嗎？', opts:['可以！','不可以'], correct:0, fb:'可以！很多女生是很厲害的警察和消防員。'},
+  {cat:'職業', q:'男生可以當護理師、幼兒園老師嗎？', opts:['可以！','不可以'], correct:0, fb:'可以！工作不分男女，做得好最重要。'},
+  {cat:'顏色', q:'男生可以喜歡粉紅色嗎？', opts:['可以','不行，粉紅色是女生的'], correct:0, fb:'可以！顏色沒有性別，喜歡哪個顏色都行。'},
+  {cat:'玩具', q:'女生想玩機器人、車子，可以嗎？', opts:['可以！','不可以'], correct:0, fb:'可以！玩具不分男女生，想玩什麼都可以。'},
+  {cat:'尊重', q:'同學穿得跟你不一樣，你應該？', opts:['取笑他','尊重他、欣賞他的不一樣'], correct:1, fb:'很棒！欣賞別人的不一樣，就是尊重。'},
+  {cat:'尊重', q:'有人說「男生不可以哭」，這句話對嗎？', opts:['對','不對，男生也會難過，也可以哭'], correct:1, fb:'對！每個人都有情緒，難過時哭出來沒關係。'},
+  {cat:'霸凌', q:'同學因為性別取笑你，你可以怎麼做？', opts:['忍著不說','告訴老師或大人'], correct:1, fb:'對！被取笑要說出來，找信任的大人幫忙。'},
+  {cat:'身體界線', q:'別人想摸你的身體，你不喜歡，可以說？', opts:['不可以！我不喜歡','只能忍耐'], correct:0, fb:'對！身體是你的，可以大聲說「不可以」。'},
+  {cat:'身體界線', q:'身體哪些地方是「隱私部位」不能隨便給人看？', opts:['手和腳','背心、褲子蓋住的地方'], correct:1, fb:'對！泳衣或內衣蓋住的地方是隱私，要保護好。'},
+  {cat:'求助', q:'有人讓你覺得不舒服、不安全，你要？', opts:['自己藏在心裡','馬上告訴爸媽或老師'], correct:1, fb:'對！覺得怪怪的、不舒服，一定要說出來求助。'},
+  {cat:'平等', q:'班長一定要男生當嗎？', opts:['對','不對，男生女生都可以當'], correct:1, fb:'對！能力好、肯負責的人都可以當班長。'},
+  {cat:'平等', q:'搬重物一定要男生嗎？', opts:['看誰有力氣、誰願意，一起幫忙','一定要男生'], correct:0, fb:'對！互相幫忙最好，不是只有男生要出力。'},
+  {cat:'刻板印象', q:'「女生數學一定比較差」這句話對嗎？', opts:['對','不對，每個人都不一樣'], correct:1, fb:'對！會不會數學跟性別無關，努力最重要。'},
+  {cat:'刻板印象', q:'長頭髮一定是女生嗎？', opts:['不一定，男生也可以留長髮','一定是女生'], correct:0, fb:'對！髮型是個人喜好，男生女生都可以。'},
+  {cat:'稱呼', q:'同學想被叫的名字跟你想的不一樣，你應該？', opts:['照他喜歡的方式叫他','隨便亂叫'], correct:0, fb:'對！尊重別人想要的稱呼，是基本的禮貌。'},
+  {cat:'分工', q:'打掃時間，掃廁所應該誰做？', opts:['只有女生','輪流、大家公平分配'], correct:1, fb:'對！工作要公平輪流，不分男女。'},
+  {cat:'情緒', q:'男生難過時，可以找人說、可以哭嗎？', opts:['可以，表達情緒很健康','不行，男生要忍住'], correct:0, fb:'對！把情緒說出來，是勇敢也是健康的。'},
+  {cat:'夢想', q:'女生說「我長大想當太空人」，你會？', opts:['支持她、為她加油','笑她不可能'], correct:0, fb:'對！夢想不分性別，為朋友加油最棒。'},
+  {cat:'家庭', q:'媽媽出去上班、爸爸在家照顧小孩，可以嗎？', opts:['可以，這也很好','不可以，怪怪的'], correct:0, fb:'可以！每個家庭分工方式不同，都值得尊重。'},
+  {cat:'尊重', q:'看到同學跟別人不一樣，最好的做法是？', opts:['指指點點','把他當朋友、平等對待'], correct:1, fb:'對！平等對待每個人，就是性別平等。'},
+  {cat:'公平', q:'玩遊戲分組，把女生都排在最後選，這樣？', opts:['不公平，應該公平分組','沒關係'], correct:0, fb:'對！分組要公平，不能因為性別就被冷落。'},
+  {cat:'隱私', q:'換衣服、上廁所時，我們應該？', opts:['關好門、保護自己的隱私','給別人看也沒關係'], correct:0, fb:'對！保護自己的隱私很重要。'},
+  {cat:'幫助', q:'同學被欺負，你可以怎麼做？', opts:['假裝沒看到','安慰他、找老師幫忙'], correct:1, fb:'對！伸出援手、找大人幫忙，你很有正義感。'},
+  {cat:'自我', q:'「我可以做我自己，跟別人不一樣也沒關係」對嗎？', opts:['對！','不對'], correct:0, fb:'對！你就是你，不一樣才特別。'},
+  {cat:'總結', q:'性別平等的意思是？', opts:['男生比較重要','不管男生女生，都被尊重、有一樣的機會'], correct:1, fb:'完全正確！這就是性別平等。你做到了！🎉'},
+];
+
+/* ============================================================
+   音效 (WebAudio)
+============================================================ */
+const SND = (()=>{
+  let ac=null;
+  const ctx=()=>{ if(!ac){ try{ac=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return ac; };
+  function beep(f,d=.1,type='sine',v=.18,delay=0){
+    const c=ctx(); if(!c) return;
+    const o=c.createOscillator(),g=c.createGain();
+    o.type=type;o.frequency.value=f;o.connect(g);g.connect(c.destination);
+    const t=c.currentTime+delay;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);
+    g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.start(t);o.stop(t+d+.02);
+  }
+  return {
+    select(){beep(520,.06,'triangle',.12)},
+    hit(){beep(660,.08,'square',.14);beep(880,.1,'square',.12,.06)},
+    right(){beep(660,.09,'triangle',.16);beep(880,.1,'triangle',.16,.09);beep(1180,.14,'triangle',.16,.18)},
+    wrong(){beep(200,.18,'sawtooth',.16);beep(150,.22,'sawtooth',.14,.08)},
+    combo(){[523,659,784,1046].forEach((f,i)=>beep(f,.12,'triangle',.16,i*.07))},
+    win(){[523,659,784,1046,1318].forEach((f,i)=>beep(f,.18,'triangle',.18,i*.12))},
+    resume(){const c=ctx(); if(c&&c.state==='suspended')c.resume();}
+  };
+})();
+
+/* ============================================================
+   語音念題
+============================================================ */
+let VOICE_ON=true;
+function speak(text){
+  if(!VOICE_ON || !('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='zh-TW'; u.rate=.92; u.pitch=1.05;
+    const vs=speechSynthesis.getVoices();
+    const zh=vs.find(v=>/zh|TW|Chinese|Taiwan/i.test(v.lang+v.name));
+    if(zh)u.voice=zh;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+if('speechSynthesis' in window){ speechSynthesis.onvoiceschanged=()=>{}; }
+
+/* ============================================================
+   遊戲狀態
+============================================================ */
+const MON_HP_MAX=300, PLAYER_HP_MAX=150;
+const BASE_ATK=34, COMBO_ATK=22, WRONG_DMG=22;
+const MONSTERS={1:['👹','👺','👻','🧟','🐲'],2:['👺','👹','💀','🦑','🐉']};
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+const state={1:null,2:null,over:false};
+
+function newPlayer(){
+  return {monHp:MON_HP_MAX,php:PLAYER_HP_MAX,score:0,combo:0,qIndex:0,
+          deck:shuffle(QUESTIONS),selected:-1,locked:false,monIdx:0};
+}
+
+function startGame(){
+  document.getElementById('startScreen').style.display='none';
+  document.getElementById('overScreen').style.display='none';
+  document.getElementById('gameScreen').style.display='flex';
+  state[1]=newPlayer(); state[2]=newPlayer(); state.over=false;
+  renderAll(1); renderAll(2);
+  updateBars(1); updateBars(2);
+  SND.resume();
+}
+
+function curQ(p){ const s=state[p]; return s.deck[s.qIndex % s.deck.length]; }
+
+function renderAll(p){
+  const s=state[p], q=curQ(p);
+  s.selected=-1; s.locked=false;
+  document.getElementById('qno'+'P'+p).textContent='第 '+(s.qIndex+1)+' 題';
+  document.getElementById('qcatP'+p).textContent=q.cat;
+  document.getElementById('qtextP'+p).textContent=q.q;
+  document.getElementById('monP'+p).textContent=MONSTERS[p][s.monIdx % MONSTERS[p].length];
+  // 選項
+  const wrap=document.getElementById('optsP'+p);
+  wrap.innerHTML='';
+  const keys=['A','B','C','D'];
+  q.opts.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='opt';
+    b.innerHTML='<span class="key">'+keys[i]+'</span><span>'+opt+'</span>';
+    b.onclick=()=>selectOpt(p,i);
+    wrap.appendChild(b);
+  });
+  document.querySelector('.btn-confirm[data-p="'+p+'"]').disabled=true;
+  document.getElementById('fbP'+p).textContent='';
+  document.getElementById('fbP'+p).className='feedback';
+  // 念題
+  speak(q.q+'。'+q.opts.map((o,i)=>keys[i]+'：'+o).join('，'));
+}
+
+function selectOpt(p,i){
+  const s=state[p]; if(s.locked) return;
+  s.selected=i;
+  const opts=document.querySelectorAll('#optsP'+p+' .opt');
+  opts.forEach((o,idx)=>o.classList.toggle('sel',idx===i));
+  document.querySelector('.btn-confirm[data-p="'+p+'"]').disabled=false;
+  SND.select();
+}
+
+function cancelSel(p){
+  const s=state[p]; if(s.locked) return;
+  s.selected=-1;
+  document.querySelectorAll('#optsP'+p+' .opt').forEach(o=>o.classList.remove('sel'));
+  document.querySelector('.btn-confirm[data-p="'+p+'"]').disabled=true;
+  document.getElementById('fbP'+p).textContent='';
+  document.getElementById('fbP'+p).className='feedback';
+}
+
+function confirmSel(p){
+  const s=state[p]; if(s.locked||s.selected<0||state.over) return;
+  s.locked=true;
+  const q=curQ(p);
+  const opts=document.querySelectorAll('#optsP'+p+' .opt');
+  opts.forEach(o=>o.classList.add('lock'));
+  const isRight=s.selected===q.correct;
+  const fb=document.getElementById('fbP'+p);
+
+  if(isRight){
+    opts[s.selected].classList.add('correct');
+    s.combo++; s.score+=10;
+    let atk=BASE_ATK + (s.combo>=3?COMBO_ATK:0) + Math.floor(s.combo/3)*6;
+    s.monHp=Math.max(0,s.monHp-atk);
+    SND.right();
+    hitMonster(p, atk);
+    fb.className='feedback ok';
+    fb.textContent='✅ 答對！'+q.fb;
+    // 連擊獎勵
+    if(s.combo>0 && s.combo%3===0){
+      s.php=Math.min(PLAYER_HP_MAX, s.php+25);
+      showCombo(p);
+      SND.combo();
+      fb.textContent='🔥 連擊 '+s.combo+'！補血 +25、攻擊變強！';
+    }
+  } else {
+    if(s.selected>=0) opts[s.selected].classList.add('wrong');
+    opts[q.correct].classList.add('correct');
+    s.combo=0;
+    s.php=Math.max(0,s.php-WRONG_DMG);
+    SND.wrong();
+    document.getElementById('panelP'+p).classList.add('shake');
+    setTimeout(()=>document.getElementById('panelP'+p).classList.remove('shake'),350);
+    floater(p,'-'+WRONG_DMG+' HP',true);
+    fb.className='feedback no';
+    fb.textContent='❌ 正解是 '+['A','B','C','D'][q.correct]+'。'+q.fb;
+  }
+
+  updateStats(p); updateBars(p);
+
+  // 勝負判定
+  if(s.monHp<=0){ setTimeout(()=>endGame(p),700); return; }
+  if(s.php<=0){ setTimeout(()=>endGame(p===1?2:1, true),700); return; }
+
+  // 下一題
+  s.qIndex++; if(isRight) s.monIdx++; // 答對換一隻怪獸樣子，增加打怪感
+  setTimeout(()=>{ if(!state.over) renderAll(p); }, isRight?1300:1700);
+}
+
+function hitMonster(p,atk){
+  const m=document.getElementById('monP'+p);
+  m.classList.add('hit'); setTimeout(()=>m.classList.remove('hit'),300);
+  floater(p,'-'+atk, false);
+}
+
+function floater(p,txt,isPlayer){
+  const panel=document.getElementById('panelP'+p);
+  const f=document.createElement('div');
+  f.className='floater';
+  f.textContent=txt;
+  f.style.color=isPlayer?'#ff7a88':'#ffd34d';
+  f.style.left=(isPlayer?'35%':'62%');
+  f.style.top='26%';
+  panel.appendChild(f);
+  setTimeout(()=>f.remove(),1000);
+}
+
+function showCombo(p){
+  const fl=document.getElementById('flameP'+p);
+  fl.textContent='🔥 連擊 '+state[p].combo+'！';
+  fl.classList.add('show');
+  setTimeout(()=>fl.classList.remove('show'),1400);
+}
+
+function updateStats(p){
+  document.getElementById('scoreP'+p).textContent=state[p].score;
+  document.getElementById('comboP'+p).textContent=state[p].combo;
+}
+function updateBars(p){
+  const s=state[p];
+  const mh=Math.round(s.monHp/MON_HP_MAX*100);
+  const ph=Math.round(s.php/PLAYER_HP_MAX*100);
+  document.getElementById('monHpP'+p).style.width=mh+'%';
+  document.getElementById('phpP'+p).style.width=ph+'%';
+  document.getElementById('monHpTxtP'+p).textContent=s.monHp+' / '+MON_HP_MAX;
+  document.getElementById('phpTxtP'+p).textContent=s.php+' / '+PLAYER_HP_MAX;
+}
+
+function endGame(winner, byKO){
+  if(state.over) return;
+  state.over=true;
+  speechSynthesis && speechSynthesis.cancel();
+  SND.win();
+  const names={1:'玩家1 · 騎士 🛡️',2:'玩家2 · 法師 🧙'};
+  document.getElementById('overCrown').textContent= winner===1?'🛡️🏆':'🧙🏆';
+  document.getElementById('overWinner').textContent= names[winner]+' 獲勝！';
+  const w=state[winner], l=state[winner===1?2:1];
+  document.getElementById('overScore').innerHTML=
+    '🛡️ 騎士 '+state[1].score+' 分　｜　🧙 法師 '+state[2].score+' 分'+
+    (byKO?'<br><span style="color:#9fb0d8">（對手體力歸零）</span>':'');
+  document.getElementById('overScreen').style.display='flex';
+}
+
+/* ============================================================
+   事件綁定
+============================================================ */
+document.getElementById('btnStart').onclick=startGame;
+document.getElementById('btnAgain').onclick=startGame;
+document.getElementById('btnHome').onclick=()=>{
+  document.getElementById('overScreen').style.display='none';
+  document.getElementById('gameScreen').style.display='none';
+  document.getElementById('startScreen').style.display='flex';
+};
+document.getElementById('btnRestart').onclick=()=>{ if(confirm('確定要重新開始嗎？')) startGame(); };
+
+document.querySelectorAll('.btn-cancel').forEach(b=>b.onclick=()=>cancelSel(+b.dataset.p));
+document.querySelectorAll('.btn-confirm').forEach(b=>b.onclick=()=>confirmSel(+b.dataset.p));
+document.querySelectorAll('.speak-btn').forEach(b=>b.onclick=()=>{
+  const p=+b.dataset.p, q=curQ(p);
+  speak(q.q+'。'+q.opts.map((o,i)=>['A','B','C','D'][i]+'：'+o).join('，'));
+});
+
+// 念題開關
+document.getElementById('btnVoice').onclick=function(){
+  VOICE_ON=!VOICE_ON;
+  this.classList.toggle('on',VOICE_ON);
+  this.textContent='🗣 念題：'+(VOICE_ON?'開':'關');
+  if(!VOICE_ON) speechSynthesis && speechSynthesis.cancel();
+};
+
+// 全螢幕
+function toggleFull(){
+  const el=document.documentElement;
+  if(!document.fullscreenElement){ (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); }
+  else { (document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document); }
+}
+document.getElementById('btnFull1').onclick=toggleFull;
+document.getElementById('btnFull2').onclick=toggleFull;
+</script>
+</body>
+</html>
