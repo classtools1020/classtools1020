@@ -8,7 +8,8 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;background:#1a1530;overflow:hidden;touch-action:none;font-family:'Noto Sans TC','PingFang TC',sans-serif}
 .stage{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#2d2456,#1a1530)}
-.frame{position:relative;display:flex;flex-direction:column;width:100%;max-width:1100px;aspect-ratio:16/9;max-height:100vh;box-shadow:0 0 40px rgba(255,200,100,.15)}
+.frame{position:relative;display:flex;flex-direction:column;width:100%;max-width:1100px;max-height:100vh;box-shadow:0 0 40px rgba(255,200,100,.15)}
+.game-pane{position:relative;width:100%;aspect-ratio:16/9;flex-shrink:0}
 canvas#game{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block;background:#000;border:4px solid #2d2456;border-radius:4px}
 
 .hud{position:absolute;top:8px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:0 14px;color:#fff;pointer-events:none;font-size:clamp(11px,1.5vw,15px);text-shadow:2px 2px 0 #000;letter-spacing:1px;font-weight:900;z-index:10;flex-wrap:wrap;gap:8px}
@@ -40,11 +41,11 @@ canvas#game{width:100%;height:100%;image-rendering:pixelated;image-rendering:cri
 .bubble-layer{position:absolute;inset:0;pointer-events:none;z-index:12;overflow:hidden}
 .game-bubble{position:absolute;background:#fff;color:#1a1530;padding:5px 12px;border-radius:12px;border:2px solid #1a1530;font-size:clamp(11px,1.4vw,15px);font-weight:900;white-space:nowrap;transform:translateX(-50%);box-shadow:0 3px 0 rgba(0,0,0,.2);transition:opacity .2s;letter-spacing:.5px}
 
-.touch{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;padding:8px 14px;z-index:20;pointer-events:none}
-.tch-group{display:flex;gap:10px;pointer-events:auto}
-.tch{width:clamp(48px,7vw,88px);height:clamp(48px,7vw,88px);border-radius:50%;background:rgba(40,30,70,.45);border:3px solid rgba(255,255,255,.65);color:#fff;font-size:clamp(22px,3.5vw,38px);display:flex;align-items:center;justify-content:center;font-weight:900;cursor:pointer;font-family:monospace;box-shadow:0 3px 12px rgba(0,0,0,.35);user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.touch{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:linear-gradient(180deg,#1a1530,#251a3d);border-top:2px solid rgba(255,255,255,.08);flex-shrink:0}
+.tch-group{display:flex;gap:14px}
+.tch{width:clamp(54px,8vw,90px);height:clamp(54px,8vw,90px);border-radius:50%;background:rgba(255,255,255,.12);border:3px solid rgba(255,255,255,.5);color:#fff;font-size:clamp(26px,4vw,42px);display:flex;align-items:center;justify-content:center;font-weight:900;cursor:pointer;font-family:monospace;box-shadow:0 4px 16px rgba(0,0,0,.4);user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;transition:transform .1s,background .1s}
 .tch:active{background:rgba(255,200,100,.55);transform:scale(.92)}
-.tch.jump{background:rgba(255,170,60,.5);border-color:rgba(255,210,120,.85);width:clamp(58px,9vw,108px);height:clamp(58px,9vw,108px)}
+.tch.jump{background:rgba(255,170,60,.35);border-color:rgba(255,210,120,.7);width:clamp(64px,10vw,108px);height:clamp(64px,10vw,108px)}
 
 .screen{position:absolute;inset:0;background:rgba(26,21,48,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px;z-index:30;letter-spacing:1px;overflow-y:auto}
 .screen h1{font-size:clamp(22px,4vw,40px);color:#ffc857;margin-bottom:14px;text-shadow:3px 3px 0 #000;font-weight:900}
@@ -114,45 +115,48 @@ canvas#game{width:100%;height:100%;image-rendering:pixelated;image-rendering:cri
 <div class="stage">
   <div class="frame">
 
-    <div class="title-bar">
-      🌈 豆豆冒險 · 我就是我 🌈
-      <small id="levelLabel">第 1 關</small>
-    </div>
-
-    <div class="hud">
-      <div class="hud-left">
-        <div class="hud-item"><span class="lbl">分數</span><span id="score">0</span></div>
-        <div class="hud-item"><span class="lbl">星</span><span id="starCnt">0/0</span></div>
-        <div class="hud-item combo hide" id="comboBox">🔥 <span id="comboN">0</span> · ×<span id="comboX">1</span></div>
-        <div class="hud-item power hide" id="powerBox">⚡ 護盾 <span id="powerN">10</span>s</div>
+    <div class="game-pane">
+      <div class="title-bar">
+        🌈 豆豆冒險 · 我就是我 🌈
+        <small id="levelLabel">第 1 關</small>
       </div>
-      <div class="hud-right">
-        <div class="hud-item"><span class="lbl">愛心</span><span id="lives">3</span></div>
-        <button class="btn-icon" id="btnTeacher" title="老師工具">🧑‍🏫</button>
-        <button class="btn-icon" id="btnVoice" title="語音念題">🗣</button>
-        <button class="btn-icon" id="btnSound" title="音效">🔊</button>
-        <button class="btn-icon" id="btnPause" title="暫停">⏸</button>
+
+      <div class="hud">
+        <div class="hud-left">
+          <div class="hud-item"><span class="lbl">分數</span><span id="score">0</span></div>
+          <div class="hud-item"><span class="lbl">星</span><span id="starCnt">0/0</span></div>
+          <div class="hud-item combo hide" id="comboBox">🔥 <span id="comboN">0</span> · ×<span id="comboX">1</span></div>
+          <div class="hud-item power hide" id="powerBox">⚡ 護盾 <span id="powerN">10</span>s</div>
+        </div>
+        <div class="hud-right">
+          <div class="hud-item"><span class="lbl">愛心</span><span id="lives">3</span></div>
+          <button class="btn-icon" id="btnTeacher" title="老師工具">🧑‍🏫</button>
+          <button class="btn-icon" id="btnVoice" title="語音念題">🗣</button>
+          <button class="btn-icon" id="btnSound" title="音效">🔊</button>
+          <button class="btn-icon" id="btnPause" title="暫停">⏸</button>
+        </div>
+      </div>
+
+      <canvas id="game" width="480" height="270"></canvas>
+
+      <!-- HTML 浮層：清晰對話 -->
+      <div class="npc-bubble" id="npcBubble">
+        <span class="speaker">🌱 夥伴 小豆</span>
+        <span id="npcText"></span>
+      </div>
+      <div class="lesson-toast" id="lessonToast"></div>
+      <div class="bubble-layer" id="bubbleLayer"></div>
+
+      <div class="teacher-tray" id="teacherTray">
+        <button class="tt-btn" id="ttSlow">🐢 慢動作</button>
+        <button class="tt-btn" id="ttInvul">🛡 無敵模式</button>
+        <button class="tt-btn" id="ttJump">🚀 高跳</button>
+        <button class="tt-btn" id="ttSkip">⏭ 跳過此關</button>
+        <button class="tt-btn danger" id="ttReset">🗑 清進度</button>
       </div>
     </div>
 
-    <canvas id="game" width="480" height="270"></canvas>
-
-    <!-- HTML 浮層：清晰對話 -->
-    <div class="npc-bubble" id="npcBubble">
-      <span class="speaker">🌱 夥伴 小豆</span>
-      <span id="npcText"></span>
-    </div>
-    <div class="lesson-toast" id="lessonToast"></div>
-    <div class="bubble-layer" id="bubbleLayer"></div>
-
-    <div class="teacher-tray" id="teacherTray">
-      <button class="tt-btn" id="ttSlow">🐢 慢動作</button>
-      <button class="tt-btn" id="ttInvul">🛡 無敵模式</button>
-      <button class="tt-btn" id="ttJump">🚀 高跳</button>
-      <button class="tt-btn" id="ttSkip">⏭ 跳過此關</button>
-      <button class="tt-btn danger" id="ttReset">🗑 清進度</button>
-    </div>
-
+    <!-- 觸控按鈕區（畫面下方，不擋角色） -->
     <div class="touch" id="touchControls">
       <div class="tch-group">
         <div class="tch" data-key="left">◀</div>
