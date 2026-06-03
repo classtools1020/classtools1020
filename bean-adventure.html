@@ -184,7 +184,8 @@ canvas#game{width:100%;height:100%;image-rendering:pixelated;image-rendering:cri
       </p>
       <p class="sub" style="font-size:.88em">
         🌸 撞花會出題，答對 → <b style="color:#ffc857">變大！跳更高！</b><br>
-        ⚡ <b style="color:#ff8a65">變大時掉下去會被救回來！</b><br>
+        ⚡ <b style="color:#ff8a65">變大時掉下去會被熱氣球救起來！</b><br>
+        💔 <b style="color:#ff8a8a">沒變大時掉下去會扣愛心</b>，愛心歸 0 就 Game Over<br>
         🗣 <b style="color:#88c0e8">畫面會語音念題（可隨時關）</b>
       </p>
       <button id="btnContinue" class="hide">繼續上次 →</button>
@@ -650,7 +651,32 @@ function checkMilestone(){
   updateHUD();
 }
 
-// 🎈 熱氣球救命
+// 💔 正常掉下去：扣愛心 + 立刻復活在安全位置
+function handleFall(){
+  lives--;
+  updateHUD();
+  SND.hurt();
+  combo = 0;
+  comboTimer = 0;
+  if(lives <= 0){
+    lose('💔 愛心用完了…');
+    return;
+  }
+  // 復活到最後安全位置
+  const lvWidth = LEVELS[curLevel].width;
+  const safeX = (lastSafeX > 20 && lastSafeX < lvWidth - 20) ? lastSafeX : LEVELS[curLevel].start[0];
+  const safeY = (lastSafeY > 0 && lastSafeY < 240) ? lastSafeY : 200;
+  player.x = safeX;
+  player.y = safeY - 30;
+  player.vx = 0; player.vy = 0;
+  invul = 120; // 2 秒無敵
+  // 鏡頭立刻跟上
+  camX = Math.max(0, Math.min(lvWidth - W, safeX + player.w/2 - W/2));
+  showLessonToast(`💔 掉下去了！剩 ${lives} 顆愛心 ❤️`);
+  SP.speak(`掉下去了，還剩${lives}顆愛心`);
+}
+
+// 🎈 熱氣球救命（變大狀態的特殊獎勵）
 let rescueCount = 0;
 function startBalloonRescue(){
   rescueCount++;
@@ -679,11 +705,14 @@ function startBalloonRescue(){
   // 重置連敗計數，給保護
   consecHits = 0;
   invul = 60;
-  SND.flower();
+  // 用掉變大狀態
+  player.superTime = 0;
+  player.w = player.baseW;
+  player.h = player.baseH;
+  SND.rescue();
   setTimeout(() => SND.power(), 200);
-  // 大字提示：學生一定看得到
-  showLessonToast(`🎈 喔喔！掉下去了！再來一次（第 ${rescueCount} 次救援）`);
-  SP.speak('再來一次');
+  showLessonToast('🎈 答對的能量救了你一命！');
+  SP.speak('熱氣球救你了');
 }
 
 function updateBalloon(){
@@ -793,16 +822,16 @@ function update(){
   }
 
   if(player.y > H + 40){
-    // 任何情況下玩家掉到畫面外 → 立刻救
-    if(balloon && balloon.phase === 'done'){
-      balloon = null; // 清掉舊氣球，馬上接新的
-    }
-    if(!balloon){
+    // 變大狀態（答對題目的獎勵）→ 熱氣球救命
+    if(player.superTime > 0 && !balloon){
       startBalloonRescue();
+    } else if(!balloon){
+      // 正常掉下去 → 扣愛心 + 立刻復活在安全位置
+      handleFall();
     } else if(player.y > H + 200){
-      // 掉太遠（已超出救命中範圍）→ 強制重啟救命
+      // 已在救命中又掉太遠 → 強制復活
       balloon = null;
-      startBalloonRescue();
+      handleFall();
     }
   }
 
