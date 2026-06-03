@@ -541,6 +541,7 @@ function initLevel(idx){
   starsAtLastMilestone = 0;
   consecHits = 0;
   consecProtect = 0;
+  rescueCount = 0;
   updateHUD();
   document.getElementById('levelLabel').textContent = `第 ${idx+1} 關 · ${L.name}`;
 
@@ -650,29 +651,39 @@ function checkMilestone(){
 }
 
 // 🎈 熱氣球救命
+let rescueCount = 0;
 function startBalloonRescue(){
+  rescueCount++;
   const colors = ['#ff6b9a','#88c0e8','#7ed487','#ffd96a','#b388e8','#ff8a65'];
-  // 直接放在畫面內、安全位置上空 → 立刻可見
-  const startX = Math.max(20, Math.min(LEVELS[curLevel].width - 20, lastSafeX));
-  const startY = Math.max(70, lastSafeY - 90);
+  // 確保 lastSafeX/Y 有效（防止異常值）
+  const lvWidth = LEVELS[curLevel].width;
+  const safeX = (lastSafeX > 20 && lastSafeX < lvWidth - 20) ? lastSafeX : LEVELS[curLevel].start[0];
+  const safeY = (lastSafeY > 0 && lastSafeY < 240) ? lastSafeY : 200;
+  const startX = Math.max(20, Math.min(lvWidth - 20, safeX));
+  const startY = Math.max(70, safeY - 90);
   balloon = {
-    phase: 'flying',  // 跳過 rising 階段，直接飛行
+    phase: 'flying',
     x: startX,
     y: startY,
-    targetX: lastSafeX,
-    targetY: lastSafeY - 20,
+    targetX: safeX,
+    targetY: safeY - 20,
     color: colors[Math.floor(Math.random()*colors.length)],
     life: 0,
   };
-  // 玩家立刻傳到氣球上
+  // 玩家立刻傳到氣球上、停止輸入動量
   player.x = startX;
   player.y = startY - 12;
   player.vx = 0; player.vy = 0;
-  // 鏡頭跟過去
-  camX = Math.max(0, Math.min(LEVELS[curLevel].width - W, startX + player.w/2 - W/2));
+  // 鏡頭立刻跳到救援位置（不平滑跟隨，避免畫面外）
+  camX = Math.max(0, Math.min(lvWidth - W, startX + player.w/2 - W/2));
+  // 重置連敗計數，給保護
+  consecHits = 0;
+  invul = 60;
   SND.flower();
   setTimeout(() => SND.power(), 200);
-  showLessonToast('🎈 熱氣球來救你了！');
+  // 大字提示：學生一定看得到
+  showLessonToast(`🎈 喔喔！掉下去了！再來一次（第 ${rescueCount} 次救援）`);
+  SP.speak('再來一次');
 }
 
 function updateBalloon(){
@@ -781,9 +792,18 @@ function update(){
     coyoteTime--;
   }
 
-  if(player.y > H + 40 && !balloon){
-    // 🎈 熱氣球永遠接住，不扣愛心
-    startBalloonRescue();
+  if(player.y > H + 40){
+    // 任何情況下玩家掉到畫面外 → 立刻救
+    if(balloon && balloon.phase === 'done'){
+      balloon = null; // 清掉舊氣球，馬上接新的
+    }
+    if(!balloon){
+      startBalloonRescue();
+    } else if(player.y > H + 200){
+      // 掉太遠（已超出救命中範圍）→ 強制重啟救命
+      balloon = null;
+      startBalloonRescue();
+    }
   }
 
   // 熱氣球動畫更新
