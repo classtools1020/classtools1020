@@ -134,9 +134,24 @@
   .qtop{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
   .qno{font-weight:900;color:var(--gold);font-size:clamp(12px,1.6vw,16px)}
   .qcat{font-size:clamp(10px,1.4vw,13px);font-weight:800;color:#cfe0ff;background:rgba(255,255,255,.1);padding:3px 9px;border-radius:999px}
-  .qart{flex:0 0 auto;text-align:center;font-size:clamp(40px,7vw,72px);line-height:1.05;letter-spacing:6px;
-    filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));animation:bob 2.2s ease-in-out infinite}
-  @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-9px) rotate(2deg)}}
+  /* 插圖舞台：藍天 + 草地 + 角色 */
+  .scene{position:relative;flex:0 0 auto;height:clamp(96px,16vh,160px);border-radius:18px;overflow:hidden;
+    background:linear-gradient(180deg,#bfe6ff 0%,#e6f6ff 58%,#cdeeb0 58%,#aee08a 100%);
+    border:3px solid rgba(255,255,255,.65);box-shadow:inset 0 -8px 0 rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.25)}
+  .s-deco{position:absolute;font-size:clamp(18px,2.6vw,28px);opacity:.9;pointer-events:none}
+  .s-deco.sun{top:7px;left:10px;animation:spin 9s linear infinite}
+  .s-deco.cloud{top:9px;right:12px;animation:drift 6s ease-in-out infinite}
+  .s-deco.spark1{top:18%;right:24%;font-size:clamp(13px,1.8vw,18px);animation:twinkle 1.8s ease-in-out infinite}
+  .s-deco.spark2{top:40%;left:18%;font-size:clamp(13px,1.8vw,18px);animation:twinkle 2.3s ease-in-out infinite .5s}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes drift{0%,100%{transform:translateX(0)}50%{transform:translateX(-8px)}}
+  @keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+  .s-art{position:absolute;left:50%;bottom:18%;transform:translateX(-50%);font-size:clamp(46px,9vw,92px);line-height:1;
+    filter:drop-shadow(0 7px 5px rgba(0,0,0,.28));animation:bob 2.2s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0) rotate(-3deg)}50%{transform:translateX(-50%) translateY(-10px) rotate(3deg)}}
+  .s-cap{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);white-space:nowrap;
+    background:rgba(11,15,36,.82);color:#ffe9a8;font-weight:900;font-size:clamp(12px,1.7vw,17px);
+    padding:3px 14px;border-radius:999px;border:2px solid rgba(255,255,255,.35)}
   .qtext{flex:0 0 auto;font-size:clamp(16px,2.3vw,25px);font-weight:900;line-height:1.45;text-align:center;padding:clamp(4px,.8vw,8px) 4px;color:#fff}
   .speak-btn{border-radius:999px;width:clamp(32px,4vw,42px);height:clamp(32px,4vw,42px);font-size:clamp(15px,2vw,20px);
     background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center}
@@ -209,7 +224,7 @@
 <div id="startScreen">
   <div class="start-card">
     <div class="title-zh">性別平等大作戰</div>
-    <div class="title-sub">騎士 ⚔ 法師 · 雙人打怪 ｜ 國中特教班・社會科・性別平等<br>精選 12 題 · 一場約 6～8 題就能打贏（3～5 分鐘）</div>
+    <div class="title-sub">騎士 ⚔ 法師 · 雙人打怪 ｜ 國中特教班・社會科・性別平等<br>18 個生活情境插圖題 · 一場約 6～8 題就能打贏（3～5 分鐘）</div>
 
     <div class="vs-wrap">
       <div class="hero k"><div class="face">🛡️</div><div class="nm">玩家1 騎士</div></div>
@@ -306,7 +321,12 @@
           <span class="qcat" id="qcatP1">主題</span>
           <button class="speak-btn" data-p="1">🔊</button>
         </div>
-        <div class="qart" id="qartP1">🌟</div>
+        <div class="scene" id="sceneP1">
+          <span class="s-deco sun">☀️</span><span class="s-deco cloud">☁️</span>
+          <span class="s-deco spark1">✨</span><span class="s-deco spark2">⭐</span>
+          <span class="s-art" id="qartP1">🌟</span>
+          <span class="s-cap" id="scapP1">主題</span>
+        </div>
         <div class="qtext" id="qtextP1">題目</div>
         <div class="opts" id="optsP1"></div>
         <div class="confirm-row">
@@ -362,7 +382,12 @@
           <span class="qcat" id="qcatP2">主題</span>
           <button class="speak-btn" data-p="2">🔊</button>
         </div>
-        <div class="qart" id="qartP2">🌟</div>
+        <div class="scene" id="sceneP2">
+          <span class="s-deco sun">☀️</span><span class="s-deco cloud">☁️</span>
+          <span class="s-deco spark1">✨</span><span class="s-deco spark2">⭐</span>
+          <span class="s-art" id="qartP2">🌟</span>
+          <span class="s-cap" id="scapP2">主題</span>
+        </div>
         <div class="qtext" id="qtextP2">題目</div>
         <div class="opts" id="optsP2"></div>
         <div class="confirm-row">
@@ -394,22 +419,28 @@
 <div class="rotate-hint">📱➡️🖥️<br><br>請把畫面轉成<b>橫向</b>，<br>或用電子白板/電腦全螢幕遊玩！</div>
 
 <script>
-/* ===== 精選 12 題 · 國中特教班 性別平等題庫 =====
-   情境化 + 生活連結 + 大圖示；全部 2 選 1。
-   emoji=情境大圖；taunt=怪獸說的刻板印象話；答對=反駁打牠 */
+/* ===== 18 題 · 國中特教班 性別平等題庫 =====
+   情境化 + 生活連結 + 插圖舞台；全部 2 選 1。
+   emoji=舞台主角；cap=場景小標籤；taunt=怪獸的刻板印象話；答對=反駁打牠 */
 const QUESTIONS = [
-  {cat:'興趣',emoji:'🕺💃',taunt:'男生不可以跳舞啦！',q:'小華是男生，他想參加學校的「跳舞社」🕺，可以嗎？',opts:['👍 當然可以，喜歡就去跳！','🙅 不行，跳舞是女生的'],correct:0,fb:'興趣不分男女，喜歡就去做，超棒的！'},
-  {cat:'運動',emoji:'⚽👧',taunt:'女生不會踢足球啦！',q:'小美是女生，下課想跟大家一起踢足球 ⚽，可以嗎？',opts:['🙅 不行，足球是男生玩的','👍 可以呀，一起踢超開心！'],correct:1,fb:'運動不分男女，誰都能踢、能跑、能跳！'},
-  {cat:'家事',emoji:'🍽️🧽',taunt:'家事都給媽媽做就好！',q:'吃飽飯了 🍚，家裡的碗和家事應該誰做？',opts:['👨‍👩‍👧‍👦 全家人一起分工','👩 只有媽媽一個人做'],correct:0,fb:'家事是大家的事，爸爸、媽媽、小孩都能幫忙！'},
-  {cat:'職業',emoji:'👮‍♀️🚓',taunt:'女生怎麼能當警察！',q:'小芳長大想當警察 👮‍♀️，幫助別人抓壞人，可以嗎？',opts:['👍 可以，超勇敢超帥！','🙅 不行，女生不能當警察'],correct:0,fb:'很多女生是很厲害的警察和消防員喔！'},
-  {cat:'顏色',emoji:'🎒💗',taunt:'粉紅色是女生的顏色！',q:'阿明背粉紅色書包 🎒💗，同學笑他「像女生」，這樣對嗎？',opts:['🙅 不對，顏色不分男女','😆 對，男生不能用粉紅色'],correct:0,fb:'顏色沒有性別，喜歡哪個顏色都可以！'},
-  {cat:'玩具',emoji:'🤖🚗',taunt:'機器人是男生在玩的！',q:'小婷是女生，她想玩機器人和小汽車 🤖🚗，可以嗎？',opts:['👍 可以，想玩就玩！','🙅 不行，那是男生的玩具'],correct:0,fb:'玩具不分男女，想玩什麼都可以！'},
-  {cat:'身體界線',emoji:'🙅✋',taunt:'我想摸你就摸，你管不著！',q:'有人一直想摸你，你覺得很不舒服 😣，你可以怎麼做？',opts:['🗣️ 大聲說「我不喜歡，不可以！」','😶 忍耐，不要說出來'],correct:0,fb:'身體是你的，可以大聲說「不可以」！'},
-  {cat:'求助',emoji:'🆘🧑‍🏫',taunt:'不舒服也要自己忍著！',q:'有人讓你覺得怪怪的、不安全 😰，你應該？',opts:['🤐 自己藏在心裡不講','🗣️ 馬上告訴爸媽或老師'],correct:1,fb:'覺得不舒服，一定要說出來找大人幫忙！'},
-  {cat:'情緒',emoji:'😢🤗',taunt:'男生不准哭，羞羞臉！',q:'小傑考試考不好，很難過想哭 😢，可以嗎？',opts:['👍 可以，哭出來沒關係','🙅 不行，男生不能哭'],correct:0,fb:'每個人都會難過，哭出來沒關係的。'},
-  {cat:'反霸凌',emoji:'😡🧑‍🏫',taunt:'笑你像女生又怎樣！',q:'同學一直取笑你「動作像女生」😠，你可以怎麼做？',opts:['😶 忍著都不說','🗣️ 告訴老師或信任的大人'],correct:1,fb:'被取笑要說出來，找信任的大人幫忙！'},
-  {cat:'平等',emoji:'🙋👑',taunt:'班長一定要男生當！',q:'班上要選班長啦 👑！誰可以當班長呢？',opts:['👦👧 男生女生都可以當','👦 一定要男生才能當'],correct:0,fb:'能力好、肯負責的人都可以當班長！'},
-  {cat:'做自己',emoji:'🌈🌟',taunt:'你就要跟大家一模一樣！',q:'「我可以做我自己，跟別人不一樣也很棒！」🌈 這句話對嗎？',opts:['💯 對！我就是獨特的我','🙅 不對，要跟大家一樣'],correct:0,fb:'你就是你，不一樣才特別，最棒了！'},
+  {cat:'興趣',emoji:'🕺',cap:'跳舞社',taunt:'男生不可以跳舞啦！',q:'小華是男生，他想參加學校的「跳舞社」🕺，可以嗎？',opts:['👍 當然可以，喜歡就去跳！','🙅 不行，跳舞是女生的'],correct:0,fb:'興趣不分男女，喜歡就去做，超棒的！'},
+  {cat:'運動',emoji:'⚽',cap:'踢足球',taunt:'女生不會踢足球啦！',q:'小美是女生，下課想跟大家一起踢足球 ⚽，可以嗎？',opts:['🙅 不行，足球是男生玩的','👍 可以呀，一起踢超開心！'],correct:1,fb:'運動不分男女，誰都能踢、能跑、能跳！'},
+  {cat:'家事',emoji:'🧽',cap:'一起洗碗',taunt:'家事都給媽媽做就好！',q:'吃飽飯了 🍚，家裡的碗和家事應該誰做？',opts:['👨‍👩‍👧‍👦 全家人一起分工','👩 只有媽媽一個人做'],correct:0,fb:'家事是大家的事，爸爸、媽媽、小孩都能幫忙！'},
+  {cat:'職業',emoji:'👮‍♀️',cap:'當警察',taunt:'女生怎麼能當警察！',q:'小芳長大想當警察 👮‍♀️，幫助別人抓壞人，可以嗎？',opts:['👍 可以，超勇敢超帥！','🙅 不行，女生不能當警察'],correct:0,fb:'很多女生是很厲害的警察和消防員喔！'},
+  {cat:'顏色',emoji:'🎒',cap:'粉紅書包',taunt:'粉紅色是女生的顏色！',q:'阿明背粉紅色書包 🎒，同學笑他「像女生」，這樣對嗎？',opts:['🙅 不對，顏色不分男女','😆 對，男生不能用粉紅色'],correct:0,fb:'顏色沒有性別，喜歡哪個顏色都可以！'},
+  {cat:'玩具',emoji:'🤖',cap:'玩機器人',taunt:'機器人是男生在玩的！',q:'小婷是女生，她想玩機器人和小汽車 🤖🚗，可以嗎？',opts:['👍 可以，想玩就玩！','🙅 不行，那是男生的玩具'],correct:0,fb:'玩具不分男女，想玩什麼都可以！'},
+  {cat:'身體界線',emoji:'🙅',cap:'說不可以',taunt:'我想摸你就摸，你管不著！',q:'有人一直想摸你，你覺得很不舒服 😣，你可以怎麼做？',opts:['🗣️ 大聲說「我不喜歡，不可以！」','😶 忍耐，不要說出來'],correct:0,fb:'身體是你的，可以大聲說「不可以」！'},
+  {cat:'求助',emoji:'🆘',cap:'找大人幫忙',taunt:'不舒服也要自己忍著！',q:'有人讓你覺得怪怪的、不安全 😰，你應該？',opts:['🤐 自己藏在心裡不講','🗣️ 馬上告訴爸媽或老師'],correct:1,fb:'覺得不舒服，一定要說出來找大人幫忙！'},
+  {cat:'情緒',emoji:'😢',cap:'難過想哭',taunt:'男生不准哭，羞羞臉！',q:'小傑考試考不好，很難過想哭 😢，可以嗎？',opts:['👍 可以，哭出來沒關係','🙅 不行，男生不能哭'],correct:0,fb:'每個人都會難過，哭出來沒關係的。'},
+  {cat:'反霸凌',emoji:'😡',cap:'被取笑',taunt:'笑你像女生又怎樣！',q:'同學一直取笑你「動作像女生」😠，你可以怎麼做？',opts:['😶 忍著都不說','🗣️ 告訴老師或信任的大人'],correct:1,fb:'被取笑要說出來，找信任的大人幫忙！'},
+  {cat:'平等',emoji:'👑',cap:'選班長',taunt:'班長一定要男生當！',q:'班上要選班長啦 👑！誰可以當班長呢？',opts:['👦👧 男生女生都可以當','👦 一定要男生才能當'],correct:0,fb:'能力好、肯負責的人都可以當班長！'},
+  {cat:'做自己',emoji:'🌈',cap:'做自己',taunt:'你就要跟大家一模一樣！',q:'「我可以做我自己，跟別人不一樣也很棒！」🌈 這句話對嗎？',opts:['💯 對！我就是獨特的我','🙅 不對，要跟大家一樣'],correct:0,fb:'你就是你，不一樣才特別，最棒了！'},
+  {cat:'外型',emoji:'💇‍♂️',cap:'留長頭髮',taunt:'男生留長頭髮很奇怪！',q:'阿哲是男生，他想把頭髮留長 💇‍♂️，可以嗎？',opts:['👍 可以，髮型自己決定','🙅 不行，長頭髮是女生的'],correct:0,fb:'髮型是個人喜好，男生女生都可以！'},
+  {cat:'職業',emoji:'👨‍🍳',cap:'當廚師',taunt:'男生進廚房煮飯沒出息！',q:'阿宏的夢想是當廚師 👨‍🍳，煮好吃的料理給大家，可以嗎？',opts:['🙅 不行，煮飯是女生的事','👍 可以，當廚師超厲害！'],correct:1,fb:'很多有名的大廚都是男生，工作不分男女！'},
+  {cat:'運動',emoji:'🏀',cap:'加入籃球隊',taunt:'籃球隊不收女生！',q:'小婷想加入學校的籃球隊 🏀，可以嗎？',opts:['👍 可以，一起打球！','🙅 不行，籃球是男生的'],correct:0,fb:'運動不分男女，想打就一起打！'},
+  {cat:'家庭',emoji:'👨‍🍼',cap:'爸爸顧 baby',taunt:'男人帶小孩，笑死人！',q:'爸爸在家照顧小寶寶、泡牛奶 👨‍🍼，這樣可以嗎？',opts:['👍 可以，爸爸好溫柔','🙅 不行，那是媽媽的事'],correct:0,fb:'照顧小孩是爸爸媽媽共同的責任，很棒！'},
+  {cat:'隱私',emoji:'🚪',cap:'保護隱私',taunt:'換衣服給人看沒差啦！',q:'在學校換體育服、上廁所時，我們應該怎麼做 🚪？',opts:['🚪 關好門，保護自己的隱私','😶 給別人看也沒關係'],correct:0,fb:'保護好自己的隱私部位，很重要！'},
+  {cat:'網路安全',emoji:'📱',cap:'網路安全',taunt:'把你的照片傳給我看看嘛！',q:'網路上有陌生人一直要你的照片 📱，你應該？',opts:['📸 拍給他也沒關係','🙅 不給，並告訴爸媽或老師'],correct:1,fb:'不隨便給陌生人照片，覺得怪要告訴大人！'},
 ];
 
 /* ===== 音效 ===== */
@@ -481,6 +512,7 @@ function renderAll(p){
   document.getElementById('qnoP'+p).textContent='第 '+(s.qIndex+1)+' 題';
   document.getElementById('qcatP'+p).textContent=q.cat;
   document.getElementById('qartP'+p).textContent=q.emoji||'🌟';
+  document.getElementById('scapP'+p).textContent=q.cap||q.cat;
   document.getElementById('qtextP'+p).textContent=q.q;
   const wrap=document.getElementById('optsP'+p); wrap.innerHTML='';
   q.opts.forEach((opt,i)=>{const b=document.createElement('button');b.className='opt';
