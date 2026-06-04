@@ -134,7 +134,10 @@
   .qtop{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:0 0 auto}
   .qno{font-weight:900;color:var(--gold);font-size:clamp(12px,1.6vw,16px)}
   .qcat{font-size:clamp(10px,1.4vw,13px);font-weight:800;color:#cfe0ff;background:rgba(255,255,255,.1);padding:3px 9px;border-radius:999px}
-  .qtext{flex:0 0 auto;font-size:clamp(16px,2.3vw,25px);font-weight:900;line-height:1.45;text-align:center;padding:clamp(5px,1vw,10px) 4px;color:#fff}
+  .qart{flex:0 0 auto;text-align:center;font-size:clamp(40px,7vw,72px);line-height:1.05;letter-spacing:6px;
+    filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));animation:bob 2.2s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-9px) rotate(2deg)}}
+  .qtext{flex:0 0 auto;font-size:clamp(16px,2.3vw,25px);font-weight:900;line-height:1.45;text-align:center;padding:clamp(4px,.8vw,8px) 4px;color:#fff}
   .speak-btn{border-radius:999px;width:clamp(32px,4vw,42px);height:clamp(32px,4vw,42px);font-size:clamp(15px,2vw,20px);
     background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center}
 
@@ -303,6 +306,7 @@
           <span class="qcat" id="qcatP1">主題</span>
           <button class="speak-btn" data-p="1">🔊</button>
         </div>
+        <div class="qart" id="qartP1">🌟</div>
         <div class="qtext" id="qtextP1">題目</div>
         <div class="opts" id="optsP1"></div>
         <div class="confirm-row">
@@ -358,6 +362,7 @@
           <span class="qcat" id="qcatP2">主題</span>
           <button class="speak-btn" data-p="2">🔊</button>
         </div>
+        <div class="qart" id="qartP2">🌟</div>
         <div class="qtext" id="qtextP2">題目</div>
         <div class="opts" id="optsP2"></div>
         <div class="confirm-row">
@@ -389,21 +394,22 @@
 <div class="rotate-hint">📱➡️🖥️<br><br>請把畫面轉成<b>橫向</b>，<br>或用電子白板/電腦全螢幕遊玩！</div>
 
 <script>
-/* ===== 精選 12 題 · 國中特教班 性別平等題庫（全部 2 選 1，貼近生活）===== */
-/* taunt = 怪獸說的刻板印象話；答對 = 反駁打牠 */
+/* ===== 精選 12 題 · 國中特教班 性別平等題庫 =====
+   情境化 + 生活連結 + 大圖示；全部 2 選 1。
+   emoji=情境大圖；taunt=怪獸說的刻板印象話；答對=反駁打牠 */
 const QUESTIONS = [
-  {cat:'興趣',taunt:'男生畫什麼畫、跳什麼舞！',q:'男生喜歡畫畫、跳舞，可以嗎？',opts:['可以，喜歡就好','不可以，那是女生的'],correct:0,fb:'興趣不分男女，喜歡就去做。'},
-  {cat:'運動',taunt:'女生怎麼可以踢足球、打籃球！',q:'女生喜歡踢足球、打籃球，可以嗎？',opts:['不可以','可以！'],correct:1,fb:'運動不分男女，誰都能踢、能打。'},
-  {cat:'家事',taunt:'家事本來就是女人做的！',q:'家裡的家事，應該誰來做？',opts:['只有媽媽做','全家人一起分工'],correct:1,fb:'家事是大家的事，爸爸、媽媽、小孩都能做。'},
-  {cat:'職業',taunt:'女生怎麼當得了警察！',q:'女生可以當警察、消防員嗎？',opts:['可以！','不可以'],correct:0,fb:'很多女生是很厲害的警察和消防員。'},
-  {cat:'顏色',taunt:'粉紅色是女生的，男生不准喜歡！',q:'男生可以喜歡粉紅色嗎？',opts:['不行，那是女生的顏色','可以，喜歡就好'],correct:1,fb:'顏色沒有性別，喜歡哪個顏色都行。'},
-  {cat:'玩具',taunt:'機器人、車子是男生在玩的！',q:'女生想玩機器人、車子，可以嗎？',opts:['可以！','不可以'],correct:0,fb:'玩具不分男女，想玩什麼都可以。'},
-  {cat:'身體界線',taunt:'我想摸你就摸，你不能拒絕！',q:'別人想摸你的身體，你不喜歡，可以說？',opts:['不可以！我不喜歡','只能忍耐'],correct:0,fb:'身體是你的，可以大聲說「不可以」。'},
-  {cat:'求助',taunt:'不舒服也要自己忍著，別吵！',q:'有人讓你覺得不舒服、不安全，你要？',opts:['自己藏在心裡','馬上告訴爸媽或老師'],correct:1,fb:'不舒服一定要說出來，找大人幫忙。'},
-  {cat:'情緒',taunt:'男生哭出來最丟臉了！',q:'男生難過的時候，可以哭嗎？',opts:['可以，難過哭出來沒關係','不行，男生不能哭'],correct:0,fb:'每個人都有情緒，哭出來沒關係。'},
-  {cat:'霸凌',taunt:'被笑就忍著，說出來才丟臉！',q:'同學因為性別取笑你，你可以怎麼做？',opts:['忍著不說','告訴老師或大人'],correct:1,fb:'被取笑要說出來，找信任的大人幫忙。'},
-  {cat:'平等',taunt:'班長當然要男生來當！',q:'班長一定要男生當嗎？',opts:['不對，男生女生都可以當','對，一定要男生'],correct:0,fb:'能力好、肯負責的人都可以當班長。'},
-  {cat:'做自己',taunt:'你就該跟大家一模一樣！',q:'「我可以做我自己，跟別人不一樣也沒關係」對嗎？',opts:['對！','不對'],correct:0,fb:'你就是你，不一樣才特別。'},
+  {cat:'興趣',emoji:'🕺💃',taunt:'男生不可以跳舞啦！',q:'小華是男生，他想參加學校的「跳舞社」🕺，可以嗎？',opts:['👍 當然可以，喜歡就去跳！','🙅 不行，跳舞是女生的'],correct:0,fb:'興趣不分男女，喜歡就去做，超棒的！'},
+  {cat:'運動',emoji:'⚽👧',taunt:'女生不會踢足球啦！',q:'小美是女生，下課想跟大家一起踢足球 ⚽，可以嗎？',opts:['🙅 不行，足球是男生玩的','👍 可以呀，一起踢超開心！'],correct:1,fb:'運動不分男女，誰都能踢、能跑、能跳！'},
+  {cat:'家事',emoji:'🍽️🧽',taunt:'家事都給媽媽做就好！',q:'吃飽飯了 🍚，家裡的碗和家事應該誰做？',opts:['👨‍👩‍👧‍👦 全家人一起分工','👩 只有媽媽一個人做'],correct:0,fb:'家事是大家的事，爸爸、媽媽、小孩都能幫忙！'},
+  {cat:'職業',emoji:'👮‍♀️🚓',taunt:'女生怎麼能當警察！',q:'小芳長大想當警察 👮‍♀️，幫助別人抓壞人，可以嗎？',opts:['👍 可以，超勇敢超帥！','🙅 不行，女生不能當警察'],correct:0,fb:'很多女生是很厲害的警察和消防員喔！'},
+  {cat:'顏色',emoji:'🎒💗',taunt:'粉紅色是女生的顏色！',q:'阿明背粉紅色書包 🎒💗，同學笑他「像女生」，這樣對嗎？',opts:['🙅 不對，顏色不分男女','😆 對，男生不能用粉紅色'],correct:0,fb:'顏色沒有性別，喜歡哪個顏色都可以！'},
+  {cat:'玩具',emoji:'🤖🚗',taunt:'機器人是男生在玩的！',q:'小婷是女生，她想玩機器人和小汽車 🤖🚗，可以嗎？',opts:['👍 可以，想玩就玩！','🙅 不行，那是男生的玩具'],correct:0,fb:'玩具不分男女，想玩什麼都可以！'},
+  {cat:'身體界線',emoji:'🙅✋',taunt:'我想摸你就摸，你管不著！',q:'有人一直想摸你，你覺得很不舒服 😣，你可以怎麼做？',opts:['🗣️ 大聲說「我不喜歡，不可以！」','😶 忍耐，不要說出來'],correct:0,fb:'身體是你的，可以大聲說「不可以」！'},
+  {cat:'求助',emoji:'🆘🧑‍🏫',taunt:'不舒服也要自己忍著！',q:'有人讓你覺得怪怪的、不安全 😰，你應該？',opts:['🤐 自己藏在心裡不講','🗣️ 馬上告訴爸媽或老師'],correct:1,fb:'覺得不舒服，一定要說出來找大人幫忙！'},
+  {cat:'情緒',emoji:'😢🤗',taunt:'男生不准哭，羞羞臉！',q:'小傑考試考不好，很難過想哭 😢，可以嗎？',opts:['👍 可以，哭出來沒關係','🙅 不行，男生不能哭'],correct:0,fb:'每個人都會難過，哭出來沒關係的。'},
+  {cat:'反霸凌',emoji:'😡🧑‍🏫',taunt:'笑你像女生又怎樣！',q:'同學一直取笑你「動作像女生」😠，你可以怎麼做？',opts:['😶 忍著都不說','🗣️ 告訴老師或信任的大人'],correct:1,fb:'被取笑要說出來，找信任的大人幫忙！'},
+  {cat:'平等',emoji:'🙋👑',taunt:'班長一定要男生當！',q:'班上要選班長啦 👑！誰可以當班長呢？',opts:['👦👧 男生女生都可以當','👦 一定要男生才能當'],correct:0,fb:'能力好、肯負責的人都可以當班長！'},
+  {cat:'做自己',emoji:'🌈🌟',taunt:'你就要跟大家一模一樣！',q:'「我可以做我自己，跟別人不一樣也很棒！」🌈 這句話對嗎？',opts:['💯 對！我就是獨特的我','🙅 不對，要跟大家一樣'],correct:0,fb:'你就是你，不一樣才特別，最棒了！'},
 ];
 
 /* ===== 音效 ===== */
@@ -417,6 +423,8 @@ const SND=(()=>{let ac=null;const ctx=()=>{if(!ac){try{ac=new(window.AudioContex
 
 /* ===== 語音 ===== */
 let VOICE_ON=true;
+/* 去掉 emoji / 符號，讓語音念得順 */
+function clean(t){return (t||'').replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{1F1E6}-\u{1F1FF}\u{FE0F}\u{200D}]/gu,'').replace(/\s+/g,' ').trim();}
 const CHEER_OK=['你做到了！','太棒了！','好厲害！','完全正確！','你好聰明！','答對了，讚！'];
 const CHEER_NO=['沒關係，再試一次。','差一點點，下次一定行。','勇敢嘗試，很棒！','別灰心，繼續加油。'];
 function speak(text){if(!VOICE_ON||!('speechSynthesis'in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='zh-TW';u.rate=.92;u.pitch=1.05;const vs=speechSynthesis.getVoices();const zh=vs.find(v=>/zh|TW|Chinese|Taiwan/i.test(v.lang+v.name));if(zh)u.voice=zh;speechSynthesis.speak(u);}catch(e){}}
@@ -472,6 +480,7 @@ function renderAll(p){
   s.selected=-1; s.locked=false;
   document.getElementById('qnoP'+p).textContent='第 '+(s.qIndex+1)+' 題';
   document.getElementById('qcatP'+p).textContent=q.cat;
+  document.getElementById('qartP'+p).textContent=q.emoji||'🌟';
   document.getElementById('qtextP'+p).textContent=q.q;
   const wrap=document.getElementById('optsP'+p); wrap.innerHTML='';
   q.opts.forEach((opt,i)=>{const b=document.createElement('button');b.className='opt';
@@ -481,9 +490,9 @@ function renderAll(p){
   updateMonsterUI(p);
   // 怪獸講刻板印象話（PK 模式不講）
   showBubble(p, MODE==='pk'?'':q.taunt);
-  // 念題
-  let read=q.q+'。'+q.opts.map((o,i)=>KEYS[i]+'：'+o).join('，');
-  if(MODE!=='pk'&&q.taunt) read='怪獸說：'+q.taunt+'。'+read;
+  // 念題（去掉 emoji 才唸得順）
+  let read=clean(q.q)+'。'+q.opts.map((o,i)=>KEYS[i]+'：'+clean(o)).join('，');
+  if(MODE!=='pk'&&q.taunt) read='怪獸說：'+clean(q.taunt)+'。'+read;
   speak(read);
 }
 
@@ -714,7 +723,7 @@ document.querySelectorAll('.btn-cancel').forEach(b=>b.onclick=()=>cancelSel(+b.d
 document.querySelectorAll('.btn-confirm').forEach(b=>b.onclick=()=>confirmSel(+b.dataset.p));
 document.querySelectorAll('.ult-btn').forEach(b=>b.onclick=()=>fireUlt(+b.dataset.p));
 document.querySelectorAll('.speak-btn').forEach(b=>b.onclick=()=>{const p=+b.dataset.p,q=curQ(p);
-  let r=q.q+'。'+q.opts.map((o,i)=>KEYS[i]+'：'+o).join('，');if(MODE!=='pk'&&q.taunt)r='怪獸說：'+q.taunt+'。'+r;speak(r);});
+  let r=clean(q.q)+'。'+q.opts.map((o,i)=>KEYS[i]+'：'+clean(o)).join('，');if(MODE!=='pk'&&q.taunt)r='怪獸說：'+clean(q.taunt)+'。'+r;speak(r);});
 document.getElementById('btnVoice').onclick=function(){VOICE_ON=!VOICE_ON;this.classList.toggle('on',VOICE_ON);
   this.textContent='🗣 念題：'+(VOICE_ON?'開':'關');if(!VOICE_ON&&'speechSynthesis'in window)speechSynthesis.cancel();};
 function toggleFull(){const el=document.documentElement;if(!document.fullscreenElement){(el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el);}else{(document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document);}}
