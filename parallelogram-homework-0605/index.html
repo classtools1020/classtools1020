@@ -113,6 +113,29 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
 .floating-plus.fly{animation:floatPlus 1.4s ease-out forwards}
 @keyframes floatPlus{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}25%{opacity:1;transform:translate(-50%,-80%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
 
+/* ============ CHEST VIEW ============ */
+.chest-container{text-align:center;max-width:760px;width:100%}
+.chest-title{font-size:48px;font-weight:900;background:linear-gradient(135deg,#FFD93D,#FF6BB0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;filter:drop-shadow(0 4px 16px rgba(255,217,61,.5))}
+.chest-subtitle{font-size:18px;color:rgba(255,255,255,.85);margin-bottom:32px}
+.chests-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.chest{position:relative;width:120px;height:140px;background:linear-gradient(180deg,#8B4513 0%,#5C2E0F 100%);border:5px solid #FFD93D;border-radius:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .2s,box-shadow .2s;font-family:inherit;box-shadow:0 8px 20px rgba(0,0,0,.4),inset 0 -6px 0 rgba(0,0,0,.3);overflow:hidden}
+.chest::before{content:"";position:absolute;top:0;left:0;right:0;height:35%;background:linear-gradient(180deg,#A0522D,#8B4513);border-bottom:3px solid #FFD93D}
+.chest::after{content:"🔒";position:absolute;top:18%;left:50%;transform:translateX(-50%);font-size:18px;color:#FFD93D}
+.chest:hover:not(.opened):not(:disabled){transform:translateY(-8px) rotate(-2deg);box-shadow:0 14px 28px rgba(255,217,61,.4),inset 0 -6px 0 rgba(0,0,0,.3)}
+.chest-num{position:relative;z-index:2;font-family:'Orbitron',sans-serif;font-size:32px;font-weight:900;color:#FFD93D;text-shadow:0 2px 4px rgba(0,0,0,.7);margin-top:30px}
+.chest-hint{position:relative;z-index:2;font-size:11px;color:rgba(255,217,61,.7);letter-spacing:1px;margin-top:6px}
+.chest.opened{animation:chestPop .8s ease forwards}
+.chest.opened::after{content:"✨";font-size:24px}
+.chest.dim{opacity:.35;cursor:not-allowed}
+@keyframes chestPop{0%{transform:scale(1)}30%{transform:scale(1.2) rotate(-5deg)}60%{transform:scale(1.3) rotate(3deg)}100%{transform:scale(1.1)}}
+
+.chest-reveal{margin-top:18px}
+.coin-big{font-size:130px;line-height:1;animation:coinSpin 1.5s ease-in-out infinite;display:inline-block;filter:drop-shadow(0 0 30px rgba(255,217,61,.8))}
+@keyframes coinSpin{0%,100%{transform:scaleX(1)}50%{transform:scaleX(-1)}}
+.reward-text{font-size:22px;color:#fff;margin:14px 0 6px;font-weight:700}
+.reward-coins{font-family:'Orbitron',sans-serif;font-size:64px;font-weight:900;color:#FFD93D;text-shadow:0 0 32px rgba(255,217,61,.7),0 6px 18px rgba(0,0,0,.6);margin-bottom:22px;line-height:1}
+.reward-coins .coin-unit{font-size:24px;color:#fff;font-family:'Noto Sans TC',sans-serif;font-weight:900}
+
 @media (max-width:600px){
   .game-title{font-size:42px}
   .subtitle{font-size:15px}
@@ -176,16 +199,31 @@ body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 10
   </div>
 </section>
 
+<!-- VIEW: CHEST (after gate 7, before end) -->
+<section class="view view-chest" id="view-chest">
+  <div class="chest-container">
+    <h1 class="chest-title">🚩 全部通關！</h1>
+    <p class="chest-subtitle">挑一個寶箱開出你的獎勵金幣</p>
+    <div class="chests-row" id="chests-row"></div>
+    <div class="chest-reveal" id="chest-reveal" hidden>
+      <div class="coin-big">🪙</div>
+      <div class="reward-text">你抽到了</div>
+      <div class="reward-coins"><span id="reward-num">0</span><span class="coin-unit"> 金幣！</span></div>
+      <button class="btn-primary" id="btn-chest-continue">查看成績 →</button>
+    </div>
+  </div>
+</section>
+
 <!-- VIEW: END -->
 <section class="view view-end" id="view-end">
   <div class="end-container">
-    <div class="end-medal">★</div>
-    <h1 class="end-title">7 道閘門全部通過！</h1>
+    <div class="end-medal">🪙</div>
+    <h1 class="end-title">全部通關！</h1>
     <p class="end-subtitle">恭喜畢業，<span id="end-name"></span> 飛行員</p>
     <div class="end-stats">
       <div class="end-stat"><div class="end-stat-label">通關</div><div class="end-stat-value">7 / 7</div></div>
+      <div class="end-stat"><div class="end-stat-label">寶箱金幣</div><div class="end-stat-value" id="end-coins" style="color:#FFD93D">0</div></div>
       <div class="end-stat"><div class="end-stat-label">用時</div><div class="end-stat-value" id="end-time">-</div></div>
-      <div class="end-stat"><div class="end-stat-label">挑戰次數</div><div class="end-stat-value" id="end-attempts">-</div></div>
     </div>
     <div class="end-message">
       <div class="end-message-title">已自動上傳給老師</div>
@@ -467,6 +505,8 @@ function saveRecord(){
     totalAttempts: state.attempts.length,
     wrongCount: state.attempts.filter(a=>!a.correct).length,
     gatesPassed: state.currentIdx,
+    bonusCoins: state.bonusCoins || 0,
+    chestPicked: (typeof state.chestPicked==='number')?state.chestPicked:null,
     completed: state.completed
   };
   try { localStorage.setItem(STORAGE_KEY+'_'+state.sessionId, JSON.stringify(record)); } catch(e){}
@@ -564,7 +604,7 @@ function onAnswer(idx,btn){
     saveRecord();
     setTimeout(()=>{
       if(state.currentIdx >= GATES.length){
-        finishGame();
+        showChestStage();
       } else {
         renderGate(state.currentIdx);
         showToast(`通過第 ${state.currentIdx} 關！下一關 →`);
@@ -588,6 +628,86 @@ function onAnswer(idx,btn){
   }
 }
 
+/* ===== CHEST FLOW ===== */
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function showChestStage(){
+  state.chestRewards = shuffle([200,500,1000,2000,5000]);
+  state.chestPicked = null;
+  state.bonusCoins = 0;
+  const row = document.getElementById('chests-row');
+  row.innerHTML = '';
+  for(let i=0;i<5;i++){
+    const btn = document.createElement('button');
+    btn.className = 'chest';
+    btn.innerHTML = `<div class="chest-num">${i+1}</div><div class="chest-hint">點我開！</div>`;
+    btn.addEventListener('click',()=>onChestPick(i,btn));
+    row.appendChild(btn);
+  }
+  document.getElementById('chest-reveal').hidden = true;
+  switchView('chest');
+  // intro confetti
+  confetti({particleCount:120,spread:140,origin:{y:.45},colors:['#FFD93D','#FF6BB0','#27D7FF','#9B5BFF']});
+  playVroom();
+}
+
+function onChestPick(idx,btn){
+  if(state.chestPicked!==null) return;
+  state.chestPicked = idx;
+  const reward = state.chestRewards[idx];
+  state.bonusCoins = reward;
+  btn.classList.add('opened');
+  document.querySelectorAll('.chest').forEach((c,i)=>{ if(i!==idx) c.classList.add('dim'); });
+  playCorrect();
+  const r = btn.getBoundingClientRect();
+  floatPlusOne(r.left+r.width/2, r.top);
+  // animate count up
+  const target = reward;
+  const numEl = document.getElementById('reward-num');
+  let cur = 0;
+  document.getElementById('chest-reveal').hidden = false;
+  const startT = performance.now();
+  const dur = 1200;
+  function tick(t){
+    const p = Math.min(1,(t-startT)/dur);
+    cur = Math.floor(target * (1 - Math.pow(1-p,3)));
+    numEl.textContent = cur;
+    if(p<1) requestAnimationFrame(tick);
+    else numEl.textContent = target;
+  }
+  requestAnimationFrame(tick);
+  // confetti by reward tier
+  setTimeout(()=>{
+    const colors=['#FFD93D','#FF6BB0','#27D7FF','#9B5BFF','#fff'];
+    if(reward>=5000){
+      confetti({particleCount:300,spread:170,origin:{y:.4},colors});
+      playVictory();
+      setTimeout(()=>fireRaceCar(true),200);
+    } else if(reward>=2000){
+      confetti({particleCount:200,spread:140,origin:{y:.45},colors});
+      playVictory();
+      setTimeout(()=>fireRaceCar(false),200);
+    } else if(reward>=1000){
+      confetti({particleCount:140,spread:120,origin:{y:.5},colors});
+      tone(659,.18,0,'sine',.22); tone(988,.3,.16,'sine',.22);
+    } else {
+      confetti({particleCount:80,spread:100,origin:{y:.5},colors});
+    }
+  },200);
+  saveRecord();
+}
+
+document.getElementById('btn-chest-continue').addEventListener('click',()=>{
+  finishGame();
+});
+
 /* ===== END FLOW ===== */
 function finishGame(){
   state.completed = true;
@@ -597,7 +717,7 @@ function finishGame(){
   const secs = Math.floor((elapsedMs%60000)/1000);
   document.getElementById('end-name').textContent = state.name;
   document.getElementById('end-time').textContent = mins>0 ? `${mins}分${secs}秒` : `${secs}秒`;
-  document.getElementById('end-attempts').textContent = state.attempts.length;
+  document.getElementById('end-coins').textContent = state.bonusCoins || 0;
   switchView('end');
   // epic finale
   setTimeout(()=>{
