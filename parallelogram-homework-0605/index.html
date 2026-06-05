@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -265,56 +265,47 @@ const GATES = [
 
 /* ===== SVG DRAWERS ===== */
 function drawParallelLines(opts){
-  // L1: y=70; L2: y=200; transversal from (130,30) to (290,250)
-  // L1 ∩ M ≈ (158, 70); L2 ∩ M ≈ (242, 200)
-  const isCorr = opts.mark2Pos==='corresponding';
-  const isAlt = opts.mark2Pos==='alternate';
-  const isCoint = opts.mark2Pos==='cointerior';
-  // ∠1 always at L1∩M upper-right (between L1 going right and M going up)
-  // ∠2: corresponding → L2∩M same position (upper-right between L2 and M)
-  //     alternate → L2∩M opposite (interior, opposite side of M from ∠1)
-  //     cointerior → L2∩M same side as ∠1 but between lines (interior)
-  let mark2Box;
-  if(isCorr){
-    // ∠2 at upper-right of L2∩M (same position relative)
-    mark2Box = {x:248, y:174, label:'∠2 = ?'};
-  } else if(isAlt){
-    // ∠2 at upper-left of L2∩M (interior, opposite side of transversal)
-    mark2Box = {x:170, y:174, label:'∠2 = ?'};
+  const IL1 = {x:261, y:85};
+  const IL2 = {x:155, y:205};
+  let a1Pos, a2Pos, a1Arc, a2Arc, hintText, hintColor;
+  if(opts.mark2Pos==='corresponding'){
+    a1Pos = {x:300, y:62, w:80};
+    a1Arc = `M ${IL1.x+22},${IL1.y} A 22,22 0 0 0 ${IL1.x+12},${IL1.y-19}`;
+    a2Pos = {x:194, y:182, w:64};
+    a2Arc = `M ${IL2.x+22},${IL2.y} A 22,22 0 0 0 ${IL2.x+12},${IL2.y-19}`;
+    hintText = 'F 形 · 同位角';
+    hintColor = '#B47BFF';
+  } else if(opts.mark2Pos==='alternate'){
+    a1Pos = {x:300, y:120, w:80};
+    a1Arc = `M ${IL1.x+22},${IL1.y} A 22,22 0 0 1 ${IL1.x+12},${IL1.y+19}`;
+    a2Pos = {x:116, y:182, w:64};
+    a2Arc = `M ${IL2.x-22},${IL2.y} A 22,22 0 0 0 ${IL2.x-12},${IL2.y-19}`;
+    hintText = 'Z 形 · 內錯角';
+    hintColor = '#B47BFF';
   } else {
-    // ∠2 at upper-right of L2∩M, BUT we frame it as same-side interior with ∠1 at lower-right of L1∩M
-    // For consistency, swap ∠1 to be at lower-right (below L1)
-    mark2Box = {x:248, y:174, label:'∠2 = ?'};
+    a1Pos = {x:300, y:120, w:80};
+    a1Arc = `M ${IL1.x+22},${IL1.y} A 22,22 0 0 1 ${IL1.x+12},${IL1.y+19}`;
+    a2Pos = {x:194, y:182, w:64};
+    a2Arc = `M ${IL2.x+22},${IL2.y} A 22,22 0 0 0 ${IL2.x+12},${IL2.y-19}`;
+    hintText = 'C 形 · 同側和 180°';
+    hintColor = '#FF8FB1';
   }
-  // ∠1 position: for cointerior, mark below L1 (interior, between lines, right of M)
-  let mark1Box = isCoint ? {x:170, y:84, label:'∠1 = '+opts.mark1+'°'} : {x:170, y:50, label:'∠1 = '+opts.mark1+'°'};
-  // arc paths for visualization
   return `<svg viewBox="0 0 420 280" xmlns="http://www.w3.org/2000/svg">
-    <defs><marker id="ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><circle cx="5" cy="5" r="4" fill="#27D7FF"/></marker></defs>
-    <!-- parallel lines -->
-    <line x1="30" y1="70" x2="390" y2="70" stroke="#27D7FF" stroke-width="3"/>
-    <line x1="30" y1="200" x2="390" y2="200" stroke="#27D7FF" stroke-width="3"/>
-    <text x="395" y="76" fill="#27D7FF" font-size="14" font-weight="900">L₁</text>
-    <text x="395" y="206" fill="#27D7FF" font-size="14" font-weight="900">L₂</text>
-    <!-- arrows showing parallel -->
-    <path d="M200,62 L230,62" stroke="#27D7FF" stroke-width="2" marker-end="url(#ah)"/>
-    <path d="M200,192 L230,192" stroke="#27D7FF" stroke-width="2" marker-end="url(#ah)"/>
-    <!-- transversal -->
-    <line x1="130" y1="30" x2="290" y2="250" stroke="#FFD93D" stroke-width="3"/>
-    <!-- ∠1 marking (arc) -->
-    <path d="M ${isCoint?170:170},${isCoint?80:60} A 18,18 0 0 ${isCoint?1:0} ${isCoint?186:188},${isCoint?72:74}" fill="none" stroke="#FFD93D" stroke-width="3"/>
-    <!-- ∠2 marking (arc) at L2 ∩ M -->
-    <path d="M ${isAlt?226:262},${isAlt?192:188} A 16,16 0 0 ${isAlt?0:1} ${isAlt?240:248},${isAlt?212:204}" fill="none" stroke="#27D7FF" stroke-width="3"/>
-    <!-- ∠1 label box (yellow) -->
-    <rect x="${mark1Box.x-32}" y="${mark1Box.y-14}" width="76" height="22" rx="6" fill="#FFD93D"/>
-    <text x="${mark1Box.x+6}" y="${mark1Box.y+2}" text-anchor="middle" fill="#1a0b3d" font-size="14" font-weight="900">${mark1Box.label}</text>
-    <!-- ∠2 label box (cyan) -->
-    <rect x="${mark2Box.x-30}" y="${mark2Box.y-14}" width="62" height="22" rx="6" fill="#fff" stroke="#27D7FF" stroke-width="2"/>
-    <text x="${mark2Box.x+1}" y="${mark2Box.y+2}" text-anchor="middle" fill="#27D7FF" font-size="14" font-weight="900">${mark2Box.label}</text>
-    <!-- hint indicator for corresponding: dotted purple line connecting positions -->
-    ${isCorr?`<line x1="158" y1="65" x2="242" y2="195" stroke="#B47BFF" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.6"/>`:''}
-    ${isAlt?`<text x="210" y="135" text-anchor="middle" fill="#9B5BFF" font-size="12" font-weight="700" opacity="0.7">內錯 (Z 形)</text>`:''}
-    ${isCoint?`<text x="210" y="135" text-anchor="middle" fill="#FF6BB0" font-size="12" font-weight="700" opacity="0.7">同側內角 (C 形)</text>`:''}
+    <defs><marker id="parr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#27D7FF"/></marker></defs>
+    <line x1="20" y1="85" x2="395" y2="85" stroke="#27D7FF" stroke-width="3.5"/>
+    <line x1="20" y1="205" x2="395" y2="205" stroke="#27D7FF" stroke-width="3.5"/>
+    <text x="400" y="91" fill="#27D7FF" font-size="14" font-weight="900">L₁</text>
+    <text x="400" y="211" fill="#27D7FF" font-size="14" font-weight="900">L₂</text>
+    <path d="M 55,85 L 80,85" stroke="#27D7FF" stroke-width="3" marker-end="url(#parr)"/>
+    <path d="M 55,205 L 80,205" stroke="#27D7FF" stroke-width="3" marker-end="url(#parr)"/>
+    <line x1="115" y1="250" x2="305" y2="35" stroke="#FFD93D" stroke-width="3.5"/>
+    <text x="210" y="160" text-anchor="middle" fill="${hintColor}" font-size="13" font-weight="900" opacity=".55" letter-spacing="2">${hintText}</text>
+    <path d="${a1Arc}" fill="none" stroke="#FFD93D" stroke-width="3"/>
+    <path d="${a2Arc}" fill="none" stroke="#27D7FF" stroke-width="3"/>
+    <rect x="${a1Pos.x-a1Pos.w/2}" y="${a1Pos.y-13}" width="${a1Pos.w}" height="22" rx="6" fill="#FFD93D"/>
+    <text x="${a1Pos.x}" y="${a1Pos.y+3}" text-anchor="middle" fill="#1a0b3d" font-size="14" font-weight="900">∠１ = ${opts.mark1}°</text>
+    <rect x="${a2Pos.x-a2Pos.w/2}" y="${a2Pos.y-13}" width="${a2Pos.w}" height="22" rx="6" fill="#fff" stroke="#27D7FF" stroke-width="2.5"/>
+    <text x="${a2Pos.x}" y="${a2Pos.y+3}" text-anchor="middle" fill="#27D7FF" font-size="14" font-weight="900">∠２ = ?</text>
   </svg>`;
 }
 
