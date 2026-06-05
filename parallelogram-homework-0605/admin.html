@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>飛行員作業 · 老師後臺</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB27uSUnTSYkKJ5u5FqOqEnSbuA9br4lmE",
+  authDomain: "classtools1019.firebaseapp.com",
+  databaseURL: "https://classtools1019-default-rtdb.firebaseio.com",
+  projectId: "classtools1019",
+  storageBucket: "classtools1019.firebasestorage.app",
+  messagingSenderId: "402119556579",
+  appId: "1:402119556579:web:e0bace85a3454fb88eb4d6"
+};
+try { firebase.initializeApp(firebaseConfig); } catch(e){ console.warn(e); }
+const FB_PATH = 'submissions/parallelogram_homework_0605';
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
+body{font-family:'Noto Sans TC',sans-serif;background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 100%);color:#fff;min-height:100vh;padding:24px;-webkit-font-smoothing:antialiased}
+.container{max-width:1200px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+h1{font-size:30px;font-weight:900;background:linear-gradient(135deg,#FFD93D,#FF6BB0,#27D7FF);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{color:rgba(255,255,255,.6);font-size:13px;margin-top:4px;letter-spacing:1px}
+#fb-status{font-size:12px;margin-top:4px;color:rgba(255,255,255,.5)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.18);padding:10px 18px;border-radius:10px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.btn:hover{background:rgba(255,255,255,.16)}
+.btn-warn{background:rgba(255,107,176,.15);border-color:#FF6BB0;color:#FF6BB0}
+.btn-go{background:linear-gradient(135deg,#7B61FF,#27D7FF);border:none;color:#fff;text-decoration:none;display:inline-block;line-height:1.2}
+
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:24px}
+.summary-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px}
+.summary-label{font-size:12px;color:rgba(255,255,255,.55);letter-spacing:2px;margin-bottom:4px}
+.summary-value{font-size:28px;font-weight:900;color:#FFD93D;font-family:'Orbitron',sans-serif}
+
+.records{display:grid;gap:14px}
+.record{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:16px}
+.record-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.record-name{font-size:22px;font-weight:900}
+.record-badge{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:900;letter-spacing:1px}
+.record-badge.done{background:rgba(255,217,61,.2);color:#FFD93D;border:1px solid #FFD93D}
+.record-badge.ongoing{background:rgba(39,215,255,.2);color:#27D7FF;border:1px solid #27D7FF}
+.record-meta{margin-left:auto;font-size:12px;color:rgba(255,255,255,.55);text-align:right}
+.record-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:12px}
+.stat-box{background:rgba(0,0,0,.25);border-radius:10px;padding:9px 12px}
+.stat-box-label{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:1px}
+.stat-box-value{font-size:18px;font-weight:900;color:#fff;margin-top:2px}
+.gate-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.gate-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-family:'Orbitron',sans-serif;font-weight:900;font-size:13px;position:relative}
+.gate-cell.passed{background:linear-gradient(135deg,#27D7FF33,#9B5BFF33);border:1px solid #27D7FF;color:#fff}
+.gate-cell.passed::after{content:"★";position:absolute;top:-4px;right:-2px;font-size:10px;color:#FFD93D}
+.gate-cell.pending{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3)}
+.gate-cell .gate-tries{font-size:9px;color:rgba(255,255,255,.5);position:absolute;bottom:2px;right:3px}
+
+.no-data{text-align:center;padding:60px 20px;color:rgba(255,255,255,.5);background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.15);border-radius:18px}
+.no-data h3{font-size:20px;margin-bottom:10px;color:rgba(255,255,255,.8)}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div>
+    <h1>飛行員作業 · 老師後臺</h1>
+    <div class="subtitle">6/5 線上作業 · 4-1 + 4-2</div>
+    <div id="fb-status">☁️ 連線中…</div>
+  </div>
+  <div class="toolbar">
+    <a class="btn btn-go" href="index.html">前往學生網站 →</a>
+    <button class="btn" id="btn-refresh">重新整理</button>
+    <button class="btn btn-warn" id="btn-clear">清空所有紀錄</button>
+  </div>
+</header>
+
+<div class="summary" id="summary"></div>
+<div class="records" id="records"></div>
+
+</div>
+
+<script>
+let cached = [];
+let connected = false;
+
+function render(){
+  const list = cached;
+  const total = list.length;
+  const completed = list.filter(s=>s.completed).length;
+  const totalAtt = list.reduce((a,s)=>a+(s.totalAttempts||0),0);
+  const totalCorr = list.reduce((a,s)=>a+((s.attempts||[]).filter(a=>a.correct).length),0);
+  const acc = totalAtt>0 ? Math.round(totalCorr*100/totalAtt) : 0;
+  document.getElementById('summary').innerHTML = `
+    <div class="summary-card"><div class="summary-label">已交件</div><div class="summary-value">${completed}</div></div>
+    <div class="summary-card"><div class="summary-label">進行中</div><div class="summary-value">${total-completed}</div></div>
+    <div class="summary-card"><div class="summary-label">總答題次數</div><div class="summary-value">${totalAtt}</div></div>
+    <div class="summary-card"><div class="summary-label">正確率</div><div class="summary-value">${acc}%</div></div>
+  `;
+  const wrap = document.getElementById('records');
+  if(list.length===0){
+    wrap.innerHTML = `<div class="no-data"><h3>還沒有學生交件</h3><div>請學生在<a href="index.html" style="color:#27D7FF">線上作業</a>輸入名字、完成 7 道閘門</div></div>`;
+    return;
+  }
+  const sorted = [...list].sort((a,b)=>(b.startTime||0)-(a.startTime||0));
+  wrap.innerHTML = sorted.map(s=>{
+    const dur = s.endTime ? s.endTime-s.startTime : 0;
+    const m = Math.floor(dur/60000), se = Math.floor((dur%60000)/1000);
+    const gateAtt = {};
+    (s.attempts||[]).forEach(a=>{ gateAtt[a.gateId]=(gateAtt[a.gateId]||0)+1; });
+    const cells = Array.from({length:7},(_,i)=>{
+      const id=i+1; const passed=(s.gatesPassed||0)>i; const att=gateAtt[id]||0;
+      return `<div class="gate-cell ${passed?'passed':'pending'}">關${id}${att>0?`<span class="gate-tries">${att}試</span>`:''}</div>`;
+    }).join('');
+    const wrong = (s.attempts||[]).filter(a=>!a.correct).length;
+    return `
+      <div class="record">
+        <div class="record-head">
+          <div class="record-name">${s.name||'(無名字)'}</div>
+          <div class="record-badge ${s.completed?'done':'ongoing'}">${s.completed?'已完成':'進行中'}</div>
+          <div class="record-meta">
+            開始 ${fmtT(s.startTime)}<br>
+            ${s.endTime?`結束 ${fmtT(s.endTime)} · 用時 ${m>0?m+'分':''}${se}秒`:'進行中...'}
+          </div>
+        </div>
+        <div class="record-stats">
+          <div class="stat-box"><div class="stat-box-label">通過</div><div class="stat-box-value">${s.gatesPassed||0}/7</div></div>
+          <div class="stat-box"><div class="stat-box-label">總答題</div><div class="stat-box-value">${s.totalAttempts||0}</div></div>
+          <div class="stat-box"><div class="stat-box-label">答錯</div><div class="stat-box-value">${wrong}</div></div>
+        </div>
+        <div class="gate-grid">${cells}</div>
+      </div>`;
+  }).join('');
+}
+
+function fmtT(ts){
+  if(!ts) return '-';
+  const d = new Date(ts);
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  const hh = String(d.getHours()).padStart(2,'0');
+  const mi = String(d.getMinutes()).padStart(2,'0');
+  return `${mm}/${dd} ${hh}:${mi}`;
+}
+
+function setupListener(){
+  if(typeof firebase==='undefined' || !firebase.database){
+    document.getElementById('fb-status').textContent = '⚠ Firebase 未載入';
+    return;
+  }
+  firebase.database().ref(FB_PATH).on('value',(snap)=>{
+    const val = snap.val() || {};
+    cached = Object.values(val);
+    connected = true;
+    document.getElementById('fb-status').textContent = '☁️ 已連線 · 即時同步中';
+    document.getElementById('fb-status').style.color = '#27D7FF';
+    render();
+  },(err)=>{
+    document.getElementById('fb-status').textContent = '⚠ 雲端連線失敗';
+    document.getElementById('fb-status').style.color = '#FF6BB0';
+  });
+}
+
+document.getElementById('btn-refresh').addEventListener('click',render);
+document.getElementById('btn-clear').addEventListener('click',()=>{
+  if(!confirm('確定要清空所有學生紀錄嗎？（雲端 + 本機都會清空，無法復原）')) return;
+  if(typeof firebase!=='undefined' && firebase.database){
+    firebase.database().ref(FB_PATH).remove().catch(e=>console.warn(e));
+  }
+  cached = [];
+  render();
+});
+
+render();
+setupListener();
+</script>
+</body>
+</html>

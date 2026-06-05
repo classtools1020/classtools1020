@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>平行宇宙飛行員 · 6/5 作業</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB27uSUnTSYkKJ5u5FqOqEnSbuA9br4lmE",
+  authDomain: "classtools1019.firebaseapp.com",
+  databaseURL: "https://classtools1019-default-rtdb.firebaseio.com",
+  projectId: "classtools1019",
+  storageBucket: "classtools1019.firebasestorage.app",
+  messagingSenderId: "402119556579",
+  appId: "1:402119556579:web:e0bace85a3454fb88eb4d6"
+};
+try { firebase.initializeApp(firebaseConfig); } catch(e){ console.warn(e); }
+const FB_PATH = 'submissions/parallelogram_homework_0605';
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
+html,body{height:100%;overflow:hidden;font-family:'Noto Sans TC',sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(ellipse at top,#1a0b3d 0%,#0a0625 50%,#02010f 100%);position:relative}
+#starfield{position:fixed;inset:0;z-index:0;pointer-events:none}
+#app{position:relative;z-index:1;height:100vh;width:100vw;overflow:hidden}
+.view{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s;overflow-y:auto}
+.view.active{opacity:1;pointer-events:auto}
+.btn-primary{background:linear-gradient(135deg,#7B61FF,#27D7FF);color:#fff;border:none;padding:18px 42px;border-radius:999px;font-family:inherit;font-weight:900;font-size:22px;cursor:pointer;letter-spacing:.5px;box-shadow:0 12px 32px rgba(123,97,255,.4),inset 0 -4px 0 rgba(0,0,0,.2);transition:transform .15s}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-primary:active{transform:translateY(1px)}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+
+/* ============ START VIEW ============ */
+.start-container{text-align:center;max-width:560px;width:100%}
+.title-badge{display:inline-block;padding:6px 18px;background:linear-gradient(90deg,#FFD93D,#FF6BB0);color:#1a0b3d;border-radius:999px;font-family:'Orbitron',sans-serif;font-weight:900;font-size:14px;letter-spacing:3px;margin-bottom:18px}
+.game-title{font-size:64px;font-weight:900;letter-spacing:-1px;line-height:1.05;background:linear-gradient(180deg,#fff 20%,#27D7FF 70%,#9B5BFF 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 8px 24px rgba(155,91,255,.5));margin-bottom:8px}
+.game-title .accent{background:linear-gradient(180deg,#FFD93D 30%,#FF6BB0 90%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:18px;color:rgba(255,255,255,.8);margin-bottom:36px;letter-spacing:1px}
+.name-block{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:28px;margin-bottom:18px}
+.name-block label{display:block;font-size:16px;color:rgba(255,255,255,.7);margin-bottom:12px;letter-spacing:1px}
+#player-name{width:100%;background:rgba(0,0,0,.3);border:2px solid rgba(255,255,255,.15);color:#fff;padding:16px 20px;border-radius:14px;font-family:inherit;font-weight:700;font-size:22px;text-align:center;margin-bottom:20px;outline:none;transition:border-color .2s}
+#player-name:focus{border-color:#27D7FF}
+.start-footer{color:rgba(255,255,255,.45);font-size:13px;margin-top:10px}
+
+/* ============ QUIZ VIEW ============ */
+.view-quiz{justify-content:flex-start;padding:0}
+.quiz-hud{width:100%;display:flex;align-items:center;gap:14px;padding:12px 22px;background:linear-gradient(180deg,rgba(0,0,0,.5),transparent);backdrop-filter:blur(8px);z-index:5}
+.hud-player{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);padding:6px 16px;border-radius:12px;border:1px solid rgba(155,91,255,.4)}
+.hud-player-icon{font-family:'Orbitron',sans-serif;font-weight:900;color:#FFD93D;font-size:18px}
+.hud-player-name{font-weight:900;font-size:15px}
+.hud-center{flex:1;max-width:560px;margin:0 auto}
+.hud-progress-label{font-size:11px;color:rgba(255,255,255,.55);letter-spacing:2px;text-align:center;margin-bottom:3px}
+.hud-progress-bar{position:relative;width:100%;height:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
+.hud-progress-fill{position:absolute;left:0;top:0;height:100%;width:0%;background:linear-gradient(90deg,#27D7FF,#9B5BFF,#FF6BB0,#FFD93D);border-radius:999px;box-shadow:0 0 16px rgba(155,91,255,.6);transition:width .8s cubic-bezier(.4,0,.2,1)}
+.hud-progress-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+.hud-stars{font-weight:900;font-size:18px;color:#FFD93D;text-shadow:0 0 12px rgba(255,217,61,.6);min-width:54px;text-align:right}
+
+.quiz-scene{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;padding:18px 20px 24px;overflow-y:auto}
+.gate-header{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.gate-num{font-family:'Orbitron',sans-serif;font-weight:900;font-size:14px;padding:6px 14px;border-radius:999px;letter-spacing:2px;background:rgba(0,0,0,.5);border:2px solid var(--gate-color,#27D7FF);color:var(--gate-color,#27D7FF)}
+.gate-label{font-size:14px;color:rgba(255,255,255,.7);letter-spacing:1px}
+.gate-title{font-size:28px;font-weight:900;margin-bottom:14px;text-align:center;color:var(--gate-color,#fff);text-shadow:0 0 18px var(--gate-glow,rgba(155,91,255,.4))}
+
+.gate-frame{position:relative;width:min(540px,100%);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(0,0,0,.4));border:3px solid var(--gate-color,#27D7FF);border-radius:24px;padding:18px;margin-bottom:18px;box-shadow:0 0 32px var(--gate-glow,rgba(39,215,255,.3))}
+.gate-frame::before{content:attr(data-gate);position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#1a0b3d,#0a0625);padding:4px 16px;border-radius:999px;border:2px solid var(--gate-color,#27D7FF);color:var(--gate-color,#27D7FF);font-family:'Orbitron',sans-serif;font-weight:900;font-size:13px;letter-spacing:2px}
+.gate-svg{width:100%;aspect-ratio:5/3;background:rgba(0,0,0,.4);border-radius:14px;padding:10px;display:flex;align-items:center;justify-content:center}
+.gate-svg svg{width:100%;height:100%}
+
+.q-prompt{font-size:18px;font-weight:700;line-height:1.55;max-width:560px;text-align:center;margin-bottom:18px;padding:14px 18px;background:rgba(255,217,61,.1);border:2px solid rgba(255,217,61,.4);border-radius:14px}
+.q-prompt strong{color:#FFD93D}
+
+.doors-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(540px,100%)}
+.door-btn{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:3px solid rgba(255,255,255,.18);color:#fff;padding:20px 18px;border-radius:18px;font-family:inherit;font-weight:900;font-size:20px;cursor:pointer;text-align:center;transition:all .2s;display:flex;align-items:center;gap:14px;justify-content:center;box-shadow:inset 0 -4px 0 rgba(0,0,0,.3)}
+.door-btn:hover{background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.05));border-color:rgba(255,255,255,.4);transform:translateY(-3px)}
+.door-btn .door-letter{flex-shrink:0;width:36px;height:36px;border-radius:10px;background:rgba(0,0,0,.4);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:15px}
+.door-btn.correct{background:linear-gradient(180deg,#27D7FF44,#27D7FF22);border-color:#27D7FF;animation:doorOpen .55s ease}
+.door-btn.correct .door-letter{background:#27D7FF;color:#1a0b3d}
+.door-btn.wrong{background:rgba(255,107,176,.18);border-color:#FF6BB0;animation:doorShake .4s ease}
+@keyframes doorOpen{0%{transform:scale(1)}40%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes doorShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-5px)}}
+.retry-msg{grid-column:1/-1;text-align:center;color:#FF6BB0;font-size:14px;font-weight:700;margin-top:6px}
+
+/* ============ END VIEW ============ */
+.end-container{text-align:center;max-width:580px;width:100%}
+.end-title{font-size:46px;font-weight:900;background:linear-gradient(135deg,#FFD93D,#FF6BB0,#27D7FF);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:14px;filter:drop-shadow(0 4px 16px rgba(255,217,61,.5))}
+.end-subtitle{font-size:18px;color:rgba(255,255,255,.85);margin-bottom:24px}
+.end-medal{font-family:'Orbitron',sans-serif;font-size:120px;font-weight:900;color:#FFD93D;text-shadow:0 0 40px rgba(255,217,61,.7),0 8px 24px rgba(0,0,0,.5);margin-bottom:14px;line-height:1}
+.end-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.end-stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:14px}
+.end-stat-label{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:2px;margin-bottom:4px}
+.end-stat-value{font-size:22px;font-weight:900;color:#FFD93D}
+.end-message{background:rgba(39,215,255,.1);border:2px solid #27D7FF;border-radius:16px;padding:18px 22px;margin-bottom:20px}
+.end-message-title{font-size:18px;font-weight:900;color:#27D7FF;margin-bottom:6px}
+.end-message-body{color:rgba(255,255,255,.9);font-size:14px;line-height:1.6}
+
+/* ============ EFFECTS ============ */
+.race-car{position:fixed;top:38%;left:-340px;z-index:200;width:280px;height:120px;pointer-events:none;opacity:0;filter:drop-shadow(0 10px 20px rgba(255,63,142,.5))}
+.race-car.go{animation:zoomRace 1.4s cubic-bezier(.2,0,.4,1) forwards}
+.race-car.go.mega{animation:zoomRaceMega 2.2s cubic-bezier(.2,0,.4,1) forwards}
+@keyframes zoomRace{0%{left:-340px;opacity:0;transform:translateY(0) rotate(-3deg)}15%{opacity:1}50%{transform:translateY(-8px) rotate(2deg)}90%{opacity:1}100%{left:100vw;opacity:0;transform:translateY(-6px) rotate(3deg)}}
+@keyframes zoomRaceMega{0%{left:-340px;opacity:0;transform:scale(1.4)}10%{opacity:1}90%{opacity:1}100%{left:100vw;opacity:0;transform:scale(1.4)}}
+
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-30px);background:linear-gradient(135deg,#27D7FF,#9B5BFF);color:#fff;padding:14px 28px;border-radius:999px;font-weight:900;font-size:16px;z-index:300;opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;box-shadow:0 12px 32px rgba(155,91,255,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.floating-plus{position:fixed;font-family:'Orbitron',sans-serif;font-weight:900;font-size:54px;color:#FFD93D;text-shadow:0 0 30px rgba(255,217,61,.8);z-index:201;pointer-events:none;opacity:0}
+.floating-plus.fly{animation:floatPlus 1.4s ease-out forwards}
+@keyframes floatPlus{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}25%{opacity:1;transform:translate(-50%,-80%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
+
+@media (max-width:600px){
+  .game-title{font-size:42px}
+  .subtitle{font-size:15px}
+  .gate-title{font-size:22px}
+  .q-prompt{font-size:16px}
+  .door-btn{font-size:17px;padding:16px 12px}
+  .doors-grid{grid-template-columns:1fr}
+  .end-title{font-size:32px}
+  .end-medal{font-size:80px}
+  .quiz-hud{flex-direction:column;gap:8px;padding:10px}
+  .hud-center{order:2;width:100%}
+}
+</style>
+</head>
+<body>
+<canvas id="starfield"></canvas>
+<div id="app">
+
+<!-- VIEW: START -->
+<section class="view view-start active" id="view-start">
+  <div class="start-container">
+    <div class="title-badge">6/5 線上作業 · 4-1+4-2</div>
+    <h1 class="game-title">平行宇宙<br><span class="accent">飛行員</span></h1>
+    <p class="subtitle">穿越 7 道宇宙閘門</p>
+    <div class="name-block">
+      <label for="player-name">在這裡輸入你的名字</label>
+      <input type="text" id="player-name" maxlength="10" placeholder="例：阿明" autocomplete="off">
+      <button class="btn-primary" id="btn-start">起飛 →</button>
+    </div>
+    <div class="start-footer">完成後自動上傳給老師、不用截圖</div>
+  </div>
+</section>
+
+<!-- VIEW: QUIZ -->
+<section class="view view-quiz" id="view-quiz">
+  <header class="quiz-hud">
+    <div class="hud-player">
+      <div class="hud-player-icon">★</div>
+      <div class="hud-player-name" id="hud-name"></div>
+    </div>
+    <div class="hud-center">
+      <div class="hud-progress-label">已通過閘門</div>
+      <div class="hud-progress-bar">
+        <div class="hud-progress-fill" id="hud-fill"></div>
+        <div class="hud-progress-text" id="hud-text">0 / 7</div>
+      </div>
+    </div>
+    <div class="hud-stars" id="hud-stars">★ 0</div>
+  </header>
+  <div class="quiz-scene">
+    <div class="gate-header">
+      <div class="gate-num" id="gate-num">GATE 1</div>
+      <div class="gate-label" id="gate-label"></div>
+    </div>
+    <h2 class="gate-title" id="gate-title"></h2>
+    <div class="gate-frame" id="gate-frame" data-gate="GATE 1">
+      <div class="gate-svg" id="gate-svg"></div>
+    </div>
+    <p class="q-prompt" id="q-prompt"></p>
+    <div class="doors-grid" id="doors-grid"></div>
+  </div>
+</section>
+
+<!-- VIEW: END -->
+<section class="view view-end" id="view-end">
+  <div class="end-container">
+    <div class="end-medal">★</div>
+    <h1 class="end-title">7 道閘門全部通過！</h1>
+    <p class="end-subtitle">恭喜畢業，<span id="end-name"></span> 飛行員</p>
+    <div class="end-stats">
+      <div class="end-stat"><div class="end-stat-label">通關</div><div class="end-stat-value">7 / 7</div></div>
+      <div class="end-stat"><div class="end-stat-label">用時</div><div class="end-stat-value" id="end-time">-</div></div>
+      <div class="end-stat"><div class="end-stat-label">挑戰次數</div><div class="end-stat-value" id="end-attempts">-</div></div>
+    </div>
+    <div class="end-message">
+      <div class="end-message-title">已自動上傳給老師</div>
+      <div class="end-message-body">你的紀錄已經傳到老師後臺，不用截圖、不用回 LINE，下週上課老師會看到。</div>
+    </div>
+    <button class="btn-primary" id="btn-restart">再玩一次 ↻</button>
+  </div>
+</section>
+
+</div>
+
+<div class="race-car" id="race-car" aria-hidden="true">
+  <svg viewBox="0 0 280 120">
+    <defs><linearGradient id="carBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF3F8E"/><stop offset="1" stop-color="#7B61FF"/></linearGradient></defs>
+    <g stroke-linecap="round"><line x1="0" y1="40" x2="50" y2="40" stroke="#FFD93D" stroke-width="5"/><line x1="0" y1="65" x2="60" y2="65" stroke="#FF6BB0" stroke-width="4"/></g>
+    <path d="M55,55 L20,45 L42,65 L20,85 L55,72 Z" fill="#FF6BB0"/>
+    <path d="M55,60 L30,52 L45,65 L30,75 L55,68 Z" fill="#FFD93D"/>
+    <rect x="65" y="55" width="190" height="40" rx="14" fill="url(#carBody)"/>
+    <path d="M95,55 L135,30 L210,30 L240,55 Z" fill="#27D7FF" stroke="#fff" stroke-width="2"/>
+    <circle cx="175" cy="40" r="8" fill="#FFD93D"/>
+    <rect x="65" y="72" width="190" height="5" fill="#FFD93D"/>
+    <circle cx="100" cy="100" r="15" fill="#1a0b3d"/><circle cx="100" cy="100" r="9" fill="#444"/><circle cx="100" cy="100" r="3" fill="#FFD93D"/>
+    <circle cx="225" cy="100" r="15" fill="#1a0b3d"/><circle cx="225" cy="100" r="9" fill="#444"/><circle cx="225" cy="100" r="3" fill="#FFD93D"/>
+  </svg>
+</div>
+<div class="floating-plus" id="floating-plus">+1</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'parallelogramHomework_v1';
+
+/* ===== GATES (7 questions) ===== */
+const GATES = [
+  {
+    id:1, topic:'4-1', label:'平行線・同位角', color:'#27D7FF', glow:'rgba(39,215,255,.5)',
+    drawSVG: function(){return drawParallelLines({mark1:80,mark2Pos:'corresponding'});},
+    prompt:'看圖：∠1 = <strong>80°</strong>，和它「同位置」的 ∠2 是多少？',
+    options:['60°','80°','100°','110°'], correct:1
+  },
+  {
+    id:2, topic:'4-1', label:'平行線・內錯角', color:'#9B5BFF', glow:'rgba(155,91,255,.5)',
+    drawSVG: function(){return drawParallelLines({mark1:70,mark2Pos:'alternate'});},
+    prompt:'看圖：∠1 = <strong>70°</strong>，和它「斜對面、夾在中間」的 ∠2 是多少？',
+    options:['35°','70°','100°','110°'], correct:1
+  },
+  {
+    id:3, topic:'4-1', label:'平行線・同側內角', color:'#FF6BB0', glow:'rgba(255,107,176,.5)',
+    drawSVG: function(){return drawParallelLines({mark1:110,mark2Pos:'cointerior'});},
+    prompt:'看圖：∠1 = <strong>110°</strong>，和它「同一邊、夾在中間」的 ∠2 是多少？（提示：兩個加起來 180°）',
+    options:['70°','110°','90°','180°'], correct:0
+  },
+  {
+    id:4, topic:'4-2', label:'平四・對邊等長', color:'#FFD93D', glow:'rgba(255,217,61,.5)',
+    drawSVG: function(){return drawPgEqualSides();},
+    prompt:'看圖：平行四邊形 AB = <strong>9 公分</strong>，那麼 CD = ？',
+    options:['6 公分','9 公分','12 公分','15 公分'], correct:1
+  },
+  {
+    id:5, topic:'4-2', label:'平四・對角線互平分', color:'#27D7FF', glow:'rgba(39,215,255,.5)',
+    drawSVG: function(){return drawPgDiagonal();},
+    prompt:'看圖：對角線 AC = <strong>12</strong>，O 是兩條對角線的交點。AO = ？',
+    options:['6','8','10','12'], correct:0
+  },
+  {
+    id:6, topic:'4-2', label:'平四・面積四等分', color:'#9B5BFF', glow:'rgba(155,91,255,.5)',
+    drawSVG: function(){return drawPgArea();},
+    prompt:'看圖：平四面積 = <strong>24</strong>，對角線把它切成 4 個三角形，每個三角形的面積 = ？',
+    options:['4','6','8','12'], correct:1
+  },
+  {
+    id:7, topic:'4-2', label:'平四・傳說判別', color:'#FFD93D', glow:'rgba(255,217,61,.6)', rarity:'legendary',
+    drawSVG: function(){return drawPgOnePairParallelEqual();},
+    prompt:'看圖：四邊形 AB ∥ CD 且 AB = CD = <strong>5</strong>。它一定是平行四邊形嗎？',
+    options:['一定是','不一定','一定不是','資料不夠'], correct:0
+  }
+];
+
+/* ===== SVG DRAWERS ===== */
+function drawParallelLines(opts){
+  // L1: y=70; L2: y=200; transversal from (130,30) to (290,250)
+  // L1 ∩ M ≈ (158, 70); L2 ∩ M ≈ (242, 200)
+  const isCorr = opts.mark2Pos==='corresponding';
+  const isAlt = opts.mark2Pos==='alternate';
+  const isCoint = opts.mark2Pos==='cointerior';
+  // ∠1 always at L1∩M upper-right (between L1 going right and M going up)
+  // ∠2: corresponding → L2∩M same position (upper-right between L2 and M)
+  //     alternate → L2∩M opposite (interior, opposite side of M from ∠1)
+  //     cointerior → L2∩M same side as ∠1 but between lines (interior)
+  let mark2Box;
+  if(isCorr){
+    // ∠2 at upper-right of L2∩M (same position relative)
+    mark2Box = {x:248, y:174, label:'∠2 = ?'};
+  } else if(isAlt){
+    // ∠2 at upper-left of L2∩M (interior, opposite side of transversal)
+    mark2Box = {x:170, y:174, label:'∠2 = ?'};
+  } else {
+    // ∠2 at upper-right of L2∩M, BUT we frame it as same-side interior with ∠1 at lower-right of L1∩M
+    // For consistency, swap ∠1 to be at lower-right (below L1)
+    mark2Box = {x:248, y:174, label:'∠2 = ?'};
+  }
+  // ∠1 position: for cointerior, mark below L1 (interior, between lines, right of M)
+  let mark1Box = isCoint ? {x:170, y:84, label:'∠1 = '+opts.mark1+'°'} : {x:170, y:50, label:'∠1 = '+opts.mark1+'°'};
+  // arc paths for visualization
+  return `<svg viewBox="0 0 420 280" xmlns="http://www.w3.org/2000/svg">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><circle cx="5" cy="5" r="4" fill="#27D7FF"/></marker></defs>
+    <!-- parallel lines -->
+    <line x1="30" y1="70" x2="390" y2="70" stroke="#27D7FF" stroke-width="3"/>
+    <line x1="30" y1="200" x2="390" y2="200" stroke="#27D7FF" stroke-width="3"/>
+    <text x="395" y="76" fill="#27D7FF" font-size="14" font-weight="900">L₁</text>
+    <text x="395" y="206" fill="#27D7FF" font-size="14" font-weight="900">L₂</text>
+    <!-- arrows showing parallel -->
+    <path d="M200,62 L230,62" stroke="#27D7FF" stroke-width="2" marker-end="url(#ah)"/>
+    <path d="M200,192 L230,192" stroke="#27D7FF" stroke-width="2" marker-end="url(#ah)"/>
+    <!-- transversal -->
+    <line x1="130" y1="30" x2="290" y2="250" stroke="#FFD93D" stroke-width="3"/>
+    <!-- ∠1 marking (arc) -->
+    <path d="M ${isCoint?170:170},${isCoint?80:60} A 18,18 0 0 ${isCoint?1:0} ${isCoint?186:188},${isCoint?72:74}" fill="none" stroke="#FFD93D" stroke-width="3"/>
+    <!-- ∠2 marking (arc) at L2 ∩ M -->
+    <path d="M ${isAlt?226:262},${isAlt?192:188} A 16,16 0 0 ${isAlt?0:1} ${isAlt?240:248},${isAlt?212:204}" fill="none" stroke="#27D7FF" stroke-width="3"/>
+    <!-- ∠1 label box (yellow) -->
+    <rect x="${mark1Box.x-32}" y="${mark1Box.y-14}" width="76" height="22" rx="6" fill="#FFD93D"/>
+    <text x="${mark1Box.x+6}" y="${mark1Box.y+2}" text-anchor="middle" fill="#1a0b3d" font-size="14" font-weight="900">${mark1Box.label}</text>
+    <!-- ∠2 label box (cyan) -->
+    <rect x="${mark2Box.x-30}" y="${mark2Box.y-14}" width="62" height="22" rx="6" fill="#fff" stroke="#27D7FF" stroke-width="2"/>
+    <text x="${mark2Box.x+1}" y="${mark2Box.y+2}" text-anchor="middle" fill="#27D7FF" font-size="14" font-weight="900">${mark2Box.label}</text>
+    <!-- hint indicator for corresponding: dotted purple line connecting positions -->
+    ${isCorr?`<line x1="158" y1="65" x2="242" y2="195" stroke="#B47BFF" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.6"/>`:''}
+    ${isAlt?`<text x="210" y="135" text-anchor="middle" fill="#9B5BFF" font-size="12" font-weight="700" opacity="0.7">內錯 (Z 形)</text>`:''}
+    ${isCoint?`<text x="210" y="135" text-anchor="middle" fill="#FF6BB0" font-size="12" font-weight="700" opacity="0.7">同側內角 (C 形)</text>`:''}
+  </svg>`;
+}
+
+const PG = {A:{x:90,y:62},B:{x:300,y:62},C:{x:330,y:200},D:{x:120,y:200}};
+const pgPath = `M${PG.A.x},${PG.A.y} L${PG.B.x},${PG.B.y} L${PG.C.x},${PG.C.y} L${PG.D.x},${PG.D.y} Z`;
+
+function pgBase(){
+  return `<path d="${pgPath}" fill="rgba(155,91,255,.06)" stroke="rgba(255,255,255,.35)" stroke-width="2"/>
+    <g font-family="Orbitron,sans-serif" font-size="14" font-weight="900" fill="#fff" opacity=".85">
+      <text x="${PG.A.x-14}" y="${PG.A.y-6}">A</text>
+      <text x="${PG.B.x+4}" y="${PG.B.y-6}">B</text>
+      <text x="${PG.C.x+4}" y="${PG.C.y+18}">C</text>
+      <text x="${PG.D.x-16}" y="${PG.D.y+18}">D</text>
+    </g>`;
+}
+
+function drawPgEqualSides(){
+  return `<svg viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+    ${pgBase()}
+    <line x1="${PG.A.x}" y1="${PG.A.y}" x2="${PG.B.x}" y2="${PG.B.y}" stroke="#FFD93D" stroke-width="6"/>
+    <line x1="${PG.D.x}" y1="${PG.D.y}" x2="${PG.C.x}" y2="${PG.C.y}" stroke="#FFD93D" stroke-width="6"/>
+    <rect x="170" y="32" width="60" height="22" rx="6" fill="#FFD93D"/>
+    <text x="200" y="49" text-anchor="middle" fill="#1a0b3d" font-size="16" font-weight="900">AB = 9</text>
+    <rect x="195" y="208" width="60" height="22" rx="6" fill="#fff" stroke="#27D7FF" stroke-width="2"/>
+    <text x="225" y="225" text-anchor="middle" fill="#27D7FF" font-size="16" font-weight="900">CD = ?</text>
+    <text x="195" y="22" fill="#FFD93D" font-size="18" font-weight="900">＝</text>
+    <text x="225" y="252" fill="#FFD93D" font-size="18" font-weight="900">＝</text>
+  </svg>`;
+}
+
+function drawPgDiagonal(){
+  const Ox = (PG.A.x+PG.C.x)/2, Oy = (PG.A.y+PG.C.y)/2;
+  return `<svg viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+    ${pgBase()}
+    <line x1="${PG.A.x}" y1="${PG.A.y}" x2="${PG.C.x}" y2="${PG.C.y}" stroke="#27D7FF" stroke-width="3"/>
+    <line x1="${PG.B.x}" y1="${PG.B.y}" x2="${PG.D.x}" y2="${PG.D.y}" stroke="#FF6BB0" stroke-width="2"/>
+    <circle cx="${Ox}" cy="${Oy}" r="8" fill="#FFD93D"/>
+    <text x="${Ox+10}" y="${Oy-10}" fill="#FFD93D" font-size="16" font-weight="900">O</text>
+    <rect x="${(PG.A.x+Ox)/2-28}" y="${(PG.A.y+Oy)/2-22}" width="56" height="22" rx="6" fill="#fff" stroke="#27D7FF" stroke-width="2"/>
+    <text x="${(PG.A.x+Ox)/2}" y="${(PG.A.y+Oy)/2-5}" text-anchor="middle" fill="#27D7FF" font-size="14" font-weight="900">AO = ?</text>
+    <rect x="50" y="232" width="160" height="22" rx="6" fill="#FFD93D"/>
+    <text x="130" y="249" text-anchor="middle" fill="#1a0b3d" font-size="14" font-weight="900">整條 AC = 12</text>
+  </svg>`;
+}
+
+function drawPgArea(){
+  const Ox = (PG.A.x+PG.C.x)/2, Oy = (PG.A.y+PG.C.y)/2;
+  return `<svg viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+    ${pgBase()}
+    <polygon points="${PG.A.x},${PG.A.y} ${PG.B.x},${PG.B.y} ${Ox},${Oy}" fill="rgba(39,215,255,.3)" stroke="#27D7FF" stroke-width="1.5"/>
+    <polygon points="${PG.B.x},${PG.B.y} ${PG.C.x},${PG.C.y} ${Ox},${Oy}" fill="rgba(155,91,255,.3)" stroke="#9B5BFF" stroke-width="1.5"/>
+    <polygon points="${PG.C.x},${PG.C.y} ${PG.D.x},${PG.D.y} ${Ox},${Oy}" fill="rgba(255,107,176,.3)" stroke="#FF6BB0" stroke-width="1.5"/>
+    <polygon points="${PG.D.x},${PG.D.y} ${PG.A.x},${PG.A.y} ${Ox},${Oy}" fill="rgba(255,217,61,.3)" stroke="#FFD93D" stroke-width="1.5"/>
+    <text x="${(PG.A.x+PG.B.x)/2}" y="${PG.A.y+30}" text-anchor="middle" fill="#fff" font-size="20" font-weight="900">?</text>
+    <text x="${(PG.B.x+PG.C.x)/2+8}" y="${(PG.B.y+PG.C.y)/2}" text-anchor="middle" fill="#fff" font-size="20" font-weight="900">?</text>
+    <text x="${(PG.C.x+PG.D.x)/2}" y="${PG.C.y-12}" text-anchor="middle" fill="#fff" font-size="20" font-weight="900">?</text>
+    <text x="${(PG.D.x+PG.A.x)/2-10}" y="${(PG.D.y+PG.A.y)/2}" text-anchor="middle" fill="#fff" font-size="20" font-weight="900">?</text>
+    <rect x="130" y="232" width="160" height="22" rx="6" fill="#FFD93D"/>
+    <text x="210" y="249" text-anchor="middle" fill="#1a0b3d" font-size="14" font-weight="900">總面積 = 24</text>
+  </svg>`;
+}
+
+function drawPgOnePairParallelEqual(){
+  return `<svg viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg">
+    <defs><marker id="ar5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#FFD93D"/></marker></defs>
+    ${pgBase()}
+    <line x1="${PG.A.x}" y1="${PG.A.y}" x2="${PG.B.x}" y2="${PG.B.y}" stroke="#FFD93D" stroke-width="6"/>
+    <line x1="${PG.D.x}" y1="${PG.D.y}" x2="${PG.C.x}" y2="${PG.C.y}" stroke="#FFD93D" stroke-width="6"/>
+    <path d="M${PG.A.x+50},${PG.A.y-22} L${PG.A.x+80},${PG.A.y-22}" stroke="#FFD93D" stroke-width="2.5" marker-end="url(#ar5)"/>
+    <path d="M${PG.D.x+50},${PG.D.y+22} L${PG.D.x+80},${PG.D.y+22}" stroke="#FFD93D" stroke-width="2.5" marker-end="url(#ar5)"/>
+    <rect x="160" y="24" width="80" height="22" rx="6" fill="#FFD93D"/>
+    <text x="200" y="41" text-anchor="middle" fill="#1a0b3d" font-size="14" font-weight="900">AB ∥ DC 且 = 5</text>
+    <rect x="185" y="232" width="80" height="22" rx="6" fill="#FFD93D"/>
+    <text x="225" y="249" text-anchor="middle" fill="#1a0b3d" font-size="14" font-weight="900">CD = 5</text>
+    <text x="195" y="55" fill="#FFD93D" font-size="20" font-weight="900">＝</text>
+    <text x="225" y="222" fill="#FFD93D" font-size="20" font-weight="900">＝</text>
+  </svg>`;
+}
+
+/* ===== STATE ===== */
+let state = { name:'', sessionId:'', startTime:0, currentIdx:0, attempts:[], completed:false };
+
+/* ===== AUDIO ===== */
+let audioCtx = null;
+function initAudio(){
+  if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){return;} }
+  if(audioCtx.state==='suspended') audioCtx.resume();
+}
+function tone(f,d,delay=0,type='sine',v=0.18){
+  if(!audioCtx) return;
+  const t = audioCtx.currentTime+delay;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type=type; o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(0.001,t+d);
+  o.connect(g).connect(audioCtx.destination); o.start(t); o.stop(t+d);
+}
+function playCorrect(){ tone(659,0.08,0,'sine',0.2); tone(988,0.25,0.08,'sine',0.22); }
+function playWrong(){ tone(220,0.12,0,'triangle',0.13); tone(180,0.18,0.06,'triangle',0.1); }
+function playVroom(){ if(!audioCtx) return; const t=audioCtx.currentTime; const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(80,t); o.frequency.linearRampToValueAtTime(260,t+0.25); o.frequency.linearRampToValueAtTime(60,t+0.9); g.gain.setValueAtTime(0.06,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.9); o.connect(g).connect(audioCtx.destination); o.start(t); o.stop(t+0.9); }
+function playVictory(){ const n=[[523,.18,0],[659,.18,.16],[784,.18,.32],[1047,.4,.48],[1047,.16,.92],[1319,.7,1.1]]; n.forEach(([f,d,t])=>tone(f,d,t,'sine',0.24)); }
+
+function fireRaceCar(mega=false){
+  const c = document.getElementById('race-car');
+  c.classList.remove('go','mega');
+  void c.offsetWidth;
+  if(mega) c.classList.add('go','mega'); else c.classList.add('go');
+  playVroom();
+}
+function floatPlusOne(x,y){
+  const e = document.getElementById('floating-plus');
+  e.style.left=x+'px'; e.style.top=y+'px';
+  e.classList.remove('fly'); void e.offsetWidth; e.classList.add('fly');
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer = setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ===== STARFIELD ===== */
+const canvas = document.getElementById('starfield');
+const ctx = canvas.getContext('2d');
+let stars=[];
+function resizeStarfield(){
+  canvas.width=window.innerWidth*devicePixelRatio;
+  canvas.height=window.innerHeight*devicePixelRatio;
+  canvas.style.width=window.innerWidth+'px';
+  canvas.style.height=window.innerHeight+'px';
+  stars=Array.from({length:120},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+.4,a:Math.random()*.6+.2,s:Math.random()*.01+.003}));
+}
+function drawStars(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(s=>{
+    s.a += s.s*(Math.random()>.5?1:-1);
+    if(s.a>.9)s.a=.9; if(s.a<.1)s.a=.1;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r*devicePixelRatio,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,${s.a})`; ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+window.addEventListener('resize',resizeStarfield);
+resizeStarfield(); drawStars();
+
+/* ===== VIEW SWITCHING ===== */
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+}
+
+/* ===== STORAGE ===== */
+function saveRecord(){
+  const record = {
+    id: state.sessionId,
+    name: state.name,
+    startTime: state.startTime,
+    endTime: state.completed ? Date.now() : null,
+    currentIdx: state.currentIdx,
+    attempts: [...state.attempts],
+    totalAttempts: state.attempts.length,
+    wrongCount: state.attempts.filter(a=>!a.correct).length,
+    gatesPassed: state.currentIdx,
+    completed: state.completed
+  };
+  try { localStorage.setItem(STORAGE_KEY+'_'+state.sessionId, JSON.stringify(record)); } catch(e){}
+  try {
+    if(typeof firebase!=='undefined' && firebase.database){
+      firebase.database().ref(FB_PATH+'/'+state.sessionId).set(record);
+    }
+  } catch(e){ console.warn('Firebase error:',e); }
+}
+
+/* ===== START FLOW ===== */
+document.getElementById('btn-start').addEventListener('click',()=>{
+  const name = document.getElementById('player-name').value.trim();
+  if(!name){
+    const input = document.getElementById('player-name');
+    if(typeof gsap!=='undefined') gsap.fromTo(input,{x:-8},{x:0,duration:.3,ease:'elastic.out(1,.3)'});
+    input.focus();
+    showToast('請先輸入名字喔！');
+    return;
+  }
+  initAudio();
+  state.name = name;
+  state.sessionId = 'hw_'+Date.now()+'_'+Math.floor(Math.random()*1000);
+  state.startTime = Date.now();
+  state.currentIdx = 0;
+  state.attempts = [];
+  state.completed = false;
+  document.getElementById('hud-name').textContent = name;
+  saveRecord();
+  switchView('quiz');
+  renderGate(0);
+});
+document.getElementById('player-name').addEventListener('keypress',e=>{
+  if(e.key==='Enter') document.getElementById('btn-start').click();
+});
+
+/* ===== QUIZ FLOW ===== */
+let currentAttemptStart = 0;
+
+function renderGate(idx){
+  const g = GATES[idx];
+  document.getElementById('view-quiz').style.setProperty('--gate-color',g.color);
+  document.getElementById('view-quiz').style.setProperty('--gate-glow',g.glow);
+  document.getElementById('gate-num').textContent = 'GATE '+(idx+1);
+  document.getElementById('gate-num').style.setProperty('--gate-color',g.color);
+  document.getElementById('gate-num').style.borderColor = g.color;
+  document.getElementById('gate-num').style.color = g.color;
+  document.getElementById('gate-label').textContent = g.topic + ' · ' + g.label;
+  document.getElementById('gate-title').textContent = g.label;
+  document.getElementById('gate-title').style.color = g.color;
+  document.getElementById('gate-title').style.textShadow = '0 0 20px '+g.glow;
+  document.getElementById('gate-frame').style.borderColor = g.color;
+  document.getElementById('gate-frame').style.boxShadow = '0 0 32px '+g.glow;
+  document.getElementById('gate-frame').setAttribute('data-gate','GATE '+(idx+1));
+  document.getElementById('gate-svg').innerHTML = g.drawSVG();
+  document.getElementById('q-prompt').innerHTML = g.prompt;
+  // doors
+  const grid = document.getElementById('doors-grid');
+  grid.innerHTML = '';
+  const letters=['A','B','C','D'];
+  g.options.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'door-btn';
+    btn.innerHTML = `<div class="door-letter">${letters[i]}</div><div>${opt}</div>`;
+    btn.addEventListener('click',()=>onAnswer(i,btn));
+    grid.appendChild(btn);
+  });
+  // entrance animation
+  if(typeof gsap!=='undefined'){
+    gsap.fromTo('.gate-frame',{scale:.92,y:20},{scale:1,y:0,duration:.5,ease:'back.out(1.4)'});
+    gsap.fromTo('.door-btn',{y:30},{y:0,duration:.4,stagger:.06,ease:'back.out(1.4)'});
+  }
+  // progress
+  document.getElementById('hud-fill').style.width = (idx*100/7)+'%';
+  document.getElementById('hud-text').textContent = idx+' / 7';
+  document.getElementById('hud-stars').textContent = '★ '+idx;
+  currentAttemptStart = Date.now();
+}
+
+function onAnswer(idx,btn){
+  if(btn.disabled) return;
+  const g = GATES[state.currentIdx];
+  const correct = idx === g.correct;
+  state.attempts.push({gateId:g.id,correct,timeMs:Date.now()-currentAttemptStart,chose:idx});
+  if(correct){
+    btn.classList.add('correct');
+    playCorrect();
+    const r = btn.getBoundingClientRect();
+    floatPlusOne(r.left+r.width/2, r.top+r.height/2);
+    const isFinal = (state.currentIdx === GATES.length-1);
+    fireRaceCar(isFinal);
+    // confetti
+    confetti({particleCount:isFinal?180:80,spread:isFinal?160:90,origin:{y:.55},colors:[g.color,'#FFD93D','#fff']});
+    state.currentIdx += 1;
+    saveRecord();
+    setTimeout(()=>{
+      if(state.currentIdx >= GATES.length){
+        finishGame();
+      } else {
+        renderGate(state.currentIdx);
+        showToast(`通過第 ${state.currentIdx} 關！下一關 →`);
+      }
+    },1400);
+  } else {
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    playWrong();
+    setTimeout(()=>btn.classList.remove('wrong'),400);
+    const grid = document.getElementById('doors-grid');
+    let msg = grid.querySelector('.retry-msg');
+    if(!msg){
+      msg = document.createElement('div');
+      msg.className = 'retry-msg';
+      msg.textContent = '差一點點！再選一道門 →';
+      grid.appendChild(msg);
+    }
+    currentAttemptStart = Date.now();
+    saveRecord();
+  }
+}
+
+/* ===== END FLOW ===== */
+function finishGame(){
+  state.completed = true;
+  saveRecord();
+  const elapsedMs = Date.now() - state.startTime;
+  const mins = Math.floor(elapsedMs/60000);
+  const secs = Math.floor((elapsedMs%60000)/1000);
+  document.getElementById('end-name').textContent = state.name;
+  document.getElementById('end-time').textContent = mins>0 ? `${mins}分${secs}秒` : `${secs}秒`;
+  document.getElementById('end-attempts').textContent = state.attempts.length;
+  switchView('end');
+  // epic finale
+  setTimeout(()=>{
+    const colors=['#FFD93D','#FF6BB0','#27D7FF','#9B5BFF','#fff','#FFB300'];
+    confetti({particleCount:260,spread:170,origin:{y:.35},colors});
+    playVictory();
+    setTimeout(()=>confetti({particleCount:160,spread:120,angle:60,origin:{x:0,y:.6},colors}),250);
+    setTimeout(()=>confetti({particleCount:160,spread:120,angle:120,origin:{x:1,y:.6},colors}),500);
+    setTimeout(()=>fireRaceCar(true),300);
+    setTimeout(()=>fireRaceCar(false),1500);
+    setTimeout(()=>confetti({particleCount:200,spread:360,startVelocity:35,origin:{y:.5},colors}),900);
+  },200);
+}
+
+document.getElementById('btn-restart').addEventListener('click',()=>{
+  state = { name:'', sessionId:'', startTime:0, currentIdx:0, attempts:[], completed:false };
+  document.getElementById('player-name').value = '';
+  switchView('start');
+  setTimeout(()=>document.getElementById('player-name').focus(),300);
+});
+
+/* ===== INIT ===== */
+window.addEventListener('load',()=>{
+  document.getElementById('player-name').focus();
+});
+</script>
+</body>
+</html>
