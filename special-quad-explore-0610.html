@@ -283,7 +283,7 @@ const FB_PATH = 'submissions/special_quad_explore_0610';
 
 const FB_PATH_REF = 'submissions/special_quad_explore_0610';
 
-const state = {
+var state = {
   nick: '',
   startTime: 0,
   currentQ: 0,
@@ -291,33 +291,36 @@ const state = {
   completed: [false, false, false, false, false],
 };
 
-const TASKS = [
+var TASKS = [
   {
     title: '🪁 冬山風箏館：拖風箏到展示位',
     mission: '請把 3 個風箏「拖到」上方的展示框！每個展示位置都要有風箏喔～',
-    setup: setupQ1, check: checkQ1, reward: 30,
+    setup: () => setupQ1(), check: () => checkQ1(), reward: 30,
   },
   {
     title: '🌟 鳶形誕生：找出「兩組鄰邊等長」',
     mission: '拖 B 點跟 D 點，讓「AB=AD」+「CB=CD」同時成立！',
-    setup: setupQ2, check: checkQ2, reward: 50,
+    setup: () => setupQ2(), check: () => checkQ2(), reward: 50,
   },
   {
     title: '💎 菱形挑戰：四條邊都一樣長',
     mission: '繼續拖 4 個頂點，目標：4 條邊都相等（誤差 ≤ 0.3）',
-    setup: setupQ3, check: checkQ3, reward: 80,
+    setup: () => setupQ3(), check: () => checkQ3(), reward: 80,
   },
   {
     title: '⚡ 對角線秘密：垂直 + 平分',
     mission: '拖 A、C 點觀察兩條對角線。AC ⊥ BD 嗎？OB = OD 嗎？',
-    setup: setupQ4, check: checkQ4, reward: 80,
+    setup: () => setupQ4(), check: () => checkQ4(), reward: 80,
   },
   {
     title: '🏆 BOSS：風箏分類學家',
     mission: '4 個風箏拖到正確分類框！（提示：紅=鳶形、藍=菱形、紫=正方形、黃=長方形）',
-    setup: setupQ5, check: checkQ5, reward: 120,
+    setup: () => setupQ5(), check: () => checkQ5(), reward: 120,
   },
 ];
+// 掛到 window 讓 isolated world 也能訪問（debugging 用）
+window.TASKS = TASKS;
+window.state = state;
 
 /* ============ Drag helper ============ */
 function makeDraggable(el, onMove) {
