@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🪁 風箏館大冒險 · 4-3 預習探索 (6/10)</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB27uSUnTSYkKJ5u5FqOqEnSbuA9br4lmE",
+  authDomain: "classtools1019.firebaseapp.com",
+  databaseURL: "https://classtools1019-default-rtdb.firebaseio.com",
+  projectId: "classtools1019",
+  storageBucket: "classtools1019.firebasestorage.app",
+  messagingSenderId: "402119556579",
+  appId: "1:402119556579:web:e0bace85a3454fb88eb4d6"
+};
+try { firebase.initializeApp(firebaseConfig); } catch(e){ console.warn(e); }
+const FB_PATH = 'submissions/special_quad_explore_0610';
+</script>
+<style>
+  /* === 角落生物療癒風（同 6/2 PRO） === */
+  :root {
+    --bg: #FFF8F0;
+    --paper: #FFFFFF;
+    --primary: #FFB3C7;
+    --primary-soft: #FFD6E0;
+    --accent: #A5D8FF;
+    --accent-soft: #CCE7FF;
+    --gold: #FFE066;
+    --gold-soft: #FFF3B8;
+    --mint: #B8E6B8;
+    --lavender: #D0BFFF;
+    --orange: #FFA94D;
+    --success: #95D5B2;
+    --success-soft: #C6E9CF;
+    --warning: #FFD23F;
+    --danger: #FFA8A8;
+    --text: #4A4458;
+    --text-dim: #918CA1;
+    --ink: #4A4458;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;user-select:none;-webkit-user-select:none}
+  html,body{
+    font-family:'M PLUS Rounded 1c','Microsoft JhengHei','PingFang TC',sans-serif;
+    background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;
+  }
+  body{
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255,179,199,0.15) 0, transparent 28%),
+      radial-gradient(circle at 85% 75%, rgba(165,216,255,0.15) 0, transparent 30%),
+      radial-gradient(circle, rgba(255,224,102,0.06) 1.5px, transparent 1.5px) 0 0 / 24px 24px,
+      var(--bg);
+    background-attachment:fixed;
+  }
+  .app{max-width:880px;margin:0 auto;padding:14px;position:relative;z-index:1}
+
+  /* HUD */
+  .hud{
+    display:flex;justify-content:space-between;align-items:center;
+    background:white;border-radius:24px;padding:10px 18px;margin-bottom:14px;
+    box-shadow:0 4px 0 var(--primary-soft), 0 8px 20px rgba(255,179,199,0.25);
+    flex-wrap:wrap;gap:8px;
+  }
+  .hud-nick{font-weight:900;color:var(--primary);font-size:15px}
+  .hud-stat{font-weight:800;color:var(--text);font-size:14px}
+  .hud-coins{color:var(--orange)}
+  .progress{display:flex;gap:6px}
+  .pdot{
+    width:32px;height:32px;border-radius:50%;background:white;
+    border:2.5px solid var(--primary-soft);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:900;color:var(--text-dim);
+    box-shadow:0 2px 0 var(--primary-soft);
+  }
+  .pdot.done{background:var(--success);color:white;border-color:var(--success);box-shadow:0 2px 0 #6FB68A}
+  .pdot.active{background:var(--primary);color:white;border-color:var(--primary);transform:scale(1.15);box-shadow:0 3px 0 #FF8FA8}
+
+  /* 卡片 */
+  .card{
+    background:white;border-radius:28px;padding:22px;
+    box-shadow:0 6px 0 var(--primary-soft), 0 12px 28px rgba(255,179,199,0.2);
+    position:relative;animation:cardIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .card::before{content:'🪁';position:absolute;top:-22px;right:-6px;font-size:44px;animation:kite-float 3s ease-in-out infinite}
+  .card::after{content:'🐻';position:absolute;bottom:-18px;left:-8px;font-size:36px;animation:bear-float 3.5s ease-in-out infinite}
+  @keyframes kite-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-6px) rotate(-5deg)}}
+  @keyframes bear-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-5px) rotate(5deg)}}
+  @keyframes cardIn{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+  h1{font-size:clamp(28px,7vw,40px);background:linear-gradient(135deg, #FFB3C7 0%, #FFA94D 50%, #FFD23F 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-align:center;font-weight:900;letter-spacing:2px;padding:4px 0;filter:drop-shadow(0 3px 0 rgba(74,68,88,0.15))}
+  h2{font-size:clamp(20px,5vw,26px);color:var(--primary);margin-bottom:10px;font-weight:900}
+  .subtitle{text-align:center;color:var(--text-dim);font-size:15px;margin-bottom:14px;font-weight:700}
+
+  /* 按鈕 */
+  .btn{min-height:54px;padding:14px 26px;background:linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);color:white;border:none;font-size:17px;font-weight:900;border-radius:28px;cursor:pointer;font-family:inherit;letter-spacing:1px;box-shadow:0 5px 0 #B89BB3, 0 8px 20px rgba(255,179,199,0.4);transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);min-width:120px}
+  .btn:hover{transform:translateY(-3px)}
+  .btn:active{transform:translateY(5px);box-shadow:0 0 0 #B89BB3}
+  .btn-gold{background:linear-gradient(135deg, var(--gold) 0%, var(--orange) 100%);box-shadow:0 5px 0 #B88A1F}
+  .btn-ghost{background:white;color:var(--text);box-shadow:0 4px 0 var(--text-dim)}
+
+  /* Input */
+  .input{width:100%;padding:16px 22px;background:#FFFEF7;border:3px solid var(--primary-soft);border-radius:20px;box-shadow:0 4px 0 var(--primary-soft);font-size:20px;color:var(--text);text-align:center;font-weight:800;font-family:inherit}
+  .input:focus{outline:none;border-color:var(--primary);background:white;box-shadow:0 4px 0 var(--primary)}
+
+  /* 任務說明卡 */
+  .task-title{font-size:clamp(18px,4.6vw,22px);font-weight:800;line-height:1.7;color:var(--text);margin:18px 0 8px;background:#FFFEF5;border-left:6px solid var(--accent);border-radius:16px;padding:16px 20px;box-shadow:0 4px 0 var(--accent-soft)}
+  .task-mission{font-size:14px;color:var(--text);background:linear-gradient(135deg, var(--gold-soft) 0%, rgba(255,228,142,0.5) 100%);border:2px dashed var(--orange);padding:10px 16px;border-radius:14px;margin-top:8px;text-align:center;font-weight:700}
+
+  /* 拖拉舞台 */
+  .stage{
+    background:linear-gradient(135deg, #FFFEF5 0%, #FFF8E7 100%);
+    border:3px solid var(--accent-soft);
+    border-radius:24px;
+    padding:8px;margin:14px 0;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,0.04);
+    position:relative;
+    touch-action:none;
+  }
+  .stage svg{width:100%;height:auto;display:block;touch-action:none}
+
+  /* 即時數據面板 */
+  .live-panel{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+    gap:8px;margin:12px 0;
+  }
+  .live-card{
+    background:white;border-radius:14px;padding:10px;
+    text-align:center;border:2px solid var(--accent-soft);
+    box-shadow:0 3px 0 var(--accent-soft);
+  }
+  .live-card .lbl{font-size:11px;color:var(--text-dim);font-weight:700;letter-spacing:1px}
+  .live-card .val{font-size:24px;color:var(--text);font-weight:900;margin-top:2px}
+  .live-card.match{background:var(--success-soft);border-color:var(--success);box-shadow:0 3px 0 var(--success)}
+  .live-card.match .val{color:#3E8E5E}
+
+  /* 目標卡 */
+  .goal-box{
+    background:linear-gradient(135deg, var(--primary-soft) 0%, var(--gold-soft) 100%);
+    border:none;border-radius:18px;
+    padding:14px 18px;margin:10px 0;
+    text-align:center;font-weight:800;color:var(--text);
+    box-shadow:0 4px 0 var(--primary), 0 6px 14px rgba(255,179,199,0.3);
+    transition:all 0.4s;
+  }
+  .goal-box.cleared{
+    background:linear-gradient(135deg, var(--success) 0%, var(--mint) 100%);
+    color:white;
+    box-shadow:0 4px 0 #6FB68A, 0 8px 20px rgba(149,213,178,0.4);
+    animation:goal-pop 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes goal-pop{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+
+  /* SVG 拖曳元素 */
+  .draggable{cursor:grab;transition:filter 0.15s}
+  .draggable:hover{filter:brightness(1.1)}
+  .draggable:active{cursor:grabbing}
+
+  /* 慶祝動畫 */
+  .reveal-banner{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:linear-gradient(135deg, var(--gold) 0%, var(--primary) 100%);
+    color:white;padding:24px 36px;border-radius:30px;
+    font-size:32px;font-weight:900;letter-spacing:3px;
+    box-shadow:0 8px 0 #B85C7C, 0 16px 40px rgba(0,0,0,0.3);
+    text-shadow:0 3px 0 rgba(0,0,0,0.2);
+    pointer-events:none;z-index:9000;
+    animation:banner-in 2s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  @keyframes banner-in{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(0.3)}
+    20%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}
+    40%{transform:translate(-50%,-50%) scale(1)}
+    80%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    100%{opacity:0;transform:translate(-50%,-80%) scale(1.1)}
+  }
+
+  /* Confetti */
+  .confetti{position:fixed;width:14px;height:14px;top:-20px;pointer-events:none;z-index:9500;animation:confetti-fall linear forwards;border-radius:50%}
+  @keyframes confetti-fall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(110vh) rotate(540deg)}}
+
+  /* Start screen */
+  .start-screen{text-align:center;padding:20px 18px}
+  .start-screen .crown{font-size:80px;margin-bottom:6px;display:inline-block;animation:crown-float 3s ease-in-out infinite}
+  @keyframes crown-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .start-screen .tagline{color:var(--text);font-size:16px;margin-bottom:20px;font-weight:800;background:linear-gradient(135deg, var(--primary-soft) 0%, var(--gold-soft) 100%);border-radius:24px;padding:10px 20px;display:inline-block;box-shadow:0 4px 0 var(--primary)}
+  .stage-info{background:#FFFEF7;border-radius:20px;box-shadow:0 5px 0 var(--accent-soft);padding:18px;margin:18px 0;font-size:15px;line-height:1.8;font-weight:700;text-align:left}
+
+  /* Nav */
+  .nav{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+  .nav .btn{flex:1;min-width:130px}
+
+  /* Hint */
+  .hint-box{background:#FFF0F5;border-left:5px solid var(--primary);border-radius:14px;padding:12px 14px;margin-top:10px;font-size:14px;line-height:1.7;color:var(--text);font-weight:600;box-shadow:0 3px 0 var(--primary-soft)}
+  .hint-box strong{color:var(--orange)}
+
+  /* 分類框（Q5） */
+  .category-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+  .category-box{
+    background:white;border:3px dashed var(--accent);border-radius:18px;
+    padding:14px;min-height:90px;
+    text-align:center;font-weight:800;color:var(--text);
+    transition:all 0.2s;
+  }
+  .category-box.hover{background:var(--accent-soft);border-color:var(--primary);transform:scale(1.04)}
+  .category-box.cleared{background:var(--success-soft);border:3px solid var(--success);border-style:solid;color:#3E8E5E}
+  .category-box .label{font-size:14px;margin-bottom:6px}
+  .category-box .slot{font-size:32px;min-height:40px;display:flex;align-items:center;justify-content:center}
+
+  .kite-tray{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0;padding:10px;background:#FFFEF5;border-radius:18px;border:2px dashed var(--gold)}
+  .kite-item{font-size:48px;cursor:grab;transition:transform 0.2s;filter:drop-shadow(0 3px 4px rgba(0,0,0,0.15))}
+  .kite-item:hover{transform:scale(1.2)}
+  .kite-item:active{cursor:grabbing;transform:scale(1.3)}
+  .kite-item.dragging{opacity:0.4}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- 開始畫面 -->
+  <section id="screen-start" class="card start-screen">
+    <div class="crown">🪁</div>
+    <h1>風箏館大冒險</h1>
+    <p class="tagline">🌟 4-3 預習探索 · 6/10 (三)</p>
+    <div style="margin:18px 0">
+      <label style="display:block;margin-bottom:8px;color:var(--primary);font-weight:900">請輸入你的暱稱</label>
+      <input id="nick-input" class="input" type="text" placeholder="例：小新、艾妲、神槍手" maxlength="12" autocomplete="off">
+    </div>
+    <div class="stage-info">
+      🎯 任務內容：5 個風箏館探索<br>
+      ✨ 玩法：拖拉、觀察、發現秘密<br>
+      💎 沒有對錯！只有探索！<br>
+      🪁 完成全部 → 風箏王
+    </div>
+    <button id="start-btn" class="btn btn-gold" style="width:100%;font-size:18px;min-height:62px">🪁 出發！進入冬山風箏館</button>
+  </section>
+
+  <!-- 探索畫面 -->
+  <section id="screen-quest" style="display:none">
+    <div class="hud">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <span class="hud-nick">🪁 <span id="hud-name">召喚師</span></span>
+        <span class="hud-stat hud-coins">💰 <span id="hud-coins">0</span></span>
+      </div>
+      <div class="progress" id="hud-progress"></div>
+    </div>
+    <div class="card" id="quest-card"></div>
+  </section>
+
+  <!-- 勝利畫面 -->
+  <section id="screen-victory" style="display:none">
+    <div class="card" style="text-align:center;padding:28px">
+      <div style="font-size:80px;animation:kite-float 1.5s infinite">🏆</div>
+      <h1>風箏館大冒險完成！</h1>
+      <p style="color:var(--text);margin:14px 0;font-weight:700">
+        召喚師 <strong style="color:var(--primary)" id="vic-name">XXX</strong> 探索了所有風箏的秘密！
+      </p>
+      <div style="background:linear-gradient(135deg, var(--gold-soft), var(--primary-soft), var(--accent-soft));border-radius:24px;padding:24px;margin:18px 0;box-shadow:0 6px 0 var(--primary)">
+        <div style="font-size:64px;font-weight:900;color:var(--orange);text-shadow:0 4px 0 rgba(74,68,88,0.15)">
+          💰 <span id="vic-coins">0</span>
+        </div>
+        <div style="font-size:13px;color:var(--text);margin-top:4px;font-weight:800">探索金幣</div>
+      </div>
+      <div style="background:#FFF0F5;border-radius:18px;padding:16px;margin:14px 0;text-align:left;font-size:14px;line-height:1.9;color:var(--text);font-weight:600">
+        <strong style="color:var(--primary);font-size:15px">🎁 你發現的 3 個秘密：</strong><br>
+        1️⃣ <strong>鳶形</strong>＝兩組鄰邊等長<br>
+        2️⃣ <strong>菱形</strong>＝四邊都等長<br>
+        3️⃣ <strong>對角線</strong>有時候會「互相垂直」+ 「平分」
+      </div>
+      <div id="vic-status" style="background:var(--accent-soft);color:#3676B2;padding:14px;border-radius:16px;text-align:center;font-weight:800;margin:14px 0">
+        ⏳ 正在把你的探索送給老師...
+      </div>
+      <button class="btn btn-ghost" style="width:100%" onclick="restart()">🔄 再玩一次</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+'use strict';
+
+const FB_PATH_REF = 'submissions/special_quad_explore_0610';
+
+const state = {
+  nick: '',
+  startTime: 0,
+  currentQ: 0,
+  coins: 0,
+  completed: [false, false, false, false, false],
+};
+
+const TASKS = [
+  {
+    title: '🪁 冬山風箏館：拖風箏到展示位',
+    mission: '請把 3 個風箏「拖到」上方的展示框！每個展示位置都要有風箏喔～',
+    setup: setupQ1, check: checkQ1, reward: 30,
+  },
+  {
+    title: '🌟 鳶形誕生：找出「兩組鄰邊等長」',
+    mission: '拖 B 點跟 D 點，讓「AB=AD」+「CB=CD」同時成立！',
+    setup: setupQ2, check: checkQ2, reward: 50,
+  },
+  {
+    title: '💎 菱形挑戰：四條邊都一樣長',
+    mission: '繼續拖 4 個頂點，目標：4 條邊都相等（誤差 ≤ 0.3）',
+    setup: setupQ3, check: checkQ3, reward: 80,
+  },
+  {
+    title: '⚡ 對角線秘密：垂直 + 平分',
+    mission: '拖 A、C 點觀察兩條對角線。AC ⊥ BD 嗎？OB = OD 嗎？',
+    setup: setupQ4, check: checkQ4, reward: 80,
+  },
+  {
+    title: '🏆 BOSS：風箏分類學家',
+    mission: '4 個風箏拖到正確分類框！（提示：紅=鳶形、藍=菱形、紫=正方形、黃=長方形）',
+    setup: setupQ5, check: checkQ5, reward: 120,
+  },
+];
+
+/* ============ Drag helper ============ */
+function makeDraggable(el, onMove) {
+  let dragging = false, startPt = null, startT = null;
+  function getPos(e) {
+    const svg = el.ownerSVGElement;
+    const pt = svg.createSVGPoint();
+    const evt = e.touches ? e.touches[0] : e;
+    pt.x = evt.clientX; pt.y = evt.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+  function getTransform() {
+    const t = el.getAttribute('transform') || 'translate(0,0)';
+    const m = t.match(/translate\(([^,)\s]+)[\s,]+([^)]+)\)/);
+    return m ? {x:parseFloat(m[1]),y:parseFloat(m[2])} : {x:0,y:0};
+  }
+  function onStart(e){
+    e.preventDefault();
+    dragging = true;
+    startPt = getPos(e);
+    startT = getTransform();
+  }
+  function onMv(e){
+    if(!dragging) return;
+    e.preventDefault();
+    const p = getPos(e);
+    const nx = startT.x + (p.x - startPt.x);
+    const ny = startT.y + (p.y - startPt.y);
+    el.setAttribute('transform', `translate(${nx}, ${ny})`);
+    if(onMove) onMove(nx, ny);
+  }
+  function onEnd(){ dragging = false; }
+  el.addEventListener('mousedown', onStart);
+  window.addEventListener('mousemove', onMv);
+  window.addEventListener('mouseup', onEnd);
+  el.addEventListener('touchstart', onStart, {passive:false});
+  window.addEventListener('touchmove', onMv, {passive:false});
+  window.addEventListener('touchend', onEnd);
+}
+
+/* ============ Q1: 風箏拖到展示位 ============ */
+function setupQ1() {
+  const card = document.getElementById('quest-card');
+  const t = TASKS[0];
+  card.innerHTML = `
+    <h2>${t.title}</h2>
+    <div class="task-mission">${t.mission}</div>
+    <div class="stage">
+      <svg viewBox="0 0 660 320" xmlns="http://www.w3.org/2000/svg">
+        <!-- 3 個展示位（虛線框） -->
+        <rect x="80" y="40" width="120" height="100" rx="14" fill="#FFFEF5" stroke="#FFB3C7" stroke-width="3" stroke-dasharray="6 4"/>
+        <text x="140" y="98" text-anchor="middle" fill="#FFB3C7" font-size="18" font-weight="900">展示 1</text>
+        <rect x="270" y="40" width="120" height="100" rx="14" fill="#FFFEF5" stroke="#A5D8FF" stroke-width="3" stroke-dasharray="6 4"/>
+        <text x="330" y="98" text-anchor="middle" fill="#A5D8FF" font-size="18" font-weight="900">展示 2</text>
+        <rect x="460" y="40" width="120" height="100" rx="14" fill="#FFFEF5" stroke="#FFE066" stroke-width="3" stroke-dasharray="6 4"/>
+        <text x="520" y="98" text-anchor="middle" fill="#D4A800" font-size="18" font-weight="900">展示 3</text>
+        <!-- 3 個風箏（可拖） -->
+        <g id="kite-a" class="draggable" transform="translate(80, 200)">
+          <text font-size="68" text-anchor="middle">🪁</text>
+        </g>
+        <g id="kite-b" class="draggable" transform="translate(280, 200)">
+          <text font-size="68" text-anchor="middle">🪁</text>
+        </g>
+        <g id="kite-c" class="draggable" transform="translate(480, 200)">
+          <text font-size="68" text-anchor="middle">🪁</text>
+        </g>
+      </svg>
+    </div>
+    <div class="goal-box" id="q1-goal">🎯 把 3 個風箏都拖到展示位！(0 / 3)</div>
+    <div class="hint-box">💡 提示：用手指（或滑鼠）按住 🪁，慢慢拖到上面的虛線框。冬山風箏館要開幕囉！</div>
+  `;
+  // 設定 draggable
+  ['kite-a','kite-b','kite-c'].forEach(id => {
+    const el = document.getElementById(id);
+    makeDraggable(el, () => checkQ1());
+  });
+}
+
+function inBox(el, bx, by, bw, bh) {
+  const t = el.getAttribute('transform').match(/translate\(([^,)\s]+)[\s,]+([^)]+)\)/);
+  const x = parseFloat(t[1]), y = parseFloat(t[2]);
+  // 風箏的 emoji 在 (x, y) 是中心
+  return x >= bx && x <= bx + bw && y >= by && y <= by + bh;
+}
+
+function checkQ1() {
+  const boxes = [[80,40,120,100], [270,40,120,100], [460,40,120,100]];
+  const kites = ['kite-a','kite-b','kite-c'];
+  let inside = 0;
+  // 每個展示位至少有 1 隻風箏
+  const occupied = boxes.map(b => kites.some(k => inBox(document.getElementById(k), ...b)));
+  inside = occupied.filter(Boolean).length;
+  const goal = document.getElementById('q1-goal');
+  if (inside === 3) {
+    if (!state.completed[0]) {
+      state.completed[0] = true;
+      completeTask(0, '🪁 風箏館開幕了！');
+    }
+    goal.classList.add('cleared');
+    goal.innerHTML = '✅ 風箏館開幕！每個展示位都有風箏了！';
+  } else {
+    goal.innerHTML = `🎯 把 3 個風箏都拖到展示位！(${inside} / 3)`;
+  }
+}
+
+/* ============ Q2: 鳶形誕生（兩組鄰邊等長） ============ */
+const KITE_CENTER = {ax: 330, by: 60, cy: 260, dx_off: 80};
+function setupQ2() {
+  const card = document.getElementById('quest-card');
+  const t = TASKS[1];
+  card.innerHTML = `
+    <h2>${t.title}</h2>
+    <div class="task-mission">${t.mission}</div>
+    <div class="stage">
+      <svg viewBox="0 0 660 360" xmlns="http://www.w3.org/2000/svg">
+        <polygon id="q2-shape" fill="rgba(255,179,199,0.2)" stroke="#FFB3C7" stroke-width="3"/>
+        <line id="q2-diag-ac" stroke="#A5D8FF" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.5"/>
+        <line id="q2-diag-bd" stroke="#A5D8FF" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.5"/>
+        <!-- 邊長標籤 -->
+        <text id="q2-lbl-ab" font-size="14" font-weight="900" fill="#4A4458"></text>
+        <text id="q2-lbl-ad" font-size="14" font-weight="900" fill="#4A4458"></text>
+        <text id="q2-lbl-cb" font-size="14" font-weight="900" fill="#4A4458"></text>
+        <text id="q2-lbl-cd" font-size="14" font-weight="900" fill="#4A4458"></text>
+        <!-- 頂點 (A 上、C 下固定，B 左、D 右可拖) -->
+        <g id="q2-pt-a">
+          <circle cx="0" cy="0" r="14" fill="#FFE066" stroke="#4A4458" stroke-width="2.5"/>
+          <text x="0" y="5" text-anchor="middle" font-size="16" font-weight="900" fill="#4A4458">A</text>
+        </g>
+        <g id="q2-pt-c">
+          <circle cx="0" cy="0" r="14" fill="#FFE066" stroke="#4A4458" stroke-width="2.5"/>
+          <text x="0" y="5" text-anchor="middle" font-size="16" font-weight="900" fill="#4A4458">C</text>
+        </g>
+        <g id="q2-pt-b" class="draggable">
+          <circle cx="0" cy="0" r="18" fill="#FF8FA3" stroke="#4A4458" stroke-width="3"/>
+          <text x="0" y="5" text-anchor="middle" font-size="18" font-weight="900" fill="white">B</text>
+        </g>
+        <g id="q2-pt-d" class="draggable">
+          <circle cx="0" cy="0" r="18" fill="#A5D8FF" stroke="#4A4458" stroke-width="3"/>
+          <text x="0" y="5" text-anchor="middle" font-size="18" font-weight="900" fill="white">D</text>
+        </g>
+      </svg>
+    </div>
+    <div class="live-panel">
+      <div class="live-card" id="q2-card-ab"><div class="lbl">AB</div><div class="val" id="q2-val-ab">0</div></div>
+      <div class="live-card" id="q2-card-ad"><div class="lbl">AD</div><div class="val" id="q2-val-ad">0</div></div>
+      <div class="live-card" id="q2-card-cb"><div class="lbl">CB</div><div class="val" id="q2-val-cb">0</div></div>
+      <div class="live-card" id="q2-card-cd"><div class="lbl">CD</div><div class="val" id="q2-val-cd">0</div></div>
+    </div>
+    <div class="goal-box" id="q2-goal">🎯 目標：AB = AD 且 CB = CD（兩組鄰邊等長）</div>
+    <div class="hint-box">💡 <strong>提示</strong>：A 點固定在頂、C 點固定在底。把 B 點 D 點左右拖，讓「上面兩條邊（AB、AD）一樣長」+「下面兩條邊（CB、CD）一樣長」 → 鳶形誕生！</div>
+  `;
+  // 初始位置
+  const A = {x:330, y:60}, C = {x:330, y:280};
+  let B = {x:200, y:170}, D = {x:460, y:170};
+  document.getElementById('q2-pt-a').setAttribute('transform', `translate(${A.x},${A.y})`);
+  document.getElementById('q2-pt-c').setAttribute('transform', `translate(${C.x},${C.y})`);
+  document.getElementById('q2-pt-b').setAttribute('transform', `translate(${B.x},${B.y})`);
+  document.getElementById('q2-pt-d').setAttribute('transform', `translate(${D.x},${D.y})`);
+  state._q2 = {A, C, B, D};
+  drawQ2();
+  makeDraggable(document.getElementById('q2-pt-b'), (nx, ny) => {
+    nx = Math.max(60, Math.min(310, nx));
+    ny = Math.max(80, Math.min(280, ny));
+    document.getElementById('q2-pt-b').setAttribute('transform', `translate(${nx},${ny})`);
+    state._q2.B = {x:nx, y:ny};
+    drawQ2();
+  });
+  makeDraggable(document.getElementById('q2-pt-d'), (nx, ny) => {
+    nx = Math.max(350, Math.min(620, nx));
+    ny = Math.max(80, Math.min(280, ny));
+    document.getElementById('q2-pt-d').setAttribute('transform', `translate(${nx},${ny})`);
+    state._q2.D = {x:nx, y:ny};
+    drawQ2();
+  });
+}
+
+function dist(p1, p2) {
+  return Math.sqrt(Math.pow(p1.x-p2.x,2) + Math.pow(p1.y-p2.y,2)) / 30;  // 1 公分 = 30 px
+}
+
+function drawQ2() {
+  const {A, C, B, D} = state._q2;
+  document.getElementById('q2-shape').setAttribute('points', `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y} ${D.x},${D.y}`);
+  document.getElementById('q2-diag-ac').setAttribute('x1', A.x); document.getElementById('q2-diag-ac').setAttribute('y1', A.y);
+  document.getElementById('q2-diag-ac').setAttribute('x2', C.x); document.getElementById('q2-diag-ac').setAttribute('y2', C.y);
+  document.getElementById('q2-diag-bd').setAttribute('x1', B.x); document.getElementById('q2-diag-bd').setAttribute('y1', B.y);
+  document.getElementById('q2-diag-bd').setAttribute('x2', D.x); document.getElementById('q2-diag-bd').setAttribute('y2', D.y);
+  // 邊長
+  const AB = dist(A,B), AD = dist(A,D), CB = dist(C,B), CD = dist(C,D);
+  const fmt = v => v.toFixed(1);
+  document.getElementById('q2-val-ab').textContent = fmt(AB);
+  document.getElementById('q2-val-ad').textContent = fmt(AD);
+  document.getElementById('q2-val-cb').textContent = fmt(CB);
+  document.getElementById('q2-val-cd').textContent = fmt(CD);
+  // 邊長標籤位置（線中點）
+  const setLbl = (id, p1, p2, val, ox=0, oy=0) => {
+    const lbl = document.getElementById(id);
+    lbl.setAttribute('x', (p1.x+p2.x)/2 + ox);
+    lbl.setAttribute('y', (p1.y+p2.y)/2 + oy);
+    lbl.textContent = fmt(val);
+  };
+  setLbl('q2-lbl-ab', A, B, AB, -16, 0);
+  setLbl('q2-lbl-ad', A, D, AD, 16, 0);
+  setLbl('q2-lbl-cb', C, B, CB, -16, 0);
+  setLbl('q2-lbl-cd', C, D, CD, 16, 0);
+  // 配對檢查（誤差 0.4 公分）
+  const matchAB_AD = Math.abs(AB-AD) <= 0.4;
+  const matchCB_CD = Math.abs(CB-CD) <= 0.4;
+  document.getElementById('q2-card-ab').classList.toggle('match', matchAB_AD);
+  document.getElementById('q2-card-ad').classList.toggle('match', matchAB_AD);
+  document.getElementById('q2-card-cb').classList.toggle('match', matchCB_CD);
+  document.getElementById('q2-card-cd').classList.toggle('match', matchCB_CD);
+  checkQ2();
+}
+
+function checkQ2() {
+  const {A, C, B, D} = state._q2;
+  const AB = dist(A,B), AD = dist(A,D), CB = dist(C,B), CD = dist(C,D);
+  const ok = Math.abs(AB-AD) <= 0.4 && Math.abs(CB-CD) <= 0.4;
+  const goal = document.getElementById('q2-goal');
+  if (ok) {
+    if (!state.completed[1]) {
+      state.completed[1] = true;
+      completeTask(1, '🌟 鳶形誕生！');
+    }
+    goal.classList.add('cleared');
+    goal.innerHTML = '✅ 鳶形誕生！兩組鄰邊都相等了！這就是「鳶形」(kite)';
+    document.getElementById('q2-shape').setAttribute('fill', 'rgba(149,213,178,0.4)');
+    document.getElementById('q2-shape').setAttribute('stroke', '#95D5B2');
+  } else {
+    goal.innerHTML = '🎯 目標：AB = AD 且 CB = CD（兩組鄰邊等長）';
+    document.getElementById('q2-shape').setAttribute('fill', 'rgba(255,179,199,0.2)');
+    document.getElementById('q2-shape').setAttribute('stroke', '#FFB3C7');
+  }
+}
+
+/* ============ Q3: 菱形挑戰（四邊都等長） ============ */
+function setupQ3() {
+  setupQ2.call(null);  // 用同樣架構
+  // 修改任務說明
+  const card = document.getElementById('quest-card');
+  const t = TASKS[2];
+  card.querySelector('h2').textContent = t.title;
+  card.querySelector('.task-mission').innerHTML = t.mission;
+  card.querySelector('.hint-box').innerHTML = '💡 <strong>提示</strong>：拖到 4 條邊（AB、AD、CB、CD）「全部相等」！誤差 ≤ 0.3 算過關。菱形的特色就是「四邊等長」！';
+  // 把 q2 全部 id 改 q3
+  card.innerHTML = card.innerHTML.replace(/q2-/g, 'q3-');
+  // 重新綁定（因為 innerHTML 換了，listener 沒了）
+  const A = {x:330, y:60}, C = {x:330, y:280};
+  let B = {x:200, y:170}, D = {x:460, y:170};
+  document.getElementById('q3-pt-a').setAttribute('transform', `translate(${A.x},${A.y})`);
+  document.getElementById('q3-pt-c').setAttribute('transform', `translate(${C.x},${C.y})`);
+  document.getElementById('q3-pt-b').setAttribute('transform', `translate(${B.x},${B.y})`);
+  document.getElementById('q3-pt-d').setAttribute('transform', `translate(${D.x},${D.y})`);
+  state._q3 = {A:Object.assign({},A), C:Object.assign({},C), B, D};
+  drawQ3();
+  // A 也可以拖（讓菱形更靈活）
+  makeDraggable(document.getElementById('q3-pt-a'), (nx, ny) => {
+    nx = Math.max(40, Math.min(620, nx)); ny = Math.max(20, Math.min(150, ny));
+    document.getElementById('q3-pt-a').setAttribute('transform', `translate(${nx},${ny})`);
+    state._q3.A = {x:nx, y:ny}; drawQ3();
+  });
+  makeDraggable(document.getElementById('q3-pt-c'), (nx, ny) => {
+    nx = Math.max(40, Math.min(620, nx)); ny = Math.max(200, Math.min(340, ny));
+    document.getElementById('q3-pt-c').setAttribute('transform', `translate(${nx},${ny})`);
+    state._q3.C = {x:nx, y:ny}; drawQ3();
+  });
+  makeDraggable(document.getElementById('q3-pt-b'), (nx, ny) => {
+    nx = Math.max(40, Math.min(310, nx)); ny = Math.max(80, Math.min(280, ny));
+    document.getElementById('q3-pt-b').setAttribute('transform', `translate(${nx},${ny})`);
+    state._q3.B = {x:nx, y:ny}; drawQ3();
+  });
+  makeDraggable(document.getElementById('q3-pt-d'), (nx, ny) => {
+    nx = Math.max(350, Math.min(620, nx)); ny = Math.max(80, Math.min(280, ny));
+    document.getElementById('q3-pt-d').setAttribute('transform', `translate(${nx},${ny})`);
+    state._q3.D = {x:nx, y:ny}; drawQ3();
+  });
+}
+
+function drawQ3() {
+  const {A, C, B, D} = state._q3;
+  document.getElementById('q3-shape').setAttribute('points', `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y} ${D.x},${D.y}`);
+  document.getElementById('q3-diag-ac').setAttribute('x1', A.x); document.getElementById('q3-diag-ac').setAttribute('y1', A.y);
+  document.getElementById('q3-diag-ac').setAttribute('x2', C.x); document.getElementById('q3-diag-ac').setAttribute('y2', C.y);
+  document.getElementById('q3-diag-bd').setAttribute('x1', B.x); document.getElementById('q3-diag-bd').setAttribute('y1', B.y);
+  document.getElementById('q3-diag-bd').setAttribute('x2', D.x); document.getElementById('q3-diag-bd').setAttribute('y2', D.y);
+  const AB = dist(A,B), AD = dist(A,D), CB = dist(C,B), CD = dist(C,D);
+  const fmt = v => v.toFixed(1);
+  document.getElementById('q3-val-ab').textContent = fmt(AB);
+  document.getElementById('q3-val-ad').textContent = fmt(AD);
+  document.getElementById('q3-val-cb').textContent = fmt(CB);
+  document.getElementById('q3-val-cd').textContent = fmt(CD);
+  const setLbl = (id, p1, p2, val, ox=0, oy=0) => {
+    const lbl = document.getElementById(id);
+    lbl.setAttribute('x', (p1.x+p2.x)/2 + ox);
+    lbl.setAttribute('y', (p1.y+p2.y)/2 + oy);
+    lbl.textContent = fmt(val);
+  };
+  setLbl('q3-lbl-ab', A, B, AB, -16, 0);
+  setLbl('q3-lbl-ad', A, D, AD, 16, 0);
+  setLbl('q3-lbl-cb', C, B, CB, -16, 0);
+  setLbl('q3-lbl-cd', C, D, CD, 16, 0);
+  // 4 邊都接近相等？
+  const avg = (AB+AD+CB+CD)/4;
+  const allMatch = Math.abs(AB-avg)<=0.3 && Math.abs(AD-avg)<=0.3 && Math.abs(CB-avg)<=0.3 && Math.abs(CD-avg)<=0.3;
+  ['q3-card-ab','q3-card-ad','q3-card-cb','q3-card-cd'].forEach(id => {
+    document.getElementById(id).classList.toggle('match', allMatch);
+  });
+  checkQ3();
+}
+
+function checkQ3() {
+  const {A, C, B, D} = state._q3;
+  const AB = dist(A,B), AD = dist(A,D), CB = dist(C,B), CD = dist(C,D);
+  const avg = (AB+AD+CB+CD)/4;
+  const ok = Math.abs(AB-avg)<=0.3 && Math.abs(AD-avg)<=0.3 && Math.abs(CB-avg)<=0.3 && Math.abs(CD-avg)<=0.3;
+  const goal = document.getElementById('q3-goal');
+  if (ok) {
+    if (!state.completed[2]) {
+      state.completed[2] = true;
+      completeTask(2, '💎 菱形大師！');
+    }
+    goal.classList.add('cleared');
+    goal.innerHTML = '✅ 菱形大師！四邊都等長 → 這就是「菱形」(rhombus)';
+    document.getElementById('q3-shape').setAttribute('fill', 'rgba(208,191,255,0.4)');
+    document.getElementById('q3-shape').setAttribute('stroke', '#D0BFFF');
+  } else {
+    goal.innerHTML = '🎯 目標：4 條邊都相等！(現在 AB=' + AB.toFixed(1) + ', AD=' + AD.toFixed(1) + ', CB=' + CB.toFixed(1) + ', CD=' + CD.toFixed(1) + ')';
+    document.getElementById('q3-shape').setAttribute('fill', 'rgba(255,179,199,0.2)');
+    document.getElementById('q3-shape').setAttribute('stroke', '#FFB3C7');
+  }
+}
+
+/* ============ Q4: 對角線秘密 ============ */
+function setupQ4() {
+  const card = document.getElementById('quest-card');
+  const t = TASKS[3];
+  card.innerHTML = `
+    <h2>${t.title}</h2>
+    <div class="task-mission">${t.mission}</div>
+    <div class="stage">
+      <svg viewBox="0 0 660 360" xmlns="http://www.w3.org/2000/svg">
+        <polygon id="q4-shape" fill="rgba(208,191,255,0.3)" stroke="#D0BFFF" stroke-width="3"/>
+        <line id="q4-diag-ac" stroke="#FFB3C7" stroke-width="4"/>
+        <line id="q4-diag-bd" stroke="#A5D8FF" stroke-width="4"/>
+        <circle id="q4-O" r="6" fill="#FF6600" stroke="#4A4458" stroke-width="2.5"/>
+        <text id="q4-O-lbl" font-size="14" font-weight="900" fill="#FF6600"></text>
+        <g id="q4-pt-a" class="draggable">
+          <circle cx="0" cy="0" r="18" fill="#FFE066" stroke="#4A4458" stroke-width="3"/>
+          <text x="0" y="5" text-anchor="middle" font-size="18" font-weight="900" fill="#4A4458">A</text>
+        </g>
+        <g id="q4-pt-c" class="draggable">
+          <circle cx="0" cy="0" r="18" fill="#FFE066" stroke="#4A4458" stroke-width="3"/>
+          <text x="0" y="5" text-anchor="middle" font-size="18" font-weight="900" fill="#4A4458">C</text>
+        </g>
+        <g id="q4-pt-b" class="draggable">
+          <circle cx="0" cy="0" r="18" fill="#FF8FA3" stroke="#4A4458" stroke-width="3"/>
+          <text x="0" y="5" text-anchor="middle" font-size="18" font-weight="900" fill="white">B</text>
+        </g>
+        <g id="q4-pt-d" class="draggable">
+          <circle cx="0" cy="0" r="18" fill="#A5D8FF" stroke="#4A4458" stroke-width="3"/>
+          <text x="0" y="5" text-anchor="middle" font-size="18" font-weight="900" fill="white">D</text>
+        </g>
+      </svg>
+    </div>
+    <div class="live-panel">
+      <div class="live-card" id="q4-card-perp"><div class="lbl">AC ⊥ BD?</div><div class="val" id="q4-val-perp">?</div></div>
+      <div class="live-card" id="q4-card-bisect"><div class="lbl">OB = OD?</div><div class="val" id="q4-val-bisect">?</div></div>
+      <div class="live-card"><div class="lbl">夾角</div><div class="val" id="q4-val-angle">?</div></div>
+    </div>
+    <div class="goal-box" id="q4-goal">🎯 目標：兩條對角線「垂直」(90°) + 「OB = OD 平分」</div>
+    <div class="hint-box">💡 <strong>提示</strong>：拖 4 個點，讓兩條對角線 <span style="color:#FFB3C7">AC</span>（粉紅）跟 <span style="color:#A5D8FF">BD</span>（藍）變成 <strong>90° 直角</strong>，並且 O 點剛好在 BD 的中間！</div>
+  `;
+  const A = {x:330, y:60}, C = {x:330, y:300}, B = {x:160, y:180}, D = {x:500, y:180};
+  document.getElementById('q4-pt-a').setAttribute('transform', `translate(${A.x},${A.y})`);
+  document.getElementById('q4-pt-c').setAttribute('transform', `translate(${C.x},${C.y})`);
+  document.getElementById('q4-pt-b').setAttribute('transform', `translate(${B.x},${B.y})`);
+  document.getElementById('q4-pt-d').setAttribute('transform', `translate(${D.x},${D.y})`);
+  state._q4 = {A:Object.assign({},A), C:Object.assign({},C), B:Object.assign({},B), D:Object.assign({},D)};
+  drawQ4();
+  ['a','b','c','d'].forEach(n => {
+    makeDraggable(document.getElementById('q4-pt-'+n), (nx, ny) => {
+      nx = Math.max(40, Math.min(620, nx)); ny = Math.max(20, Math.min(340, ny));
+      document.getElementById('q4-pt-'+n).setAttribute('transform', `translate(${nx},${ny})`);
+      state._q4[n.toUpperCase()] = {x:nx, y:ny};
+      drawQ4();
+    });
+  });
+}
+
+function drawQ4() {
+  const {A, C, B, D} = state._q4;
+  document.getElementById('q4-shape').setAttribute('points', `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y} ${D.x},${D.y}`);
+  document.getElementById('q4-diag-ac').setAttribute('x1', A.x); document.getElementById('q4-diag-ac').setAttribute('y1', A.y);
+  document.getElementById('q4-diag-ac').setAttribute('x2', C.x); document.getElementById('q4-diag-ac').setAttribute('y2', C.y);
+  document.getElementById('q4-diag-bd').setAttribute('x1', B.x); document.getElementById('q4-diag-bd').setAttribute('y1', B.y);
+  document.getElementById('q4-diag-bd').setAttribute('x2', D.x); document.getElementById('q4-diag-bd').setAttribute('y2', D.y);
+  // 兩線交點 O
+  const O = lineIntersect(A, C, B, D);
+  if (O) {
+    document.getElementById('q4-O').setAttribute('cx', O.x);
+    document.getElementById('q4-O').setAttribute('cy', O.y);
+    document.getElementById('q4-O-lbl').setAttribute('x', O.x+10);
+    document.getElementById('q4-O-lbl').setAttribute('y', O.y+5);
+    document.getElementById('q4-O-lbl').textContent = 'O';
+  }
+  // 角度
+  const v1 = {x:C.x-A.x, y:C.y-A.y};
+  const v2 = {x:D.x-B.x, y:D.y-B.y};
+  const dot = v1.x*v2.x + v1.y*v2.y;
+  const m1 = Math.sqrt(v1.x*v1.x+v1.y*v1.y), m2 = Math.sqrt(v2.x*v2.x+v2.y*v2.y);
+  let cos = dot/(m1*m2); cos = Math.max(-1,Math.min(1,cos));
+  let ang = Math.acos(Math.abs(cos)) * 180 / Math.PI;
+  document.getElementById('q4-val-angle').textContent = ang.toFixed(0) + '°';
+  const perpOk = Math.abs(ang-90) <= 6;
+  document.getElementById('q4-val-perp').textContent = perpOk ? '✓' : '✗';
+  document.getElementById('q4-card-perp').classList.toggle('match', perpOk);
+  // O 是否平分 BD？
+  let bisectOk = false;
+  if (O) {
+    const OB = dist(O, B), OD = dist(O, D);
+    bisectOk = Math.abs(OB-OD) <= 0.3;
+    document.getElementById('q4-val-bisect').textContent = bisectOk ? '✓' : '✗';
+    document.getElementById('q4-card-bisect').classList.toggle('match', bisectOk);
+  }
+  checkQ4(perpOk, bisectOk);
+}
+
+function lineIntersect(p1, p2, p3, p4) {
+  const x1=p1.x, y1=p1.y, x2=p2.x, y2=p2.y, x3=p3.x, y3=p3.y, x4=p4.x, y4=p4.y;
+  const d = (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4);
+  if (Math.abs(d) < 0.001) return null;
+  const t = ((x1-x3)*(y3-y4) - (y1-y3)*(x3-x4)) / d;
+  return {x:x1+t*(x2-x1), y:y1+t*(y2-y1)};
+}
+
+function checkQ4(perpOk, bisectOk) {
+  const goal = document.getElementById('q4-goal');
+  if (perpOk && bisectOk) {
+    if (!state.completed[3]) {
+      state.completed[3] = true;
+      completeTask(3, '⚡ 對角線秘密 GET！');
+    }
+    goal.classList.add('cleared');
+    goal.innerHTML = '✅ 找到了！對角線「垂直」+「平分」！這是<strong>鳶形/菱形</strong>的特殊性質！';
+  } else {
+    goal.innerHTML = '🎯 目標：AC ⊥ BD（' + (perpOk?'✓':'快了！') + '）+ OB = OD（' + (bisectOk?'✓':'O 點要在中間') + '）';
+  }
+}
+
+/* ============ Q5: BOSS 風箏分類 ============ */
+function setupQ5() {
+  const card = document.getElementById('quest-card');
+  const t = TASKS[4];
+  card.innerHTML = `
+    <h2>${t.title}</h2>
+    <div class="task-mission">${t.mission}</div>
+    <div class="kite-tray" id="q5-tray">
+      <span class="kite-item" draggable="true" data-id="kite1" data-type="kite" title="鳶形">🪁</span>
+      <span class="kite-item" draggable="true" data-id="kite2" data-type="rhombus" title="菱形">🔷</span>
+      <span class="kite-item" draggable="true" data-id="kite3" data-type="square" title="正方形">🟪</span>
+      <span class="kite-item" draggable="true" data-id="kite4" data-type="rect" title="長方形">🟨</span>
+    </div>
+    <div class="category-grid">
+      <div class="category-box" data-accept="kite">
+        <div class="label">🟥 鳶形（兩組鄰邊等長）</div>
+        <div class="slot"></div>
+      </div>
+      <div class="category-box" data-accept="rhombus">
+        <div class="label">🟦 菱形（四邊都等長）</div>
+        <div class="slot"></div>
+      </div>
+      <div class="category-box" data-accept="square">
+        <div class="label">🟪 正方形（四邊等 + 四角直）</div>
+        <div class="slot"></div>
+      </div>
+      <div class="category-box" data-accept="rect">
+        <div class="label">🟨 長方形（對邊等 + 四角直）</div>
+        <div class="slot"></div>
+      </div>
+    </div>
+    <div class="goal-box" id="q5-goal">🎯 把 4 個風箏拖到正確分類！(0 / 4)</div>
+    <div class="hint-box">💡 <strong>提示</strong>：每個 emoji 顏色都對應一個分類框，顏色配對好就是答案！</div>
+  `;
+  // HTML5 drag and drop
+  let dragId = null;
+  document.querySelectorAll('.kite-item').forEach(item => {
+    item.addEventListener('dragstart', e => {
+      dragId = item.dataset.id;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    item.addEventListener('dragend', () => item.classList.remove('dragging'));
+    // Touch fallback
+    let touchTarget = null;
+    item.addEventListener('touchstart', e => {
+      dragId = item.dataset.id;
+      touchTarget = item;
+      item.classList.add('dragging');
+    });
+    item.addEventListener('touchmove', e => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      document.querySelectorAll('.category-box').forEach(b => b.classList.remove('hover'));
+      const box = el && el.closest('.category-box');
+      if (box) box.classList.add('hover');
+    }, {passive:false});
+    item.addEventListener('touchend', e => {
+      item.classList.remove('dragging');
+      const touch = e.changedTouches[0];
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      const box = el && el.closest('.category-box');
+      document.querySelectorAll('.category-box').forEach(b => b.classList.remove('hover'));
+      if (box) tryDropQ5(box, item);
+    });
+  });
+  document.querySelectorAll('.category-box').forEach(box => {
+    box.addEventListener('dragover', e => {e.preventDefault(); box.classList.add('hover')});
+    box.addEventListener('dragleave', () => box.classList.remove('hover'));
+    box.addEventListener('drop', e => {
+      e.preventDefault();
+      box.classList.remove('hover');
+      if (!dragId) return;
+      const item = document.querySelector(`.kite-item[data-id="${dragId}"]`);
+      tryDropQ5(box, item);
+    });
+  });
+}
+
+function tryDropQ5(box, item) {
+  if (box.classList.contains('cleared')) return;  // 已經被佔
+  if (box.dataset.accept === item.dataset.type) {
+    // 正確配對
+    box.classList.add('cleared');
+    const slot = box.querySelector('.slot');
+    slot.textContent = item.textContent;
+    item.style.display = 'none';
+    state._q5_count = (state._q5_count || 0) + 1;
+    spawnConfetti(40);
+    updateQ5();
+  } else {
+    // 錯誤 — 搖晃
+    box.style.animation = 'shake 0.4s';
+    setTimeout(() => box.style.animation = '', 400);
+  }
+}
+
+function updateQ5() {
+  const count = state._q5_count || 0;
+  const goal = document.getElementById('q5-goal');
+  if (count === 4) {
+    if (!state.completed[4]) {
+      state.completed[4] = true;
+      completeTask(4, '🏆 風箏分類學家！');
+    }
+    goal.classList.add('cleared');
+    goal.innerHTML = '✅ 風箏王！4 種四邊形分類完成！';
+  } else {
+    goal.innerHTML = `🎯 把 4 個風箏拖到正確分類！(${count} / 4)`;
+  }
+}
+
+/* ============ Complete + 過關 ============ */
+function completeTask(idx, msg) {
+  state.coins += TASKS[idx].reward;
+  document.getElementById('hud-coins').textContent = state.coins;
+  showBanner(msg);
+  spawnConfetti(80);
+  renderProgress();
+  // 自動下一關（2 秒後）
+  setTimeout(() => {
+    if (idx < TASKS.length - 1) {
+      const nb = document.createElement('button');
+      nb.className = 'btn btn-gold';
+      nb.style.width = '100%';
+      nb.style.marginTop = '14px';
+      nb.textContent = '✨ 進入下一關 →';
+      nb.onclick = () => { state.currentQ = idx + 1; renderQuest(); };
+      const card = document.getElementById('quest-card');
+      if (!card.querySelector('.next-btn-injected')) {
+        nb.classList.add('next-btn-injected');
+        card.appendChild(nb);
+      }
+    } else {
+      // 最後一關 → 勝利
+      setTimeout(() => finish(), 2000);
+    }
+  }, 1500);
+}
+
+function showBanner(msg) {
+  const b = document.createElement('div');
+  b.className = 'reveal-banner';
+  b.textContent = msg;
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 2200);
+}
+
+function spawnConfetti(count = 80) {
+  const colors = ['#FFB3C7', '#FFE066', '#A5D8FF', '#95D5B2', '#D0BFFF', '#FFA94D'];
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    c.style.animationDelay = (Math.random() * 0.4) + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4000);
+  }
+}
+
+function renderProgress() {
+  const c = document.getElementById('hud-progress'); c.innerHTML = '';
+  for (let i = 0; i < TASKS.length; i++) {
+    const d = document.createElement('div'); d.className = 'pdot';
+    if (state.completed[i]) d.classList.add('done');
+    else if (i === state.currentQ) d.classList.add('active');
+    d.textContent = i + 1;
+    c.appendChild(d);
+  }
+}
+
+function renderQuest() {
+  document.getElementById('hud-name').textContent = state.nick;
+  document.getElementById('hud-coins').textContent = state.coins;
+  renderProgress();
+  const task = TASKS[state.currentQ];
+  task.setup();
+}
+
+function finish() {
+  document.getElementById('vic-name').textContent = state.nick;
+  document.getElementById('vic-coins').textContent = state.coins;
+  document.getElementById('screen-quest').style.display = 'none';
+  document.getElementById('screen-victory').style.display = '';
+  spawnConfetti(200);
+  setTimeout(() => spawnConfetti(150), 500);
+  setTimeout(() => spawnConfetti(150), 1000);
+  // Submit to Firebase
+  submitToFirebase();
+}
+
+async function submitToFirebase() {
+  const payload = {
+    nick: state.nick,
+    hwId: 'special_quad_explore_0610',
+    completedAll: state.completed.every(Boolean),
+    completed: state.completed,
+    coins: state.coins,
+    elapsedSec: Math.round((Date.now() - state.startTime) / 1000),
+    submittedAt: new Date().toISOString(),
+  };
+  try {
+    await firebase.database().ref(FB_PATH_REF).push(payload);
+    document.getElementById('vic-status').innerHTML = '✅ 探索已送到老師後台！';
+    document.getElementById('vic-status').style.background = 'var(--success-soft)';
+    document.getElementById('vic-status').style.color = '#3E8E5E';
+  } catch (err) {
+    document.getElementById('vic-status').innerHTML = '⚠️ 送出失敗，請告訴老師你的暱稱和金幣 ' + state.coins;
+    document.getElementById('vic-status').style.background = 'var(--primary-soft)';
+  }
+}
+
+function restart() {
+  state.nick = ''; state.startTime = 0; state.currentQ = 0; state.coins = 0;
+  state.completed = [false,false,false,false,false];
+  document.getElementById('nick-input').value = '';
+  document.getElementById('screen-victory').style.display = 'none';
+  document.getElementById('screen-start').style.display = '';
+}
+
+document.getElementById('start-btn').addEventListener('click', () => {
+  const v = document.getElementById('nick-input').value.trim();
+  if (!v) { document.getElementById('nick-input').focus(); return; }
+  state.nick = v; state.startTime = Date.now();
+  document.getElementById('screen-start').style.display = 'none';
+  document.getElementById('screen-quest').style.display = '';
+  renderQuest();
+});
+
+document.getElementById('nick-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter') document.getElementById('start-btn').click();
+});
+
+// shake keyframes
+const styleEl = document.createElement('style');
+styleEl.textContent = `
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+`;
+document.head.appendChild(styleEl);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教師後台 · 風箏館大冒險 (6/10)</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB27uSUnTSYkKJ5u5FqOqEnSbuA9br4lmE",
+  authDomain: "classtools1019.firebaseapp.com",
+  databaseURL: "https://classtools1019-default-rtdb.firebaseio.com",
+  projectId: "classtools1019",
+};
+try { firebase.initializeApp(firebaseConfig); } catch(e){}
+const FB_PATH = 'submissions/special_quad_explore_0610';
+const PASSWORD = 'stacey2026';
+</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'PingFang TC','Microsoft JhengHei',sans-serif;background:#FFF8F0;color:#4A4458;min-height:100vh}
+  .login{max-width:420px;margin:80px auto;background:white;border-radius:24px;padding:36px 30px;box-shadow:0 6px 0 #FFD6E0, 0 12px 28px rgba(255,179,199,0.2);text-align:center}
+  .login .icon{font-size:64px;margin-bottom:8px}
+  .login h1{font-size:24px;color:#FFB3C7;margin-bottom:6px;font-weight:900}
+  .login p{color:#918CA1;margin-bottom:20px;font-size:14px;font-weight:700}
+  .login input{width:100%;padding:14px;border:3px solid #FFD6E0;border-radius:18px;font-size:18px;text-align:center;margin-bottom:14px;font-weight:800;color:#4A4458}
+  .login input:focus{outline:none;border-color:#FFB3C7}
+  .login button{width:100%;padding:14px;background:linear-gradient(135deg, #FFB3C7, #A5D8FF);color:white;border:none;border-radius:18px;font-size:17px;font-weight:900;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 0 #B89BB3}
+  .login .err{color:#FF6B9D;font-size:14px;margin-top:8px;min-height:20px;font-weight:700}
+
+  .dashboard{max-width:1300px;margin:0 auto;padding:20px}
+  .header{background:white;border-radius:20px;padding:18px 22px;margin-bottom:16px;box-shadow:0 4px 0 #FFD6E0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  .header h1{font-size:22px;color:#FFB3C7;font-weight:900}
+  .meta{display:flex;gap:14px;font-size:13px;color:#918CA1;font-weight:700}
+  .live{padding:4px 12px;border-radius:999px;background:#C6E9CF;color:#3E8E5E;font-weight:800;font-size:12px}
+  .live::before{content:'●';animation:blink 1.4s infinite;margin-right:4px}
+  @keyframes blink{50%{opacity:0.3}}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .stat{background:white;border-radius:18px;padding:16px;box-shadow:0 4px 0 #FFD6E0}
+  .stat .lbl{font-size:12px;color:#918CA1;font-weight:700}
+  .stat .val{font-size:32px;font-weight:900;color:#FFB3C7;margin-top:4px}
+  .stat.green .val{color:#3E8E5E}
+  .stat.orange .val{color:#FFA94D}
+
+  .controls{background:white;border-radius:18px;padding:14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;box-shadow:0 3px 0 #FFD6E0}
+  .btn{padding:10px 18px;border:2px solid #FFD6E0;background:white;border-radius:14px;font-size:14px;font-weight:800;cursor:pointer;color:#4A4458}
+  .btn:hover{background:#FFFEF5;border-color:#FFB3C7}
+  .btn-primary{background:linear-gradient(135deg, #FFB3C7, #A5D8FF);color:white;border-color:transparent}
+  .search{flex:1;min-width:180px;padding:10px 14px;border:2px solid #FFD6E0;border-radius:14px;font-size:14px;font-weight:700}
+
+  .table-wrap{background:white;border-radius:20px;overflow:hidden;box-shadow:0 4px 0 #FFD6E0;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:900px}
+  th{background:linear-gradient(135deg, #FFB3C7, #A5D8FF);color:white;padding:14px;text-align:left;font-size:13px;font-weight:900;white-space:nowrap;letter-spacing:1px}
+  td{padding:14px;border-bottom:1px solid #FFEFE0;font-size:14px;vertical-align:middle}
+  tr:hover{background:#FFFEF5}
+  .nick{font-weight:900;color:#FFB3C7;font-size:16px}
+  .coins{font-weight:900;color:#FFA94D;font-size:16px}
+  .progress-cell{display:flex;gap:4px}
+  .pdot{width:26px;height:26px;border-radius:50%;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center}
+  .pdot.done{background:#95D5B2;color:white}
+  .pdot.skip{background:#FFE0E0;color:#FFA8A8}
+  .time-cell{font-family:monospace;color:#918CA1}
+  .empty{text-align:center;padding:60px 20px;color:#918CA1;font-weight:700}
+  .empty .emoji{font-size:64px;margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<section id="login" class="login">
+  <div class="icon">🪁</div>
+  <h1>教師後台 · 風箏館大冒險</h1>
+  <p>4-3 特殊四邊形預習探索 · 6/10</p>
+  <input id="pwd" type="password" placeholder="輸入密碼" autocomplete="off">
+  <button onclick="tryLogin()">登入</button>
+  <div class="err" id="err"></div>
+</section>
+
+<section id="dashboard" class="dashboard" style="display:none">
+  <div class="header">
+    <h1>🪁 風箏館大冒險 · 教師後台</h1>
+    <div class="meta">
+      <span>作業：<strong>4-3 預習探索 6/10</strong></span>
+      <span class="live">即時連線</span>
+      <span id="last-update">尚未刷新</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="lbl">📊 探索人數</div><div class="val" id="s-count">0</div></div>
+    <div class="stat green"><div class="lbl">🌟 全破人數</div><div class="val" id="s-perfect">0</div></div>
+    <div class="stat orange"><div class="lbl">💰 平均金幣</div><div class="val" id="s-coins">—</div></div>
+    <div class="stat"><div class="lbl">⏱️ 平均用時</div><div class="val" id="s-time">—</div></div>
+  </div>
+
+  <div class="controls">
+    <input class="search" id="search" placeholder="🔍 搜尋暱稱..." oninput="render()">
+    <select class="btn" id="sort" onchange="render()">
+      <option value="time-desc">最新探索</option>
+      <option value="time-asc">最早探索</option>
+      <option value="coins-desc">金幣高→低</option>
+      <option value="coins-asc">金幣低→高</option>
+    </select>
+    <button class="btn btn-primary" onclick="fetchData()">🔄 立即刷新</button>
+    <button class="btn" onclick="exportCSV()">📥 匯出 CSV</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>暱稱</th>
+          <th>金幣</th>
+          <th>完成率</th>
+          <th>5 個探索 (1-5)</th>
+          <th>用時</th>
+          <th>提交時間</th>
+        </tr>
+      </thead>
+      <tbody id="rows"><tr><td colspan="7" class="empty"><div class="emoji">⏳</div>正在載入...</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+'use strict';
+let submissions = [];
+let pollTimer = null;
+
+function tryLogin() {
+  const v = document.getElementById('pwd').value;
+  if (v === PASSWORD) {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('dashboard').style.display = '';
+    fetchData();
+    pollTimer = setInterval(fetchData, 6000);
+  } else {
+    document.getElementById('err').textContent = '密碼錯誤';
+  }
+}
+document.getElementById('pwd').addEventListener('keypress', e => {
+  if (e.key === 'Enter') tryLogin();
+});
+
+async function fetchData() {
+  try {
+    const snap = await firebase.database().ref(FB_PATH).once('value');
+    const data = snap.val();
+    submissions = data ? Object.entries(data).map(([k,v]) => Object.assign({_key:k}, v)) : [];
+    document.getElementById('last-update').textContent = '剛剛更新 ' + new Date().toLocaleTimeString('zh-TW',{hour12:false});
+    renderStats();
+    render();
+  } catch(e) {
+    document.getElementById('last-update').textContent = '⚠️ 連線失敗 ' + e.message;
+  }
+}
+
+function renderStats() {
+  const n = submissions.length;
+  document.getElementById('s-count').textContent = n;
+  if (n === 0) {
+    document.getElementById('s-perfect').textContent = '0';
+    document.getElementById('s-coins').textContent = '—';
+    document.getElementById('s-time').textContent = '—';
+    return;
+  }
+  const perfect = submissions.filter(s => s.completedAll || (s.completed||[]).every(Boolean)).length;
+  const avgCoins = (submissions.reduce((a,s)=>a+(s.coins||0),0)/n).toFixed(0);
+  const avgTime = submissions.reduce((a,s)=>a+(s.elapsedSec||0),0)/n;
+  document.getElementById('s-perfect').textContent = perfect;
+  document.getElementById('s-coins').textContent = avgCoins;
+  const m = Math.floor(avgTime/60), s = Math.round(avgTime%60);
+  document.getElementById('s-time').textContent = m + ':' + (s<10?'0':'') + s;
+}
+
+function render() {
+  const search = document.getElementById('search').value.trim().toLowerCase();
+  const sort = document.getElementById('sort').value;
+  let list = submissions.slice();
+  if (search) list = list.filter(s => (s.nick||'').toLowerCase().includes(search));
+  list.sort((a,b) => {
+    if (sort === 'time-desc') return new Date(b.submittedAt) - new Date(a.submittedAt);
+    if (sort === 'time-asc') return new Date(a.submittedAt) - new Date(b.submittedAt);
+    if (sort === 'coins-desc') return (b.coins||0) - (a.coins||0);
+    if (sort === 'coins-asc') return (a.coins||0) - (b.coins||0);
+  });
+  const tbody = document.getElementById('rows');
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty"><div class="emoji">🪁</div>${submissions.length===0?'還沒有學生提交':'找不到符合的學生'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map((s,idx) => {
+    const c = s.completed || [false,false,false,false,false];
+    const dots = c.map((v,i)=>`<div class="pdot ${v?'done':'skip'}">${v?'✓':i+1}</div>`).join('');
+    const m = Math.floor((s.elapsedSec||0)/60), sec = (s.elapsedSec||0)%60;
+    const completeCount = c.filter(Boolean).length;
+    const perc = Math.round(completeCount/5*100);
+    const t = new Date(s.submittedAt);
+    const tstr = t.toLocaleString('zh-TW',{hour12:false, month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'});
+    return `<tr>
+      <td>${idx+1}</td>
+      <td class="nick">${(s.nick||'?').replace(/</g,'&lt;')}</td>
+      <td class="coins">💰 ${s.coins||0}</td>
+      <td><strong style="color:${perc>=100?'#3E8E5E':perc>=60?'#FFA94D':'#FFB3C7'}">${completeCount}/5 (${perc}%)</strong></td>
+      <td><div class="progress-cell">${dots}</div></td>
+      <td class="time-cell">${m}:${sec<10?'0':''}${sec}</td>
+      <td>${tstr}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportCSV() {
+  if (submissions.length === 0) { alert('還沒有資料'); return; }
+  const headers = ['暱稱','金幣','完成數','Q1','Q2','Q3','Q4','Q5','用時(秒)','提交時間'];
+  const rows = submissions.map(s => {
+    const c = s.completed || [];
+    return [s.nick||'', s.coins||0, c.filter(Boolean).length,
+      c[0]?'✓':'✗', c[1]?'✓':'✗', c[2]?'✓':'✗', c[3]?'✓':'✗', c[4]?'✓':'✗',
+      s.elapsedSec||0, new Date(s.submittedAt).toLocaleString('zh-TW',{hour12:false})];
+  });
+  const csv = '﻿' + headers.join(',') + '\n' + rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '風箏館成績_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+window.tryLogin = tryLogin;
+window.fetchData = fetchData;
+window.exportCSV = exportCSV;
+window.render = render;
+</script>
+
+</body>
+</html>
