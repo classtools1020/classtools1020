@@ -1,10 +1,24 @@
 <!DOCTYPE html>
-<!-- saved from url=(0051)file:///C:/Users/user/Downloads/quad-adventure.html -->
 <html lang="zh-Hant"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>四邊形冒險島：收服篇</title>
-<link href="./四邊形冒險島：收服篇_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB27uSUnTSYkKJ5u5FqOqEnSbuA9br4lmE",
+  authDomain: "classtools1019.firebaseapp.com",
+  databaseURL: "https://classtools1019-default-rtdb.firebaseio.com",
+  projectId: "classtools1019",
+  storageBucket: "classtools1019.firebasestorage.app",
+  messagingSenderId: "402119556579",
+  appId: "1:402119556579:web:e0bace85a3454fb88eb4d6"
+};
+try { firebase.initializeApp(firebaseConfig); } catch(e){ console.warn(e); }
+const FB_PATH = 'submissions/quad_island_catch_0612';
+</script>
 <style>
   :root{
     --grass:#7ec850; --grass2:#72bd46; --tall:#4e9e34; --path:#e8d5a8; --path2:#dfc996;
@@ -23,6 +37,10 @@
   .game-sub{color:#ffd96b;font-size:14px;line-height:1.7;}
   .start-sprites{display:flex;gap:6px;}
   .start-sprites svg{width:60px;height:60px;}
+  #nameInput{width:100%;max-width:330px;padding:14px;font-family:inherit;font-size:18px;text-align:center;border:4px solid #000;border-radius:14px;background:#fffdf5;color:var(--ink);box-shadow:0 5px 0 #000;}
+  #nameInput::placeholder{color:#9aa0c0;font-size:16px;}
+  #nameInput.need{border-color:#e53935;animation:shake .35s;}
+  .name-label{color:#fff;font-size:15px;text-shadow:2px 2px 0 #000;}
   .tier-btn{width:100%;max-width:330px;padding:15px;font-family:inherit;font-size:18px;border:4px solid #000;border-radius:14px;cursor:pointer;box-shadow:0 5px 0 #000;transition:transform .08s;}
   .tier-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #000;}
   .tier-star{background:#ffe082;}.tier-moon{background:#b3e5fc;}.tier-sun{background:#ffab91;}
@@ -165,6 +183,8 @@
   <circle cx="38" cy="72" r="4" fill="#ff8a80" opacity=".7"></circle><circle cx="82" cy="72" r="4" fill="#ff8a80" opacity=".7"></circle></svg></div>
     <div class="game-title">四邊形冒險島<br>收服篇</div>
     <div class="game-sub">走進草叢收服「四邊形獸」、讓牠們進化，<br>登錄全部 6 隻圖鑑，挑戰山頂的冠軍！</div>
+    <div class="name-label">📝 訓練家，先留下你的名字！</div>
+    <input id="nameInput" maxlength="12" placeholder="輸入你的名字或暱稱" autocomplete="off">
     <button class="tier-btn tier-star" onclick="startGame(&#39;star&#39;)">⭐ 星星之路<small>認識形狀，看圖收服</small></button>
     <button class="tier-btn tier-moon" onclick="startGame(&#39;moon&#39;)">🌙 月亮之路<small>邊、角、對角線的祕密</small></button>
     <button class="tier-btn tier-sun" onclick="startGame(&#39;sun&#39;)">☀️ 太陽之路<small>課本計算題，段考實戰</small></button>
@@ -434,7 +454,22 @@ const ZONE_NAME={par:'左上草叢｜平四獸出沒',kite:'右上草叢｜箏�
 let player={x:5,y:7}, tier='star', xp=0, combo=0, bestCombo=0;
 let caught={}, registered=new Set(), champDone=false;
 let battle=null;
+let playerName='', fbRef=null, gameStart=0, nCorrect=0, nWrong=0;
 const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+
+/* ============ 進度回傳（老師後台用） ============ */
+function syncProgress(){
+  if(!fbRef)return;
+  fbRef.update({
+    nick:playerName, tier, xp,
+    dex:registered.size, registered:Array.from(registered),
+    correct:nCorrect, wrong:nWrong, bestCombo,
+    champDone, status:champDone?'done':(registered.size>=6?'dex':'playing'),
+    elapsedSec:Math.round((Date.now()-gameStart)/1000),
+    updatedAt:new Date().toISOString()
+  }).catch(()=>{});
+}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
 const tierIcon=()=>tier==='star'?'⭐':tier==='moon'?'🌙':'☀️';
 
@@ -443,7 +478,7 @@ function currentTitle(){let t=TITLES[0];for(const x of TITLES){if(xp>=x.xp)t=x;}
 function nextTitle(){for(const x of TITLES){if(xp<x.xp)return x;}return null;}
 function renderHUD(){
   const t=currentTitle(), n=nextTitle();
-  $('titleName').textContent=t.n;
+  $('titleName').textContent=(playerName?playerName+'｜':'')+t.n;
   $('dexCount').textContent=`📔 ${registered.size}/6`;
   $('comboTag').textContent=combo>=2?`🔥 連對×${combo}`:'';
   $('tierTag').textContent=tierIcon();
@@ -550,6 +585,7 @@ function renderChampQ(){
 }
 function answer(btn,right,q){
   if(right){
+    nCorrect++;syncProgress();
     combo++;bestCombo=Math.max(bestCombo,combo);
     document.querySelectorAll('.choice').forEach(c=>c.disabled=true);
     btn.classList.add('right');sndOK();
@@ -561,6 +597,7 @@ function answer(btn,right,q){
     else if(battle.mode==='evo'){nb.textContent='開始進化！✨';nb.onclick=doEvolve;}
     else{nb.textContent=battle.i<4?'下一題 ▶':'奪冠！🏆';nb.onclick=champNext;}
   }else{
+    nWrong++;syncProgress();
     combo=0;renderHUD();
     btn.classList.add('wrong');btn.disabled=true;sndNo();battle.wrong++;
     $('battleSprite').classList.add('shake');setTimeout(()=>$('battleSprite').classList.remove('shake'),400);
@@ -576,6 +613,7 @@ function catchMonster(){
   caught[sp]=(caught[sp]||0)+1;
   const isNew=!registered.has(sp);registered.add(sp);
   const gain=10+(combo>=3?5:0);gainXP(gain);
+  syncProgress();
   sndCatch();
   showResult({
     title:isNew?'🎉 收服成功！圖鑑登錄！':'✅ 收服成功！',
@@ -587,7 +625,7 @@ function catchMonster(){
 function doEvolve(){
   const e=EVO[battle.key];
   registered.add(e.to);
-  gainXP(30);sndEvo();
+  gainXP(30);syncProgress();sndEvo();
   $('battleSprite').innerHTML=mSVG(e.to,'class="evoFlash"')+'<div class="speech">✨ 進化成功！</div>';
   setTimeout(()=>{
     showResult({
@@ -602,6 +640,7 @@ function champNext(){
   battle.i++;
   if(battle.i<5){renderChampQ();return;}
   champDone=true;gainXP(50);renderHUD();
+  syncProgress();
   renderWin();show('winScreen');sndEvo();
 }
 function fleeBattle(){show('gameScreen');placePlayer();sayDialog('安全撤退！準備好再走進草叢。'+(combo>=2?'（連對紀錄還在喔🔥）':''));renderHUD();}
@@ -655,14 +694,27 @@ function renderDex(){
 /* ============ 破關 ============ */
 function renderWin(){
   $('winRow').innerHTML=['kite','trap','par','rect','rhom','sq'].map(s=>mSVG(s)).join('');
-  $('winText').innerHTML=`👑「我認證你是 <b style="color:#ffd96b">四邊形大師</b>！」<br><br>總經驗值 <b>${xp} XP</b>｜最高連對 <b>🔥×${bestCombo}</b><br>你收服了 6 隻四邊形獸，<br>還親手讓平行四邊形進化成長方形、菱形、正方形——<br>這個祕密，全班只有你最懂 💪`;
+  $('winText').innerHTML=`👑「我認證 <b style="color:#ffd96b">${esc(playerName)}</b> 是 <b style="color:#ffd96b">四邊形大師</b>！」<br><br>總經驗值 <b>${xp} XP</b>｜最高連對 <b>🔥×${bestCombo}</b><br>你收服了 6 隻四邊形獸，<br>還親手讓平行四邊形進化成長方形、菱形、正方形——<br>這個祕密，全班只有你最懂 💪<br><br>`+(fbRef?'<span style="color:#8df0a8">✅ 成績已自動送給老師！</span>':'<span style="color:#ffb74d">⚠️ 網路沒連上，請直接告訴老師你破關了！</span>');
 }
 
 /* ============ 流程 ============ */
 function startGame(t){
+  const nameEl=$('nameInput'), name=nameEl.value.trim();
+  if(!name){
+    nameEl.classList.add('need');nameEl.focus();
+    setTimeout(()=>nameEl.classList.remove('need'),600);
+    sndNo();return;
+  }
+  playerName=name;
   tier=t;xp=0;combo=0;bestCombo=0;caught={};registered=new Set();champDone=false;
+  nCorrect=0;nWrong=0;gameStart=Date.now();fbRef=null;
+  try{
+    fbRef=firebase.database().ref(FB_PATH).push();
+    fbRef.set({nick:playerName,tier,startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+      status:'playing',xp:0,dex:0,correct:0,wrong:0,bestCombo:0,champDone:false,elapsedSec:0});
+  }catch(e){fbRef=null;}
   show('gameScreen');buildMap();renderHUD();
-  sayDialog('歡迎來到冒險島！🌿 走進<b>深色草叢</b>收服四邊形獸吧！<br><span style="font-size:13px">左上＝平四獸｜右上＝箏箏獸｜下方＝梯梯獸</span>');
+  sayDialog(`歡迎 <b>${esc(playerName)}</b> 來到冒險島！🌿 走進<b>深色草叢</b>收服四邊形獸吧！<br><span style="font-size:13px">左上＝平四獸｜右上＝箏箏獸｜下方＝梯梯獸</span>`);
   beep(523,.12,'triangle',.1);
 }
 function backToStart(){show('startScreen');}

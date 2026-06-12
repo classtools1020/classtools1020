@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教師後台 · 四邊形冒險島：收服篇 (6/12)</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB27uSUnTSYkKJ5u5FqOqEnSbuA9br4lmE",
+  authDomain: "classtools1019.firebaseapp.com",
+  databaseURL: "https://classtools1019-default-rtdb.firebaseio.com",
+  projectId: "classtools1019",
+};
+try { firebase.initializeApp(firebaseConfig); } catch(e){}
+const FB_PATH = 'submissions/quad_island_catch_0612';
+const PASSWORD = 'stacey2026';
+</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'PingFang TC','Microsoft JhengHei',sans-serif;background:#1a1f3c;color:#2b2b3a;min-height:100vh}
+  .login{max-width:420px;margin:80px auto;background:#fffdf5;border-radius:24px;padding:36px 30px;box-shadow:0 8px 0 #000;text-align:center;border:4px solid #000}
+  .login .icon{font-size:64px;margin-bottom:8px}
+  .login h1{font-size:22px;color:#3949ab;margin-bottom:6px;font-weight:900}
+  .login p{color:#888;margin-bottom:20px;font-size:14px;font-weight:700}
+  .login input{width:100%;padding:14px;border:3px solid #c5cae9;border-radius:18px;font-size:18px;text-align:center;margin-bottom:14px;font-weight:800}
+  .login input:focus{outline:none;border-color:#3949ab}
+  .login button{width:100%;padding:14px;background:linear-gradient(135deg,#3949ab,#7c4dff);color:white;border:none;border-radius:18px;font-size:17px;font-weight:900;cursor:pointer;letter-spacing:1px}
+  .login .err{color:#e53935;font-size:14px;margin-top:8px;min-height:20px;font-weight:700}
+
+  .dashboard{max-width:1300px;margin:0 auto;padding:20px}
+  .header{background:#fffdf5;border-radius:20px;padding:18px 22px;margin-bottom:16px;border:3px solid #000;box-shadow:0 5px 0 #000;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  .header h1{font-size:22px;color:#3949ab;font-weight:900}
+  .meta{display:flex;gap:14px;font-size:13px;color:#888;font-weight:700;align-items:center}
+  .live{padding:4px 12px;border-radius:999px;background:#c8f3d6;color:#2e9e5b;font-weight:800;font-size:12px}
+  .live::before{content:'●';animation:blink 1.4s infinite;margin-right:4px}
+  @keyframes blink{50%{opacity:0.3}}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+  .stat{background:#fffdf5;border-radius:18px;padding:16px;border:3px solid #000;box-shadow:0 4px 0 #000}
+  .stat .lbl{font-size:12px;color:#888;font-weight:700}
+  .stat .val{font-size:32px;font-weight:900;color:#3949ab;margin-top:4px}
+  .stat.green .val{color:#2e9e5b}
+  .stat.orange .val{color:#ef6c00}
+  .stat.purple .val{color:#7c4dff}
+
+  .controls{background:#fffdf5;border-radius:18px;padding:14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border:3px solid #000;box-shadow:0 4px 0 #000}
+  .btn{padding:10px 18px;border:2px solid #c5cae9;background:white;border-radius:14px;font-size:14px;font-weight:800;cursor:pointer;color:#2b2b3a}
+  .btn:hover{border-color:#3949ab}
+  .btn-primary{background:linear-gradient(135deg,#3949ab,#7c4dff);color:white;border-color:transparent}
+  .search{flex:1;min-width:180px;padding:10px 14px;border:2px solid #c5cae9;border-radius:14px;font-size:14px;font-weight:700}
+
+  .table-wrap{background:#fffdf5;border-radius:20px;overflow:hidden;border:3px solid #000;box-shadow:0 5px 0 #000;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:1000px}
+  th{background:linear-gradient(135deg,#3949ab,#7c4dff);color:white;padding:13px;text-align:left;font-size:13px;font-weight:900;white-space:nowrap;letter-spacing:1px}
+  td{padding:13px;border-bottom:1px solid #e8eaf6;font-size:14px;vertical-align:middle}
+  tr:hover{background:#f5f6ff}
+  .nick{font-weight:900;color:#3949ab;font-size:16px}
+  .badge{display:inline-block;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:900;white-space:nowrap}
+  .b-done{background:#ffe082;color:#7a5c00}
+  .b-dex{background:#c8f3d6;color:#2e9e5b}
+  .b-playing{background:#e3f2fd;color:#1565c0}
+  .b-stale{background:#eee;color:#999}
+  .dex-cell{display:flex;gap:4px;flex-wrap:nowrap}
+  .mdot{min-width:34px;height:24px;border-radius:8px;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 4px}
+  .mdot.on{background:#c8f3d6;color:#1b5e20;border:1.5px solid #2e9e5b}
+  .mdot.off{background:#f0f0f0;color:#bbb;border:1.5px solid #ddd}
+  .num{font-weight:900}
+  .num.ok{color:#2e9e5b}.num.no{color:#e07a5f}
+  .time-cell{font-family:monospace;color:#888;white-space:nowrap}
+  .empty{text-align:center;padding:60px 20px;color:#888;font-weight:700}
+  .empty .emoji{font-size:64px;margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<section id="login" class="login">
+  <div class="icon">🏝️</div>
+  <h1>教師後台 · 四邊形冒險島</h1>
+  <p>4-3 特殊四邊形 收服篇 · 6/12</p>
+  <input id="pwd" type="password" placeholder="輸入密碼" autocomplete="off">
+  <button onclick="tryLogin()">登入</button>
+  <div class="err" id="err"></div>
+</section>
+
+<section id="dashboard" class="dashboard" style="display:none">
+  <div class="header">
+    <h1>🏝️ 四邊形冒險島 · 教師後台</h1>
+    <div class="meta">
+      <span>活動：<strong>4-3 收服篇 6/12</strong></span>
+      <span class="live">即時連線</span>
+      <span id="last-update">等待資料...</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="lbl">🎮 遊玩人次</div><div class="val" id="s-count">0</div></div>
+    <div class="stat green"><div class="lbl">📔 圖鑑全滿 (6/6)</div><div class="val" id="s-dex">0</div></div>
+    <div class="stat orange"><div class="lbl">🏆 破關（打贏冠軍）</div><div class="val" id="s-champ">0</div></div>
+    <div class="stat purple"><div class="lbl">✅ 平均答對率</div><div class="val" id="s-acc">—</div></div>
+  </div>
+
+  <div class="controls">
+    <input class="search" id="search" placeholder="🔍 搜尋名字..." oninput="render()">
+    <select class="btn" id="sort" onchange="render()">
+      <option value="time-desc">最新活動</option>
+      <option value="time-asc">最早開始</option>
+      <option value="xp-desc">XP 高→低</option>
+      <option value="dex-desc">圖鑑多→少</option>
+    </select>
+    <button class="btn btn-primary" onclick="fetchData()">🔄 立即刷新</button>
+    <button class="btn" onclick="exportCSV()">📥 匯出 CSV</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>名字</th>
+          <th>難度</th>
+          <th>狀態</th>
+          <th>圖鑑（6 隻四邊形獸）</th>
+          <th>答對</th>
+          <th>答錯</th>
+          <th>XP</th>
+          <th>🔥連對</th>
+          <th>用時</th>
+          <th>最後動態</th>
+        </tr>
+      </thead>
+      <tbody id="rows"><tr><td colspan="11" class="empty"><div class="emoji">⏳</div>正在載入...</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+'use strict';
+let submissions = [];
+const DEX_ORDER = [
+  ['par','平四'], ['kite','箏箏'], ['trap','梯梯'],
+  ['rect','長方'], ['rhom','菱菱'], ['sq','正方']
+];
+const TIER_ICON = {star:'⭐ 星星', moon:'🌙 月亮', sun:'☀️ 太陽'};
+
+function tryLogin() {
+  const v = document.getElementById('pwd').value;
+  if (v === PASSWORD) {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('dashboard').style.display = '';
+    firebase.database().ref(FB_PATH).on('value', snap => {
+      const data = snap.val();
+      submissions = data ? Object.entries(data).map(([k,v]) => Object.assign({_key:k}, v)) : [];
+      document.getElementById('last-update').textContent = '更新於 ' + new Date().toLocaleTimeString('zh-TW',{hour12:false});
+      renderStats();
+      render();
+    }, err => {
+      document.getElementById('last-update').textContent = '⚠️ 連線失敗 ' + err.message;
+    });
+  } else {
+    document.getElementById('err').textContent = '密碼錯誤';
+  }
+}
+document.getElementById('pwd').addEventListener('keypress', e => {
+  if (e.key === 'Enter') tryLogin();
+});
+
+function fetchData() {
+  firebase.database().ref(FB_PATH).once('value').then(snap => {
+    const data = snap.val();
+    submissions = data ? Object.entries(data).map(([k,v]) => Object.assign({_key:k}, v)) : [];
+    document.getElementById('last-update').textContent = '更新於 ' + new Date().toLocaleTimeString('zh-TW',{hour12:false});
+    renderStats();
+    render();
+  });
+}
+
+function lastTime(s){ return new Date(s.updatedAt || s.startedAt || 0); }
+
+function renderStats() {
+  const n = submissions.length;
+  document.getElementById('s-count').textContent = n;
+  if (n === 0) {
+    document.getElementById('s-dex').textContent = '0';
+    document.getElementById('s-champ').textContent = '0';
+    document.getElementById('s-acc').textContent = '—';
+    return;
+  }
+  document.getElementById('s-dex').textContent = submissions.filter(s => (s.dex||0) >= 6).length;
+  document.getElementById('s-champ').textContent = submissions.filter(s => s.champDone).length;
+  const tc = submissions.reduce((a,s)=>a+(s.correct||0),0);
+  const tw = submissions.reduce((a,s)=>a+(s.wrong||0),0);
+  document.getElementById('s-acc').textContent = (tc+tw) ? Math.round(tc/(tc+tw)*100)+'%' : '—';
+}
+
+function statusBadge(s){
+  if (s.champDone) return '<span class="badge b-done">🏆 破關完成</span>';
+  if ((s.dex||0) >= 6) return '<span class="badge b-dex">📔 圖鑑完成</span>';
+  const idleMin = (Date.now() - lastTime(s).getTime()) / 60000;
+  if (idleMin > 20) return `<span class="badge b-stale">⏸ 未完成 (${s.dex||0}/6)</span>`;
+  return `<span class="badge b-playing">🎮 進行中 (${s.dex||0}/6)</span>`;
+}
+
+function render() {
+  const search = document.getElementById('search').value.trim().toLowerCase();
+  const sort = document.getElementById('sort').value;
+  let list = submissions.slice();
+  if (search) list = list.filter(s => (s.nick||'').toLowerCase().includes(search));
+  list.sort((a,b) => {
+    if (sort === 'time-desc') return lastTime(b) - lastTime(a);
+    if (sort === 'time-asc') return new Date(a.startedAt||0) - new Date(b.startedAt||0);
+    if (sort === 'xp-desc') return (b.xp||0) - (a.xp||0);
+    if (sort === 'dex-desc') return (b.dex||0) - (a.dex||0);
+  });
+  const tbody = document.getElementById('rows');
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="11" class="empty"><div class="emoji">🏝️</div>${submissions.length===0?'還沒有學生開始遊戲':'找不到符合的學生'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map((s,idx) => {
+    const reg = new Set(s.registered || []);
+    const dots = DEX_ORDER.map(([k,nm]) => `<div class="mdot ${reg.has(k)?'on':'off'}">${reg.has(k)?'✓':''}${nm}</div>`).join('');
+    const el = s.elapsedSec || 0;
+    const m = Math.floor(el/60), sec = el%60;
+    const t = lastTime(s);
+    const tstr = t.getTime() ? t.toLocaleString('zh-TW',{hour12:false, month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '—';
+    return `<tr>
+      <td>${idx+1}</td>
+      <td class="nick">${(s.nick||'?').replace(/</g,'&lt;')}</td>
+      <td>${TIER_ICON[s.tier] || s.tier || '—'}</td>
+      <td>${statusBadge(s)}</td>
+      <td><div class="dex-cell">${dots}</div></td>
+      <td class="num ok">${s.correct||0}</td>
+      <td class="num no">${s.wrong||0}</td>
+      <td class="num" style="color:#7c4dff">${s.xp||0}</td>
+      <td>🔥×${s.bestCombo||0}</td>
+      <td class="time-cell">${m}:${sec<10?'0':''}${sec}</td>
+      <td class="time-cell">${tstr}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportCSV() {
+  if (submissions.length === 0) { alert('還沒有資料'); return; }
+  const headers = ['名字','難度','狀態','圖鑑數','平四','箏箏','梯梯','長方','菱菱','正方','答對','答錯','XP','最高連對','用時(秒)','開始時間','最後動態'];
+  const rows = submissions.map(s => {
+    const reg = new Set(s.registered || []);
+    const st = s.champDone ? '破關完成' : ((s.dex||0)>=6 ? '圖鑑完成' : '未完成 '+(s.dex||0)+'/6');
+    return [s.nick||'', TIER_ICON[s.tier]||s.tier||'', st, s.dex||0,
+      ...DEX_ORDER.map(([k]) => reg.has(k)?'✓':'✗'),
+      s.correct||0, s.wrong||0, s.xp||0, s.bestCombo||0, s.elapsedSec||0,
+      s.startedAt ? new Date(s.startedAt).toLocaleString('zh-TW',{hour12:false}) : '',
+      s.updatedAt ? new Date(s.updatedAt).toLocaleString('zh-TW',{hour12:false}) : ''];
+  });
+  const csv = '﻿' + headers.join(',') + '\n' + rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '四邊形冒險島成績_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+window.tryLogin = tryLogin;
+window.fetchData = fetchData;
+window.exportCSV = exportCSV;
+window.render = render;
+</script>
+
+</body>
+</html>
