@@ -66,6 +66,9 @@ const FB_PATH = 'submissions/quad_island_catch_0612';
   .t-path{background:var(--path);}.t-path.alt{background:var(--path2);}
   .t-water{background:var(--water);animation:waterShift 2.4s infinite alternate;}
   .t-tall{background:var(--tall);}
+  .t-tall.cleared{background:#b5e08c;}
+  .t-tall.cleared .deco span{animation:ballPop .5s ease-out;}
+  @keyframes ballPop{0%{transform:scale(0);}60%{transform:scale(1.4);}100%{transform:scale(1);}}
   @keyframes waterShift{from{filter:brightness(1);}to{filter:brightness(1.12);}}
   .deco{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
   .deco span{font-size:calc(100% + 13px);line-height:1;}
@@ -406,6 +409,7 @@ let player={x:5,y:7}, tier='star', xp=0, combo=0, bestCombo=0;
 let caught={}, registered=new Set(), champDone=false;
 let battle=null;
 let playerName='', fbRef=null, gameStart=0, nCorrect=0, nWrong=0;
+let clearedTiles=new Set(), lastGrass=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 
@@ -479,7 +483,11 @@ function move(dx,dy){
   if(t===2||t===3){beep(120,.06,'square',.04);return;}
   player.x=nx;player.y=ny;facingChamp=Math.abs(player.x-CHAMP_POS.x)+Math.abs(player.y-CHAMP_POS.y)===1;
   sndMove();placePlayer();
-  if(t===5){const sp=zoneSpecies(nx,ny);setTimeout(()=>startBattle(sp),180);return;}
+  if(t===5){
+    if(clearedTiles.has(nx+','+ny)){sayDialog('⚾ 這個草叢<b>已經收服過了</b>！去找其他<b>深色草叢</b>吧！');return;}
+    lastGrass={x:nx,y:ny};
+    const sp=zoneSpecies(nx,ny);setTimeout(()=>startBattle(sp),180);return;
+  }
   sayDialog(facingChamp?'👑 <b>冠軍</b>就在旁邊！按 <b>A</b> 對話。':defaultHint());
 }
 function talk(){
@@ -564,6 +572,12 @@ function catchMonster(){
   const sp=battle.sp;
   caught[sp]=(caught[sp]||0)+1;
   const isNew=!registered.has(sp);registered.add(sp);
+  if(lastGrass){
+    clearedTiles.add(lastGrass.x+','+lastGrass.y);
+    const tl=$(`tile-${lastGrass.x}-${lastGrass.y}`);
+    if(tl){tl.classList.add('cleared');const d=tl.querySelector('.deco span');if(d)d.textContent='⚾';}
+    lastGrass=null;
+  }
   const gain=10+(combo>=3?5:0);gainXP(gain);
   syncProgress();
   sndCatch();
@@ -659,6 +673,7 @@ function startGame(t){
   }
   playerName=name;
   tier=t;xp=0;combo=0;bestCombo=0;caught={};registered=new Set();champDone=false;qIdx={};
+  clearedTiles=new Set();lastGrass=null;
   nCorrect=0;nWrong=0;gameStart=Date.now();fbRef=null;
   try{
     fbRef=firebase.database().ref(FB_PATH).push();
@@ -666,7 +681,7 @@ function startGame(t){
       status:'playing',xp:0,dex:0,correct:0,wrong:0,bestCombo:0,champDone:false,elapsedSec:0});
   }catch(e){fbRef=null;}
   show('gameScreen');buildMap();renderHUD();
-  sayDialog(`歡迎 <b>${esc(playerName)}</b> 來到冒險島！🌿 走進<b>深色草叢</b>收服四邊形獸吧！<br><span style="font-size:13px">左上＝平四獸｜右上＝箏箏獸｜下方＝梯梯獸</span>`);
+  sayDialog(`歡迎 <b>${esc(playerName)}</b> 來到冒險島！🌿 走進<b>深色草叢</b>收服四邊形獸吧！收服過的草叢會變亮並出現 ⚾<br><span style="font-size:13px">左上＝平四獸｜右上＝箏箏獸｜下方＝梯梯獸</span>`);
   beep(523,.12,'triangle',.1);
 }
 function backToStart(){show('startScreen');}
