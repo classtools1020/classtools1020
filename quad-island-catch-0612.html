@@ -158,6 +158,17 @@ const FB_PATH = 'submissions/quad_island_catch_0612';
   .combo-flash{position:fixed;inset:0;pointer-events:none;z-index:60;display:flex;align-items:center;justify-content:center;font-size:44px;color:#ff7043;text-shadow:3px 3px 0 #000;opacity:0;}
   .combo-flash.go{animation:comboPop .9s;}
   @keyframes comboPop{0%{opacity:0;transform:scale(.4);}30%{opacity:1;transform:scale(1.2);}70%{opacity:1;transform:scale(1);}100%{opacity:0;}}
+
+  /* ===== 漫遊怪（刺激挑戰） ===== */
+  .roamer{position:absolute;z-index:4;display:flex;align-items:center;justify-content:center;transition:left .25s linear,top .25s linear;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.35));pointer-events:none;}
+  .roamer svg{width:82%;height:82%;animation:roamBob .9s infinite alternate ease-in-out;}
+  .roamer .ang{position:absolute;top:-2px;right:-1px;font-size:13px;animation:angBlink .8s infinite;}
+  .roamer::after{content:"";position:absolute;inset:8%;border-radius:50%;border:2px solid rgba(229,57,53,.55);animation:warnPulse 1.1s infinite;}
+  @keyframes roamBob{from{transform:translateY(1px);}to{transform:translateY(-4px);}}
+  @keyframes angBlink{0%,100%{opacity:1;}50%{opacity:.2;}}
+  @keyframes warnPulse{0%{transform:scale(.6);opacity:.75;}100%{transform:scale(1.3);opacity:0;}}
+  @media (prefers-reduced-motion:reduce){.roamer{transition:none;}.roamer svg{animation:none;}.roamer::after{animation:none;}}
+  .snd-btn{background:#000;color:#ffd96b;border:2px solid #ffd96b;border-radius:8px;padding:4px 7px;font-size:13px;font-family:inherit;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -199,6 +210,7 @@ const FB_PATH = 'submissions/quad_island_catch_0612';
         <div id="dexCount">📔 2/6</div>
         <div id="comboTag">🔥 連對×5</div>
         <button class="hud-btn" onclick="openDex()">📔 圖鑑</button>
+        <button class="snd-btn" id="sndBtn" onclick="toggleSound()">🔊</button>
         <button class="hud-btn" onclick="backToStart()" id="tierTag">⭐</button>
       </div>
       <div class="hud-row">
@@ -281,14 +293,35 @@ const FB_PATH = 'submissions/quad_island_catch_0612';
 
 <script>
 /* ============ 音效 ============ */
-let AC=null;
-function beep(f,d,type='square',v=.12){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.stop(AC.currentTime+d);}catch(e){}}
+let AC=null, muted=false;
+function beep(f,d,type='square',v=.12){if(muted)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.stop(AC.currentTime+d);}catch(e){}}
 const sndMove=()=>beep(220,.05,'square',.05);
 const sndOK=()=>{beep(660,.1);setTimeout(()=>beep(880,.18),100);};
 const sndNo=()=>beep(160,.25,'sawtooth',.08);
 const sndCatch=()=>{[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.18,'triangle',.14),i*120));};
 const sndEvo=()=>{[392,523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,.22,'triangle',.13),i*140));};
 const sndCombo=()=>{beep(880,.08);setTimeout(()=>beep(1175,.12),90);};
+const sndRoam=()=>{beep(200,.1,'sawtooth',.08);setTimeout(()=>beep(150,.14,'sawtooth',.08),110);};
+
+/* ---- 背景音樂（輕快循環，可用右上角 🔊 開關） ---- */
+const BGM_MEL=[523,0,659,784, 880,784,659,587, 523,0,659,784, 988,880,784,659];
+const BGM_BASS=[131,0,0,0, 196,0,0,0, 175,0,0,0, 196,0,0,0];
+let bgmTimer=null, bgmStep=0;
+function bgmTick(){
+  if(muted)return;
+  const m=BGM_MEL[bgmStep%BGM_MEL.length]; if(m)beep(m,.18,'triangle',.04);
+  const b=BGM_BASS[bgmStep%BGM_BASS.length]; if(b)beep(b,.24,'sine',.05);
+  bgmStep++;
+}
+function startBGM(){ if(bgmTimer)return; bgmTimer=setInterval(bgmTick,260); }
+function stopBGM(){ if(bgmTimer){clearInterval(bgmTimer);bgmTimer=null;} }
+function unlockAudio(){ try{AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended')AC.resume();}catch(e){} }
+function toggleSound(){
+  muted=!muted;
+  const b=$('sndBtn'); if(b)b.textContent=muted?'🔇':'🔊';
+  if(muted){ stopBGM(); }
+  else{ unlockAudio(); beep(660,.1); startBGM(); }
+}
 
 /* ============ 四邊形獸 ============ */
 function face(cx,cy,s=1){
@@ -403,6 +436,16 @@ const MAPDATA=[
 const CHAMP_POS={x:5,y:1};
 function zoneSpecies(x,y){ if(y<=3) return x<6?'par':'kite'; return 'trap'; }
 const ZONE_NAME={par:'左上草叢｜平四獸出沒',kite:'右上草叢｜箏箏獸出沒',trap:'下方草叢｜梯梯獸出沒'};
+/* 收服某種獸後，把同種獸的其他深色草叢一起標記為已收服（避免重複遭遇） */
+function clearZoneGrass(sp){
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    if(MAPDATA[y][x]!==5||zoneSpecies(x,y)!==sp)continue;
+    const key=x+','+y; if(clearedTiles.has(key))continue;
+    clearedTiles.add(key);
+    const tl=$(`tile-${x}-${y}`);
+    if(tl){tl.classList.add('cleared');const d=tl.querySelector('.deco span');if(d)d.textContent='⚾';}
+  }
+}
 
 /* ============ 狀態 ============ */
 let player={x:5,y:7}, tier='star', xp=0, combo=0, bestCombo=0;
@@ -466,7 +509,7 @@ function placePlayer(){
   p.style.width=r.width+'px';p.style.height=r.height+'px';
   p.style.left=(r.left-w.left)+'px';p.style.top=(r.top-w.top)+'px';
 }
-window.addEventListener('resize',()=>{if($('gameScreen').classList.contains('active'))placePlayer();});
+window.addEventListener('resize',()=>{if($('gameScreen').classList.contains('active')){placePlayer();repositionRoamers();}});
 function sayDialog(h){$('dialog').innerHTML=h;}
 function defaultHint(){
   if(registered.size>=6&&!champDone)return '📔 圖鑑 6/6 完成！快去最上面找 <b>👑 冠軍</b>挑戰最終五連戰！';
@@ -485,15 +528,107 @@ function move(dx,dy){
   sndMove();placePlayer();
   if(t===5){
     if(clearedTiles.has(nx+','+ny)){sayDialog('⚾ 這個草叢<b>已經收服過了</b>！去找其他<b>深色草叢</b>吧！');return;}
-    lastGrass={x:nx,y:ny};
+    lastGrass={x:nx,y:ny};pendingEncounter=true;
     const sp=zoneSpecies(nx,ny);setTimeout(()=>startBattle(sp),180);return;
   }
+  if(checkRoamerCollision())return;
   sayDialog(facingChamp?'👑 <b>冠軍</b>就在旁邊！按 <b>A</b> 對話。':defaultHint());
 }
 function talk(){
   if(!facingChamp)return;
   if(registered.size<6){sayDialog(`👑「想挑戰我？先把<b>圖鑑 6 隻</b>集滿吧！現在 ${registered.size}/6。提示：有些獸要靠<b>進化</b>才拿得到喔！」`);sndNo();return;}
   startChamp();
+}
+
+/* ============ 漫遊怪（在地圖上遊蕩、會追玩家，撞上就開打） ============ */
+let roamers=[], roamTimer=null, pendingEncounter=false;
+function roamWalkable(x,y){
+  if(x<1||y<1||x>=W-1||y>=H-1)return false;
+  const t=MAPDATA[y][x];
+  if(t!==0&&t!==1&&t!==4)return false;          /* 只在草地/道路/花地遊蕩 */
+  if(x===CHAMP_POS.x&&y===CHAMP_POS.y)return false;
+  return true;
+}
+function randRoamSpot(awayFromPlayer){
+  for(let i=0;i<80;i++){
+    const x=1+Math.floor(Math.random()*(W-2)), y=1+Math.floor(Math.random()*(H-2));
+    if(!roamWalkable(x,y))continue;
+    if(x===player.x&&y===player.y)continue;
+    if(roamers.some(r=>r.x===x&&r.y===y))continue;
+    if(awayFromPlayer&&Math.abs(x-player.x)+Math.abs(y-player.y)<4)continue;
+    return {x,y};
+  }
+  return null;
+}
+function clearRoamers(){ roamers.forEach(r=>{if(r.el&&r.el.parentNode)r.el.parentNode.removeChild(r.el);}); roamers=[]; }
+function spawnRoamers(){
+  clearRoamers();
+  ['par','kite','trap'].forEach(sp=>{
+    const s=randRoamSpot(true); if(!s)return;
+    const el=document.createElement('div'); el.className='roamer';
+    el.innerHTML=mSVG(sp)+'<span class="ang">💢</span>';
+    $('mapWrap').appendChild(el);
+    const r={x:s.x,y:s.y,sp,el}; roamers.push(r); positionRoamer(r);
+  });
+}
+function positionRoamer(r){
+  const tile=$(`tile-${r.x}-${r.y}`),wrap=$('mapWrap'); if(!tile||!r.el)return;
+  const a=tile.getBoundingClientRect(),w=wrap.getBoundingClientRect();
+  r.el.style.width=a.width+'px'; r.el.style.height=a.height+'px';
+  r.el.style.left=(a.left-w.left)+'px'; r.el.style.top=(a.top-w.top)+'px';
+}
+function repositionRoamers(){ roamers.forEach(positionRoamer); }
+function roamingAllowed(){
+  return $('gameScreen').classList.contains('active')
+    && !$('resultPop').classList.contains('show') && !pendingEncounter;
+}
+function roamTick(){
+  if(!roamingAllowed())return;
+  const chaseProb=registered.size>=6?0:.5;        /* 集滿 6 隻後不再追人，方便去找冠軍 */
+  roamers.forEach(r=>{
+    const opts=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>
+      roamWalkable(r.x+dx,r.y+dy) && !roamers.some(o=>o!==r&&o.x===r.x+dx&&o.y===r.y+dy));
+    if(!opts.length)return;
+    let mv;
+    if(Math.random()<chaseProb){
+      opts.sort((a,b)=>(Math.abs(r.x+a[0]-player.x)+Math.abs(r.y+a[1]-player.y))
+                      -(Math.abs(r.x+b[0]-player.x)+Math.abs(r.y+b[1]-player.y)));
+      mv=opts[0];
+    }else mv=opts[Math.floor(Math.random()*opts.length)];
+    r.x+=mv[0]; r.y+=mv[1]; positionRoamer(r);
+  });
+  checkRoamerCollision();
+}
+function checkRoamerCollision(){
+  if(pendingEncounter)return false;
+  const r=roamers.find(r=>r.x===player.x&&r.y===player.y);
+  if(r){startRoamBattle(r);return true;}
+  return false;
+}
+function startRoamTimer(){ if(roamTimer)return; roamTimer=setInterval(roamTick,780); }
+function stopRoamTimer(){ if(roamTimer){clearInterval(roamTimer);roamTimer=null;} }
+function startRoamBattle(r){
+  pendingEncounter=true;
+  battle={mode:'roam',sp:r.sp,q:pickQ(r.sp),wrong:0,roamer:r};
+  $('bName').textContent=`野生的 ${SPECIES[r.sp].name} 攔住去路！`;
+  $('bTier').textContent='⚔️';
+  $('battleSprite').className='';
+  $('battleSprite').innerHTML=mSVG(r.sp)+`<div class="speech">可惡的入侵者…想過去？<br>先答對我的題目！⚔️</div>`;
+  $('fleeBtn').style.display='block';
+  sndRoam();
+  show('battleScreen');renderQ();
+}
+function relocateRoamer(r){ const s=randRoamSpot(true)||randRoamSpot(false); if(r&&s){r.x=s.x;r.y=s.y;positionRoamer(r);} }
+function repelRoamer(){
+  const r=battle.roamer, sp=battle.sp;
+  const gain=8+(combo>=3?6:0); gainXP(gain); syncProgress(); sndCatch();
+  relocateRoamer(r);
+  showResult({
+    title:'💥 擊退成功！',
+    sprite:mSVG(sp),
+    text:`擊退了野生的 <b>${SPECIES[sp].name}</b>！<br><span style="font-size:13px">牠落荒而逃，到別的地方遊蕩去了…</span>`,
+    gain
+  });
 }
 
 /* ============ 戰鬥 ============ */
@@ -554,6 +689,7 @@ function answer(btn,right,q){
     $('bFeedback').innerHTML=`<span class="fb-ok">✅ ${cheers[Math.floor(Math.random()*cheers.length)]}</span> ${q.why}`;
     const nb=$('bNext');nb.style.display='block';$('fleeBtn').style.display='none';
     if(battle.mode==='wild'){nb.textContent='丟出收服球！⚾';nb.onclick=catchMonster;}
+    else if(battle.mode==='roam'){nb.textContent='擊退牠！💥';nb.onclick=repelRoamer;}
     else if(battle.mode==='evo'){nb.textContent='開始進化！✨';nb.onclick=doEvolve;}
     else{nb.textContent=battle.i<4?'下一題 ▶':'奪冠！🏆';nb.onclick=champNext;}
   }else{
@@ -561,7 +697,7 @@ function answer(btn,right,q){
     combo=0;renderHUD();
     btn.classList.add('wrong');btn.disabled=true;sndNo();battle.wrong++;
     $('battleSprite').classList.add('shake');setTimeout(()=>$('battleSprite').classList.remove('shake'),400);
-    const esc=battle.mode==='wild'?`啊！${SPECIES[battle.sp].name} 掙脫了！但牠還在，`:'差一點！';
+    const esc=battle.mode==='wild'?`啊！${SPECIES[battle.sp].name} 掙脫了！但牠還在，`:(battle.mode==='roam'?`${SPECIES[battle.sp].name} 又撲了上來！`:'差一點！');
     $('bFeedback').innerHTML=`<span class="fb-no">💡 ${esc}看提示再選一次：${q.hint}</span>`;
     if(battle.wrong>=2)$('breathBox').classList.add('show');
   }
@@ -578,6 +714,7 @@ function catchMonster(){
     if(tl){tl.classList.add('cleared');const d=tl.querySelector('.deco span');if(d)d.textContent='⚾';}
     lastGrass=null;
   }
+  clearZoneGrass(sp);   /* 同一種獸的其他草叢一起收掉，不再重複出現 */
   const gain=10+(combo>=3?5:0);gainXP(gain);
   syncProgress();
   sndCatch();
@@ -609,7 +746,12 @@ function champNext(){
   syncProgress();
   renderWin();show('winScreen');sndEvo();
 }
-function fleeBattle(){show('gameScreen');placePlayer();sayDialog('安全撤退！準備好再走進草叢。'+(combo>=2?'（連對紀錄還在喔🔥）':''));renderHUD();}
+function fleeBattle(){
+  if(battle&&battle.mode==='roam')relocateRoamer(battle.roamer);
+  pendingEncounter=false;
+  show('gameScreen');placePlayer();repositionRoamers();
+  sayDialog('安全撤退！準備好再走進草叢。'+(combo>=2?'（連對紀錄還在喔🔥）':''));renderHUD();
+}
 
 /* ============ 結算 ============ */
 function showResult(o){
@@ -629,7 +771,8 @@ function showResult(o){
 }
 function closeResult(){
   $('resultPop').classList.remove('show');
-  show('gameScreen');placePlayer();sayDialog(defaultHint());renderHUD();
+  pendingEncounter=false;
+  show('gameScreen');placePlayer();repositionRoamers();sayDialog(defaultHint());renderHUD();
 }
 
 /* ============ 圖鑑 ============ */
@@ -673,7 +816,7 @@ function startGame(t){
   }
   playerName=name;
   tier=t;xp=0;combo=0;bestCombo=0;caught={};registered=new Set();champDone=false;qIdx={};
-  clearedTiles=new Set();lastGrass=null;
+  clearedTiles=new Set();lastGrass=null;pendingEncounter=false;
   nCorrect=0;nWrong=0;gameStart=Date.now();fbRef=null;
   try{
     fbRef=firebase.database().ref(FB_PATH).push();
@@ -681,10 +824,12 @@ function startGame(t){
       status:'playing',xp:0,dex:0,correct:0,wrong:0,bestCombo:0,champDone:false,elapsedSec:0});
   }catch(e){fbRef=null;}
   show('gameScreen');buildMap();renderHUD();
-  sayDialog(`歡迎 <b>${esc(playerName)}</b> 來到冒險島！🌿 走進<b>深色草叢</b>收服四邊形獸吧！收服過的草叢會變亮並出現 ⚾<br><span style="font-size:13px">左上＝平四獸｜右上＝箏箏獸｜下方＝梯梯獸</span>`);
+  spawnRoamers();startRoamTimer();
+  unlockAudio();startBGM();
+  sayDialog(`歡迎 <b>${esc(playerName)}</b> 來到冒險島！🌿 走進<b>深色草叢</b>收服四邊形獸吧！收服過的草叢會變亮並出現 ⚾<br><span style="font-size:13px">⚠️ 小心地圖上遊蕩的<b>四邊形獸</b>，被牠追到就要應戰！｜左上＝平四獸｜右上＝箏箏獸｜下方＝梯梯獸</span>`);
   beep(523,.12,'triangle',.1);
 }
-function backToStart(){show('startScreen');}
+function backToStart(){stopRoamTimer();clearRoamers();stopBGM();show('startScreen');}
 $('startSprites').innerHTML=['par','rect','rhom','sq','kite','trap'].map(s=>mSVG(s)).join('');
 
 document.querySelectorAll('.dbtn').forEach(b=>{
