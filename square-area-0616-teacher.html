@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>教師後台 · 對角線特工：正方形與面積 (6/16)</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB27uSUnTSYkKJ5u5FqOqEnSbuA9br4lmE",
+  authDomain: "classtools1019.firebaseapp.com",
+  databaseURL: "https://classtools1019-default-rtdb.firebaseio.com",
+  projectId: "classtools1019",
+};
+try { firebase.initializeApp(firebaseConfig); } catch(e){}
+const FB_PATH = 'submissions/square_area_0616';
+const PASSWORD = 'stacey2026';
+const TOTAL = 7;
+</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'PingFang TC','Microsoft JhengHei',sans-serif;background:#0f0c29;color:#2b2b3a;min-height:100vh}
+  .login{max-width:420px;margin:80px auto;background:#fffdf5;border-radius:24px;padding:36px 30px;box-shadow:0 8px 0 #000;text-align:center;border:4px solid #000}
+  .login .icon{font-size:64px;margin-bottom:8px}
+  .login h1{font-size:22px;color:#7c3aed;margin-bottom:6px;font-weight:900}
+  .login p{color:#888;margin-bottom:20px;font-size:14px;font-weight:700}
+  .login input{width:100%;padding:14px;border:3px solid #ddd6fe;border-radius:18px;font-size:18px;text-align:center;margin-bottom:14px;font-weight:800}
+  .login input:focus{outline:none;border-color:#7c3aed}
+  .login button{width:100%;padding:14px;background:linear-gradient(135deg,#22d3ee,#a855f7);color:white;border:none;border-radius:18px;font-size:17px;font-weight:900;cursor:pointer;letter-spacing:1px}
+  .login .err{color:#e53935;font-size:14px;margin-top:8px;min-height:20px;font-weight:700}
+
+  .dashboard{max-width:1300px;margin:0 auto;padding:20px}
+  .header{background:#fffdf5;border-radius:20px;padding:18px 22px;margin-bottom:16px;border:3px solid #000;box-shadow:0 5px 0 #000;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  .header h1{font-size:22px;color:#7c3aed;font-weight:900}
+  .meta{display:flex;gap:14px;font-size:13px;color:#888;font-weight:700;align-items:center;flex-wrap:wrap}
+  .live{padding:4px 12px;border-radius:999px;background:#c8f3d6;color:#2e9e5b;font-weight:800;font-size:12px}
+  .live::before{content:'●';animation:blink 1.4s infinite;margin-right:4px}
+  @keyframes blink{50%{opacity:0.3}}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .stat{background:#fffdf5;border-radius:18px;padding:16px;border:3px solid #000;box-shadow:0 4px 0 #000}
+  .stat .lbl{font-size:12px;color:#888;font-weight:700}
+  .stat .val{font-size:30px;font-weight:900;color:#7c3aed;margin-top:4px}
+  .stat.green .val{color:#2e9e5b}.stat.orange .val{color:#ef6c00}.stat.cyan .val{color:#0891b2}
+
+  .controls{background:#fffdf5;border-radius:18px;padding:14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border:3px solid #000;box-shadow:0 4px 0 #000}
+  .btn{padding:10px 18px;border:2px solid #ddd6fe;background:white;border-radius:14px;font-size:14px;font-weight:800;cursor:pointer;color:#2b2b3a}
+  .btn:hover{border-color:#7c3aed}
+  .btn-primary{background:linear-gradient(135deg,#22d3ee,#a855f7);color:white;border-color:transparent}
+  .search{flex:1;min-width:180px;padding:10px 14px;border:2px solid #ddd6fe;border-radius:14px;font-size:14px;font-weight:700}
+
+  .table-wrap{background:#fffdf5;border-radius:20px;overflow:hidden;border:3px solid #000;box-shadow:0 5px 0 #000;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:1000px}
+  th{background:linear-gradient(135deg,#22d3ee,#a855f7);color:white;padding:13px;text-align:left;font-size:13px;font-weight:900;white-space:nowrap;letter-spacing:1px}
+  td{padding:12px 13px;border-bottom:1px solid #efe8ff;font-size:14px;vertical-align:middle}
+  tr:hover{background:#faf5ff}
+  .nick{font-weight:900;color:#7c3aed;font-size:16px}
+  .badge{display:inline-block;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:900;white-space:nowrap}
+  .b-done{background:#ffe082;color:#7a5c00}
+  .b-playing{background:#e0f2fe;color:#0369a1}
+  .b-stale{background:#eee;color:#999}
+  .qcells{display:flex;gap:4px}
+  .qd{width:22px;height:24px;border-radius:6px;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center}
+  .qd.ok{background:#c8f3d6;color:#1b5e20;border:1.5px solid #2e9e5b}
+  .qd.no{background:#ffd9cf;color:#b3502f;border:1.5px solid #e07a5f}
+  .qd.na{background:#f0f0f0;color:#bbb;border:1.5px solid #ddd}
+  .score{font-weight:900;font-size:16px}
+  .score.hi{color:#2e9e5b}.score.mid{color:#ef6c00}.score.lo{color:#e07a5f}
+  .num{font-weight:900}
+  .time-cell{font-family:monospace;color:#888;white-space:nowrap}
+  .empty{text-align:center;padding:60px 20px;color:#888;font-weight:700}
+  .empty .emoji{font-size:64px;margin-bottom:10px}
+  .qlegend{font-size:12px;color:#888;font-weight:700;margin:2px 0 14px;line-height:1.7}
+</style>
+</head>
+<body>
+
+<section id="login" class="login">
+  <div class="icon">📐</div>
+  <h1>教師後台 · 對角線特工</h1>
+  <p>4-3 正方形 × 對角線垂直面積 · 6/16</p>
+  <input id="pwd" type="password" placeholder="輸入密碼" autocomplete="off">
+  <button onclick="tryLogin()">登入</button>
+  <div class="err" id="err"></div>
+</section>
+
+<section id="dashboard" class="dashboard" style="display:none">
+  <div class="header">
+    <h1>📐 對角線特工 · 教師後台</h1>
+    <div class="meta">
+      <span>活動：<strong>正方形與面積 6/16（7 題）</strong></span>
+      <span class="live">即時連線</span>
+      <span id="last-update">等待資料...</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="lbl">🎮 作答人次</div><div class="val" id="s-count">0</div></div>
+    <div class="stat green"><div class="lbl">🏁 完成作業</div><div class="val" id="s-done">0</div></div>
+    <div class="stat orange"><div class="lbl">📊 平均分數 (/7)</div><div class="val" id="s-avg">—</div></div>
+    <div class="stat cyan"><div class="lbl">✅ 平均答對率</div><div class="val" id="s-acc">—</div></div>
+  </div>
+
+  <div class="controls">
+    <input class="search" id="search" placeholder="🔍 搜尋名字..." oninput="render()">
+    <select class="btn" id="sort" onchange="render()">
+      <option value="time-desc">最新活動</option>
+      <option value="score-desc">分數 高→低</option>
+      <option value="score-asc">分數 低→高</option>
+      <option value="time-asc">最早開始</option>
+    </select>
+    <button class="btn btn-primary" onclick="fetchData()">🔄 立即刷新</button>
+    <button class="btn" onclick="exportCSV()">📥 匯出 CSV</button>
+  </div>
+
+  <div class="qlegend" id="qlegend"></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>名字</th><th>狀態</th><th>分數</th>
+          <th>七題作答（✓首次答對／✗首次答錯／—未答）</th>
+          <th>答對率</th><th>🔥連擊</th><th>等級</th><th>用時</th><th>最後動態</th>
+        </tr>
+      </thead>
+      <tbody id="rows"><tr><td colspan="10" class="empty"><div class="emoji">⏳</div>正在載入...</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+'use strict';
+let submissions = [];
+const QTAGS = ['正方形性質','正方形判別','面積公式','菱形面積','箏形面積','正方形面積','一般垂直四邊形'];
+
+function tryLogin() {
+  const v = document.getElementById('pwd').value;
+  if (v === PASSWORD) {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('dashboard').style.display = '';
+    document.getElementById('qlegend').innerHTML =
+      '題目對照：' + QTAGS.map((t,i)=>`<strong>Q${i+1}</strong> ${t}`).join('　·　');
+    firebase.database().ref(FB_PATH).on('value', snap => {
+      const data = snap.val();
+      submissions = data ? Object.entries(data).map(([k,v]) => Object.assign({_key:k}, v)) : [];
+      document.getElementById('last-update').textContent = '更新於 ' + new Date().toLocaleTimeString('zh-TW',{hour12:false});
+      renderStats(); render();
+    }, err => {
+      document.getElementById('last-update').textContent = '⚠️ 連線失敗 ' + err.message;
+    });
+  } else {
+    document.getElementById('err').textContent = '密碼錯誤';
+  }
+}
+document.getElementById('pwd').addEventListener('keypress', e => { if (e.key === 'Enter') tryLogin(); });
+
+function fetchData() {
+  firebase.database().ref(FB_PATH).once('value').then(snap => {
+    const data = snap.val();
+    submissions = data ? Object.entries(data).map(([k,v]) => Object.assign({_key:k}, v)) : [];
+    document.getElementById('last-update').textContent = '更新於 ' + new Date().toLocaleTimeString('zh-TW',{hour12:false});
+    renderStats(); render();
+  });
+}
+function lastTime(s){ return new Date(s.updatedAt || s.startedAt || 0); }
+function scoreOf(s){ return (s.correct!=null)? s.correct : (Array.isArray(s.q)? s.q.filter(x=>x===1).length : 0); }
+
+function renderStats() {
+  const n = submissions.length;
+  document.getElementById('s-count').textContent = n;
+  if (n === 0) { ['s-done','s-avg','s-acc'].forEach(id=>document.getElementById(id).textContent= id==='s-done'?'0':'—'); return; }
+  document.getElementById('s-done').textContent = submissions.filter(s => s.done).length;
+  const avg = submissions.reduce((a,s)=>a+scoreOf(s),0)/n;
+  document.getElementById('s-avg').textContent = avg.toFixed(1);
+  const accs = submissions.map(s=>s.accuracy||0).filter(x=>x>0);
+  document.getElementById('s-acc').textContent = accs.length? Math.round(accs.reduce((a,b)=>a+b,0)/accs.length)+'%' : '—';
+}
+function statusBadge(s){
+  if (s.done) return '<span class="badge b-done">🏁 已完成</span>';
+  const idleMin = (Date.now() - lastTime(s).getTime()) / 60000;
+  const ans = Array.isArray(s.q)? s.q.filter(x=>x===0||x===1).length : (s.answered||0);
+  if (idleMin > 20) return `<span class="badge b-stale">⏸ 未完成 (${ans}/${TOTAL})</span>`;
+  return `<span class="badge b-playing">🎮 進行中 (${ans}/${TOTAL})</span>`;
+}
+function qCells(s){
+  const q = Array.isArray(s.q)? s.q : [];
+  let out='<div class="qcells">';
+  for(let i=0;i<TOTAL;i++){
+    const v = q[i];
+    if(v===1) out+=`<div class="qd ok" title="Q${i+1} ${QTAGS[i]}：首次答對">✓</div>`;
+    else if(v===0) out+=`<div class="qd no" title="Q${i+1} ${QTAGS[i]}：首次答錯">✗</div>`;
+    else out+=`<div class="qd na" title="Q${i+1} ${QTAGS[i]}：未作答">—</div>`;
+  }
+  return out+'</div>';
+}
+function render() {
+  const search = document.getElementById('search').value.trim().toLowerCase();
+  const sort = document.getElementById('sort').value;
+  let list = submissions.slice();
+  if (search) list = list.filter(s => (s.nick||'').toLowerCase().includes(search));
+  list.sort((a,b) => {
+    if (sort === 'time-desc') return lastTime(b) - lastTime(a);
+    if (sort === 'time-asc') return new Date(a.startedAt||0) - new Date(b.startedAt||0);
+    if (sort === 'score-desc') return scoreOf(b) - scoreOf(a);
+    if (sort === 'score-asc') return scoreOf(a) - scoreOf(b);
+  });
+  const tbody = document.getElementById('rows');
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" class="empty"><div class="emoji">📐</div>${submissions.length===0?'還沒有學生開始作答':'找不到符合的學生'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map((s,idx) => {
+    const sc = scoreOf(s), scls = sc>=6?'hi':sc>=3?'mid':'lo';
+    const el = s.elapsedSec || 0, m = Math.floor(el/60), sec = el%60;
+    const t = lastTime(s);
+    const tstr = t.getTime()? t.toLocaleString('zh-TW',{hour12:false, month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '—';
+    return `<tr>
+      <td>${idx+1}</td>
+      <td class="nick">${(s.nick||'?').replace(/</g,'&lt;')}</td>
+      <td>${statusBadge(s)}</td>
+      <td><span class="score ${scls}">${sc}/${TOTAL}</span></td>
+      <td>${qCells(s)}</td>
+      <td class="num">${s.accuracy!=null?s.accuracy+'%':'—'}</td>
+      <td>🔥×${s.bestCombo||0}</td>
+      <td>Lv.${s.level||1}</td>
+      <td class="time-cell">${m}:${sec<10?'0':''}${sec}</td>
+      <td class="time-cell">${tstr}</td>
+    </tr>`;
+  }).join('');
+}
+function exportCSV() {
+  if (submissions.length === 0) { alert('還沒有資料'); return; }
+  const headers = ['名字','狀態','分數(/7)','答對率',...QTAGS.map((t,i)=>`Q${i+1}_${t}`),'最高連擊','等級','用時(秒)','開始時間','最後動態'];
+  const rows = submissions.map(s => {
+    const q = Array.isArray(s.q)? s.q : [];
+    const st = s.done ? '已完成' : '未完成';
+    return [s.nick||'', st, scoreOf(s), (s.accuracy!=null?s.accuracy+'%':''),
+      ...Array.from({length:TOTAL},(_,i)=> q[i]===1?'✓':q[i]===0?'✗':'—'),
+      s.bestCombo||0, s.level||1, s.elapsedSec||0,
+      s.startedAt ? new Date(s.startedAt).toLocaleString('zh-TW',{hour12:false}) : '',
+      s.updatedAt ? new Date(s.updatedAt).toLocaleString('zh-TW',{hour12:false}) : ''];
+  });
+  const csv = '﻿' + headers.join(',') + '\n' + rows.map(r => r.map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '正方形面積特訓成績_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+window.tryLogin=tryLogin; window.fetchData=fetchData; window.exportCSV=exportCSV; window.render=render;
+</script>
+</body>
+</html>

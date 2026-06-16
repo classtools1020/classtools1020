@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>對角線特工 · 正方形與面積特訓 (6/16)</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB27uSUnTSYkKJ5u5FqOqEnSbuA9br4lmE",
+  authDomain: "classtools1019.firebaseapp.com",
+  databaseURL: "https://classtools1019-default-rtdb.firebaseio.com",
+  projectId: "classtools1019",
+  storageBucket: "classtools1019.firebasestorage.app",
+  messagingSenderId: "402119556579",
+  appId: "1:402119556579:web:e0bace85a3454fb88eb4d6"
+};
+try { firebase.initializeApp(firebaseConfig); } catch(e){ console.warn(e); }
+const FB_PATH = 'submissions/square_area_0616';
+</script>
+<style>
+  :root{
+    --bg1:#0f0c29; --bg2:#302b63; --bg3:#24243e;
+    --cyan:#22d3ee; --violet:#a855f7; --pink:#ec4899; --gold:#fbbf24;
+    --ok:#34d399; --no:#fb7185; --ink:#f1f5f9; --dim:#a3a3c2;
+    --glass:rgba(255,255,255,.08); --line:rgba(255,255,255,.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{font-family:'Segoe UI Rounded','Microsoft JhengHei','PingFang TC',system-ui,sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2),var(--bg3));background-attachment:fixed;
+    color:var(--ink);display:flex;justify-content:center;min-height:100vh;overflow-x:hidden;}
+  #app{width:100%;max-width:480px;display:flex;flex-direction:column;min-height:100vh;position:relative;}
+  .screen{display:none;flex-direction:column;flex:1;padding:18px 16px 26px;}
+  .screen.active{display:flex;}
+  .glass{background:var(--glass);border:1.5px solid var(--line);border-radius:22px;backdrop-filter:blur(8px);}
+  .grad{background:linear-gradient(95deg,var(--cyan),var(--violet),var(--pink));}
+  .btn{font-family:inherit;font-weight:800;font-size:17px;border:none;border-radius:16px;padding:15px;cursor:pointer;color:#fff;
+    background:linear-gradient(95deg,var(--cyan),var(--violet));box-shadow:0 8px 22px rgba(168,85,247,.45);transition:transform .08s,filter .15s;}
+  .btn:active{transform:translateY(2px) scale(.99);}
+  .btn.alt{background:linear-gradient(95deg,#334155,#475569);box-shadow:0 6px 16px rgba(0,0,0,.35);}
+  .btn.gold{background:linear-gradient(95deg,#f59e0b,#fbbf24);box-shadow:0 8px 22px rgba(251,191,36,.4);color:#3b2a00;}
+  .btn:disabled{filter:grayscale(.6) brightness(.7);cursor:not-allowed;box-shadow:none;}
+  .chip{display:inline-block;font-size:12px;font-weight:800;padding:4px 11px;border-radius:999px;background:rgba(34,211,238,.18);color:var(--cyan);border:1px solid rgba(34,211,238,.4);}
+
+  /* ===== Avatar / HUD ===== */
+  .avatar{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:52px;
+    background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.25),rgba(168,85,247,.25));
+    border:3px solid rgba(255,255,255,.5);box-shadow:0 0 28px rgba(168,85,247,.6),inset 0 0 18px rgba(255,255,255,.2);position:relative;}
+  .avatar.pulse{animation:avp 2.4s infinite;}
+  @keyframes avp{0%,100%{box-shadow:0 0 22px rgba(168,85,247,.5);}50%{box-shadow:0 0 38px rgba(34,211,238,.7);}}
+  .lvbadge{position:absolute;bottom:-6px;right:-6px;font-size:12px;font-weight:900;background:var(--gold);color:#3b2a00;border-radius:999px;padding:3px 8px;border:2px solid #fff;}
+  .xpbar{height:14px;background:rgba(0,0,0,.35);border-radius:999px;overflow:hidden;border:1px solid var(--line);}
+  .xpfill{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink));transition:width .7s cubic-bezier(.2,.9,.3,1);}
+  .coins{font-weight:900;color:var(--gold);}
+
+  /* ===== Start ===== */
+  #startScreen{justify-content:center;align-items:center;gap:14px;text-align:center;}
+  .title{font-size:30px;font-weight:900;line-height:1.25;letter-spacing:1px;
+    background:linear-gradient(95deg,var(--cyan),#fff,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 20px rgba(168,85,247,.4);}
+  .sub{color:var(--dim);font-size:13.5px;line-height:1.7;}
+  .hudrow{display:flex;align-items:center;gap:12px;width:100%;}
+  #nameInput{width:100%;padding:14px;font-family:inherit;font-size:17px;font-weight:700;text-align:center;border-radius:16px;
+    border:2px solid var(--line);background:rgba(0,0,0,.25);color:#fff;}
+  #nameInput::placeholder{color:#8b8bb0;}
+  #nameInput.need{border-color:var(--no);animation:shk .35s;}
+  @keyframes shk{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .startCard{width:100%;display:flex;flex-direction:column;gap:13px;padding:20px;align-items:center;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+
+  /* ===== Quiz ===== */
+  #quizTop{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
+  .qmeta{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:800;color:var(--dim);}
+  .dots{display:flex;gap:5px;}
+  .dot{width:100%;flex:1;height:7px;border-radius:999px;background:rgba(255,255,255,.14);}
+  .dot.cur{background:var(--cyan);}.dot.done{background:var(--violet);}.dot.miss{background:var(--no);}
+  .miniav{display:flex;align-items:center;gap:8px;}
+  .miniav .a{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(255,255,255,.12);border:1.5px solid var(--line);}
+  .combo{font-weight:900;color:var(--pink);min-width:40px;text-align:right;}
+  .qcard{display:flex;flex-direction:column;gap:13px;padding:17px;flex:1;}
+  .qtag{align-self:flex-start;}
+  .diagram{width:100%;display:flex;justify-content:center;}
+  .diagram svg{width:100%;max-width:280px;height:auto;background:rgba(255,255,255,.96);border-radius:16px;border:1px solid var(--line);}
+  .qtext{font-size:18px;font-weight:800;line-height:1.55;}
+  .choices{display:flex;flex-direction:column;gap:10px;}
+  .choice{font-family:inherit;font-size:16px;font-weight:700;text-align:left;padding:14px 15px;border-radius:14px;cursor:pointer;color:#fff;
+    background:rgba(255,255,255,.07);border:2px solid var(--line);transition:transform .07s,background .15s;line-height:1.45;}
+  .choice:active{transform:scale(.99);}
+  .choice.right{background:rgba(52,211,153,.22);border-color:var(--ok);}
+  .choice.wrong{background:rgba(251,113,133,.2);border-color:var(--no);opacity:.85;}
+  .fb{min-height:24px;font-size:14.5px;line-height:1.6;font-weight:700;}
+  .fb .y{color:var(--ok);}.fb .n{color:var(--no);}
+  .gains{display:flex;gap:8px;flex-wrap:wrap;font-weight:900;font-size:14px;}
+  .gains .e{color:var(--cyan);}.gains .c{color:var(--gold);}
+  .double-banner{font-weight:900;font-size:18px;color:var(--gold);text-shadow:0 0 14px rgba(251,191,36,.7);animation:db .6s;}
+  @keyframes db{0%{transform:scale(.4);opacity:0;}50%{transform:scale(1.25);opacity:1;}100%{transform:scale(1);}}
+  .shake{animation:shk .3s;}
+  .lablink{font-size:13px;font-weight:800;color:var(--cyan);text-decoration:underline;cursor:pointer;}
+
+  /* ===== Lab ===== */
+  #labScreen{gap:12px;}
+  .labhead{display:flex;align-items:center;justify-content:space-between;}
+  .labhead h2{font-size:19px;font-weight:900;}
+  #labSvgWrap{display:flex;justify-content:center;}
+  #labSvg{width:100%;max-width:330px;height:auto;background:rgba(255,255,255,.97);border-radius:18px;touch-action:none;border:1px solid var(--line);}
+  .labreadout{font-size:16px;font-weight:800;line-height:1.8;text-align:center;}
+  .labreadout b{color:var(--gold);}
+  .labreadout .ac{color:#e11d48;}.labreadout .bd{color:#1d4ed8;}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+  .pbtn{font-family:inherit;font-weight:800;font-size:13.5px;padding:9px 13px;border-radius:12px;border:2px solid var(--line);
+    background:rgba(255,255,255,.08);color:#fff;cursor:pointer;}
+  .pbtn:active{transform:scale(.97);}
+  .pbtn.on{background:linear-gradient(95deg,var(--cyan),var(--violet));border-color:transparent;}
+  .labtip{font-size:13px;color:var(--dim);line-height:1.7;text-align:center;}
+
+  /* ===== Shop ===== */
+  #shopScreen{gap:12px;}
+  .shopgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+  .skin{padding:14px 10px;text-align:center;border-radius:18px;cursor:pointer;position:relative;border:2px solid var(--line);background:rgba(255,255,255,.06);}
+  .skin.equipped{border-color:var(--cyan);box-shadow:0 0 18px rgba(34,211,238,.5);}
+  .skin.locked{opacity:.85;}
+  .skin .em{font-size:40px;}
+  .skin .nm{font-size:13.5px;font-weight:800;margin-top:4px;}
+  .skin .px{font-size:12.5px;font-weight:900;color:var(--gold);margin-top:3px;}
+  .skin .tagk{font-size:11px;color:var(--cyan);font-weight:800;}
+
+  /* ===== End ===== */
+  #endScreen{justify-content:center;align-items:center;gap:13px;text-align:center;}
+  .rank{font-size:46px;}
+  .endline{font-size:15px;color:var(--ink);line-height:1.8;}
+  .endbig{font-size:30px;font-weight:900;background:linear-gradient(95deg,var(--cyan),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sent{color:var(--ok);font-weight:800;font-size:13.5px;}
+  .nosent{color:var(--gold);font-weight:800;font-size:13.5px;}
+
+  /* ===== popups ===== */
+  .pop{position:fixed;inset:0;background:rgba(5,5,20,.72);display:none;align-items:center;justify-content:center;z-index:50;padding:24px;}
+  .pop.show{display:flex;}
+  .popcard{padding:24px;text-align:center;max-width:330px;width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;border-radius:24px;
+    background:linear-gradient(160deg,#2a2350,#1b1733);border:1.5px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.6);}
+  .popcard h3{font-size:22px;font-weight:900;}
+  .popcard .big{font-size:64px;}
+  .confetti{position:fixed;top:-20px;font-size:22px;z-index:60;pointer-events:none;animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(540deg);opacity:.2;}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== START ===== -->
+  <div class="screen active" id="startScreen">
+    <div class="title">對角線特工<br><span style="font-size:18px;font-weight:800;color:var(--cyan)">正方形 × 面積特訓</span></div>
+    <div class="sub">📐 6/16 線上作業｜正方形性質 + 對角線垂直四邊形面積<br>答對賺能量升級 ⚡ 隨機 DOUBLE 爆擊 🎁 金幣換造型</div>
+    <div class="glass startCard">
+      <div class="avatar pulse" id="startAv">🟦<span class="lvbadge" id="startLv">Lv.1</span></div>
+      <div style="width:100%;display:flex;align-items:center;gap:10px;">
+        <div class="xpbar" style="flex:1"><div class="xpfill" id="startXp"></div></div>
+        <div class="coins" id="startCoins">🪙 0</div>
+      </div>
+      <input id="nameInput" maxlength="12" placeholder="輸入你的名字（老師才看得到成績）" autocomplete="off">
+      <button class="btn" style="width:100%" onclick="startGame()">🚀 開始挑戰（7 題）</button>
+      <div class="two">
+        <button class="btn alt" onclick="openLab('start')">🔬 面積實驗室</button>
+        <button class="btn alt" onclick="openShop('start')">🎨 造型店</button>
+      </div>
+    </div>
+    <div class="sub" style="font-size:12px">⚠️ 進度自動保存，答錯不扣分，慢慢玩！</div>
+  </div>
+
+  <!-- ===== QUIZ ===== -->
+  <div class="screen" id="quizScreen">
+    <div id="quizTop">
+      <div class="dots" id="dots"></div>
+      <div class="qmeta">
+        <div class="miniav"><div class="a" id="qAv">🟦</div><span id="qLv">Lv.1</span>
+          <div class="xpbar" style="width:90px"><div class="xpfill" id="qXp"></div></div>
+          <span class="coins" id="qCoins">🪙0</span></div>
+        <div class="combo" id="qCombo"></div>
+      </div>
+    </div>
+    <div class="glass qcard">
+      <span class="chip qtag" id="qTag">第 1 題</span>
+      <div class="diagram" id="qDiagram"></div>
+      <div class="qtext" id="qText"></div>
+      <div class="choices" id="qChoices"></div>
+      <div class="fb" id="qFb"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <span class="lablink" id="qLab" onclick="openLab('quiz')" style="display:none">🔬 想不通？打開面積實驗室動手玩</span>
+        <button class="btn" id="qNext" style="display:none;margin-left:auto;padding:12px 22px" onclick="nextQ()">下一題 ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LAB ===== -->
+  <div class="screen" id="labScreen">
+    <div class="labhead">
+      <h2>🔬 面積實驗室</h2>
+      <button class="btn alt" style="padding:9px 14px;font-size:14px" onclick="closeLab()">↩ 返回</button>
+    </div>
+    <div class="labtip">用手指拖曳 <b style="color:#e11d48">紅</b>／<b style="color:#1d4ed8">藍</b> 對角線的 4 個端點，看面積怎麼變！</div>
+    <div id="labSvgWrap"><svg id="labSvg" viewBox="0 0 300 240"></svg></div>
+    <div class="labreadout" id="labReadout"></div>
+    <div class="presets" id="labPresets">
+      <button class="pbtn" data-p="rhom" onclick="labPreset('rhom')">◆ 菱形</button>
+      <button class="pbtn" data-p="sq" onclick="labPreset('sq')">■ 正方形</button>
+      <button class="pbtn" data-p="kite" onclick="labPreset('kite')">🪁 箏形</button>
+      <button class="pbtn" data-p="free" onclick="labPreset('free')">🎲 隨機</button>
+    </div>
+    <button class="btn gold" id="labSplit" onclick="labToggleSplit()">✂️ 切開看公式怎麼來的</button>
+    <div class="labtip" id="labWhy" style="display:none">
+      沿著 <b style="color:#1d4ed8">藍色對角線 BD</b> 切開，得到上下兩個三角形：<br>
+      面積 = ½×BD×OA ＋ ½×BD×OC = ½×BD×(OA+OC) = <b>½ × BD × AC</b><br>
+      → 所以「對角線互相垂直」的四邊形，面積就是 <b>對角線 × 對角線 ÷ 2</b> 💡
+    </div>
+  </div>
+
+  <!-- ===== SHOP ===== -->
+  <div class="screen" id="shopScreen">
+    <div class="labhead">
+      <h2>🎨 造型店 <span class="coins" id="shopCoins" style="font-size:16px"></span></h2>
+      <button class="btn alt" style="padding:9px 14px;font-size:14px" onclick="closeShop()">↩ 返回</button>
+    </div>
+    <div class="labtip">點一下造型可<b>裝備</b>；金幣夠就能<b>解鎖</b>。你的造型會在挑戰時陪你升級！</div>
+    <div class="shopgrid" id="shopGrid"></div>
+    <button class="btn gold" style="margin-top:6px" onclick="gacha()">🎁 抽抽樂（隨機造型 · 60 🪙）</button>
+  </div>
+
+  <!-- ===== END ===== -->
+  <div class="screen" id="endScreen">
+    <div class="rank" id="endRank">🏆</div>
+    <div class="endbig" id="endTitle">四邊形大師！</div>
+    <div class="avatar pulse" id="endAv" style="margin:4px 0">🟦<span class="lvbadge" id="endLv">Lv.1</span></div>
+    <div class="glass" style="padding:18px;width:100%">
+      <div class="endline" id="endStats"></div>
+    </div>
+    <div id="endSent"></div>
+    <div class="two" style="width:100%">
+      <button class="btn gold" onclick="gacha()">🎁 抽抽樂</button>
+      <button class="btn alt" onclick="openShop('end')">🎨 造型店</button>
+    </div>
+    <button class="btn" style="width:100%" onclick="restart()">🔁 再挑戰一次</button>
+  </div>
+
+</div>
+
+<!-- popups -->
+<div class="pop" id="popLevel"><div class="popcard">
+  <div class="big">⚡</div><h3 id="plTitle">升級！</h3><p id="plText" style="color:var(--dim)"></p>
+  <button class="btn" style="width:100%" onclick="$('popLevel').classList.remove('show')">太強了！</button>
+</div></div>
+<div class="pop" id="popGacha"><div class="popcard">
+  <div class="big" id="pgEmoji">🎁</div><h3 id="pgTitle"></h3><p id="pgText" style="color:var(--dim)"></p>
+  <button class="btn" style="width:100%" onclick="$('popGacha').classList.remove('show')">收下！</button>
+</div></div>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+
+/* ===== 音效 ===== */
+let AC=null;
+function beep(f,d,t='triangle',v=.08){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.stop(AC.currentTime+d);}catch(e){}}
+const sOK=()=>{beep(660,.09);setTimeout(()=>beep(990,.16),90);};
+const sNo=()=>beep(170,.2,'sawtooth',.07);
+const sCrit=()=>[784,1047,1319,1568].forEach((f,i)=>setTimeout(()=>beep(f,.14,'triangle',.1),i*70));
+const sLvl=()=>[523,659,784,1047,1319].forEach((f,i)=>setTimeout(()=>beep(f,.18,'triangle',.1),i*110));
+const sCoin=()=>{beep(1175,.06);setTimeout(()=>beep(1568,.08),60);};
+function unlockAudio(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();}catch(e){}}
+
+/* ===== 造型 ===== */
+const SKINS=[
+  {id:'sq',em:'🟦',nm:'方塊',px:0},
+  {id:'cool',em:'😎',nm:'酷方塊',px:80},
+  {id:'pixel',em:'👾',nm:'像素獸',px:140},
+  {id:'fox',em:'🦊',nm:'狐狸獸',px:180},
+  {id:'dragon',em:'🐉',nm:'龍方塊',px:260},
+  {id:'unicorn',em:'🦄',nm:'彩虹獸',px:340},
+  {id:'gold',em:'🌟',nm:'黃金方塊',px:480},
+  {id:'alien',em:'🛸',nm:'幽浮',px:600},
+];
+const skinEm=id=>(SKINS.find(s=>s.id===id)||SKINS[0]).em;
+
+/* ===== 永久存檔（金幣/造型/等級跨作業保留） ===== */
+const META_KEY='sqArea0616meta';
+let meta={coins:0,totalExp:0,unlocked:['sq'],equipped:'sq',bestScore:0,plays:0};
+function loadMeta(){try{const m=JSON.parse(localStorage.getItem(META_KEY));if(m){meta=Object.assign(meta,m);if(!meta.unlocked.includes('sq'))meta.unlocked.push('sq');}}catch(e){}}
+function saveMeta(){try{localStorage.setItem(META_KEY,JSON.stringify(meta));}catch(e){}}
+const levelFor=exp=>1+Math.floor(exp/500);
+const levelPct=exp=>((exp%500)/500*100);
+
+/* ===== 題庫（每題都有圖示；涵蓋正方形/菱形/箏形/一般垂直對角線四邊形） ===== */
+const RA='<rect x="-1" y="-1" width="13" height="13" fill="none" stroke="#111" stroke-width="2"/>'; // right-angle helper drawn via transform
+function svg(inner,vb='0 0 260 200'){return `<svg viewBox="${vb}">${inner}</svg>`;}
+function lbl(x,y,t,c='#0f172a',s=15){return `<text x="${x}" y="${y}" font-size="${s}" font-weight="800" fill="${c}" font-family="sans-serif" text-anchor="middle">${t}</text>`;}
+// 由四個半對角線(像素)畫出對角線垂直的四邊形：A上 C下 B左 D右
+function quadDiag({A,C,B,D,ox=130,oy=100,fill='#dbeafe',stroke='#2563eb',dvLab='',dhLab=''}){
+  const ax=ox,ay=oy-A, cx=ox,cy=oy+C, bx=ox-B,by=oy, dx=ox+D,dy=oy;
+  let s='';
+  s+=`<polygon points="${ax},${ay} ${dx},${dy} ${cx},${cy} ${bx},${by}" fill="${fill}" stroke="${stroke}" stroke-width="3.5" stroke-linejoin="round"/>`;
+  s+=`<line x1="${ax}" y1="${ay}" x2="${cx}" y2="${cy}" stroke="#e11d48" stroke-width="3"/>`;
+  s+=`<line x1="${bx}" y1="${by}" x2="${dx}" y2="${dy}" stroke="#1d4ed8" stroke-width="3"/>`;
+  s+=`<rect x="${ox+2}" y="${oy-13}" width="11" height="11" fill="none" stroke="#111" stroke-width="2"/>`;
+  s+=`<circle cx="${ox}" cy="${oy}" r="3.2" fill="#111"/>`;
+  s+=lbl(ax,ay-7,'A')+lbl(dx+11,dy+4,'D')+lbl(cx,cy+17,'C')+lbl(bx-11,by+4,'B')+lbl(ox+20,oy+13,'O','#475569',12);
+  if(dvLab)s+=lbl(ox-15,oy-A/2+4,dvLab,'#e11d48',15);
+  if(dhLab)s+=lbl(ox+D/2,oy-7,dhLab,'#1d4ed8',15);
+  return svg(s);
+}
+// 軸對齊正方形 + 兩對角線
+function squareDiag(diagLab){
+  const x=58,y=24,w=144;
+  let s=`<rect x="${x}" y="${y}" width="${w}" height="${w}" fill="#dcfce7" stroke="#16a34a" stroke-width="3.5"/>`;
+  s+=`<line x1="${x}" y1="${y}" x2="${x+w}" y2="${y+w}" stroke="#e11d48" stroke-width="3"/>`;
+  s+=`<line x1="${x+w}" y1="${y}" x2="${x}" y2="${y+w}" stroke="#1d4ed8" stroke-width="3"/>`;
+  s+=`<circle cx="${x+w/2}" cy="${y+w/2}" r="3.2" fill="#111"/>`;
+  s+=`<rect x="${x+w/2+2}" y="${y+w/2-13}" width="11" height="11" fill="none" stroke="#111" stroke-width="2"/>`;
+  // tick marks (equal sides)
+  const tk=(mx,my,a)=>`<line x1="${mx-5}" y1="${my-5}" x2="${mx+5}" y2="${my+5}" stroke="#16a34a" stroke-width="2" transform="rotate(${a} ${mx} ${my})"/>`;
+  s+=lbl(x-12,y+w/2,'A')+lbl(x+w+12,y+w/2,'C')+lbl(x+w/2,y-8,'B')+lbl(x+w/2,y+w+18,'D');
+  if(diagLab)s+=lbl(x+w*0.7,y+w*0.32,diagLab,'#e11d48',15);
+  return svg(s,'0 0 260 200');
+}
+const Q=[
+ {tag:'正方形 · 性質',
+  d:squareDiag(''),
+  q:'正方形「四邊等長、四個角都是直角」，所以它的兩條對角線會有什麼性質？',
+  c:['等長、互相垂直、又互相平分','只有互相平分，不垂直','一條長、一條短'],a:0,
+  hint:'正方形可看成長方形(對角線等長)，也可看成菱形(對角線垂直平分)。',
+  why:'正方形＝長方形＋菱形：對角線「等長 + 互相垂直平分」三個優點全包！'},
+
+ {tag:'正方形 · 判別（例5）',
+  d:quadDiag({A:62,C:62,B:62,D:62,fill:'#ede9fe',stroke:'#7c3aed'}),
+  q:'一個四邊形的兩條對角線「等長 ＋ 互相垂直平分」，它一定是什麼四邊形？',
+  c:['正方形','只是長方形','只是菱形'],a:0,
+  hint:'對角線等長→長方形；對角線垂直平分→菱形；兩個條件同時成立呢？',
+  why:'等長⇒長方形、垂直平分⇒菱形，兩者都滿足就是「正方形」！'},
+
+ {tag:'面積公式 · 概念',
+  d:quadDiag({A:55,C:70,B:78,D:50,fill:'#cffafe',stroke:'#0891b2',dvLab:'',dhLab:''}),
+  q:'當一個四邊形的兩條對角線「互相垂直」時，它的面積要怎麼算？',
+  c:['對角線 × 對角線 ÷ 2','對角線 × 對角線','(對角線 ＋ 對角線) ÷ 2'],a:0,
+  hint:'課本加強重點：對角線垂直時，面積 = 兩對角線長乘積的「一半」。',
+  why:'面積 = ½ × 對角線 × 對角線。這就是今天的主角公式！',isArea:true},
+
+ {tag:'菱形 · 求面積',
+  d:quadDiag({A:46,C:46,B:64,D:64,fill:'#fce7f3',stroke:'#db2777',dvLab:'6',dhLab:'8'}),
+  q:'菱形的兩條對角線分別是 6 公分和 8 公分，面積是多少？',
+  c:['24 平方公分','48 平方公分','14 平方公分'],a:0,
+  hint:'對角線垂直 → 6 × 8 ÷ 2 = ？',
+  why:'6 × 8 ÷ 2 = 24（平方公分）。菱形對角線互相垂直，公式直接套！',isArea:true},
+
+ {tag:'箏形 · 求面積（隨堂練習）',
+  d:quadDiag({A:34,C:70,B:62,D:62,fill:'#dbeafe',stroke:'#2563eb',dvLab:'12',dhLab:'18'}),
+  q:'箏形 ABCD 中，對角線 AC＝12、BD＝18，箏形的面積是多少？',
+  c:['108 平方公分','216 平方公分','30 平方公分'],a:0,
+  hint:'箏形對角線也互相垂直 → 12 × 18 ÷ 2 = ？',
+  why:'12 × 18 ÷ 2 = 108（平方公分）。和課本隨堂練習一樣！',isArea:true},
+
+ {tag:'正方形 · 用對角線求面積',
+  d:squareDiag('10'),
+  q:'一個正方形的對角線長 10 公分（正方形兩條對角線一樣長），面積是多少？',
+  c:['50 平方公分','100 平方公分','20 平方公分'],a:0,
+  hint:'正方形對角線垂直又等長，兩條都是 10 → 10 × 10 ÷ 2 = ？',
+  why:'10 × 10 ÷ 2 = 50（平方公分）。正方形也適用對角線公式！',isArea:true},
+
+ {tag:'一般四邊形 · 對角線垂直',
+  d:quadDiag({A:30,C:58,B:42,D:70,fill:'#fef9c3',stroke:'#ca8a04',dvLab:'5',dhLab:'10'}),
+  q:'這個四邊形不是菱形也不是箏形，但兩條對角線「互相垂直」，AC＝5、BD＝10，面積＝？',
+  c:['25 平方公分','50 平方公分','15 平方公分'],a:0,
+  hint:'只要「對角線垂直」就能用！5 × 10 ÷ 2 = ？',
+  why:'5 × 10 ÷ 2 = 25。重點：只要對角線互相垂直，任何四邊形都能用這公式！',isArea:true},
+];
+
+/* ===== 狀態 ===== */
+let playerName='', fbRef=null, fbKey=null, gameStart=0;
+let cur=0, qRes=[], combo=0, bestCombo=0, wrongTotal=0, firstWrongThis=false;
+let sessExp=0, sessCoins=0;
+
+/* ===== HUD ===== */
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
+function refreshAvatars(){
+  const em=skinEm(meta.equipped), lv=levelFor(meta.totalExp), pct=levelPct(meta.totalExp);
+  $('startAv').firstChild.nodeValue=em;$('startLv').textContent='Lv.'+lv;$('startXp').style.width=pct+'%';$('startCoins').textContent='🪙 '+meta.coins;
+  $('qAv').textContent=em;$('qLv').textContent='Lv.'+lv;$('qXp').style.width=pct+'%';$('qCoins').textContent='🪙'+meta.coins;
+  $('endAv').firstChild.nodeValue=em;$('endLv').textContent='Lv.'+lv;
+}
+function addExp(n){const b=levelFor(meta.totalExp);meta.totalExp+=n;sessExp+=n;saveMeta();refreshAvatars();const a=levelFor(meta.totalExp);if(a>b)levelUp(a);}
+function addCoins(n){meta.coins+=n;sessCoins+=n;saveMeta();refreshAvatars();}
+function levelUp(lv){sLvl();$('plTitle').textContent=`升級！ Lv.${lv}`;$('plText').textContent='你的能量越來越強，繼續答題解鎖更多造型！';$('popLevel').classList.add('show');}
+
+/* ===== 進度回傳老師後台 ===== */
+function syncProgress(done=false){
+  const correct=qRes.filter(x=>x===1).length;
+  const ans=qRes.filter(x=>x!==undefined&&x!==null).length;
+  if(!fbRef)return;
+  fbRef.update({
+    nick:playerName, total:Q.length, correct, answered:ans, wrong:wrongTotal,
+    bestCombo, level:levelFor(meta.totalExp), expGain:sessExp,
+    accuracy: ans? Math.round(correct/ans*100):0,
+    q: Q.map((_,i)=> qRes[i]===undefined? -1 : qRes[i]),
+    status: done?'done':'playing', done,
+    elapsedSec: Math.round((Date.now()-gameStart)/1000),
+    updatedAt:new Date().toISOString()
+  }).catch(()=>{});
+}
+
+/* ===== 流程 ===== */
+function startGame(){
+  unlockAudio();
+  const nm=$('nameInput').value.trim();
+  if(!nm){$('nameInput').classList.add('need');$('nameInput').focus();setTimeout(()=>$('nameInput').classList.remove('need'),600);sNo();return;}
+  playerName=nm;cur=0;qRes=[];combo=0;bestCombo=0;wrongTotal=0;sessExp=0;sessCoins=0;gameStart=Date.now();fbRef=null;fbKey=null;
+  try{fbRef=firebase.database().ref(FB_PATH).push();fbKey=fbRef.key;
+    fbRef.set({nick:playerName,total:Q.length,correct:0,answered:0,wrong:0,bestCombo:0,level:levelFor(meta.totalExp),
+      status:'playing',done:false,startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),elapsedSec:0});
+  }catch(e){fbRef=null;}
+  show('quizScreen');renderDots();renderQ();
+  beep(523,.12,'triangle',.1);
+}
+function renderDots(){
+  $('dots').innerHTML=Q.map((_,i)=>{
+    let cls='dot';if(i<cur)cls+=qRes[i]===1?' done':' miss';if(i===cur)cls+=' cur';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+}
+function renderQ(){
+  firstWrongThis=false;
+  const q=Q[cur];
+  $('qTag').textContent=`第 ${cur+1} 題 · ${q.tag}`;
+  $('qDiagram').innerHTML=q.d||'';
+  $('qText').textContent=q.q;
+  $('qFb').innerHTML='';$('qNext').style.display='none';
+  $('qLab').style.display=q.isArea?'inline':'none';
+  $('qCombo').textContent=combo>=2?`🔥x${combo}`:'';
+  const order=[0,1,2].sort(()=>Math.random()-.5);
+  const box=$('qChoices');box.innerHTML='';
+  order.forEach(i=>{
+    const b=document.createElement('button');b.className='choice';b.textContent=q.c[i];
+    b.onclick=()=>choose(b,i,q);box.appendChild(b);
+  });
+  renderDots();refreshAvatars();
+}
+function choose(btn,idx,q){
+  if(btn.disabled)return;
+  const correct=idx===q.a;
+  if(qRes[cur]===undefined)qRes[cur]=correct?1:0;
+  if(correct){
+    [...$('qChoices').children].forEach(c=>c.disabled=true);
+    btn.classList.add('right');
+    let expG,coinG,crit=false,mult=1,banner='';
+    if(!firstWrongThis){
+      combo++;bestCombo=Math.max(bestCombo,combo);
+      mult=combo>=5?2.5:combo>=3?2:combo>=2?1.5:1;
+      crit=Math.random()<0.3;
+      expG=Math.round(100*mult*(crit?2:1));coinG=Math.round(10*mult*(crit?2:1));
+      if(crit){banner='⚡ DOUBLE 爆擊！能量 ×2！';sCrit();confetti(30);}else{sOK();confetti(mult>1?18:12);}
+      if(mult>1&&!crit)banner=`🔥 連擊 ×${mult} 加成！`;
+    }else{combo=0;expG=30;coinG=3;sOK();}
+    addExp(expG);addCoins(coinG);
+    $('qFb').innerHTML=`<span class="y">✅ 答對了！</span> ${q.why}`
+      +`<div class="gains">${banner?`<span class="double-banner">${banner}</span><br>`:''}<span class="e">＋${expG} 能量</span><span class="c">＋${coinG} 🪙</span></div>`;
+    $('qCombo').textContent=combo>=2?`🔥x${combo}`:'';
+    $('qNext').style.display='inline-block';$('qNext').textContent=cur<Q.length-1?'下一題 ▶':'看成績 🏁';
+  }else{
+    btn.classList.add('wrong');btn.disabled=true;firstWrongThis=true;combo=0;wrongTotal++;
+    $('qCombo').textContent='';
+    $('qFb').innerHTML=`<span class="n">💡 沒關係，答錯不扣分！</span> 看提示再選一次：${q.hint}`;
+    $('qChoices').classList.add('shake');setTimeout(()=>$('qChoices').classList.remove('shake'),320);
+    sNo();
+  }
+  syncProgress();
+}
+function nextQ(){
+  cur++;
+  if(cur>=Q.length){finish();return;}
+  renderQ();beep(440,.06,'square',.05);
+}
+function finish(){
+  const score=qRes.filter(x=>x===1).length;
+  meta.bestScore=Math.max(meta.bestScore,score);meta.plays++;saveMeta();
+  syncProgress(true);
+  let rank,title;
+  if(score===7){rank='🏆';title='滿分大師！';}
+  else if(score>=5){rank='🌟';title='四邊形高手！';}
+  else if(score>=3){rank='💪';title='進步神速！';}
+  else{rank='🌱';title='繼續加油，你做得到！';}
+  $('endRank').textContent=rank;$('endTitle').textContent=title;
+  $('endStats').innerHTML=
+    `<b style="font-size:22px">答對 ${score} / 7</b>　🔥 最高連擊 ×${bestCombo}<br>`
+    +`本回合 ⚡ <span style="color:var(--cyan)">＋${sessExp} 能量</span>　🪙 <span style="color:var(--gold)">＋${sessCoins} 金幣</span><br>`
+    +`目前等級 <b>Lv.${levelFor(meta.totalExp)}</b>　歷史最佳 ${meta.bestScore}/7`;
+  $('endSent').innerHTML=fbRef?'<span class="sent">✅ 成績已自動送給老師！</span>':'<span class="nosent">⚠️ 網路沒連上，請直接告訴老師你的分數！</span>';
+  refreshAvatars();show('endScreen');
+  if(score>=5){sCrit();confetti(40);}else{sOK();}
+}
+function restart(){show('startScreen');refreshAvatars();$('nameInput').value=playerName;}
+
+/* ===== 造型店 ===== */
+let shopReturn='start';
+function openShop(from){shopReturn=from||'start';renderShop();show('shopScreen');}
+function closeShop(){show(shopReturn==='end'?'endScreen':'startScreen');refreshAvatars();}
+function renderShop(){
+  $('shopCoins').textContent='🪙 '+meta.coins;
+  $('shopGrid').innerHTML=SKINS.map(s=>{
+    const owned=meta.unlocked.includes(s.id), eq=meta.equipped===s.id;
+    let foot= eq?'<div class="tagk">✓ 裝備中</div>': owned?'<div class="tagk">點我裝備</div>':`<div class="px">🪙 ${s.px}</div>`;
+    return `<div class="skin ${eq?'equipped':''} ${owned?'':'locked'}" onclick="tapSkin('${s.id}')">
+      <div class="em">${owned?s.em:'❓'}</div><div class="nm">${owned?s.nm:'？？？'}</div>${foot}</div>`;
+  }).join('');
+}
+function tapSkin(id){
+  const s=SKINS.find(x=>x.id===id);
+  if(meta.unlocked.includes(id)){meta.equipped=id;saveMeta();sCoin();renderShop();refreshAvatars();}
+  else if(meta.coins>=s.px){meta.coins-=s.px;meta.unlocked.push(id);meta.equipped=id;saveMeta();sLvl();confetti(20);renderShop();refreshAvatars();}
+  else{sNo();const c=event.currentTarget;c.classList.add('shake');setTimeout(()=>c.classList.remove('shake'),320);
+    $('shopCoins').textContent='🪙 '+meta.coins+'（金幣不夠～多答題賺金幣！）';}
+}
+function gacha(){
+  if(meta.coins<60){sNo();$('pgEmoji').textContent='🪙';$('pgTitle').textContent='金幣不夠';$('pgText').textContent='抽抽樂需要 60 金幣，先去答題賺金幣吧！';$('popGacha').classList.add('show');return;}
+  meta.coins-=60;
+  const locked=SKINS.filter(s=>!meta.unlocked.includes(s.id));
+  if(locked.length===0){meta.coins+=90;saveMeta();$('pgEmoji').textContent='💎';$('pgTitle').textContent='已收集全部造型！';$('pgText').textContent='退還 90 金幣給你，你真的太強了！';$('popGacha').classList.add('show');refreshAvatars();renderShop();return;}
+  const win=locked[Math.floor(Math.random()*locked.length)];
+  meta.unlocked.push(win.id);meta.equipped=win.id;saveMeta();sLvl();confetti(34);
+  $('pgEmoji').textContent=win.em;$('pgTitle').textContent='抽到新造型！';$('pgText').textContent=`恭喜獲得「${win.nm}」${win.em}，已自動裝備！`;
+  $('popGacha').classList.add('show');refreshAvatars();renderShop();
+}
+
+/* ===== 面積實驗室（GeoGebra 式拖曳） ===== */
+let labReturn='start', lab={A:60,C:60,B:80,D:80,split:false}, labActive=null;
+const LAB={ox:150,oy:120,min:22,max:104,unit:12}; // unit px -> 1.0
+function openLab(from){labReturn=from||'start';labPreset('rhom');show('labScreen');}
+function closeLab(){show(labReturn==='quiz'?'quizScreen':'startScreen');}
+function labPreset(p){
+  document.querySelectorAll('#labPresets .pbtn').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  if(p==='rhom'){lab.A=lab.C=54;lab.B=lab.D=84;}
+  else if(p==='sq'){lab.A=lab.C=lab.B=lab.D=72;}
+  else if(p==='kite'){lab.A=40;lab.C=88;lab.B=lab.D=78;}
+  else{lab.A=30+Math.random()*70|0;lab.C=30+Math.random()*70|0;lab.B=30+Math.random()*70|0;lab.D=30+Math.random()*70|0;}
+  renderLab();
+}
+function renderLab(){
+  const {ox,oy}=LAB;
+  const ax=ox,ay=oy-lab.A, cx=ox,cy=oy+lab.C, bx=ox-lab.B,by=oy, dx=ox+lab.D,dy=oy;
+  let s='';
+  if(lab.split){
+    s+=`<polygon points="${ax},${ay} ${dx},${dy} ${bx},${by}" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>`;
+    s+=`<polygon points="${cx},${cy} ${dx},${dy} ${bx},${by}" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>`;
+  }else{
+    s+=`<polygon points="${ax},${ay} ${dx},${dy} ${cx},${cy} ${bx},${by}" fill="#e0e7ff" stroke="#6366f1" stroke-width="3.5" stroke-linejoin="round"/>`;
+  }
+  s+=`<line x1="${ax}" y1="${ay}" x2="${cx}" y2="${cy}" stroke="#e11d48" stroke-width="3.5"/>`;
+  s+=`<line x1="${bx}" y1="${by}" x2="${dx}" y2="${dy}" stroke="#1d4ed8" stroke-width="3.5"/>`;
+  s+=`<rect x="${ox+2}" y="${oy-14}" width="12" height="12" fill="none" stroke="#111" stroke-width="2"/>`;
+  s+=`<circle cx="${ox}" cy="${oy}" r="3" fill="#111"/>`;
+  // handles
+  const H=(x,y,h,col)=>`<circle class="h" data-h="${h}" cx="${x}" cy="${y}" r="11" fill="${col}" stroke="#fff" stroke-width="3"/>`;
+  s+=H(ax,ay,'A','#e11d48')+H(cx,cy,'C','#e11d48')+H(bx,by,'B','#1d4ed8')+H(dx,dy,'D','#1d4ed8');
+  s+=lbl(ax,ay-15,'A','#e11d48',14)+lbl(cx,cy+24,'C','#e11d48',14)+lbl(bx-15,by+5,'B','#1d4ed8',14)+lbl(dx+15,dy+5,'D','#1d4ed8',14);
+  $('labSvg').innerHTML=s;
+  const acU=((lab.A+lab.C)/LAB.unit), bdU=((lab.B+lab.D)/LAB.unit), area=acU*bdU/2;
+  $('labReadout').innerHTML=`<span class="ac">AC = ${acU.toFixed(1)}</span> ， <span class="bd">BD = ${bdU.toFixed(1)}</span><br>面積 = ½ × <span class="ac">AC</span> × <span class="bd">BD</span> = ½ × ${acU.toFixed(1)} × ${bdU.toFixed(1)} = <b>${area.toFixed(1)}</b>`;
+}
+function labToggleSplit(){lab.split=!lab.split;$('labWhy').style.display=lab.split?'block':'none';$('labSplit').textContent=lab.split?'🔁 合起來':'✂️ 切開看公式怎麼來的';renderLab();}
+(function bindLab(){
+  const svgEl=$('labSvg');
+  function pt(e){const r=svgEl.getBoundingClientRect();const sx=300/r.width, sy=240/r.height;const cx=(e.touches?e.touches[0].clientX:e.clientX), cy=(e.touches?e.touches[0].clientY:e.clientY);return {x:(cx-r.left)*sx,y:(cy-r.top)*sy};}
+  function down(e){const t=e.target;if(t.dataset&&t.dataset.h){labActive=t.dataset.h;e.preventDefault();}}
+  function moveH(e){if(!labActive)return;e.preventDefault();const p=pt(e),{ox,oy,min,max}=LAB;const cl=v=>Math.max(min,Math.min(max,v));
+    if(labActive==='A')lab.A=cl(oy-p.y);else if(labActive==='C')lab.C=cl(p.y-oy);else if(labActive==='B')lab.B=cl(ox-p.x);else if(labActive==='D')lab.D=cl(p.x-ox);
+    document.querySelectorAll('#labPresets .pbtn').forEach(b=>b.classList.remove('on'));renderLab();}
+  function up(){labActive=null;}
+  svgEl.addEventListener('mousedown',down);svgEl.addEventListener('touchstart',down,{passive:false});
+  window.addEventListener('mousemove',moveH);window.addEventListener('touchmove',moveH,{passive:false});
+  window.addEventListener('mouseup',up);window.addEventListener('touchend',up);
+})();
+
+/* ===== 彩帶 ===== */
+function confetti(n){const ems=['🎉','✨','⭐','💎','🟦','💜','🩷'];for(let i=0;i<n;i++){const s=document.createElement('div');s.className='confetti';s.textContent=ems[i%ems.length];s.style.left=Math.random()*100+'vw';s.style.animationDuration=(1.6+Math.random()*1.4)+'s';s.style.fontSize=(16+Math.random()*16)+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),3200);}}
+
+/* ===== init ===== */
+loadMeta();refreshAvatars();
+</script>
+</body></html>
