@@ -1,7 +1,7 @@
 /* 成績公告頁。資料來源：Google 試算表「競賽紀錄總表（成績登打）」，格式與紙本紀錄總表相同：
  * 每個組別一個區塊，列＝項目，欄＝第一名（學校、成績）… 最右欄「公布」打 V 才顯示。 */
 import { renderResultsTable, renderSpiritList, esc, fmtTime, FLAG_SVG } from './results-table.js';
-import { API_URL as CONFIG_API } from './config.js';
+import { backend, loadPublic } from './api.js';
 
 const SHEET_ID = '1fmH2pcOlCmnwuMq2v0_FGvCwq513Dyk3hflEJ8oixMY';
 const SHEET_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
@@ -23,7 +23,7 @@ const state = { data: null, lastText: null, changedAt: null, divisionId: 1, item
 try { state.view = localStorage.getItem('asr115:view') || 'list'; } catch { /* ignore */ }
 const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
 const srcOverride = isLocal ? new URLSearchParams(location.search).get('src') : null;
-const API_URL = (isLocal && new URLSearchParams(location.search).get('api')) || CONFIG_API;
+const API_URL = backend !== 'none';
 
 // ---------- CSV ----------
 function parseCsv(text) {
@@ -134,18 +134,13 @@ async function fetchResults() {
   setOk();
 }
 async function fetchFromApi() {
-  let res;
-  try { res = await fetch(`${API_URL}${API_URL.includes('?') ? '&' : '?'}action=public&_=${Date.now()}`, { redirect: 'follow' }); }
-  catch { return setFailure('無法連線'); }
-  if (!res.ok) return setFailure(`回應 ${res.status}`);
-  const text = await res.text();
   let api;
-  try { api = JSON.parse(text); } catch { return setFailure('後台回應格式錯誤'); }
-  if (!api.ok) return setFailure(api.error || '後台錯誤');
+  try { api = await loadPublic(); } catch (e) { return setFailure(e.message || '無法連線'); }
   const key = JSON.stringify([api.results, api.announcement]);
   if (key !== state.lastText) {
     state.lastText = key;
-    state.changedAt = api.updated_at ? new Date(api.updated_at.replace(' ', 'T') + '+08:00') : new Date();
+    const iso = api.updated_at ? (api.updated_at.includes('T') ? api.updated_at : api.updated_at.replace(' ', 'T') + '+08:00') : '';
+    state.changedAt = iso ? new Date(iso) : new Date();
     if (Number.isNaN(state.changedAt.getTime())) state.changedAt = new Date();
     state.data = buildFromApi(api);
     renderAll();

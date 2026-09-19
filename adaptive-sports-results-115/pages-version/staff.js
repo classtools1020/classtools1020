@@ -1,40 +1,16 @@
 /* 成績登打頁：認證碼登入 → 選組別、項目 → 每個名次選學校、填成績 → 儲存／儲存並公布。
  * 後台是 Apps Script（config.js 的 API_URL）。 */
-import { API_URL as CONFIG_API } from './config.js';
-import { renderResultsTable, renderSpiritList, esc, fmtTime } from './results-table.js';
+import { backend, ApiError, loadStaff, saveItem, setAnnouncement } from './api.js';
+import { KNOCKOUT } from './config.js';
+import { renderResultsTable, renderSpiritList, esc } from './results-table.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const view = $('#view');
-const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
-const API_URL = (isLocal && new URLSearchParams(location.search).get('api')) || CONFIG_API;
-const KNOCKOUT = ['沙包投擲賽'];
+const API_URL = backend !== 'none';
 
 const state = { code: '', user: null, data: null, division: '國小組', item: '', rows: [], dirty: false, save: { kind: 'idle' } };
 try { state.code = localStorage.getItem('asr115:code') || ''; } catch { /* ignore */ }
 try { state.division = localStorage.getItem('asr115:division') || '國小組'; } catch { /* ignore */ }
-
-// ---------- API ----------
-class ApiError extends Error {}
-async function apiGet(params) {
-  const u = new URL(API_URL);
-  Object.entries(params).forEach(([k, v]) => u.searchParams.set(k, v));
-  u.searchParams.set('_', Date.now());
-  let res;
-  try { res = await fetch(u, { redirect: 'follow' }); } catch { throw new Error('無法連線到後台，請確認網路'); }
-  const data = await res.json().catch(() => ({ ok: false, error: '後台回應格式錯誤' }));
-  if (!data.ok) throw new ApiError(data.error || '後台錯誤');
-  return data;
-}
-async function apiPost(body) {
-  let res;
-  try {
-    // Content-Type 用 text/plain 避免瀏覽器預檢（Apps Script 不支援 OPTIONS）
-    res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ code: state.code, ...body }), redirect: 'follow' });
-  } catch { throw new Error('無法連線到後台，請確認網路後再按一次儲存'); }
-  const data = await res.json().catch(() => ({ ok: false, error: '後台回應格式錯誤' }));
-  if (!data.ok) throw new ApiError(data.error || '後台錯誤');
-  return data;
-}
 
 // ---------- 小工具 ----------
 function toast(msg, kind = 'ok') {
@@ -66,8 +42,8 @@ const tag = (st) => `<span class="tag ${STATUS[st][1]}">${STATUS[st][0]}</span>`
 function renderLogin(err = '') {
   $('#savebar').hidden = true;
   if (!API_URL) {
-    view.innerHTML = `<div class="card login"><h2>後台尚未啟用</h2><p>登打功能需要先完成一次「Apps Script 部署」（約 5 分鐘），做完後這裡就會出現登入畫面。</p>
-      <ol style="margin:12px 0 0 18px;line-height:1.8"><li>打開雲端硬碟「115適應體育」資料夾的試算表「115第23屆適應體育 成績資料庫」</li><li>擴充功能 → Apps Script → 貼上「Code.gs.txt」內容 → 儲存</li><li>選 setup → 執行 → 授權</li><li>部署 → 新增部署作業 → 網頁應用程式（執行身分：我；存取：任何人）→ 部署</li><li>把網址傳給 Claude 填入網站</li></ol></div>`;
+    view.innerHTML = `<div class="card login"><h2>後台尚未啟用</h2><p>登打功能需要先接上資料庫（Supabase，約 3 分鐘）。做完後這裡就會出現登入畫面。</p>
+      <ol style="margin:12px 0 0 18px;line-height:1.8"><li>到 supabase.com 建立一個專案（或用現有的）</li><li>左側 SQL Editor → 貼上 backend/supabase.sql 全部內容 → Run</li><li>Project Settings → API：複製 Project URL 與 anon public key 傳給 Claude</li><li>Claude 填入網站後即可用「Table Editor → asr → staff」裡的認證碼登入</li></ol></div>`;
     return;
   }
   view.innerHTML = `<div class="card login"><h2>工作人員登入</h2>${deep.item ? `<p><b>要登打：${esc(deep.division || '')}・${esc(deep.item)}</b></p>` : ''}<p class="help">輸入管理者給您的認證碼，不需要帳號或 Email。</p>
@@ -86,7 +62,7 @@ function renderLogin(err = '') {
 }
 
 async function load() {
-  const d = await apiGet({ action: 'staff', code: state.code });
+  const d = await loadStaff(state.code);
   state.data = d; state.user = d.user;
   $('#top-actions').innerHTML = `<span class="help topbar-user">${esc(d.user.name)}・${d.user.role === 'admin' ? '管理者' : '登打人員'}</span><a class="btn btn-sm" href="./" target="_blank" rel="noopener">公開頁</a><button class="btn btn-sm" id="btn-logout">登出</button>`;
   $('#btn-logout').onclick = () => { state.code = ''; state.user = null; try { localStorage.removeItem('asr115:code'); } catch { /* ignore */ } renderLogin(); };
@@ -109,7 +85,7 @@ function renderHome() {
   $('#div-seg').onclick = (e) => { const b = e.target.closest('button[data-d]'); if (!b) return; state.division = b.dataset.d; try { localStorage.setItem('asr115:division', state.division); } catch { /* ignore */ } renderHome(); };
   $('#btn-reload').onclick = async () => { try { await load(); renderHome(); toast('已更新'); } catch (err) { toast(err.message, 'err'); } };
   view.querySelectorAll('[data-item]').forEach((a) => { a.onclick = (e) => { e.preventDefault(); openItem(a.dataset.item); }; });
-  $('#btn-ann') && ($('#btn-ann').onclick = async () => { try { await apiPost({ action: 'announce', text: $('#ann').value }); toast('公告已儲存'); } catch (err) { toast(err.message, 'err'); } });
+  $('#btn-ann') && ($('#btn-ann').onclick = async () => { try { await setAnnouncement(state.code, $('#ann').value); toast('公告已儲存'); } catch (err) { toast(err.message, 'err'); } });
 }
 
 function openItem(item) {
@@ -208,7 +184,7 @@ async function save(publish) {
   if (publish && rows.length && !(await confirmDialog('儲存並公布', `確定公布「${esc(state.division)}・${esc(state.item)}」共 ${rows.length} 筆？公開頁會立即顯示。`, '確認公布'))) return;
   state.save = { kind: 'saving' }; renderSavebar();
   try {
-    const r = await apiPost({ action: 'save', division: state.division, item: state.item, publish, rows });
+    const r = await saveItem(state.code, state.division, state.item, publish, rows);
     state.dirty = false;
     state.save = { kind: 'saved', at: r.updated_at ? r.updated_at.slice(11, 16) : '' };
     renderSavebar();
