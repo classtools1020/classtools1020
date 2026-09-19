@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>成績公告｜115年度新竹縣第23屆特殊教育學生適應體育趣味運動競賽</title>
+<meta name="description" content="115年度新竹縣第23屆特殊教育學生適應體育趣味運動競賽 官方成績公告">
+<link rel="stylesheet" href="/assets/styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1f3a'/%3E%3Ctext x='16' y='22' font-size='16' text-anchor='middle' fill='%23fff' font-family='sans-serif' font-weight='700'%3E23%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <span class="kicker">官方成績公告</span>
+      <h1 id="event-name">適應體育趣味運動競賽</h1>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-sm" id="btn-qr" type="button">QR Code</button>
+      <button class="btn btn-sm" id="btn-print" type="button">列印</button>
+      <a class="btn btn-sm" href="/staff">工作人員</a>
+    </div>
+  </div>
+</header>
+<div class="eventmeta"><div class="wrap" id="event-meta"></div></div>
+
+<main class="main">
+  <div class="wrap">
+    <div class="controls" aria-label="查詢條件">
+      <div class="field">
+        <span class="label">組別</span>
+        <div class="seg" role="group" aria-label="選擇組別" id="division-seg"></div>
+      </div>
+      <div class="field">
+        <label for="item-select">比賽項目</label>
+        <select class="input" id="item-select"><option value="">全部項目</option></select>
+      </div>
+      <div class="field">
+        <label for="school-search">搜尋學校</label>
+        <input class="input" id="school-search" type="search" placeholder="輸入校名，例如：竹東" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="status-line" aria-live="polite">
+      <span id="update-status"><span class="dot wait"></span>載入中…</span>
+      <span id="award-rule"></span>
+    </div>
+    <div id="error-banner" class="banner banner-err" hidden role="alert"></div>
+    <p class="print-only help" id="print-note"></p>
+
+    <div id="results"></div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <span id="footer-org">承辦單位：新竹縣立竹東國民中學</span>
+    <span>名次以裁判核定結果為準。本頁僅顯示已公布之成績。</span>
+  </div>
+</footer>
+
+<dialog id="qr-dialog">
+  <div class="dialog-body">
+    <h2>成績公告網址</h2>
+    <div class="qr"><img id="qr-img" alt="成績公告網址 QR Code" src="/api/public/qr.svg"><code id="qr-url"></code></div>
+    <div class="dialog-actions">
+      <button class="btn" type="button" id="btn-copy-url">複製網址</button>
+      <button class="btn btn-primary" type="button" id="btn-qr-close">關閉</button>
+    </div>
+  </div>
+</dialog>
+
+<script type="module" src="/assets/public.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "adaptive-sports-results-115",
+  "version": "1.0.0",
+  "description": "115年度新竹縣第23屆特殊教育學生適應體育趣味運動競賽 成績公告系統",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "db:migrate": "node scripts/migrate.js",
+    "db:seed": "node scripts/seed.js",
+    "db:seed:demo": "node scripts/seed.js --demo",
+    "db:demo:remove": "node scripts/remove-demo.js",
+    "admin:create": "node scripts/create-admin.js",
+    "test": "node --test test/api.test.js",
+    "test:e2e": "node test/e2e/run.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "pg": "^8.13.1",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

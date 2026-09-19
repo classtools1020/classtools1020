@@ -1,0 +1,21 @@
+# Fly.io 部署設定（fly launch 會讀取此檔；資料庫請用 fly postgres create 或外部 Postgres）
+app = "adaptive-sports-results-115"
+primary_region = "nrt"
+
+[build]
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3000"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[http_service.checks]]
+  path = "/api/health"
+  interval = "30s"
+  timeout = "5s"

@@ -1,0 +1,21 @@
+# Render.com 一鍵部署藍圖：Web Service + PostgreSQL
+services:
+  - type: web
+    name: adaptive-sports-results-115
+    runtime: node
+    plan: starter            # free 方案會在閒置後休眠，比賽當天建議使用付費方案
+    buildCommand: npm ci --omit=dev
+    startCommand: node scripts/migrate.js && node scripts/seed.js && node server/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: adaptive-sports-db
+          property: connectionString
+      - key: PUBLIC_URL
+        sync: false          # 部署後填入正式網址
+databases:
+  - name: adaptive-sports-db
+    plan: basic-256mb

@@ -1,0 +1,7 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+test/e2e/screenshots/
+test-results/
