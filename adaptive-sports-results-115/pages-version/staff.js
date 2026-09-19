@@ -2,6 +2,7 @@
  * 後台是 Apps Script（config.js 的 API_URL）。 */
 import { backend, ApiError, loadStaff, saveItem, setAnnouncement } from './api.js';
 import { KNOCKOUT } from './config.js';
+import { confetti, chime } from './celebrate.js';
 import { renderResultsTable, renderSpiritList, esc } from './results-table.js';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -189,6 +190,7 @@ async function save(publish) {
     state.save = { kind: 'saved', at: r.updated_at ? r.updated_at.slice(11, 16) : '' };
     renderSavebar();
     toast(publish ? '已公布，公開頁 20 秒內更新' : '草稿已儲存（尚未公布）');
+    if (publish && rows.length) { chime(); confetti({ count: 90 }); }
     if (publish && deep.fromPublic) { $('#savebar .wrap').insertAdjacentHTML('beforeend', '<a class="btn" href="./">← 回公開頁</a>'); }
     try { await load(); } catch { /* ignore */ }
     view.querySelector('.editor-head .tag').outerHTML = tag(itemStatus(state.division, state.item));

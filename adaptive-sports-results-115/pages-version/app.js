@@ -2,6 +2,7 @@
  * 每個組別一個區塊，列＝項目，欄＝第一名（學校、成績）… 最右欄「公布」打 V 才顯示。 */
 import { renderResultsTable, renderSpiritList, esc, fmtTime, FLAG_SVG } from './results-table.js';
 import { backend, loadPublic } from './api.js';
+import { confetti } from './celebrate.js';
 
 const SHEET_ID = '1fmH2pcOlCmnwuMq2v0_FGvCwq513Dyk3hflEJ8oixMY';
 const SHEET_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
@@ -169,10 +170,12 @@ const currentDivision = () => DIVISIONS.find((d) => d.id === state.divisionId) |
 
 function trackNew() {
   const now = Date.now();
+  let fresh = 0;
   for (const r of state.data.results) {
     const key = `${r.division_id}:${r.item_id}:${JSON.stringify(r.rows)}`;
-    if (!state.seen.has(key)) state.seen.set(key, state.firstLoad ? 0 : now);
+    if (!state.seen.has(key)) { state.seen.set(key, state.firstLoad ? 0 : now); if (!state.firstLoad) fresh++; }
   }
+  if (fresh && !document.hidden) confetti();
   state.firstLoad = false;
 }
 function isNew(r) {
@@ -191,11 +194,13 @@ function renderSpotlight(d, q) {
   }
   if (!hits.length) { box.innerHTML = ''; return; }
   const schools = [...new Set(hits.map((h) => h.row.school))];
-  const c = { 1: 0, 2: 0, 3: 0, f: 0, flag: 0 };
-  hits.forEach(({ item, row }) => { if (item.kind === 'spirit') c.flag++; else if (row.rank <= 3) c[row.rank]++; else if (row.rank <= d.award_places) c.f++; });
-  const medals = [c[1] ? `<span class="m1">金牌 ${c[1]}</span>` : '', c[2] ? `<span class="m2">銀牌 ${c[2]}</span>` : '', c[3] ? `<span class="m3">銅牌 ${c[3]}</span>` : '', c.f ? `<span>獎狀 ${c.f}</span>` : '', c.flag ? `<span class="mf">精神總錦標 錦旗</span>` : ''].join('');
-  const detail = hits.filter((h) => h.item.kind !== 'spirit').sort((a, b) => a.row.rank - b.row.rank).map((h) => `${esc(h.item.name)} 第 ${h.row.rank} 名`).join('、');
-  box.innerHTML = `<section class="spotlight" aria-label="學校榮譽"><h2>${esc(schools.join('、'))}</h2><div class="medals">${medals}</div><p class="help">${esc(d.name)}目前已公布：${detail || '精神總錦標'}</p></section>`;
+  hits.sort((a, b) => (a.item.kind === 'spirit') - (b.item.kind === 'spirit') || a.row.rank - b.row.rank);
+  const chips = hits.map(({ item, row }) => {
+    const cls = item.kind === 'spirit' ? 'mf' : row.rank <= 3 ? `m${row.rank}` : '';
+    const medal = item.kind === 'spirit' ? '錦旗' : ['', '金牌', '銀牌', '銅牌'][row.rank] || '獎狀';
+    return `<span class="${cls}">${esc(item.name)}　第 ${row.rank} 名${row.tied ? '（並列）' : ''}・${medal}</span>`;
+  }).join('');
+  box.innerHTML = `<section class="spotlight" aria-label="學校榮譽"><h2>${esc(schools.join('、'))}</h2><div class="medals">${chips}</div><p class="help">${esc(d.name)}已公布的成績，共 ${hits.length} 項。恭喜！</p></section>`;
 }
 
 function renderAll() {
