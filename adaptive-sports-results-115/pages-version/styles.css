@@ -376,17 +376,6 @@ table.grid tr.g-spirit .flag { width: 16px; height: 16px; vertical-align: -3px; 
 table.grid tbody th .edit-link { margin-top: 4px; min-height: 28px; }
 @media print { .no-print { display: none !important; } }
 
-/* 學校榮譽卡 */
-.spotlight { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 16px; padding: 14px 16px; background: var(--paper); border: 1px solid var(--line); border-left: 6px solid var(--blue); border-radius: var(--radius); box-shadow: var(--shadow); }
-.spotlight h2 { font-family: var(--display); font-size: 22px; }
-.spotlight .medals { display: flex; gap: 8px; flex-wrap: wrap; }
-.spotlight .medals span { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); font-size: 15px; }
-.spotlight .medals .m1 { background: var(--gold-bg); color: var(--gold); border-color: #e2c765; }
-.spotlight .medals .m2 { background: var(--silver-bg); color: var(--silver); }
-.spotlight .medals .m3 { background: var(--bronze-bg); color: var(--bronze); border-color: #dcae8f; }
-.spotlight .medals .mf { color: var(--navy); }
-.spotlight .help { flex-basis: 100%; }
-
 /* 新公布 */
 .tag-new { color: #fff; background: #e0483d; border-color: #e0483d; animation: pop 0.5s ease-out; }
 @keyframes pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }

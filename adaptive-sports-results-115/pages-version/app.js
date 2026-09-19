@@ -182,27 +182,6 @@ function isNew(r) {
   const t = state.seen.get(`${r.division_id}:${r.item_id}:${JSON.stringify(r.rows)}`) || 0;
   return t && Date.now() - t < NEW_MS;
 }
-function renderSpotlight(d, q) {
-  const box = $('#spotlight');
-  if (!q) { box.innerHTML = ''; return; }
-  const { items, results } = state.data;
-  const hits = [];
-  for (const r of results) {
-    if (r.division_id !== d.id) continue;
-    const item = items.find((i) => i.id === r.item_id);
-    for (const row of r.rows) if (row.school.includes(q)) hits.push({ item, row });
-  }
-  if (!hits.length) { box.innerHTML = ''; return; }
-  const schools = [...new Set(hits.map((h) => h.row.school))];
-  hits.sort((a, b) => (a.item.kind === 'spirit') - (b.item.kind === 'spirit') || a.row.rank - b.row.rank);
-  const chips = hits.map(({ item, row }) => {
-    const cls = item.kind === 'spirit' ? 'mf' : row.rank <= 3 ? `m${row.rank}` : '';
-    const medal = item.kind === 'spirit' ? '錦旗' : ['', '金牌', '銀牌', '銅牌'][row.rank] || '獎狀';
-    return `<span class="${cls}">${esc(item.name)}　第 ${row.rank} 名${row.tied ? '（並列）' : ''}・${medal}</span>`;
-  }).join('');
-  box.innerHTML = `<section class="spotlight" aria-label="學校榮譽"><h2>${esc(schools.join('、'))}</h2><div class="medals">${chips}</div><p class="help">${esc(d.name)}已公布的成績，共 ${hits.length} 項。恭喜！</p></section>`;
-}
-
 function renderAll() {
   const { announcement, items, results } = state.data;
   trackNew();
@@ -229,7 +208,6 @@ function renderResults() {
   $('#award-rule').textContent = `${d.name}：核定前 ${d.award_places} 名（前三名頒獎牌、獎狀及獎品${d.award_places > 3 ? `，第 4–${d.award_places} 名頒獎狀` : ''}），精神總錦標前 ${d.spirit_places} 名頒錦旗`;
   $('#print-note').textContent = `115年度新竹縣第二十三屆特殊教育學生適應體育趣味運動競賽｜${d.name}｜列印時間 ${fmtTime(new Date())}`;
   $('#view-seg').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
-  renderSpotlight(d, q);
   $('#results').innerHTML = state.view === 'grid' ? renderGrid(d, q) : renderList(d, q);
 }
 
