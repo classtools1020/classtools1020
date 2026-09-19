@@ -3,8 +3,8 @@
  * 方式 A：Supabase（建議）— 在 Supabase 專案的 SQL Editor 執行 backend/supabase.sql，
  *   然後把 Project Settings → API 裡的 Project URL 與 anon public key 填在下面。
  * 方式 B：Google Apps Script — 依 backend/部署說明.md 部署後把網頁應用程式網址填入 API_URL。 */
-export const SUPABASE_URL = '';
-export const SUPABASE_ANON_KEY = '';
+export const SUPABASE_URL = 'https://nirqcndjbrfqxcpioqec.supabase.co';
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pcnFjbmRqYnJmcXhjcGlvcWVjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MTc0NzAsImV4cCI6MjEwNTM5MzQ3MH0.zSNX6YGzK1LtZviykJ8u25Rly8k4gcblDd99c5RuOX8';
 export const API_URL = '';
 
 export const SITE_URL = 'https://classtools1020.github.io/adaptive-sports-115/';

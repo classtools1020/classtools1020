@@ -19,7 +19,8 @@ function emptyData() {
   return { announcement: '', divisions: DIVISIONS, items: ITEMS.map((name, i) => ({ id: i + 1, name, kind: name === '精神總錦標' ? 'spirit' : KNOCKOUT.includes(name) ? 'knockout' : 'ranked', score_unit: null })), results: [] };
 }
 
-const state = { data: null, lastText: null, changedAt: null, divisionId: 1, itemId: '', query: '', view: 'list', lastOk: null, failing: false };
+const state = { data: null, lastText: null, changedAt: null, divisionId: 1, itemId: '', query: '', view: 'list', lastOk: null, failing: false, seen: new Map(), firstLoad: true };
+const NEW_MS = 10 * 60 * 1000; // 剛公布的項目標示 10 分鐘
 try { state.view = localStorage.getItem('asr115:view') || 'list'; } catch { /* ignore */ }
 const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
 const srcOverride = isLocal ? new URLSearchParams(location.search).get('src') : null;
@@ -166,8 +167,40 @@ function renderStatus() {
 // ---------- 渲染 ----------
 const currentDivision = () => DIVISIONS.find((d) => d.id === state.divisionId) || DIVISIONS[0];
 
+function trackNew() {
+  const now = Date.now();
+  for (const r of state.data.results) {
+    const key = `${r.division_id}:${r.item_id}:${JSON.stringify(r.rows)}`;
+    if (!state.seen.has(key)) state.seen.set(key, state.firstLoad ? 0 : now);
+  }
+  state.firstLoad = false;
+}
+function isNew(r) {
+  const t = state.seen.get(`${r.division_id}:${r.item_id}:${JSON.stringify(r.rows)}`) || 0;
+  return t && Date.now() - t < NEW_MS;
+}
+function renderSpotlight(d, q) {
+  const box = $('#spotlight');
+  if (!q) { box.innerHTML = ''; return; }
+  const { items, results } = state.data;
+  const hits = [];
+  for (const r of results) {
+    if (r.division_id !== d.id) continue;
+    const item = items.find((i) => i.id === r.item_id);
+    for (const row of r.rows) if (row.school.includes(q)) hits.push({ item, row });
+  }
+  if (!hits.length) { box.innerHTML = ''; return; }
+  const schools = [...new Set(hits.map((h) => h.row.school))];
+  const c = { 1: 0, 2: 0, 3: 0, f: 0, flag: 0 };
+  hits.forEach(({ item, row }) => { if (item.kind === 'spirit') c.flag++; else if (row.rank <= 3) c[row.rank]++; else if (row.rank <= d.award_places) c.f++; });
+  const medals = [c[1] ? `<span class="m1">金牌 ${c[1]}</span>` : '', c[2] ? `<span class="m2">銀牌 ${c[2]}</span>` : '', c[3] ? `<span class="m3">銅牌 ${c[3]}</span>` : '', c.f ? `<span>獎狀 ${c.f}</span>` : '', c.flag ? `<span class="mf">精神總錦標 錦旗</span>` : ''].join('');
+  const detail = hits.filter((h) => h.item.kind !== 'spirit').sort((a, b) => a.row.rank - b.row.rank).map((h) => `${esc(h.item.name)} 第 ${h.row.rank} 名`).join('、');
+  box.innerHTML = `<section class="spotlight" aria-label="學校榮譽"><h2>${esc(schools.join('、'))}</h2><div class="medals">${medals}</div><p class="help">${esc(d.name)}目前已公布：${detail || '精神總錦標'}</p></section>`;
+}
+
 function renderAll() {
   const { announcement, items, results } = state.data;
+  trackNew();
   $('#division-seg').innerHTML = DIVISIONS.map((d) => `<button type="button" data-id="${d.id}" aria-pressed="${d.id === state.divisionId}">${esc(d.name)}</button>`).join('');
   const sel = $('#item-select');
   const opts = ['<option value="">全部項目</option>', ...items.map((i) => `<option value="${i.id}">${esc(i.name)}</option>`)].join('');
@@ -191,6 +224,7 @@ function renderResults() {
   $('#award-rule').textContent = `${d.name}：核定前 ${d.award_places} 名（前三名頒獎牌、獎狀及獎品${d.award_places > 3 ? `，第 4–${d.award_places} 名頒獎狀` : ''}），精神總錦標前 ${d.spirit_places} 名頒錦旗`;
   $('#print-note').textContent = `115年度新竹縣第二十三屆特殊教育學生適應體育趣味運動競賽｜${d.name}｜列印時間 ${fmtTime(new Date())}`;
   $('#view-seg').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
+  renderSpotlight(d, q);
   $('#results').innerHTML = state.view === 'grid' ? renderGrid(d, q) : renderList(d, q);
 }
 
@@ -198,23 +232,24 @@ function rowsFor(d, item, q) {
   const r = state.data.results.find((x) => x.division_id === d.id && x.item_id === item.id);
   let rows = r?.rows || [];
   if (q) rows = rows.filter((x) => x.school.includes(q));
-  return { rows, published: Boolean(r) };
+  return { rows, published: Boolean(r), fresh: r ? isNew(r) : false };
 }
+const newTag = (fresh) => (fresh ? '<span class="tag tag-new">NEW</span>' : '');
 
 function renderList(d, q) {
   const blocks = [];
   let any = false;
   for (const item of visibleItems()) {
-    const { rows } = rowsFor(d, item, q);
+    const { rows, fresh } = rowsFor(d, item, q);
     if (q && !rows.length) continue;
     any = true;
     if (item.kind === 'spirit') {
-      blocks.push(`<section class="section spirit" aria-labelledby="item-${item.id}">
-        <div class="section-head"><h2 id="item-${item.id}">${FLAG_SVG}${esc(item.name)}<span class="visually-hidden">（${esc(d.name)}）</span></h2><span class="tag tag-navy">前 ${d.spirit_places} 名頒錦旗</span><span class="meta">${editLink(d, item)}</span></div>
+      blocks.push(`<section class="section spirit ${fresh ? 'is-new' : ''}" aria-labelledby="item-${item.id}">
+        <div class="section-head"><h2 id="item-${item.id}">${FLAG_SVG}${esc(item.name)}<span class="visually-hidden">（${esc(d.name)}）</span></h2>${newTag(fresh)}<span class="tag tag-navy">前 ${d.spirit_places} 名頒錦旗</span><span class="meta">${editLink(d, item)}</span></div>
         ${renderSpiritList({ rows, division: d, query: q })}</section>`);
     } else {
-      blocks.push(`<section class="section" aria-labelledby="item-${item.id}">
-        <div class="section-head"><h2 id="item-${item.id}">${esc(item.name)}</h2>${item.kind === 'knockout' ? '<span class="tag">單淘汰賽</span>' : ''}<span class="meta">${editLink(d, item)}</span></div>
+      blocks.push(`<section class="section ${fresh ? 'is-new' : ''}" aria-labelledby="item-${item.id}">
+        <div class="section-head"><h2 id="item-${item.id}">${esc(item.name)}</h2>${newTag(fresh)}${item.kind === 'knockout' ? '<span class="tag">單淘汰賽</span>' : ''}<span class="meta">${editLink(d, item)}</span></div>
         ${renderResultsTable({ rows, division: d, item, query: q })}</section>`);
     }
   }

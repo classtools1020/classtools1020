@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>成績公告 QR 海報｜第23屆特殊教育學生適應體育趣味運動競賽</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chocolate+Classical+Sans&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+  :root { --navy: #0b1f3a; --blue: #1f5fbf; --gold: #f4b323; --red: #e0483d; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #e9eef5; font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; color: var(--navy); }
+  .toolbar { display: flex; gap: 8px; justify-content: center; padding: 12px; }
+  .toolbar button, .toolbar a { font: inherit; font-weight: 700; min-height: 44px; padding: 0 18px; border-radius: 6px; border: 1px solid var(--navy); background: #fff; color: var(--navy); text-decoration: none; display: inline-flex; align-items: center; cursor: pointer; }
+  .toolbar .primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .page { width: 210mm; min-height: 297mm; margin: 0 auto 24px; background: #fff; padding: 18mm 16mm; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden; box-shadow: 0 4px 24px rgba(11,31,58,0.15); }
+  .page::before { content: ""; position: absolute; inset: 0; background: url("kv.svg") center top / cover no-repeat; opacity: 0.18; }
+  .page > * { position: relative; }
+  .pill { display: inline-flex; align-items: center; gap: 4px; background: var(--blue); color: #fff; border-radius: 999px; padding: 8px 22px 8px 18px; font-size: 20px; font-weight: 700; letter-spacing: 0.08em; }
+  .pill b { font-size: 34px; color: #ffd54a; line-height: 1; }
+  h1 { font-family: "Chocolate Classical Sans", "Noto Sans TC", sans-serif; font-size: 40px; line-height: 1.25; margin: 14px 0 4px; color: #174a96; }
+  .sub { font-size: 18px; margin: 0 0 18px; color: #334; }
+  .cta { font-family: "Chocolate Classical Sans", "Noto Sans TC", sans-serif; font-size: 34px; color: var(--red); margin: 6px 0 12px; }
+  .qr { width: 118mm; height: 118mm; background: #fff; padding: 6mm; border: 4px solid var(--navy); border-radius: 12px; }
+  .qr img { width: 100%; height: 100%; display: block; }
+  .url { font-size: 18px; margin: 14px 0 0; word-break: break-all; font-family: ui-monospace, Menlo, Consolas, monospace; }
+  .notes { margin-top: auto; padding-top: 18px; font-size: 16px; line-height: 1.7; color: #334; }
+  .notes b { color: var(--navy); }
+  .org { margin-top: 10px; font-size: 14px; color: #556; }
+  @page { size: A4; margin: 0; }
+  @media print { body { background: #fff; } .toolbar { display: none; } .page { box-shadow: none; margin: 0; } }
+</style>
+</head>
+<body>
+<div class="toolbar"><button class="primary" onclick="window.print()">列印這張海報（A4）</button><a href="./">回成績公告頁</a></div>
+<div class="page">
+  <p class="pill"><span>新竹縣第</span><b>23</b><span>屆</span></p>
+  <h1>特殊教育學生<br>適應體育趣味運動競賽</h1>
+  <p class="sub">115年11月6日（星期五）・國立新竹特殊教育學校</p>
+  <p class="cta">掃一下，成績馬上看</p>
+  <div class="qr"><img src="qr.svg" alt="成績公告網址 QR Code"></div>
+  <p class="url">classtools1020.github.io/adaptive-sports-115</p>
+  <div class="notes">
+    <b>裁判核定後即時公布</b>，頁面每 20 秒自動更新，不必到台前擠著看。<br>
+    可切換國小組／國中組、依項目查詢、輸入校名搜尋貴校成績。<br>
+    國小組公布前 8 名、國中組前 3 名；精神總錦標於閉幕典禮公布。
+  </div>
+  <p class="org">指導單位 教育部國民及學前教育署｜主辦單位 新竹縣政府教育局、國際獅子會300B6區｜承辦單位 新竹縣立竹東國民中學</p>
+</div>
+</body>
+</html>
