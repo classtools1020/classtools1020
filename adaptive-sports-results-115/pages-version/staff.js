@@ -66,10 +66,11 @@ const tag = (st) => `<span class="tag ${STATUS[st][1]}">${STATUS[st][0]}</span>`
 function renderLogin(err = '') {
   $('#savebar').hidden = true;
   if (!API_URL) {
-    view.innerHTML = '<div class="card login"><h2>後台尚未設定</h2><p>請管理者依 backend/部署說明.md 部署 Apps Script，並把網址填入 config.js。</p></div>';
+    view.innerHTML = `<div class="card login"><h2>後台尚未啟用</h2><p>登打功能需要先完成一次「Apps Script 部署」（約 5 分鐘），做完後這裡就會出現登入畫面。</p>
+      <ol style="margin:12px 0 0 18px;line-height:1.8"><li>打開雲端硬碟「115適應體育」資料夾的試算表「115第23屆適應體育 成績資料庫」</li><li>擴充功能 → Apps Script → 貼上「Code.gs.txt」內容 → 儲存</li><li>選 setup → 執行 → 授權</li><li>部署 → 新增部署作業 → 網頁應用程式（執行身分：我；存取：任何人）→ 部署</li><li>把網址傳給 Claude 填入網站</li></ol></div>`;
     return;
   }
-  view.innerHTML = `<div class="card login"><h2>工作人員登入</h2><p class="help">輸入管理者給您的認證碼，不需要帳號或 Email。</p>
+  view.innerHTML = `<div class="card login"><h2>工作人員登入</h2>${deep.item ? `<p><b>要登打：${esc(deep.division || '')}・${esc(deep.item)}</b></p>` : ''}<p class="help">輸入管理者給您的認證碼，不需要帳號或 Email。</p>
     <form class="form" id="login-form" style="margin-top:12px">
       <div class="field"><label for="code">認證碼</label><input class="input code-input" id="code" autocomplete="one-time-code" inputmode="numeric" autocapitalize="characters" spellcheck="false" maxlength="20" required placeholder="例如：123456"></div>
       <div id="login-err" class="banner banner-err" ${err ? '' : 'hidden'} role="alert">${esc(err)}</div>
@@ -78,7 +79,7 @@ function renderLogin(err = '') {
     e.preventDefault();
     const btn = e.target.querySelector('button'); btn.disabled = true;
     state.code = $('#code').value.trim();
-    try { await load(); try { localStorage.setItem('asr115:code', state.code); } catch { /* ignore */ } renderHome(); }
+    try { await load(); try { localStorage.setItem('asr115:code', state.code); } catch { /* ignore */ } afterLogin(); }
     catch (err) { $('#login-err').hidden = false; $('#login-err').textContent = err.message; btn.disabled = false; }
   };
   setTimeout(() => $('#code')?.focus(), 50);
@@ -212,6 +213,7 @@ async function save(publish) {
     state.save = { kind: 'saved', at: r.updated_at ? r.updated_at.slice(11, 16) : '' };
     renderSavebar();
     toast(publish ? '已公布，公開頁 20 秒內更新' : '草稿已儲存（尚未公布）');
+    if (publish && deep.fromPublic) { $('#savebar .wrap').insertAdjacentHTML('beforeend', '<a class="btn" href="./">← 回公開頁</a>'); }
     try { await load(); } catch { /* ignore */ }
     view.querySelector('.editor-head .tag').outerHTML = tag(itemStatus(state.division, state.item));
   } catch (err) {
@@ -221,11 +223,19 @@ async function save(publish) {
 }
 
 // ---------- 啟動 ----------
+// 從公開頁的「登打」按鈕進來：?division=國小組&item=階梯球&from=public → 登入後直接開該項目
+const params = new URLSearchParams(location.search);
+const deep = { division: params.get('division'), item: params.get('item'), fromPublic: params.get('from') === 'public' };
+if (deep.division) state.division = deep.division;
+function afterLogin() {
+  if (deep.item && state.data.items.includes(deep.item)) { const it = deep.item; deep.item = null; openItem(it); }
+  else renderHome();
+}
 (async () => {
-  const code = new URLSearchParams(location.search).get('code');
+  const code = params.get('code');
   if (code) { state.code = code.trim(); history.replaceState(null, '', location.pathname); }
   if (!API_URL) return renderLogin();
   if (!state.code) return renderLogin();
-  try { await load(); try { localStorage.setItem('asr115:code', state.code); } catch { /* ignore */ } renderHome(); }
+  try { await load(); try { localStorage.setItem('asr115:code', state.code); } catch { /* ignore */ } afterLogin(); }
   catch (err) { renderLogin(err instanceof ApiError ? err.message : `${err.message}（可稍後再試）`); }
 })();

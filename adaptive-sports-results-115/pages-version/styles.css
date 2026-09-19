@@ -361,3 +361,8 @@ table.grid tr.g-spirit .flag { width: 16px; height: 16px; vertical-align: -3px; 
 .rank-extra input { flex: 1; }
 @media (min-width: 760px) { .rank-fields { grid-template-columns: 1.4fr 1fr; align-items: start; } .rank-school:not(:first-child) { grid-column: 1; } .rank-extra { grid-column: 2; grid-row: 1; } }
 .editor-head .btn { margin-right: 4px; }
+
+.edit-link { min-height: 32px; padding: 0 10px; font-size: 14px; color: var(--ink-3); border: 1px dashed var(--line); }
+.edit-link:hover { color: var(--blue-600); border-color: var(--blue); background: var(--blue-50); }
+table.grid tbody th .edit-link { margin-top: 4px; min-height: 28px; }
+@media print { .no-print { display: none !important; } }
