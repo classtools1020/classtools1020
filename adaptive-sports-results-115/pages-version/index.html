@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>成績公告｜115年度新竹縣第二十三屆特殊教育學生適應體育趣味運動競賽</title>
+<meta name="description" content="115年度新竹縣第二十三屆特殊教育學生適應體育趣味運動競賽 官方成績公告（115年11月6日・國立新竹特殊教育學校）">
+<meta property="og:title" content="第23屆特殊教育學生適應體育趣味運動競賽 成績公告">
+<meta property="og:description" content="115年11月6日・國立新竹特殊教育學校・承辦：新竹縣立竹東國民中學">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f5fbf'/%3E%3Ctext x='16' y='22' font-size='16' text-anchor='middle' fill='%23ffd54a' font-family='sans-serif' font-weight='700'%3E23%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <span class="kicker">官方成績公告</span>
+      <h1>115年度新竹縣第二十三屆特殊教育學生適應體育趣味運動競賽</h1>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-sm" id="btn-qr" type="button">QR Code</button>
+      <button class="btn btn-sm" id="btn-print" type="button">列印</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero" aria-label="活動主視覺">
+  <div class="hero-art" role="img" aria-label="藍天白雲、金色獎盃與紅色緞帶的主視覺"></div>
+  <div class="wrap hero-inner">
+    <p class="hero-pill"><span>新竹縣第</span><b>23</b><span>屆</span></p>
+    <h2 class="hero-title">特殊教育學生<br class="only-mobile">適應體育趣味運動競賽</h2>
+    <p class="hero-sub">115年11月6日（星期五）<span class="sep">・</span>國立新竹特殊教育學校</p>
+    <div class="hero-stats" id="hero-stats"></div>
+  </div>
+</section>
+<div class="units">
+  <div class="wrap">
+    <span><b>指導單位</b>教育部國民及學前教育署</span>
+    <span><b>主辦單位</b>新竹縣政府教育局、國際獅子會300B6區</span>
+    <span><b>承辦單位</b>新竹縣立竹東國民中學</span>
+    <span><b>協辦單位</b>國際獅子會300B6區所屬各分會、國立新竹特殊教育學校</span>
+  </div>
+</div>
+<div class="announce" id="announce" hidden><div class="wrap"><span class="tag tag-navy">公告</span><span id="announce-text"></span></div></div>
+
+<main class="main">
+  <div class="wrap">
+    <div class="controls" aria-label="查詢條件">
+      <div class="field">
+        <span class="label">組別</span>
+        <div class="seg" role="group" aria-label="選擇組別" id="division-seg"></div>
+      </div>
+      <div class="field">
+        <label for="item-select">比賽項目</label>
+        <select class="input" id="item-select"><option value="">全部項目</option></select>
+      </div>
+      <div class="field">
+        <label for="school-search">搜尋學校</label>
+        <input class="input" id="school-search" type="search" placeholder="輸入校名，例如：竹東" autocomplete="off">
+      </div>
+      <div class="field">
+        <span class="label">檢視方式</span>
+        <div class="seg seg-view" role="group" aria-label="檢視方式" id="view-seg">
+          <button type="button" data-view="list" aria-pressed="true">逐項</button>
+          <button type="button" data-view="grid" aria-pressed="false">總表</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-line" aria-live="polite">
+      <span id="update-status"><span class="dot wait"></span>載入中…</span>
+      <span id="award-rule"></span>
+    </div>
+    <div id="error-banner" class="banner banner-err" hidden role="alert"></div>
+    <p class="print-only help" id="print-note"></p>
+
+    <div id="results"></div>
+
+    <section class="section schedule" aria-labelledby="schedule-h">
+      <div class="section-head"><h2 id="schedule-h">當日流程</h2><span class="meta">依實施計畫</span></div>
+      <ol class="timeline">
+        <li><time>08:40</time><span>報到</span></li>
+        <li><time>08:50</time><span>集合</span></li>
+        <li><time>09:00</time><span>開場表演</span></li>
+        <li><time>09:15</time><span>開幕典禮、頒發感謝狀</span></li>
+        <li><time>09:30</time><span>各項競賽活動及頒獎</span></li>
+        <li><time>12:00</time><span>午餐時間</span></li>
+        <li><time>13:00</time><span>各項競賽活動及頒獎</span></li>
+        <li><time>14:00</time><span>閉幕典禮暨頒發精神總錦標獎</span></li>
+      </ol>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <span>承辦單位：新竹縣立竹東國民中學　特教組 03-5961207 分機 605</span>
+    <span>名次以裁判核定結果為準。本頁僅顯示已公布之成績。<a href="staff.html" class="help" style="margin-left:12px">工作人員登打</a></span>
+  </div>
+</footer>
+
+<dialog id="qr-dialog">
+  <div class="dialog-body">
+    <h2>成績公告網址</h2>
+    <div class="qr"><img id="qr-img" alt="成績公告網址 QR Code" src="qr.svg"><code id="qr-url">https://classtools1020.github.io/adaptive-sports-115/</code></div>
+    <div class="dialog-actions">
+      <button class="btn" type="button" id="btn-copy-url">複製網址</button>
+      <button class="btn btn-primary" type="button" id="btn-qr-close">關閉</button>
+    </div>
+  </div>
+</dialog>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
