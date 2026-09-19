@@ -5,19 +5,31 @@ import { unauthorized, forbidden } from './errors.js';
 const SESSION_COOKIE = 'asr_session';
 const SESSION_DAYS = 14;
 
-export function hashPassword(password) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
-  return `scrypt$${salt}$${hash}`;
+/** 產生認證碼：一般人員 6 位數字（手機好輸入）；管理者 8 位不易混淆的英數。 */
+export function generateCode(role) {
+  if (role === 'admin') {
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    return Array.from(crypto.randomBytes(8), (b) => alphabet[b % alphabet.length]).join('');
+  }
+  return String(crypto.randomInt(0, 1000000)).padStart(6, '0');
 }
 
-export function verifyPassword(password, stored) {
-  if (!stored) return false;
-  const [algo, salt, hash] = stored.split('$');
-  if (algo !== 'scrypt') return false;
-  const test = crypto.scryptSync(password, salt, 64);
-  const expected = Buffer.from(hash, 'hex');
-  return test.length === expected.length && crypto.timingSafeEqual(test, expected);
+export function normalizeCode(code) {
+  return String(code || '').replace(/[\s-]/g, '').toUpperCase();
+}
+
+/** 啟動時以環境變數 ADMIN_CODE 建立／更新管理者，讓部署後不需再跑任何指令。 */
+export async function ensureAdminFromEnv() {
+  const code = normalizeCode(process.env.ADMIN_CODE);
+  if (!code) return;
+  if (code.length < 8) { console.error('ADMIN_CODE 至少 8 個字元'); return; }
+  const name = process.env.ADMIN_NAME || '管理者';
+  await query(
+    `INSERT INTO users (name, role, access_code, is_active) VALUES ($1,'admin',$2,TRUE)
+     ON CONFLICT (access_code) DO UPDATE SET role='admin', is_active=TRUE, name=EXCLUDED.name`,
+    [name, code],
+  );
+  console.log(`管理者「${name}」已就緒（使用 ADMIN_CODE 登入）`);
 }
 
 export function sha256(s) {
@@ -73,7 +85,7 @@ export async function loadUser(req, _res, next) {
     const id = cookies[SESSION_COOKIE];
     if (id) {
       const { rows } = await query(
-        `SELECT u.id, u.email, u.name, u.role, u.is_active
+        `SELECT u.id, u.name, u.role, u.is_active
            FROM sessions s JOIN users u ON u.id = s.user_id
           WHERE s.id = $1 AND s.expires_at > now()`,
         [id],

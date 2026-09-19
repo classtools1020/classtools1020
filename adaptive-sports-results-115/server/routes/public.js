@@ -11,8 +11,8 @@ export const publicRouter = Router();
 export async function buildPublicPayload() {
   const slug = process.env.ACTIVE_EVENT_SLUG;
   const { rows: events } = slug
-    ? await query('SELECT id, slug, name, edition, event_date, venue, organizer, is_demo FROM events WHERE slug=$1', [slug])
-    : await query('SELECT id, slug, name, edition, event_date, venue, organizer, is_demo FROM events WHERE is_active ORDER BY is_demo, id LIMIT 1');
+    ? await query('SELECT id, slug, name, edition, event_date, venue, organizer, announcement, is_demo FROM events WHERE slug=$1', [slug])
+    : await query('SELECT id, slug, name, edition, event_date, venue, organizer, announcement, is_demo FROM events WHERE is_active ORDER BY is_demo, id LIMIT 1');
   const event = events[0];
   if (!event) return { event: null, divisions: [], items: [], results: [], updated_at: null };
 

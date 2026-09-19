@@ -109,14 +109,13 @@ function nav() {
   if (!state.user) { n.hidden = true; return; }
   const links = [['#/', '我的項目']];
   if (state.user.role !== 'entry') links.push(['#/review', '待複核']);
-  if (state.user.role === 'admin') links.push(['#/admin/users', '人員'], ['#/admin/schools', '學校'], ['#/admin/items', '項目'], ['#/admin/event', '活動']);
+  if (state.user.role === 'admin') links.push(['#/admin/users', '人員與認證碼'], ['#/admin/schools', '學校'], ['#/admin/items', '項目'], ['#/admin/event', '活動']);
   if (state.user.role !== 'entry') links.push(['#/audit', '紀錄']);
-  links.push(['#/account', '帳號']);
   const cur = location.hash || '#/';
   n.querySelector('.wrap').innerHTML = links.map(([h, t]) =>
     `<a href="${h}" ${cur === h || (h !== '#/' && cur.startsWith(h)) ? 'aria-current="page"' : ''}>${t}</a>`).join('');
   n.hidden = false;
-  $('#top-actions').innerHTML = `<span class="help" style="color:#b9c8e0;align-self:center">${esc(state.user.name)}・${ROLE[state.user.role]}</span>
+  $('#top-actions').innerHTML = `<span class="help topbar-user">${esc(state.user.name)}・${ROLE[state.user.role]}</span>
     <a class="btn btn-sm" href="/" target="_blank" rel="noopener">公開頁</a><button class="btn btn-sm" id="btn-logout">登出</button>`;
   $('#btn-logout').onclick = async () => { await api('POST', '/api/auth/logout'); state.user = null; location.hash = '#/login'; route(); };
 }
@@ -125,13 +124,17 @@ let currentTeardown = null;
 async function route() {
   currentTeardown?.(); currentTeardown = null;
   $('#savebar').hidden = true;
-  const path = location.pathname;
-  const inviteMatch = path.match(/^\/staff\/invite\/([A-Za-z0-9_-]+)/);
-  if (inviteMatch) return renderInvite(inviteMatch[1]);
-  if (path !== '/staff' && path !== '/staff/') history.replaceState(null, '', '/staff' + location.hash);
-
+  const params = new URLSearchParams(location.search);
+  const codeFromLink = params.get('code');
+  if (codeFromLink || (location.pathname !== '/staff' && location.pathname !== '/staff/')) {
+    history.replaceState(null, '', '/staff' + location.hash); // 立刻把認證碼從網址移除
+  }
   if (!state.user) {
     try { const me = await api('GET', '/api/auth/me'); state.user = me.user; } catch { /* offline */ }
+  }
+  if (!state.user && codeFromLink) {
+    try { await api('POST', '/api/auth/login', { code: codeFromLink }); const me = await api('GET', '/api/auth/me'); state.user = me.user; }
+    catch (e) { nav(); return renderLogin(`連結中的認證碼無法登入：${errText(e)}`); }
   }
   if (!state.user) { nav(); return renderLogin(); }
   if (!state.boot) {
@@ -150,62 +153,37 @@ async function route() {
   if (hash === '#/admin/items') return renderItems();
   if (hash === '#/admin/event') return renderEvent();
   if (hash === '#/audit') return renderAudit();
-  if (hash === '#/account') return renderAccount();
+  if (hash === '#/admin/codes') return renderCodeSheet();
   renderHome();
 }
 window.addEventListener('hashchange', route);
 
-// ---------- 登入 / 邀請 ----------
-function renderLogin() {
+// ---------- 登入（認證碼） ----------
+function renderLogin(err = '') {
   view.innerHTML = `<div class="card login"><h2>工作人員登入</h2>
-    <form class="form" id="login-form">
-      <div class="field"><label for="email">電子郵件</label><input class="input" id="email" name="email" type="email" autocomplete="username" required inputmode="email"></div>
-      <div class="field"><label for="password">密碼</label><input class="input" id="password" name="password" type="password" autocomplete="current-password" required></div>
-      <div id="login-err" class="banner banner-err" hidden role="alert"></div>
+    <p class="help">輸入管理者給您的認證碼即可，不需要帳號或 Email。</p>
+    <form class="form" id="login-form" style="margin-top:12px">
+      <div class="field"><label for="code">認證碼</label><input class="input code-input" id="code" name="code" autocomplete="one-time-code" inputmode="numeric" autocapitalize="characters" spellcheck="false" maxlength="20" required placeholder="例如：123456"></div>
+      <div id="login-err" class="banner banner-err" ${err ? '' : 'hidden'} role="alert">${esc(err)}</div>
       <button class="btn btn-primary btn-block" type="submit">登入</button>
-      <p class="help">帳號由管理者以邀請連結建立。忘記密碼請請管理者重新產生邀請連結。</p>
+      <p class="help">忘記認證碼？請管理者在「人員」頁面查看或重新產生。</p>
     </form></div>`;
   $('#login-form').onsubmit = async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('button');
     btn.disabled = true;
-    try {
-      await api('POST', '/api/auth/login', { email: $('#email').value, password: $('#password').value });
-      state.boot = null; state.user = null;
-      location.hash = '#/';
-      await route();
-    } catch (err) {
+    try { await loginWithCode($('#code').value); } catch (err) {
       $('#login-err').hidden = false; $('#login-err').textContent = errText(err);
     } finally { btn.disabled = false; }
   };
+  setTimeout(() => $('#code')?.focus(), 50);
 }
 
-async function renderInvite(token) {
-  view.innerHTML = '<div class="card login"><p>讀取邀請中…</p></div>';
-  let inv;
-  try { inv = (await api('GET', `/api/auth/invite/${token}`)).invitation; } catch (e) {
-    view.innerHTML = `<div class="card login"><h2>邀請連結無法使用</h2><p>${esc(errText(e))}</p><p style="margin-top:12px"><a class="btn" href="/staff">前往登入</a></p></div>`;
-    return;
-  }
-  view.innerHTML = `<div class="card login"><h2>建立您的帳號</h2>
-    <p class="help">邀請對象：${esc(inv.name)}（${esc(inv.email)}）・角色：${ROLE[inv.role]}</p>
-    <form class="form" id="inv-form" style="margin-top:12px">
-      <div class="field"><label for="name">顯示名稱</label><input class="input" id="name" value="${esc(inv.name)}" maxlength="40" required></div>
-      <div class="field"><label for="pw">設定密碼（至少 8 個字元）</label><input class="input" id="pw" type="password" autocomplete="new-password" minlength="8" required></div>
-      <div class="field"><label for="pw2">再輸入一次密碼</label><input class="input" id="pw2" type="password" autocomplete="new-password" minlength="8" required></div>
-      <div id="inv-err" class="banner banner-err" hidden role="alert"></div>
-      <button class="btn btn-primary btn-block" type="submit">建立帳號並登入</button>
-    </form></div>`;
-  $('#inv-form').onsubmit = async (e) => {
-    e.preventDefault();
-    if ($('#pw').value !== $('#pw2').value) { $('#inv-err').hidden = false; $('#inv-err').textContent = '兩次密碼不一致'; return; }
-    try {
-      await api('POST', `/api/auth/invite/${token}/accept`, { name: $('#name').value, password: $('#pw').value });
-      state.user = null; state.boot = null;
-      history.replaceState(null, '', '/staff#/');
-      await route();
-    } catch (err) { $('#inv-err').hidden = false; $('#inv-err').textContent = errText(err); }
-  };
+async function loginWithCode(code) {
+  await api('POST', '/api/auth/login', { code });
+  state.boot = null; state.user = null;
+  if (!location.hash || location.hash === '#/login') location.hash = '#/';
+  await route();
 }
 
 // ---------- 首頁：我的項目 ----------
@@ -553,20 +531,7 @@ async function renderAudit() {
   } catch (e) { view.innerHTML = `<div class="banner banner-err">${esc(errText(e))}</div>`; }
 }
 
-// ---------- 帳號 ----------
-function renderAccount() {
-  view.innerHTML = `<div class="card login" style="margin-top:16px"><h2>我的帳號</h2><p>${esc(state.user.name)}・${esc(state.user.email)}・${ROLE[state.user.role]}</p>
-    <form class="form" id="pw-form" style="margin-top:14px">
-      <div class="field"><label for="cur">目前密碼</label><input class="input" id="cur" type="password" autocomplete="current-password" required></div>
-      <div class="field"><label for="new">新密碼（至少 8 個字元）</label><input class="input" id="new" type="password" autocomplete="new-password" minlength="8" required></div>
-      <button class="btn btn-primary" type="submit">更改密碼</button></form></div>`;
-  $('#pw-form').onsubmit = async (e) => {
-    e.preventDefault();
-    try { await api('POST', '/api/auth/change-password', { current: $('#cur').value, password: $('#new').value }); toast('密碼已更改'); e.target.reset(); } catch (err) { toast(errText(err), 'err'); }
-  };
-}
-
-// ---------- 管理：人員 ----------
+// ---------- 管理：人員與認證碼 ----------
 async function renderUsers() {
   view.innerHTML = '<div class="card"><p>載入中…</p></div>';
   await bootReload();
@@ -577,23 +542,28 @@ async function renderUsers() {
     const on = u.assignments.some((a) => a.division_id === d.id && a.item_id === i.id);
     return `<label class="check"><input type="checkbox" data-d="${d.id}" data-i="${i.id}" ${on ? 'checked' : ''}> ${esc(i.name)}</label>`;
   }).join('')}</div>`).join('');
+  const codeBox = (u) => u.access_code ? `<div class="code-box"><span class="code-big">${esc(u.access_code)}</span>
+      <button class="btn btn-sm" type="button" data-copy="${esc(u.login_link)}">複製登入連結</button>
+      <button class="btn btn-sm" type="button" data-regen="${u.id}">重新產生</button></div>` : '<span class="tag tag-warn">尚無認證碼</span>';
   view.innerHTML = `
-    <div class="card"><h2>邀請同事</h2>
-      <form class="form" id="inv-form"><div class="form-row">
-        <div class="field"><label for="inv-name">姓名</label><input class="input" id="inv-name" required maxlength="40"></div>
-        <div class="field"><label for="inv-email">電子郵件（登入帳號）</label><input class="input" id="inv-email" type="email" required></div>
-        <div class="field"><label for="inv-role">角色</label><select class="input" id="inv-role"><option value="entry">成績輸入人員</option><option value="reviewer">複核人員</option><option value="admin">管理者</option></select></div>
-        <button class="btn btn-primary" type="submit">產生邀請連結</button></div>
-      <p class="help">產生後把連結用 LINE 或 Email 傳給同事，對方自行設定密碼即可登入（7 天內有效）。同一個 Email 再邀請一次可用來重設密碼。</p>
-      <div id="inv-result"></div></form>
-      ${data.invitations.length ? `<h3>尚未使用的邀請</h3><div class="table-wrap"><table class="table"><tr><th>姓名</th><th>Email</th><th>角色</th><th>到期</th><th></th></tr>${data.invitations.map((v) => `<tr><td>${esc(v.name)}</td><td>${esc(v.email)}</td><td>${ROLE[v.role]}</td><td>${fmtTime(v.expires_at)}</td><td><button class="btn btn-sm btn-danger" data-del-inv="${v.id}">取消</button></td></tr>`).join('')}</table></div>` : ''}
+    <div class="card"><h2>新增工作人員</h2>
+      <form class="form" id="new-user-form"><div class="form-row">
+        <div class="field"><label for="nu-name">姓名（或站別，例如「九宮格站」）</label><input class="input" id="nu-name" required maxlength="40"></div>
+        <div class="field"><label for="nu-role">角色</label><select class="input" id="nu-role"><option value="entry">成績輸入人員</option><option value="reviewer">複核人員</option><option value="admin">管理者</option></select></div>
+        <div class="field"><label for="nu-note">備註（選填）</label><input class="input" id="nu-note" maxlength="60" placeholder="例如：竹東國中 王老師"></div>
+        <button class="btn btn-primary" type="submit">新增並產生認證碼</button></div>
+      <p class="help">系統會產生 6 位數認證碼。把認證碼或「登入連結」用 LINE 傳給同事，對方點開就登入，不需要帳號、Email 或密碼。</p>
+      <div id="nu-result"></div></form>
     </div>
-    <div class="card"><h2>人員與分工</h2><p class="help">管理者可處理全部項目；輸入與複核人員只能處理被勾選的組別／項目。</p>
-      ${data.users.map((u) => `<details class="card" style="padding:12px" ${u.id === state.user.id ? '' : ''}><summary style="cursor:pointer;font-weight:600;font-size:17px;min-height:44px;display:flex;align-items:center;gap:10px">
-          ${esc(u.name)} <span class="tag tag-blue">${ROLE[u.role]}</span>${u.is_active ? '' : '<span class="tag tag-err">已停用</span>'}${u.has_password ? '' : '<span class="tag tag-warn">尚未設定密碼</span>'}<span class="help" style="font-weight:400">${esc(u.email)}${u.role === 'admin' ? '' : `・${u.assignments.length} 個項目`}</span></summary>
+    <div class="card"><div class="actions"><h2 style="margin:0">人員、認證碼與分工</h2><span class="spacer"></span><a class="btn" href="#/admin/codes">列印代碼表（含 QR）</a></div>
+      <p class="help">管理者可處理全部項目；輸入與複核人員只能處理被勾選的組別／項目。取消「啟用」可立即停權。</p>
+      ${data.users.map((u) => `<details class="card" style="padding:12px" ${u.id === state.user.id ? '' : ''}><summary style="cursor:pointer;font-weight:600;font-size:17px;min-height:44px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          ${esc(u.name)} <span class="tag tag-blue">${ROLE[u.role]}</span>${u.is_active ? '' : '<span class="tag tag-err">已停用</span>'}<span class="help" style="font-weight:400">${esc(u.note || '')}${u.role === 'admin' ? '' : `・${u.assignments.length} 個項目`}${u.last_login_at ? `・最近登入 ${fmtTime(u.last_login_at)}` : '・尚未登入'}</span></summary>
         <div class="form" data-user="${u.id}" style="margin-top:10px">
+          <div class="field"><span class="label">認證碼</span>${codeBox(u)}</div>
           <div class="form-row">
             <div class="field"><label>姓名</label><input class="input" data-f="name" value="${esc(u.name)}" maxlength="40"></div>
+            <div class="field"><label>備註</label><input class="input" data-f="note" value="${esc(u.note || '')}" maxlength="60"></div>
             <div class="field"><label>角色</label><select class="input" data-f="role"><option value="entry" ${u.role === 'entry' ? 'selected' : ''}>成績輸入人員</option><option value="reviewer" ${u.role === 'reviewer' ? 'selected' : ''}>複核人員</option><option value="admin" ${u.role === 'admin' ? 'selected' : ''}>管理者</option></select></div>
             <label class="check"><input type="checkbox" data-f="is_active" ${u.is_active ? 'checked' : ''}> 啟用</label>
             <button class="btn" type="button" data-save-user="${u.id}">儲存基本資料</button>
@@ -601,20 +571,30 @@ async function renderUsers() {
           ${u.role === 'admin' ? '<p class="help">管理者不需指派，可處理全部項目。</p>' : `${matrix(u)}<div class="actions" style="margin-top:8px"><button class="btn btn-primary" type="button" data-save-assign="${u.id}">儲存分工</button><button class="btn btn-sm" type="button" data-all="${u.id}">全選</button><button class="btn btn-sm" type="button" data-none="${u.id}">全不選</button></div>`}
         </div></details>`).join('')}
     </div>`;
-  $('#inv-form').onsubmit = async (e) => {
+  $('#new-user-form').onsubmit = async (e) => {
     e.preventDefault();
     try {
-      const r = await api('POST', '/api/admin/invitations', { name: $('#inv-name').value, email: $('#inv-email').value, role: $('#inv-role').value });
-      $('#inv-result').innerHTML = `<div class="banner banner-ok" style="display:block"><b>邀請連結已產生（${esc(r.invitation.name)}）：</b><div class="link-box" style="margin-top:6px"><code id="inv-link">${esc(r.invitation.link)}</code><button class="btn btn-sm" type="button" id="copy-inv">複製</button></div></div>`;
-      $('#copy-inv').onclick = async () => { try { await navigator.clipboard.writeText(r.invitation.link); $('#copy-inv').textContent = '已複製'; } catch { /* ignore */ } };
+      const r = await api('POST', '/api/admin/users', { name: $('#nu-name').value, role: $('#nu-role').value, note: $('#nu-note').value });
+      $('#nu-result').innerHTML = `<div class="banner banner-ok" style="display:block"><b>${esc(r.user.name)} 的認證碼：</b><div class="code-box" style="margin-top:6px"><span class="code-big" id="nu-code">${esc(r.user.access_code)}</span><button class="btn btn-sm" type="button" data-copy="${esc(r.user.login_link)}">複製登入連結</button></div><p class="help" style="margin-top:6px">接著在下方展開此人，勾選負責的項目並「儲存分工」。</p></div>`;
+      wireCopy();
+      $('#nu-name').value = ''; $('#nu-note').value = '';
     } catch (err) { toast(errText(err), 'err'); }
   };
-  view.querySelectorAll('[data-del-inv]').forEach((b) => { b.onclick = async () => { await api('DELETE', `/api/admin/invitations/${b.dataset.delInv}`); renderUsers(); }; });
+  function wireCopy() {
+    view.querySelectorAll('[data-copy]').forEach((b) => { b.onclick = async () => { try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = '已複製'; } catch { toast(b.dataset.copy, 'info'); } }; });
+  }
+  wireCopy();
+  view.querySelectorAll('[data-regen]').forEach((b) => {
+    b.onclick = async () => {
+      if (!(await confirmDialog('重新產生認證碼', '舊的認證碼會立即失效，該同事需改用新碼登入。', '重新產生', true))) return;
+      try { const r = await api('POST', `/api/admin/users/${b.dataset.regen}/regenerate-code`); toast(`新認證碼：${r.user.access_code}`); renderUsers(); } catch (err) { toast(errText(err), 'err'); }
+    };
+  });
   view.querySelectorAll('[data-save-user]').forEach((b) => {
     b.onclick = async () => {
       const box = b.closest('[data-user]');
       try {
-        await api('PATCH', `/api/admin/users/${box.dataset.user}`, { name: box.querySelector('[data-f=name]').value, role: box.querySelector('[data-f=role]').value, is_active: box.querySelector('[data-f=is_active]').checked });
+        await api('PATCH', `/api/admin/users/${box.dataset.user}`, { name: box.querySelector('[data-f=name]').value, note: box.querySelector('[data-f=note]').value, role: box.querySelector('[data-f=role]').value, is_active: box.querySelector('[data-f=is_active]').checked });
         toast('已儲存'); renderUsers();
       } catch (err) { toast(errText(err), 'err'); }
     };
@@ -629,6 +609,27 @@ async function renderUsers() {
   view.querySelectorAll('[data-all],[data-none]').forEach((b) => {
     b.onclick = () => b.closest('[data-user]').querySelectorAll('input[data-d]').forEach((c) => { c.checked = b.hasAttribute('data-all'); });
   });
+}
+
+/** 列印用代碼表：每人一張卡（姓名、角色、負責項目、認證碼、QR）。 */
+async function renderCodeSheet() {
+  await bootReload();
+  const { users } = await api('GET', '/api/admin/users');
+  const active = users.filter((u) => u.is_active && u.access_code);
+  const itemsOf = (u) => u.role === 'admin' ? '全部項目' : state.boot.divisions.map((d) => {
+    const names = u.assignments.filter((a) => a.division_id === d.id).map((a) => B.item(a.item_id)?.name).filter(Boolean);
+    return names.length ? `${d.name}：${names.join('、')}` : '';
+  }).filter(Boolean).join('；') || '（尚未指派）';
+  view.innerHTML = `<div class="actions no-print" style="margin-top:12px"><a class="btn" href="#/admin/users">← 回人員頁</a><button class="btn btn-primary" id="btn-print-codes">列印</button><span class="help">每人一張，沿線剪開發給同事；掃 QR 或輸入認證碼皆可登入。</span></div>
+    <h2 class="print-only" style="font-size:18px;margin:8px 0">${esc(state.boot.event.name)}　工作人員認證碼</h2>
+    <div class="code-cards">${active.map((u) => `<div class="code-card">
+      <div class="code-card-main"><div class="code-card-name">${esc(u.name)} <span class="tag tag-blue">${ROLE[u.role]}</span></div>
+        <div class="help">${esc(itemsOf(u))}</div>
+        <div class="code-big">${esc(u.access_code)}</div>
+        <div class="help">登入網址：${esc(u.login_link.split('?')[0])}</div></div>
+      <img class="code-card-qr" src="/api/admin/users/${u.id}/qr.svg" alt="${esc(u.name)} 登入 QR Code">
+    </div>`).join('')}</div>`;
+  $('#btn-print-codes').onclick = () => window.print();
 }
 
 // ---------- 管理：學校與隊伍 ----------
@@ -716,12 +717,14 @@ async function renderEvent() {
         <div class="field"><label for="ed">日期</label><input class="input" id="ed" type="date" value="${esc(ev.event_date || '')}"></div>
         <div class="field"><label for="ev">場地</label><input class="input" id="ev" value="${esc(ev.venue || '')}"></div>
         <div class="field"><label for="eo">承辦單位</label><input class="input" id="eo" value="${esc(ev.organizer || '')}"></div>
-      </div><div><button class="btn btn-primary" type="submit">儲存</button></div></form>
+      </div>
+      <div class="field"><label for="ea">公開頁公告（選填，例如「頒獎典禮 14:00 於司令台」；留空則不顯示）</label><input class="input" id="ea" value="${esc(ev.announcement || '')}" maxlength="200"></div>
+      <div><button class="btn btn-primary" type="submit">儲存</button></div></form>
       ${ev.is_demo ? '<div class="banner banner-warn" style="margin-top:12px">目前顯示的是示範活動資料。正式上線前請清除示範資料（見 README）。</div>' : ''}
     </div>
     <div class="card"><h2>進度總覽</h2><div class="kpi"><div><b>${counts.published}</b><span>已公布</span></div><div><b>${counts.pending}</b><span>待複核</span></div><div><b>${counts.draft}</b><span>草稿</span></div><div><b>${state.boot.schools.length}</b><span>學校</span></div></div></div>
     <div class="card"><h2>匯出</h2><div class="actions"><a class="btn" href="/api/staff/export.csv?scope=published">已公布成績 CSV</a><a class="btn" href="/api/staff/export.csv?scope=all">全部（含草稿）CSV</a></div></div>`;
-  $('#ev-form').onsubmit = async (e) => { e.preventDefault(); try { await api('PATCH', '/api/admin/event', { name: $('#en').value, edition: $('#ee').value, event_date: $('#ed').value, venue: $('#ev').value, organizer: $('#eo').value }); toast('已儲存'); state.boot = null; route(); } catch (err) { toast(errText(err), 'err'); } };
+  $('#ev-form').onsubmit = async (e) => { e.preventDefault(); try { await api('PATCH', '/api/admin/event', { name: $('#en').value, edition: $('#ee').value, event_date: $('#ed').value, venue: $('#ev').value, organizer: $('#eo').value, announcement: $('#ea').value }); toast('已儲存'); state.boot = null; route(); } catch (err) { toast(errText(err), 'err'); } };
 }
 
 route();

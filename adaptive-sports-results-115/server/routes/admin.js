@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { query, withTx } from '../db.js';
-import { requireUser, requireRole, sha256, randomToken } from '../auth.js';
+import QRCode from 'qrcode';
+import { requireUser, requireRole, generateCode } from '../auth.js';
 import { badRequest, notFound } from '../errors.js';
 import { audit } from '../audit.js';
 import { activeEvent } from '../sheets.js';
@@ -21,62 +22,90 @@ const text = (v, name, max = 60, required = true) => {
   return s;
 };
 
-// ---------- 使用者與邀請 ----------
-adminRouter.get('/users', async (_req, res, next) => {
+// ---------- 工作人員與認證碼 ----------
+adminRouter.get('/users', async (req, res, next) => {
   try {
     const { rows: users } = await query(
-      `SELECT u.id, u.email, u.name, u.role, u.is_active, u.last_login_at, (u.password_hash IS NOT NULL) AS has_password,
+      `SELECT u.id, u.name, u.role, u.access_code, u.note, u.is_active, u.last_login_at,
               COALESCE(json_agg(json_build_object('division_id', a.division_id, 'item_id', a.item_id)) FILTER (WHERE a.user_id IS NOT NULL), '[]') AS assignments
          FROM users u LEFT JOIN assignments a ON a.user_id=u.id
-        GROUP BY u.id ORDER BY u.role, u.name`,
+        GROUP BY u.id ORDER BY u.role, u.id`,
     );
-    const { rows: invitations } = await query(
-      `SELECT id, email, name, role, created_at, expires_at, accepted_at FROM invitations
-        WHERE accepted_at IS NULL AND expires_at > now() ORDER BY id DESC`,
-    );
-    res.json({ users, invitations });
+    const base = publicBase(req);
+    res.json({ users: users.map((u) => ({ ...u, login_link: u.access_code ? `${base}/staff?code=${u.access_code}` : null })) });
   } catch (e) {
     next(e);
   }
 });
 
-adminRouter.post('/invitations', async (req, res, next) => {
+function publicBase(req) {
+  return process.env.PUBLIC_URL || `${req.protocol}://${req.get('host')}`;
+}
+
+async function uniqueCode(client, role) {
+  for (let i = 0; i < 20; i++) {
+    const code = generateCode(role);
+    const { rows } = await client.query('SELECT 1 FROM users WHERE access_code=$1', [code]);
+    if (!rows.length) return code;
+  }
+  throw new Error('無法產生不重複的認證碼');
+}
+
+/** 新增工作人員：只要姓名與角色，系統產生認證碼。可同時帶 assignments。 */
+adminRouter.post('/users', async (req, res, next) => {
   try {
-    const email = text(req.body?.email, '電子郵件', 120).toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw badRequest('電子郵件格式不正確');
     const name = text(req.body?.name, '姓名', 40);
     const role = String(req.body?.role || 'entry');
     if (!ROLES.includes(role)) throw badRequest('角色不正確');
-    const token = randomToken(24);
-    const result = await withTx(async (client) => {
+    const note = text(req.body?.note, '備註', 60, false) || null;
+    const list = Array.isArray(req.body?.assignments) ? req.body.assignments : [];
+    const user = await withTx(async (client) => {
+      const code = await uniqueCode(client, role);
       const { rows } = await client.query(
-        `INSERT INTO invitations (email, name, role, token_hash, created_by, expires_at)
-         VALUES ($1,$2,$3,$4,$5, now() + interval '7 days') RETURNING id, expires_at`,
-        [email, name, role, sha256(token), req.user.id],
+        'INSERT INTO users (name, role, access_code, note, is_active) VALUES ($1,$2,$3,$4,TRUE) RETURNING id, name, role, access_code, note',
+        [name, role, code, note],
       );
-      // 已存在的使用者可用邀請重設密碼／角色；分工可先行指定
-      const { rows: existing } = await client.query('SELECT id FROM users WHERE email=$1', [email]);
-      if (!existing[0]) {
-        await client.query(
-          `INSERT INTO users (email, name, role, password_hash, is_active) VALUES ($1,$2,$3,NULL,TRUE)
-           ON CONFLICT (email) DO NOTHING`,
-          [email, name, role],
-        );
+      for (const a of list) {
+        await client.query('INSERT INTO assignments (user_id, division_id, item_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING',
+          [rows[0].id, num(a.division_id, 'division_id'), num(a.item_id, 'item_id')]);
       }
-      await audit(client, req.user, 'invite.create', 'invitation', rows[0].id, null, { email, name, role });
+      await audit(client, req.user, 'user.create', 'user', rows[0].id, null, { name, role, note });
       return rows[0];
     });
-    const base = process.env.PUBLIC_URL || `${req.protocol}://${req.get('host')}`;
-    res.json({ invitation: { id: result.id, email, name, role, expires_at: result.expires_at, link: `${base}/staff/invite/${token}` } });
+    res.json({ user: { ...user, login_link: `${publicBase(req)}/staff?code=${user.access_code}` } });
   } catch (e) {
     next(e);
   }
 });
 
-adminRouter.delete('/invitations/:id', async (req, res, next) => {
+/** 重新產生認證碼（舊碼立即失效，並登出該使用者）。 */
+adminRouter.post('/users/:id/regenerate-code', async (req, res, next) => {
   try {
-    await query('DELETE FROM invitations WHERE id=$1 AND accepted_at IS NULL', [num(req.params.id, 'id')]);
-    res.json({ ok: true });
+    const id = num(req.params.id, 'id');
+    const user = await withTx(async (client) => {
+      const { rows } = await client.query('SELECT id, name, role FROM users WHERE id=$1', [id]);
+      if (!rows[0]) throw notFound();
+      const code = await uniqueCode(client, rows[0].role);
+      await client.query('UPDATE users SET access_code=$2 WHERE id=$1', [id, code]);
+      await client.query('DELETE FROM sessions WHERE user_id=$1', [id]);
+      await audit(client, req.user, 'user.regenerate_code', 'user', id, null, { name: rows[0].name });
+      return { ...rows[0], access_code: code };
+    });
+    res.json({ user: { ...user, login_link: `${publicBase(req)}/staff?code=${user.access_code}` } });
+  } catch (e) {
+    next(e);
+  }
+});
+
+/** 登入連結 QR Code（管理者列印代碼表用）。 */
+adminRouter.get('/users/:id/qr.svg', async (req, res, next) => {
+  try {
+    const id = num(req.params.id, 'id');
+    const { rows } = await query('SELECT access_code FROM users WHERE id=$1 AND is_active', [id]);
+    if (!rows[0]?.access_code) throw notFound();
+    const svg = await QRCode.toString(`${publicBase(req)}/staff?code=${rows[0].access_code}`, { type: 'svg', margin: 1, width: 160, color: { dark: '#0b1f3a', light: '#ffffff' } });
+    res.setHeader('Cache-Control', 'no-store');
+    res.type('image/svg+xml').send(svg);
   } catch (e) {
     next(e);
   }
@@ -91,12 +120,13 @@ adminRouter.patch('/users/:id', async (req, res, next) => {
       patch.role = req.body.role;
     }
     if (req.body?.name != null) patch.name = text(req.body.name, '姓名', 40);
+    if (req.body?.note != null) patch.note = text(req.body.note, '備註', 60, false) || null;
     if (req.body?.is_active != null) patch.is_active = Boolean(req.body.is_active);
     if (id === req.user.id && (patch.role && patch.role !== 'admin' || patch.is_active === false)) {
       throw badRequest('不能取消自己的管理者權限或停用自己');
     }
     await withTx(async (client) => {
-      const { rows } = await client.query('SELECT id, name, role, is_active FROM users WHERE id=$1', [id]);
+      const { rows } = await client.query('SELECT id, name, role, note, is_active FROM users WHERE id=$1', [id]);
       if (!rows[0]) throw notFound();
       const keys = Object.keys(patch);
       if (keys.length) {
@@ -320,9 +350,10 @@ adminRouter.patch('/event', async (req, res, next) => {
     const b = req.body || {};
     await withTx(async (client) => {
       await client.query(
-        'UPDATE events SET name=$2, edition=$3, event_date=$4, venue=$5, organizer=$6 WHERE id=$1',
+        'UPDATE events SET name=$2, edition=$3, event_date=$4, venue=$5, organizer=$6, announcement=$7 WHERE id=$1',
         [ev.id, text(b.name, '活動名稱', 120), text(b.edition, '屆次', 40, false) || null, b.event_date || null,
-          text(b.venue, '場地', 80, false) || null, text(b.organizer, '承辦單位', 80, false) || null],
+          text(b.venue, '場地', 80, false) || null, text(b.organizer, '承辦單位', 80, false) || null,
+          text(b.announcement, '公告', 200, false) || null],
       );
       await audit(client, req.user, 'event.update', 'event', ev.id, ev, b);
     });

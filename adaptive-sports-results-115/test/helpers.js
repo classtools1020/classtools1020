@@ -41,14 +41,10 @@ export function client() {
   }
   return {
     call,
-    login: (email, password) => call('POST', '/api/auth/login', { email, password }),
+    login: (code) => call('POST', '/api/auth/login', { code }),
     get cookie() { return cookie; },
   };
 }
 
-export const ACCOUNTS = {
-  admin: ['demo-admin@example.com', 'demo-admin-1234'],
-  entry1: ['demo-entry1@example.com', 'demo-entry-1234'],
-  entry2: ['demo-entry2@example.com', 'demo-entry-1234'],
-  reviewer: ['demo-reviewer@example.com', 'demo-review-1234'],
-};
+// 示範認證碼（scripts/seed.js --demo）
+export const ACCOUNTS = { admin: 'DEMOADMIN', entry1: '111111', entry2: '222222', reviewer: '333333' };

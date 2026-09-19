@@ -58,9 +58,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .brand .kicker { font-size: 13px; letter-spacing: 0.08em; color: #b9c8e0; text-transform: uppercase; }
 .brand h1 { font-size: 17px; font-weight: 700; color: #fff; white-space: normal; }
 .topbar-actions { display: flex; gap: 8px; flex-shrink: 0; }
-.eventmeta { background: var(--paper); border-bottom: 1px solid var(--line); }
-.eventmeta .wrap { display: flex; flex-wrap: wrap; gap: 6px 24px; padding-top: 10px; padding-bottom: 10px; font-size: 15px; color: var(--ink-2); }
-.eventmeta b { color: var(--ink); font-weight: 600; margin-right: 6px; }
 .main { padding: 16px 0 96px; }
 .footer { border-top: 1px solid var(--line); color: var(--ink-3); font-size: 14px; padding: 20px 0 40px; }
 .footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
@@ -273,3 +270,39 @@ dialog::backdrop { background: rgba(11, 31, 58, 0.45); }
 .kpi div { border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; }
 .kpi b { display: block; font-size: 24px; color: var(--navy); }
 .kpi span { font-size: 14px; color: var(--ink-3); }
+
+/* 認證碼 */
+.code-input { font-size: 24px; letter-spacing: 0.15em; text-align: center; min-height: 56px; }
+.code-box { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.code-big { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 26px; font-weight: 700; letter-spacing: 0.12em; color: var(--navy); background: var(--blue-50); border: 1px dashed #bcd3f3; border-radius: 6px; padding: 6px 12px; }
+.topbar-user { color: #b9c8e0; align-self: center; }
+.code-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin-top: 12px; }
+.code-card { display: flex; gap: 12px; align-items: center; justify-content: space-between; border: 1px dashed var(--ink-3); border-radius: 6px; padding: 12px; background: var(--paper); break-inside: avoid; }
+.code-card-main { display: grid; gap: 6px; min-width: 0; }
+.code-card-name { font-size: 18px; font-weight: 700; }
+.code-card-qr { width: 120px; height: 120px; flex-shrink: 0; }
+@media print { .code-cards { grid-template-columns: 1fr 1fr; } .appnav, .savebar, #toast { display: none !important; } }
+
+/* ---------- 公開頁主視覺 ---------- */
+.hero { position: relative; color: #fff; background: var(--navy); overflow: hidden; min-height: 220px; }
+.hero-art { position: absolute; inset: 0; background: url("/assets/kv.svg") center / cover no-repeat; }
+.hero-inner { position: relative; padding-top: 28px; padding-bottom: 24px; display: grid; gap: 8px; max-width: 1080px; }
+.hero-kicker { font-size: 12px; letter-spacing: 0.22em; color: #ffd27a; font-weight: 700; }
+.hero-title { font-size: 26px; line-height: 1.25; font-weight: 800; text-shadow: 0 2px 12px rgba(11, 31, 58, 0.6); max-width: 620px; }
+.hero-ed { display: inline-block; font-size: 15px; letter-spacing: 0.12em; color: #0b1f3a; background: #ffd27a; padding: 2px 8px; border-radius: 3px; margin-bottom: 6px; vertical-align: middle; }
+.hero-sub { font-size: 15px; color: #dbe6f5; text-shadow: 0 1px 6px rgba(11, 31, 58, 0.6); }
+.hero-sub .sep { margin: 0 4px; color: #9fb4d3; }
+.hero-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.hero-stats span { font-size: 14px; background: rgba(11, 31, 58, 0.55); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 4px; padding: 4px 10px; backdrop-filter: blur(2px); }
+.hero-stats b { color: #ffd27a; font-size: 16px; }
+@media (min-width: 720px) {
+  .hero { min-height: 300px; }
+  .hero-inner { padding-top: 44px; padding-bottom: 40px; }
+  .hero-title { font-size: 38px; }
+  .hero-ed { font-size: 17px; }
+  .hero-sub { font-size: 16px; }
+}
+.announce { background: #fff8e6; border-bottom: 1px solid #f1dfae; }
+.announce .tag { white-space: nowrap; flex-shrink: 0; }
+.announce .wrap { display: flex; gap: 10px; align-items: center; padding: 10px 16px; font-size: 16px; font-weight: 600; color: var(--ink); }
+@media print { .hero { min-height: 0; background: #fff; color: var(--ink); } .hero-art, .hero-stats, .hero-kicker { display: none; } .hero-title { text-shadow: none; font-size: 20pt; } .hero-sub { color: var(--ink-2); text-shadow: none; } .hero-ed { background: none; border: 1px solid #333; } }

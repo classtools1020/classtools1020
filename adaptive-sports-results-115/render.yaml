@@ -16,6 +16,10 @@ services:
           property: connectionString
       - key: PUBLIC_URL
         sync: false          # 部署後填入正式網址
+      - key: ADMIN_CODE
+        sync: false          # 管理者認證碼（至少 8 個字元），部署時填入
+      - key: ADMIN_NAME
+        value: 管理者
 databases:
   - name: adaptive-sports-db
     plan: basic-256mb

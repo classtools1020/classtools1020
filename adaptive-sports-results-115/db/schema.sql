@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS events (
   event_date   DATE,
   venue        TEXT,
   organizer    TEXT,
+  announcement TEXT,                       -- 公開頁公告列（例如：頒獎典禮 14:00 開始）
   is_demo      BOOLEAN NOT NULL DEFAULT FALSE,
   is_active    BOOLEAN NOT NULL DEFAULT TRUE,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -61,27 +62,17 @@ CREATE TABLE IF NOT EXISTS teams (
   UNIQUE (division_id, school_id, label)
 );
 
+-- 工作人員：以「認證碼」登入（同事不需要 Email、密碼或任何帳號）。
+-- access_code 以明文保存，讓管理者能隨時查看、列印代碼表；請只給活動當天使用並於賽後停用。
 CREATE TABLE IF NOT EXISTS users (
   id            SERIAL PRIMARY KEY,
-  email         TEXT NOT NULL UNIQUE,
   name          TEXT NOT NULL,
   role          TEXT NOT NULL CHECK (role IN ('admin','entry','reviewer')),
-  password_hash TEXT,
+  access_code   TEXT UNIQUE,
+  note          TEXT,
   is_active     BOOLEAN NOT NULL DEFAULT TRUE,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   last_login_at TIMESTAMPTZ
-);
-
-CREATE TABLE IF NOT EXISTS invitations (
-  id          SERIAL PRIMARY KEY,
-  email       TEXT NOT NULL,
-  name        TEXT NOT NULL,
-  role        TEXT NOT NULL CHECK (role IN ('admin','entry','reviewer')),
-  token_hash  TEXT NOT NULL UNIQUE,
-  created_by  INT REFERENCES users(id),
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  expires_at  TIMESTAMPTZ NOT NULL,
-  accepted_at TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -164,3 +155,8 @@ CREATE TABLE IF NOT EXISTS audit_log (
   after       JSONB
 );
 CREATE INDEX IF NOT EXISTS audit_log_entity_idx ON audit_log (entity, entity_id);
+
+-- 既有資料庫升級用（新安裝不受影響）
+ALTER TABLE events ADD COLUMN IF NOT EXISTS announcement TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS access_code TEXT UNIQUE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS note TEXT;

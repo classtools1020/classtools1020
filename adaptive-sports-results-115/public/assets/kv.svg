@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 560" preserveAspectRatio="xMidYMid slice" role="img" aria-label="校園運動祭主視覺：午後陽光下的操場、彩旗與參賽學生剪影">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c4f9c"/>
+      <stop offset="0.45" stop-color="#5f9be0"/>
+      <stop offset="0.8" stop-color="#cfe3f7"/>
+      <stop offset="1" stop-color="#f8e9c9"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.82" cy="0.28" r="0.5">
+      <stop offset="0" stop-color="#fff6d8" stop-opacity="0.95"/>
+      <stop offset="0.25" stop-color="#ffd98a" stop-opacity="0.55"/>
+      <stop offset="0.6" stop-color="#ffb347" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5f9a4f"/>
+      <stop offset="1" stop-color="#2f6a3a"/>
+    </linearGradient>
+    <linearGradient id="track" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c8664a"/>
+      <stop offset="1" stop-color="#9a4a35"/>
+    </linearGradient>
+    <linearGradient id="fig" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0b1f3a"/>
+      <stop offset="1" stop-color="#17325c"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffd27a" stop-opacity="0"/>
+      <stop offset="0.7" stop-color="#ffd27a" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#fff1c2" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="scrim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0b1f3a" stop-opacity="0.9"/>
+      <stop offset="0.45" stop-color="#0b1f3a" stop-opacity="0.55"/>
+      <stop offset="0.75" stop-color="#0b1f3a" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="cloud" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#dbe9fb" stop-opacity="0.85"/>
+    </linearGradient>
+    <filter id="blur6"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="blur2"><feGaussianBlur stdDeviation="1.5"/></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+
+  <!-- 天空與陽光 -->
+  <rect width="1600" height="560" fill="url(#sky)"/>
+  <rect width="1600" height="560" fill="url(#sun)"/>
+  <circle cx="1310" cy="150" r="46" fill="#fff8e1" filter="url(#glow)"/>
+  <circle cx="1310" cy="150" r="30" fill="#fffdf5"/>
+
+  <!-- 雲 -->
+  <g fill="url(#cloud)" filter="url(#blur2)">
+    <ellipse cx="380" cy="160" rx="150" ry="34"/><ellipse cx="440" cy="140" rx="90" ry="40"/><ellipse cx="320" cy="145" rx="70" ry="30"/>
+    <ellipse cx="900" cy="120" rx="120" ry="26"/><ellipse cx="940" cy="105" rx="70" ry="30"/>
+    <ellipse cx="1500" cy="230" rx="110" ry="22"/><ellipse cx="1530" cy="218" rx="60" ry="26"/>
+  </g>
+
+  <!-- 遠景：校舍與樹 -->
+  <g opacity="0.55" fill="#2b4a78">
+    <rect x="1040" y="300" width="330" height="70" rx="3"/><rect x="1100" y="270" width="120" height="30"/>
+    <rect x="1385" y="315" width="170" height="55" rx="3"/>
+  </g>
+  <g fill="#2f5b3f" opacity="0.8">
+    <ellipse cx="990" cy="350" rx="48" ry="42"/><ellipse cx="1420" cy="345" rx="40" ry="38"/><ellipse cx="1560" cy="352" rx="44" ry="36"/><ellipse cx="60" cy="355" rx="70" ry="44"/><ellipse cx="180" cy="345" rx="55" ry="48"/>
+  </g>
+  <!-- 帳篷 -->
+  <g>
+    <path d="M700 372 L770 318 L840 372 Z" fill="#f3f6fa"/><rect x="706" y="372" width="128" height="6" fill="#cbd5e1"/>
+    <path d="M700 372 L770 318 L840 372 Z" fill="url(#rim)" opacity="0.5"/>
+    <rect x="704" y="378" width="132" height="4" fill="#0b1f3a" opacity="0.3"/>
+  </g>
+
+  <!-- 操場：草地與跑道（透視） -->
+  <rect x="0" y="366" width="1600" height="194" fill="url(#field)"/>
+  <path d="M0 420 Q800 385 1600 420 L1600 560 L0 560 Z" fill="url(#track)"/>
+  <g stroke="#ffffff" stroke-opacity="0.75" fill="none" stroke-width="3">
+    <path d="M0 448 Q800 410 1600 448"/><path d="M0 486 Q800 440 1600 486"/><path d="M0 528 Q800 476 1600 528"/>
+  </g>
+  <path d="M0 560 L1600 560 L1600 540 Q800 500 0 540 Z" fill="#0b1f3a" opacity="0.18"/>
+
+  <!-- 彩旗（紅白、藍白） -->
+  <g stroke="#0b1f3a" stroke-opacity="0.6" stroke-width="2" fill="none">
+    <path d="M-20 40 Q400 120 820 46 Q1220 -20 1620 70"/>
+    <path d="M-20 110 Q380 190 800 116 Q1200 50 1620 140"/>
+  </g>
+  <g>
+    <g id="flags1" fill="#e0483d">
+      <path d="M30 51 l22 0 l-11 34 z"/><path d="M130 66 l22 0 l-11 34 z" fill="#fff"/><path d="M230 78 l22 0 l-11 34 z"/><path d="M330 86 l22 0 l-11 34 z" fill="#fff"/><path d="M430 90 l22 0 l-11 34 z"/><path d="M530 84 l22 0 l-11 34 z" fill="#fff"/><path d="M630 72 l22 0 l-11 34 z"/><path d="M730 58 l22 0 l-11 34 z" fill="#fff"/><path d="M830 46 l22 0 l-11 34 z"/><path d="M930 32 l22 0 l-11 34 z" fill="#fff"/><path d="M1030 20 l22 0 l-11 34 z"/><path d="M1130 14 l22 0 l-11 34 z" fill="#fff"/><path d="M1230 16 l22 0 l-11 34 z"/><path d="M1330 24 l22 0 l-11 34 z" fill="#fff"/><path d="M1430 40 l22 0 l-11 34 z"/><path d="M1530 56 l22 0 l-11 34 z" fill="#fff"/>
+    </g>
+    <g fill="#1f5fbf">
+      <path d="M80 130 l22 0 l-11 34 z"/><path d="M180 146 l22 0 l-11 34 z" fill="#fff"/><path d="M280 156 l22 0 l-11 34 z"/><path d="M380 161 l22 0 l-11 34 z" fill="#fff"/><path d="M480 160 l22 0 l-11 34 z"/><path d="M580 150 l22 0 l-11 34 z" fill="#fff"/><path d="M680 136 l22 0 l-11 34 z"/><path d="M780 120 l22 0 l-11 34 z" fill="#fff"/><path d="M880 104 l22 0 l-11 34 z"/><path d="M980 88 l22 0 l-11 34 z" fill="#fff"/><path d="M1080 78 l22 0 l-11 34 z"/><path d="M1180 76 l22 0 l-11 34 z" fill="#fff"/><path d="M1280 84 l22 0 l-11 34 z"/><path d="M1380 100 l22 0 l-11 34 z" fill="#fff"/><path d="M1480 118 l22 0 l-11 34 z"/>
+    </g>
+  </g>
+
+  <!-- 人物剪影（原創、簡化），逆光暖色描邊 -->
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <!-- 輪椅選手：舉拳 -->
+    <g transform="translate(1080 300)">
+      <circle cx="40" cy="70" r="46" fill="none" stroke="url(#fig)" stroke-width="9"/>
+      <circle cx="40" cy="70" r="46" fill="none" stroke="url(#rim)" stroke-width="3"/>
+      <circle cx="-10" cy="98" r="18" fill="none" stroke="url(#fig)" stroke-width="7"/>
+      <path d="M30 20 h48 l6 38 h-46 z" fill="url(#fig)"/>
+      <path d="M50 -24 c0 -20 34 -20 34 0 l0 12 c0 20 -34 20 -34 0 z" fill="url(#fig)"/>
+      <path d="M52 -6 c-14 4 -26 20 -26 40 l0 8 h58 l0 -8 c0 -20 -12 -36 -26 -40 z" fill="url(#fig)"/>
+      <path d="M84 8 l26 -50" stroke="url(#fig)" stroke-width="11"/>
+      <circle cx="112" cy="-46" r="9" fill="url(#fig)"/>
+      <path d="M84 8 l26 -50" stroke="url(#rim)" stroke-width="3"/>
+      <path d="M52 -6 c-14 4 -26 20 -26 40 l0 8 h58 l0 -8 c0 -20 -12 -36 -26 -40 z" fill="none" stroke="url(#rim)" stroke-width="2.5"/>
+      <path d="M50 -24 c0 -20 34 -20 34 0 l0 12 c0 20 -34 20 -34 0 z" fill="none" stroke="url(#rim)" stroke-width="2.5"/>
+    </g>
+    <!-- 投沙包的男孩 -->
+    <g transform="translate(1290 250)">
+      <path d="M0 0 c0 -22 36 -22 36 0 l0 14 c0 22 -36 22 -36 0 z" fill="url(#fig)"/>
+      <path d="M6 20 c-16 6 -28 24 -28 46 l4 30 h56 l4 -30 c0 -22 -12 -40 -28 -46 z" fill="url(#fig)"/>
+      <path d="M40 30 l44 -44" stroke="url(#fig)" stroke-width="11"/>
+      <rect x="78" y="-58" width="20" height="16" rx="4" fill="#e0483d"/>
+      <path d="M-6 96 l-16 60 M40 96 l22 58" stroke="url(#fig)" stroke-width="13"/>
+      <path d="M40 30 l44 -44" stroke="url(#rim)" stroke-width="3"/>
+      <path d="M6 20 c-16 6 -28 24 -28 46 l4 30 h56 l4 -30 c0 -22 -12 -40 -28 -46 z" fill="none" stroke="url(#rim)" stroke-width="2.5"/>
+      <path d="M0 0 c0 -22 36 -22 36 0 l0 14 c0 22 -36 22 -36 0 z" fill="none" stroke="url(#rim)" stroke-width="2.5"/>
+    </g>
+    <!-- 歡呼的女孩（雙手高舉、綁頭帶） -->
+    <g transform="translate(1440 262)">
+      <path d="M0 0 c0 -22 36 -22 36 0 l0 14 c0 22 -36 22 -36 0 z" fill="url(#fig)"/>
+      <path d="M-4 -2 h44" stroke="#e0483d" stroke-width="5"/>
+      <path d="M4 20 c-16 6 -26 22 -26 44 l6 30 h50 l6 -30 c0 -22 -10 -38 -26 -44 z" fill="url(#fig)"/>
+      <path d="M-14 30 l-26 -54 M50 30 l26 -54" stroke="url(#fig)" stroke-width="11"/>
+      <path d="M0 94 l-8 56 M36 94 l8 56" stroke="url(#fig)" stroke-width="13"/>
+      <path d="M50 30 l26 -54" stroke="url(#rim)" stroke-width="3"/>
+      <path d="M4 20 c-16 6 -26 22 -26 44 l6 30 h50 l6 -30 c0 -22 -10 -38 -26 -44 z" fill="none" stroke="url(#rim)" stroke-width="2.5"/>
+      <path d="M0 0 c0 -22 36 -22 36 0 l0 14 c0 22 -36 22 -36 0 z" fill="none" stroke="url(#rim)" stroke-width="2.5"/>
+    </g>
+    <!-- 拍手的老師 -->
+    <g transform="translate(940 236)">
+      <path d="M0 0 c0 -24 40 -24 40 0 l0 16 c0 24 -40 24 -40 0 z" fill="url(#fig)"/>
+      <path d="M2 24 c-18 6 -30 26 -30 50 l6 44 h64 l6 -44 c0 -24 -12 -44 -30 -50 z" fill="url(#fig)"/>
+      <path d="M-10 48 l32 10 M50 48 l-28 12" stroke="url(#fig)" stroke-width="11"/>
+      <path d="M4 118 l-4 62 M36 118 l4 62" stroke="url(#fig)" stroke-width="14"/>
+      <path d="M2 24 c-18 6 -30 26 -30 50 l6 44 h64 l6 -44 c0 -24 -12 -44 -30 -50 z" fill="none" stroke="url(#rim)" stroke-width="2.5"/>
+      <path d="M0 0 c0 -24 40 -24 40 0 l0 16 c0 24 -40 24 -40 0 z" fill="none" stroke="url(#rim)" stroke-width="2.5"/>
+    </g>
+    <!-- 地面影子 -->
+    <g fill="#0b1f3a" opacity="0.28" filter="url(#blur6)">
+      <ellipse cx="1120" cy="430" rx="90" ry="12"/><ellipse cx="1320" cy="412" rx="60" ry="10"/><ellipse cx="1460" cy="418" rx="50" ry="9"/><ellipse cx="960" cy="422" rx="52" ry="9"/>
+    </g>
+  </g>
+
+  <!-- 鏡頭光斑 -->
+  <g opacity="0.35">
+    <circle cx="1180" cy="240" r="14" fill="#fff3c4"/><circle cx="1090" cy="300" r="22" fill="#ffd27a" opacity="0.5"/><circle cx="1000" cy="352" r="9" fill="#fff"/>
+  </g>
+
+  <!-- 左側文字用暗色遮罩 -->
+  <rect width="1600" height="560" fill="url(#scrim)"/>
+</svg>

@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadUser } from './auth.js';
+import { loadUser, ensureAdminFromEnv } from './auth.js';
 import { HttpError } from './errors.js';
 import { publicRouter } from './routes/public.js';
 import { authRouter } from './routes/auth.js';
@@ -44,4 +44,5 @@ app.use((err, _req, res, _next) => {
 });
 
 const port = Number(process.env.PORT || 3000);
+await ensureAdminFromEnv().catch((e) => console.error('ADMIN_CODE 設定失敗：', e.message));
 app.listen(port, () => console.log(`成績公告系統已啟動：http://localhost:${port}`));

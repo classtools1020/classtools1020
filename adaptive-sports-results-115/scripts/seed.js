@@ -3,7 +3,6 @@
  * 加上 --demo 則另外建立「示範活動」與假資料（與正式資料分離，可隨時刪除）。
  */
 import { pool, withTx } from '../server/db.js';
-import { hashPassword } from '../server/auth.js';
 
 const ITEMS = ['探囊取物大奔走', '階梯球', '速速配', '顆星連珠', '弓箭標靶', '草地投籃', '九宮格', '舀杯高手', '看你多搖擺', '目標一致'];
 
@@ -84,25 +83,25 @@ await withTx(async (client) => {
     }
   }
   const users = [
-    ['demo-admin@example.com', '示範管理者', 'admin', 'demo-admin-1234'],
-    ['demo-entry1@example.com', '示範輸入甲', 'entry', 'demo-entry-1234'],
-    ['demo-entry2@example.com', '示範輸入乙', 'entry', 'demo-entry-1234'],
-    ['demo-reviewer@example.com', '示範複核', 'reviewer', 'demo-review-1234'],
+    ['DEMOADMIN', '示範管理者', 'admin'],
+    ['111111', '示範輸入甲', 'entry'],
+    ['222222', '示範輸入乙', 'entry'],
+    ['333333', '示範複核', 'reviewer'],
   ];
   const userIds = {};
-  for (const [email, name, role, pw] of users) {
+  for (const [code, name, role] of users) {
     const r = await client.query(
-      `INSERT INTO users (email, name, role, password_hash) VALUES ($1,$2,$3,$4)
-       ON CONFLICT (email) DO UPDATE SET password_hash=EXCLUDED.password_hash, role=EXCLUDED.role RETURNING id`,
-      [email, name, role, hashPassword(pw)]);
-    userIds[email] = r.rows[0].id;
+      `INSERT INTO users (name, role, access_code, note) VALUES ($1,$2,$3,'示範帳號')
+       ON CONFLICT (access_code) DO UPDATE SET role=EXCLUDED.role, name=EXCLUDED.name RETURNING id`,
+      [name, role, code]);
+    userIds[code] = r.rows[0].id;
   }
   const half = Math.ceil(itemIds.length / 2);
   for (const code of ['elementary', 'junior']) {
     for (let i = 0; i < itemIds.length; i++) {
-      const uid = i < half ? userIds['demo-entry1@example.com'] : userIds['demo-entry2@example.com'];
+      const uid = i < half ? userIds['111111'] : userIds['222222'];
       await client.query('INSERT INTO assignments VALUES ($1,$2,$3) ON CONFLICT DO NOTHING', [uid, divisionIds[code], itemIds[i]]);
-      await client.query('INSERT INTO assignments VALUES ($1,$2,$3) ON CONFLICT DO NOTHING', [userIds['demo-reviewer@example.com'], divisionIds[code], itemIds[i]]);
+      await client.query('INSERT INTO assignments VALUES ($1,$2,$3) ON CONFLICT DO NOTHING', [userIds['333333'], divisionIds[code], itemIds[i]]);
     }
   }
   // 兩張已公布的示範成績表（國小 8 名、國中 3 名）與一張待複核
@@ -112,7 +111,7 @@ await withTx(async (client) => {
     const s = await client.query(
       `INSERT INTO sheets (event_id, division_id, item_id, status, version, updated_by) VALUES ($1,$2,$3,'published',3,$4)
        ON CONFLICT (division_id, item_id) DO UPDATE SET status='published' RETURNING id`,
-      [eventId, d, it, userIds['demo-reviewer@example.com']]);
+      [eventId, d, it, userIds['333333']]);
     await client.query('DELETE FROM sheet_rows WHERE sheet_id=$1', [s.rows[0].id]);
     const rows = [];
     for (let r = 1; r <= n; r++) {
@@ -124,13 +123,13 @@ await withTx(async (client) => {
     await client.query('UPDATE publications SET is_current=FALSE WHERE sheet_id=$1', [s.rows[0].id]);
     await client.query(
       'INSERT INTO publications (sheet_id, event_id, division_id, item_id, revision, rows, published_by) VALUES ($1,$2,$3,$4,1,$5,$6)',
-      [s.rows[0].id, eventId, d, it, JSON.stringify(rows), userIds['demo-reviewer@example.com']]);
+      [s.rows[0].id, eventId, d, it, JSON.stringify(rows), userIds['333333']]);
   };
   await publish('elementary', 0, 8);
   await publish('junior', 0, 3);
   await publish('elementary', 11, 8); // 精神總錦標
-  console.log(`示範活動已建立（event_id=${eventId}）。示範帳號：`);
-  users.forEach(([e, n, r, p]) => console.log(`  ${r.padEnd(8)} ${e} / ${p}  (${n})`));
+  console.log(`示範活動已建立（event_id=${eventId}）。示範認證碼：`);
+  users.forEach(([c, n, r]) => console.log(`  ${r.padEnd(8)} ${c}  (${n})`));
   console.log('瀏覽示範資料：ACTIVE_EVENT_SLUG=demo-adaptive-sports npm start；正式上線前執行 npm run db:demo:remove 清除示範資料。');
 });
 await pool.end();

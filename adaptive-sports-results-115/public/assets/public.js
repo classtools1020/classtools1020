@@ -87,10 +87,18 @@ function renderAll() {
   document.title = `成績公告｜${event.name}`;
   $('#event-name').textContent = event.name;
   $('#event-meta').innerHTML = [
-    event.event_date ? `<span><b>日期</b>${rocDate(event.event_date)}</span>` : '',
-    event.venue ? `<span><b>場地</b>${esc(event.venue)}</span>` : '',
-    event.organizer ? `<span><b>承辦</b>${esc(event.organizer)}</span>` : '',
-  ].join('');
+    event.event_date ? `<span>${rocDate(event.event_date)}</span>` : '',
+    event.venue ? `<span>${esc(event.venue)}</span>` : '',
+    event.organizer ? `<span>承辦：${esc(event.organizer)}</span>` : '',
+  ].filter(Boolean).join('<span class="sep" aria-hidden="true">・</span>');
+  const title = event.name.replace(/^\d+年度/, '').replace(/新竹縣/, '');
+  const m = title.match(/^(第\d+屆)(.*)$/);
+  $('#hero-title').innerHTML = m ? `<span class="hero-ed">${esc(m[1])}</span>${esc(m[2])}` : esc(title);
+  const published = state.data.results.length;
+  const total = state.data.items.length * divisions.length;
+  $('#hero-stats').innerHTML = `<span><b>${published}</b> / ${total} 項已公布</span>${state.data.updated_at ? `<span>最後公布 <b>${fmtTime(state.data.updated_at)}</b></span>` : ''}`;
+  const an = $('#announce');
+  if (event.announcement) { an.hidden = false; $('#announce-text').textContent = event.announcement; } else an.hidden = true;
   if (event.organizer) $('#footer-org').textContent = `承辦單位：${event.organizer}`;
 
   if (!divisions.find((d) => d.id === state.divisionId)) state.divisionId = divisions[0]?.id ?? null;

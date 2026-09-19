@@ -18,10 +18,9 @@ const server = await startServer();
 const browser = await chromium.launch({ executablePath: exe });
 const mobile = { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 };
 
-async function login(page, [email, password]) {
+async function login(page, code) {
   await page.goto(`${BASE}/staff`);
-  await page.fill('#email', email);
-  await page.fill('#password', password);
+  await page.fill('#code', code);
   await page.click('button[type=submit]');
   await page.waitForSelector('.sheet-list');
 }
@@ -167,31 +166,46 @@ try {
   check((await C.textContent('#error-banner')).includes('更新失敗'), '斷線時公開頁明確提示更新失敗');
   await ctxC.setOffline(false);
 
-  // ---------- 管理者：邀請與分工（桌機） ----------
+  // ---------- 管理者：新增同事、認證碼、登入連結（桌機） ----------
   const ctxD = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const D = await ctxD.newPage();
   D.on('pageerror', (e) => check(false, `裝置D 頁面錯誤：${e.message}`));
   await login(D, ACCOUNTS.admin);
   await D.click('a[href="#/admin/users"]');
-  await D.waitForSelector('#inv-form');
-  await D.fill('#inv-name', '王老師');
-  await D.fill('#inv-email', 'wang@example.com');
-  await D.click('#inv-form button[type=submit]');
-  await D.waitForSelector('#inv-link');
-  const link = await D.textContent('#inv-link');
-  check(link.includes('/staff/invite/'), `產生邀請連結：${link.slice(0, 40)}…`);
+  await D.waitForSelector('#new-user-form');
+  await D.fill('#nu-name', '王老師');
+  await D.click('#new-user-form button[type=submit]');
+  await D.waitForSelector('#nu-code');
+  const code = (await D.textContent('#nu-code')).trim();
+  check(/^\d{6}$/.test(code), `產生 6 位數認證碼：${code}`);
   await D.screenshot({ path: `${shots}/07-admin-users-desktop.png`, fullPage: true });
-  // 新同事用連結建立帳號
+  await D.click('a[href="#/admin/codes"]');
+  await D.waitForSelector('.code-card');
+  check((await D.locator('.code-card img').count()) >= 4, '代碼表每人一張含 QR');
+  await D.screenshot({ path: `${shots}/09-code-sheet-desktop.png`, fullPage: true });
+  // 新同事：點登入連結直接進入（手機）
   const ctxE = await browser.newContext(mobile);
   const E = await ctxE.newPage();
-  await E.goto(link);
-  await E.waitForSelector('#inv-form');
-  await E.fill('#pw', 'wang-password-1');
-  await E.fill('#pw2', 'wang-password-1');
-  await E.click('#inv-form button[type=submit]');
+  await E.goto(`${BASE}/staff?code=${code}`);
   await E.waitForSelector('#btn-logout');
-  check((await E.textContent('#top-actions')).includes('王老師'), '新同事以邀請連結設定密碼後登入');
+  check((await E.textContent('#top-actions')).includes('王老師'), '新同事用登入連結直接登入，不需帳號密碼');
+  check(!E.url().includes('code='), '登入後認證碼已從網址移除');
   await E.screenshot({ path: `${shots}/08-invited-mobile.png` });
+  // 手動輸入認證碼登入
+  const E2 = await ctxE.newPage();
+  await E2.goto(`${BASE}/staff`);
+  await E2.waitForSelector('#btn-logout'); // 同一瀏覽器已有 session
+  await E2.click('#btn-logout');
+  await E2.waitForSelector('#code');
+  await E2.fill('#code', '999999');
+  await E2.click('button[type=submit]');
+  await E2.waitForSelector('#login-err:not([hidden])');
+  check((await E2.textContent('#login-err')).includes('不正確'), '錯誤認證碼有明確提示');
+  await E2.fill('#code', code);
+  await E2.click('button[type=submit]');
+  await E2.waitForSelector('#btn-logout');
+  check(true, '手動輸入認證碼登入成功');
+  await E2.screenshot({ path: `${shots}/10-login-mobile.png` });
 
   await ctxA.close(); await ctxB.close(); await ctxC.close(); await ctxD.close(); await ctxE.close();
 } catch (e) {
