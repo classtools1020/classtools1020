@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>生命小森林</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* 版面：投影優先。頂部分頁 → 全寬棲地帶 → 自動欄寬學生卡片；安靜挑戰是 16:9 的舞台 */
+:root{
+  --paper:#F2F6F0; --grid:#E1EAE0; --card:#FFFFFF; --line:#D2DED3;
+  --ink:#1D3832; --ink-2:#55706A;
+  --leaf:#2D7856; --leaf-2:#DCEEE2;
+  --sun:#EFAE36; --sun-2:#FCEFCF;
+  --alert:#C2553C; --alert-2:#F8E0D8;
+  --f-disp:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --r:18px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+  color:var(--ink);font-family:var(--f-body);
+  font-size:clamp(15px,0.6vw + 11px,20px);line-height:1.55;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:1500px;margin:0 auto;padding-block:14px 40px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-disp);font-weight:400;text-wrap:balance;margin:0}
+
+/* ---------- 頂部 ---------- */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand-mark{width:44px;height:44px;flex:none}
+.brand h1{font-size:1.7em;letter-spacing:.04em}
+.brand small{display:block;color:var(--ink-2);font-size:.62em;letter-spacing:.08em;margin-top:-2px}
+.class-sel{border:2px solid var(--line);background:var(--card);border-radius:12px;padding:6px 10px;max-width:220px}
+.tabs{display:flex;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.tab{border:0;background:transparent;border-radius:10px;padding:8px 14px;font-family:var(--f-disp);font-size:1.05em;color:var(--ink-2);white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--leaf);color:#fff}
+.icon-btn{border:2px solid var(--line);background:var(--card);border-radius:12px;padding:7px 12px;white-space:nowrap}
+
+.banner{background:var(--sun-2);border:2px dashed var(--sun);border-radius:14px;padding:10px 14px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.banner b{font-family:var(--f-disp);font-weight:400}
+.link-btn{border:0;background:none;color:var(--leaf);text-decoration:underline;padding:0}
+
+/* ---------- 棲地 + 能量 ---------- */
+.habitat{position:relative;border-radius:var(--r);overflow:hidden;border:2px solid var(--line);
+  height:clamp(150px,17vw,240px);
+  background:linear-gradient(#CDE8F3 0%,#E6F4F0 55%,#9FD08A 55.5%,#7DBE6A 100%)}
+.habitat::before{content:"";position:absolute;left:-5%;right:-5%;bottom:30%;height:30%;
+  background:radial-gradient(60% 100% at 25% 100%,#8CC97A 98%,transparent 100%),radial-gradient(50% 90% at 78% 100%,#94CE80 98%,transparent 100%)}
+.critter{position:absolute;transform:translateX(-50%);border:0;background:none;padding:0;line-height:1;
+  display:flex;flex-direction:column;align-items:center;gap:2px;animation:bob 3.2s ease-in-out infinite}
+.critter .tag{font-size:12px;background:rgba(255,255,255,.85);border-radius:8px;padding:1px 6px;color:var(--ink);white-space:nowrap}
+@keyframes bob{50%{transform:translate(-50%,-6px)}}
+.energy{position:absolute;left:14px;right:14px;top:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  background:rgba(255,255,255,.88);border-radius:14px;padding:8px 12px}
+.energy-label{font-family:var(--f-disp);white-space:nowrap}
+.energy-bar{flex:1 1 180px;height:16px;border-radius:99px;background:var(--leaf-2);overflow:hidden;min-width:120px}
+.energy-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--leaf),#5BB07F);border-radius:99px;transition:width .6s}
+.energy-num{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.energy-reward{color:var(--ink-2);font-size:.88em;min-width:0}
+
+/* ---------- 工具列 ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.btn{border:2px solid var(--line);background:var(--card);border-radius:14px;padding:9px 16px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.btn.primary{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.btn.sun{background:var(--sun);border-color:var(--sun);color:var(--ink)}
+.btn.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.danger{color:var(--alert);border-color:var(--alert-2)}
+
+/* ---------- 學生卡 ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr));gap:14px}
+.card{position:relative;border:2px solid var(--line);background:var(--card);border-radius:var(--r);padding:12px 12px 10px;
+  display:grid;grid-template-rows:96px auto auto auto;justify-items:center;gap:2px;text-align:center;transition:transform .15s,border-color .15s}
+.card:hover{transform:translateY(-2px);border-color:var(--leaf)}
+.card.sel{border-color:var(--sun);box-shadow:0 0 0 4px var(--sun-2)}
+.card.sel::after{content:"✓";position:absolute;top:8px;right:10px;width:26px;height:26px;border-radius:50%;background:var(--sun);font-weight:700;line-height:26px}
+.card .pet{align-self:end}
+.nm{font-family:var(--f-disp);font-size:1.25em;line-height:1.2}
+.seat{font-family:var(--f-body);font-size:.62em;color:var(--ink-2);margin-right:6px;font-variant-numeric:tabular-nums}
+.stg{font-size:.85em;color:var(--ink-2)}
+.dots{display:flex;gap:4px;justify-content:center;align-items:center;min-height:18px;flex-wrap:wrap}
+.dots i{width:12px;height:12px;border-radius:50%;border:2px solid var(--leaf);display:block}
+.dots i.f{background:var(--leaf)}
+.dots .star{font-size:14px}
+.float{position:absolute;left:50%;top:30%;transform:translateX(-50%);font-family:var(--f-disp);font-size:2em;color:var(--leaf);pointer-events:none;animation:up 1.1s ease-out forwards}
+@keyframes up{to{transform:translate(-50%,-60px);opacity:0}}
+.card.pop .pet{animation:pop .5s}
+@keyframes pop{40%{transform:scale(1.3)}}
+
+.pet{line-height:1;display:inline-flex;align-items:center;justify-content:center;font-size:var(--fs,3rem)}
+.pet svg{width:1.2em;height:1.2em;display:block}
+.emo{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+
+.empty{border:2px dashed var(--line);border-radius:var(--r);padding:30px;text-align:center;background:var(--card)}
+
+/* ---------- 生命週期條 ---------- */
+.cycle{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.cs{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 10px;border-radius:14px;min-width:70px}
+.cs-l{font-size:.85em}
+.cs.next{opacity:.35}
+.cs.now{background:var(--sun-2);outline:2px solid var(--sun)}
+.cs-arr{color:var(--ink-2);font-size:1.2em}
+
+/* ---------- 視窗 ---------- */
+.overlay{position:fixed;inset:0;background:rgba(20,40,35,.45);display:flex;align-items:center;justify-content:center;z-index:50;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet{background:var(--card);border-radius:24px;max-width:760px;width:100%;max-height:100%;overflow:auto;padding:20px;display:grid;gap:16px;animation:rise .25s ease-out}
+@keyframes rise{from{transform:translateY(20px);opacity:0}}
+.sh-head{display:flex;gap:14px;align-items:center}
+.sh-head h3{font-size:1.6em}
+.sh-head p{margin:0;color:var(--ink-2)}
+.sh-head .x{margin-left:auto;border:0;background:var(--paper);width:44px;height:44px;border-radius:50%;font-size:1.4em;flex:none}
+.behs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:10px}
+.beh{border:2px solid var(--line);background:var(--paper);border-radius:16px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.beh:hover{border-color:var(--leaf);background:var(--leaf-2)}
+.beh .be{font-size:2.2em;line-height:1}
+.beh .bt{font-family:var(--f-disp);font-size:1.1em}
+.beh .bp{font-size:.8em;color:var(--leaf);font-weight:700}
+.sh-foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;color:var(--ink-2);font-size:.88em}
+
+.evo{text-align:center;justify-items:center}
+.evo-k{margin:0;color:var(--leaf);letter-spacing:.2em;font-weight:700}
+.evo h2{font-size:2em}
+.evo-row{display:flex;align-items:center;gap:18px;justify-content:center}
+.evo-row .to{animation:grow .9s cubic-bezier(.3,1.6,.5,1)}
+@keyframes grow{from{transform:scale(.2) rotate(-20deg);opacity:0}}
+.evo-t{font-family:var(--f-disp);font-size:1.4em;margin:0}
+.evo-list{display:grid;gap:10px;width:100%}
+.evo-item{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap}
+
+.confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:60;pointer-events:none;animation:fall 2.4s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+
+/* ---------- 安靜挑戰 ---------- */
+.q-layout{display:grid;gap:14px}
+.scene{position:relative;aspect-ratio:16/9;max-width:100%;width:min(100%,calc((100vh - 230px)*16/9));min-width:min(100%,520px);margin-inline:auto;border-radius:var(--r);overflow:hidden;border:2px solid var(--line);
+  background:linear-gradient(#9CD3EE,#D9F0F5);container-type:inline-size}
+.scene.fs{border-radius:0;border:0;width:100vw;height:100vh;aspect-ratio:auto}
+.scene .ground{position:absolute;left:0;right:0;bottom:0;height:16%;background:#7DBE6A}
+.scene > svg{position:absolute;inset:0;width:100%;height:100%}
+.sun,.moon{position:absolute;width:9%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);transition:left 1s linear,top 1s linear}
+.sun{background:radial-gradient(circle,#FFE48A 40%,#FFC94A 70%);box-shadow:0 0 40px 10px rgba(255,214,90,.6)}
+.moon{background:#F4F1DE;box-shadow:inset -14px -6px 0 0 #D9D3B4;opacity:0;transition:opacity 1.5s}
+.stars{position:absolute;inset:0 0 40% 0;opacity:0;transition:opacity 1.5s;
+  background-image:radial-gradient(2px 2px at 12% 20%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 30% 35%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 48% 12%,#fff 50%,transparent 51%),radial-gradient(3px 3px at 70% 25%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 85% 10%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 92% 40%,#fff 50%,transparent 51%)}
+.scene.night .stars,.scene.night .moon{opacity:1}
+.hud{position:absolute;left:2.5%;top:4%;display:flex;flex-direction:column;gap:1cqw;align-items:flex-start}
+.timer{font-family:var(--f-disp);font-size:9cqw;line-height:1;background:rgba(255,255,255,.9);border-radius:2cqw;padding:1.2cqw 2.4cqw;font-variant-numeric:tabular-nums;color:var(--ink)}
+.hearts{font-size:3.6cqw;background:rgba(255,255,255,.8);border-radius:2cqw;padding:.6cqw 1.4cqw;letter-spacing:.2em}
+.hearts .lost{filter:grayscale(1);opacity:.35}
+.bubble{position:absolute;left:52%;top:6%;max-width:40%;background:#fff;border-radius:2.4cqw;padding:1.2cqw 2cqw;font-family:var(--f-disp);font-size:2.8cqw;color:var(--ink);box-shadow:0 4px 0 rgba(0,0,0,.08)}
+.bubble::after{content:"";position:absolute;left:12%;bottom:-1.6cqw;border:1cqw solid transparent;border-top:1.4cqw solid #fff}
+.zzz{position:absolute;left:58%;top:28%;font-family:var(--f-disp);color:#fff;text-shadow:0 2px 0 rgba(30,60,80,.35)}
+.zzz span{position:absolute;opacity:0;animation:zz 3s infinite}
+.zzz span:nth-child(1){font-size:3cqw;animation-delay:0s}
+.zzz span:nth-child(2){font-size:4cqw;animation-delay:1s}
+.zzz span:nth-child(3){font-size:5cqw;animation-delay:2s}
+@keyframes zz{0%{opacity:0;transform:translate(0,0)}20%{opacity:1}100%{opacity:0;transform:translate(6cqw,-12cqw)}}
+.scene:not(.sleep) .zzz{display:none}
+.owl-breath{transform-box:fill-box;transform-origin:50% 100%;animation:breath 3s ease-in-out infinite}
+@keyframes breath{50%{transform:scale(1.02,1.035)}}
+.owl-move{transform-box:fill-box;transform-origin:50% 100%}
+.scene.stir .owl-move{animation:wob .5s ease-in-out infinite}
+.scene.awake .owl-move{animation:shake .25s linear infinite}
+@keyframes wob{25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+@keyframes shake{25%{transform:translateX(-4px) rotate(-2deg)}75%{transform:translateX(4px) rotate(2deg)}}
+.eye-o,.alarm{display:none}
+.scene.awake .eye-o,.scene.awake .alarm,.scene.done-ok .eye-o{display:inline}
+.scene.awake .eye-c,.scene.done-ok .eye-c{display:none}
+.scene.awake .blush{display:none}
+.fs-btn{position:absolute;right:2%;bottom:3%;border:0;background:rgba(255,255,255,.85);border-radius:12px;padding:6px 12px;font-size:14px}
+.q-end{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:3%;background:linear-gradient(transparent 55%,rgba(20,40,60,.35))}
+.q-end-box{background:#fff;border-radius:3cqw;padding:2cqw 4cqw;text-align:center;display:grid;gap:1.6cqw;justify-items:center;max-width:80%}
+.q-end-box h2{font-size:5cqw}
+.q-end-box p{margin:0;font-size:max(14px,2.2cqw)}
+.q-end-box .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+.meter{display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px 14px;flex-wrap:wrap}
+.meter-track{position:relative;flex:1 1 220px;height:22px;border-radius:99px;background:linear-gradient(90deg,#CFEBD9 0%,#FBEFC9 70%,#F6D3C8 100%);overflow:visible}
+.meter-fill{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:var(--leaf);opacity:.85;width:0%;transition:width .08s}
+.meter-fill.hot{background:var(--alert)}
+.meter-thr{position:absolute;top:-6px;bottom:-6px;width:4px;border-radius:2px;background:var(--ink);transform:translateX(-50%)}
+.meter-thr::after{content:"門檻";position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:12px;white-space:nowrap}
+.meter-num{font-variant-numeric:tabular-nums;min-width:8.5em;color:var(--ink-2);font-size:.9em}
+
+.panel{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:14px;align-content:start}
+.field{display:grid;gap:6px}
+.field > label,.field > .lbl{font-family:var(--f-disp);font-size:1.1em}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{border:2px solid var(--line);background:var(--paper);border-radius:99px;padding:6px 14px;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.num-in{width:5em;border:2px solid var(--line);border-radius:10px;padding:5px 8px;background:var(--paper)}
+.hint{color:var(--ink-2);font-size:.85em;margin:0}
+input[type=range]{width:100%;accent-color:var(--leaf)}
+.fact{margin:0;background:var(--leaf-2);border-radius:14px;padding:10px 14px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px}
+
+/* ---------- 設定 ---------- */
+.set-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px}
+.panel h2{font-size:1.35em}
+textarea{width:100%;min-height:180px;border:2px solid var(--line);border-radius:12px;padding:10px;background:var(--paper);resize:vertical}
+.txt-in{border:2px solid var(--line);border-radius:10px;padding:7px 10px;background:var(--paper);width:100%}
+.pet-table{display:grid;gap:6px;max-height:420px;overflow:auto}
+.pet-row{display:grid;grid-template-columns:3em 1fr auto 3.2em;gap:8px;align-items:center}
+.pet-row select{border:2px solid var(--line);border-radius:10px;padding:4px 6px;background:var(--paper)}
+.pet-row .pet{--fs:1.6rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+@media (max-width:600px){
+  .tab{padding:7px 10px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .card{grid-template-rows:80px auto auto auto}
+  .habitat{height:230px}
+  .energy-reward{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#2D7856"/><path d="M24 36V20" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M24 24c-7 0-10-5-10-10 6 0 10 4 10 10zM24 21c0-6 4-10 11-10 0 6-4 10-11 10z" fill="#BFE5C9"/><circle cx="35" cy="34" r="4" fill="#EFAE36"/></svg>
+      <h1>生命小森林<small>特教班自然課 · 班級經營</small></h1>
+    </div>
+    <select class="class-sel" id="classSel" aria-label="切換班級"></select>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="board" aria-selected="true">🌱 夥伴成長</button>
+      <button class="tab" role="tab" data-tab="quiet" aria-selected="false">🦉 安靜挑戰</button>
+      <button class="tab" role="tab" data-tab="settings" aria-selected="false">⚙️ 設定</button>
+    </div>
+    <button class="icon-btn" id="fullBtn" title="整個頁面全螢幕">⛶ 投影</button>
+  </header>
+
+  <!-- ===== 夥伴成長 ===== -->
+  <section id="tab-board">
+    <div class="banner" id="sampleBanner" hidden>
+      <b>現在是範例名單</b><span>到「設定」貼上你的學生名單，分數就會從 0 開始。</span>
+      <button class="link-btn" data-goto="settings">前往設定 →</button>
+    </div>
+    <div class="habitat" id="habitat">
+      <div class="energy">
+        <span class="energy-label">🌳 全班森林能量</span>
+        <div class="energy-bar"><i id="energyFill"></i></div>
+        <span class="energy-num" id="energyNum"></span>
+        <span class="energy-reward" id="energyReward"></span>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="btn primary" id="allBtn">🎉 全班加分</button>
+      <button class="btn" id="multiBtn">☑️ 多選加分</button>
+      <button class="btn sun" id="multiGo" hidden>給選取的 0 位加分</button>
+      <button class="btn" id="undoBtn" disabled>↶ 復原</button>
+      <button class="btn" id="soundBtn">🔊 音效開</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- ===== 安靜挑戰 ===== -->
+  <section id="tab-quiet" hidden>
+    <div class="q-layout">
+      <div class="scene sleep" id="scene">
+        <div class="stars"></div>
+        <div class="sun" id="sun" style="left:12%;top:60%"></div>
+        <div class="moon" id="moon" style="left:80%;top:22%"></div>
+        <div class="ground"></div>
+        <svg viewBox="0 0 800 450" preserveAspectRatio="xMidYMax meet" aria-label="在樹枝上睡午覺的貓頭鷹">
+          <path d="M-20 400 Q160 320 360 380 T820 360 V470 H-20Z" fill="#8CC97A"/>
+          <path d="M-20 430 Q220 380 470 420 T820 410 V470 H-20Z" fill="#74B562"/>
+          <!-- 樹 -->
+          <path d="M610 460 C620 360 615 250 640 120 L700 120 C690 250 690 360 710 460Z" fill="#7A5638"/>
+          <path d="M650 300 C560 300 430 296 230 302 C225 312 228 320 236 322 C430 318 560 322 655 326Z" fill="#7A5638"/>
+          <ellipse cx="660" cy="300" rx="16" ry="20" fill="#5D4029"/>
+          <g fill="#4E9A5E">
+            <circle cx="600" cy="110" r="70"/><circle cx="690" cy="80" r="80"/><circle cx="760" cy="140" r="65"/>
+            <circle cx="540" cy="160" r="50"/><circle cx="250" cy="300" r="26"/><circle cx="225" cy="290" r="18"/>
+          </g>
+          <g fill="#62B072"><circle cx="630" cy="70" r="40"/><circle cx="720" cy="120" r="44"/><circle cx="262" cy="288" r="14"/></g>
+          <!-- 貓頭鷹 -->
+          <g transform="translate(420 300)">
+            <g class="owl-move">
+              <g class="owl-breath">
+                <path d="M-58 -150 L-46 -196 L-22 -158Z" fill="#7C5A3E"/>
+                <path d="M58 -150 L46 -196 L22 -158Z" fill="#7C5A3E"/>
+                <ellipse cx="0" cy="-86" rx="72" ry="86" fill="#8A6648"/>
+                <ellipse cx="-64" cy="-74" rx="22" ry="50" fill="#6E4F36" transform="rotate(14 -64 -74)"/>
+                <ellipse cx="64" cy="-74" rx="22" ry="50" fill="#6E4F36" transform="rotate(-14 64 -74)"/>
+                <ellipse cx="0" cy="-62" rx="46" ry="56" fill="#EAD5B2"/>
+                <g fill="none" stroke="#B9966C" stroke-width="3" stroke-linecap="round">
+                  <path d="M-22 -80 l6 6 l6 -6"/><path d="M8 -80 l6 6 l6 -6"/><path d="M-8 -58 l6 6 l6 -6"/>
+                  <path d="M-26 -40 l6 6 l6 -6"/><path d="M12 -40 l6 6 l6 -6"/>
+                </g>
+                <circle cx="-29" cy="-124" r="31" fill="#F5E8CD"/>
+                <circle cx="29" cy="-124" r="31" fill="#F5E8CD"/>
+                <g class="eye-c" fill="none" stroke="#3A2A1E" stroke-width="5" stroke-linecap="round">
+                  <path d="M-43 -122 q14 11 28 0"/><path d="M15 -122 q14 11 28 0"/>
+                </g>
+                <g class="eye-o">
+                  <circle cx="-29" cy="-124" r="17" fill="#F6C431"/><circle cx="29" cy="-124" r="17" fill="#F6C431"/>
+                  <circle cx="-29" cy="-124" r="9" fill="#1C1C1C"/><circle cx="29" cy="-124" r="9" fill="#1C1C1C"/>
+                  <circle cx="-25" cy="-128" r="3" fill="#fff"/><circle cx="33" cy="-128" r="3" fill="#fff"/>
+                </g>
+                <g class="blush" fill="#E99A8A" opacity=".55"><ellipse cx="-44" cy="-102" rx="9" ry="4.5"/><ellipse cx="44" cy="-102" rx="9" ry="4.5"/></g>
+                <path d="M-9 -108 L9 -108 L0 -90Z" fill="#E8933A"/>
+                <!-- 睡帽 -->
+                <path d="M30 -170 Q62 -210 104 -196 Q78 -186 70 -160Z" fill="#5B7FC4"/>
+                <circle cx="106" cy="-196" r="9" fill="#fff"/>
+                <path d="M26 -168 Q48 -176 72 -160" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/>
+              </g>
+              <g fill="#E8933A"><ellipse cx="-22" cy="0" rx="12" ry="6"/><ellipse cx="22" cy="0" rx="12" ry="6"/></g>
+              <g class="alarm" fill="#C2553C" font-family="Huninn, sans-serif" font-size="46"><text x="80" y="-150">!!</text></g>
+            </g>
+          </g>
+        </svg>
+        <div class="zzz" aria-hidden="true"><span>Z</span><span>z</span><span>z</span></div>
+        <div class="bubble" id="bubble">呼～呼～白天是我的睡覺時間</div>
+        <div class="hud">
+          <div class="timer" id="qTimer">05:00</div>
+          <div class="hearts" id="qHearts"></div>
+        </div>
+        <div class="q-end" id="qEnd" hidden></div>
+        <button class="fs-btn" id="sceneFs">⛶ 全螢幕</button>
+      </div>
+
+      <div class="meter">
+        <span>🔈 音量</span>
+        <div class="meter-track"><div class="meter-fill" id="meterFill"></div><div class="meter-thr" id="meterThr"></div></div>
+        <span class="meter-num" id="meterNum">麥克風未開啟</span>
+      </div>
+
+      <div class="cols" id="qSetup">
+        <div class="panel">
+          <div class="field">
+            <span class="lbl">⏱ 挑戰時間</span>
+            <div class="chips" id="durChips"></div>
+            <div class="chips"><span class="hint">自訂</span><input class="num-in" id="qCustom" type="number" min="1" max="60" inputmode="numeric" aria-label="自訂分鐘"><span class="hint">分鐘（1–60）</span></div>
+          </div>
+          <div class="field">
+            <span class="lbl">❤️ 可以吵醒幾次</span>
+            <div class="chips" id="heartChips"></div>
+            <p class="hint">愛心用完，貓頭鷹就生氣不睡了，挑戰結束。</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="field">
+            <span class="lbl">🎤 麥克風</span>
+            <div class="row">
+              <button class="btn" id="micBtn">開啟麥克風</button>
+              <button class="btn" id="calBtn" disabled>測環境音 3 秒</button>
+            </div>
+            <p class="hint" id="micStatus">麥克風只在瀏覽器裡算音量，不錄音、不上傳。</p>
+          </div>
+          <div class="field">
+            <label for="thr">門檻（越往右越不容易吵醒）</label>
+            <input type="range" id="thr" min="10" max="95" step="1">
+            <p class="hint">開始前先請大家拍手、講話試試，看音量條跑到哪裡，再把門檻拉到剛好。</p>
+          </div>
+          <button class="btn primary" id="qStart" style="justify-content:center;font-size:1.2em">▶ 開始安靜挑戰</button>
+        </div>
+      </div>
+
+      <div class="toolbar" id="qRun" hidden>
+        <button class="btn" id="qPause">⏸ 暫停</button>
+        <button class="btn" id="qStop">⏹ 結束</button>
+        <button class="btn danger" id="qPoke">👋 手動吵醒一次</button>
+      </div>
+
+      <p class="fact">🦉 <b>自然小知識：</b>貓頭鷹是<b>夜行性動物</b>，白天在樹上睡覺，晚上才出來抓老鼠和昆蟲。挑戰期間太陽會慢慢往西邊走，天黑了就成功！</p>
+    </div>
+  </section>
+
+  <!-- ===== 設定 ===== -->
+  <section id="tab-settings" hidden>
+    <div class="set-grid" id="settings"></div>
+  </section>
+</div>
+
+<div class="overlay" id="overlay" hidden></div>
+
+<script>
+/* ================= 資料 ================= */
+const LS = 'lifeForest_v1';
+const SVG = {
+  frogEggs:'<svg viewBox="0 0 100 100"><g fill="#CFEAF2" stroke="#7FB3C2" stroke-width="3">'+[[30,40],[52,34],[72,46],[40,60],[62,64],[26,66],[50,82],[74,74]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="12"/>`).join('')+'</g><g fill="#22332E">'+[[30,40],[52,34],[72,46],[40,60],[62,64],[26,66],[50,82],[74,74]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4.5"/>`).join('')+'</g></svg>',
+  tadpole:'<svg viewBox="0 0 100 100"><path d="M52 52 q14 -12 24 -2 t22 0" stroke="#2E3F39" stroke-width="7" fill="none" stroke-linecap="round"/><ellipse cx="36" cy="52" rx="22" ry="17" fill="#2E3F39"/><circle cx="28" cy="46" r="4" fill="#fff"/></svg>',
+  tadLegs:'<svg viewBox="0 0 100 100"><path d="M56 52 q12 -8 20 -2 t16 0" stroke="#3E6B3A" stroke-width="6" fill="none" stroke-linecap="round"/><g stroke="#3E6B3A" stroke-width="5" stroke-linecap="round" fill="none"><path d="M50 62 l6 14 l8 2"/><path d="M42 64 l-2 14 l-8 4"/><path d="M26 60 l-6 10"/></g><ellipse cx="38" cy="52" rx="22" ry="16" fill="#4F8A47"/><circle cx="30" cy="44" r="6" fill="#fff"/><circle cx="30" cy="44" r="3" fill="#1C1C1C"/></svg>',
+  bfEgg:'<svg viewBox="0 0 100 100"><path d="M10 70 Q40 10 92 24 Q76 80 10 70Z" fill="#6DB35C"/><path d="M14 68 Q50 46 88 26" stroke="#4E8F40" stroke-width="3" fill="none"/><ellipse cx="56" cy="44" rx="7" ry="9" fill="#F5E7A8" stroke="#C9B15A" stroke-width="2"/></svg>',
+  pupa:'<svg viewBox="0 0 100 100"><path d="M50 4 V22" stroke="#9A8A6A" stroke-width="3"/><path d="M50 20 C72 30 70 66 50 94 C30 66 28 30 50 20Z" fill="#8CC56E" stroke="#5E9A44" stroke-width="3"/><path d="M42 44 h16 M40 58 h20 M44 72 h12" stroke="#E8C64A" stroke-width="3" stroke-linecap="round"/></svg>',
+  seed:'<svg viewBox="0 0 100 100"><path d="M50 10 C76 30 72 76 50 92 C28 76 24 30 50 10Z" fill="#3B3B3B"/><path d="M50 16 V86 M38 30 C34 50 36 70 44 84 M62 30 C66 50 64 70 56 84" stroke="#E9E4D6" stroke-width="3" fill="none"/></svg>',
+  mqEggs:'<svg viewBox="0 0 100 100"><rect x="0" y="40" width="100" height="60" fill="#CDE8F3"/><path d="M0 40 H100" stroke="#7FB3C2" stroke-width="3"/><g fill="#3A3A3A">'+[18,26,34,42,50,58,66,74,82].map(x=>`<ellipse cx="${x}" cy="44" rx="3.4" ry="9"/>`).join('')+'</g></svg>',
+  wiggler:'<svg viewBox="0 0 100 100"><rect x="0" y="10" width="100" height="90" fill="#CDE8F3"/><path d="M0 10 H100" stroke="#7FB3C2" stroke-width="3"/><path d="M60 12 L54 22" stroke="#3A3A3A" stroke-width="4"/><path d="M54 22 Q40 44 52 62 Q60 74 50 86" stroke="#3A3A3A" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="50" cy="88" r="7" fill="#3A3A3A"/></svg>',
+  mqPupa:'<svg viewBox="0 0 100 100"><rect x="0" y="10" width="100" height="90" fill="#CDE8F3"/><path d="M0 10 H100" stroke="#7FB3C2" stroke-width="3"/><path d="M40 14 l-2 8 M54 14 l2 8" stroke="#3A3A3A" stroke-width="3"/><circle cx="46" cy="40" r="20" fill="#3A3A3A"/><path d="M60 52 Q74 70 58 84" stroke="#3A3A3A" stroke-width="8" fill="none" stroke-linecap="round"/></svg>'
+};
+const CYCLES = {
+  frog:      {name:'青蛙',   stages:[['卵',SVG.frogEggs],['蝌蚪',SVG.tadpole],['長出腳',SVG.tadLegs],['青蛙','🐸']]},
+  butterfly: {name:'蝴蝶',   stages:[['卵',SVG.bfEgg],['幼蟲','🐛'],['蛹',SVG.pupa],['成蟲','🦋']]},
+  chicken:   {name:'雞',     stages:[['蛋','🥚'],['破殼','🐣'],['小雞','🐥'],['雞','🐔']]},
+  sunflower: {name:'向日葵', stages:[['種子',SVG.seed],['發芽','🌱'],['長葉子','🌿'],['開花','🌻']]},
+  mosquito:  {name:'蚊子',   stages:[['卵',SVG.mqEggs],['孑孓',SVG.wiggler],['蛹',SVG.mqPupa],['成蚊','🦟']]}
+};
+const CYC_KEYS = Object.keys(CYCLES);
+const SPEEDS = {fast:{n:'快（2·5·9 點）',t:[0,2,5,9]}, normal:{n:'中（3·8·15 點）',t:[0,3,8,15]}, slow:{n:'慢（5·12·25 點）',t:[0,5,12,25]}};
+const SIZES = [.55,.72,.86,1];
+const DEFAULT_BEH = [
+  {e:'👀',t:'專心看',p:1},{e:'🙋',t:'舉手回答',p:1},{e:'🔍',t:'仔細觀察',p:1},{e:'🧪',t:'動手做實驗',p:1},
+  {e:'🧤',t:'安全操作',p:1},{e:'🧹',t:'收拾器材',p:1},{e:'🤝',t:'幫助同學',p:1},{e:'🌟',t:'超級表現',p:2}
+];
+const uid = () => Math.random().toString(36).slice(2,9);
+function seed(){
+  const names = ['小安','柏宇','語晴','志明','欣怡','冠廷','品妤','家豪'];
+  const pts = [4,9,1,6,12,3,7,0];
+  const id = uid();
+  return {cur:id, sound:true, q:{min:5,hearts:3,thr:65},
+    classes:[{id,name:'範例班 自然課',speed:'fast',goal:40,reward:'看一部動物紀錄片',energy:23,sample:true,
+      behaviors:DEFAULT_BEH.map(b=>({...b})),
+      students:names.map((n,i)=>({id:uid(),seat:i+1,name:n,pet:CYC_KEYS[i%CYC_KEYS.length],points:pts[i]}))}]};
+}
+function load(){
+  try{const r = JSON.parse(localStorage.getItem(LS)); if(r && Array.isArray(r.classes) && r.classes.length){ r.q = Object.assign({min:5,hearts:3,thr:65}, r.q||{}); return r; }}catch(e){}
+  return seed();
+}
+let S = load();
+function save(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){} }
+const C = () => S.classes.find(c=>c.id===S.cur) || S.classes[0];
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const $ = s => document.querySelector(s);
+const pad = n => String(n).padStart(2,'0');
+
+function stageOf(c, pts){ const t = SPEEDS[c.speed].t; let s = 0; t.forEach((v,i)=>{ if(pts>=v) s=i; }); return s; }
+function petVis(cyc, st, fs){
+  const v = CYCLES[cyc].stages[st][1];
+  const inner = v.startsWith('<svg') ? v : `<span class="emo">${v}</span>`;
+  return `<span class="pet" style="--fs:${fs}">${inner}</span>`;
+}
+function dotsHTML(c, pts){
+  const t = SPEEDS[c.speed].t, s = stageOf(c, pts);
+  if(s < 3){
+    const have = pts - t[s], need = t[s+1] - t[s];
+    return Array.from({length:need},(_,i)=>`<i class="${i<have?'f':''}"></i>`).join('');
+  }
+  const stars = Math.min(5, Math.floor((pts - t[3]) / 5));
+  return stars ? '<span class="star">' + '⭐'.repeat(stars) + '</span>' : '<span class="star">🏆</span>';
+}
+function cycleHTML(cyc, st, fs='2.4rem'){
+  return '<div class="cycle">' + CYCLES[cyc].stages.map((sg,i)=>
+    (i?'<span class="cs-arr">→</span>':'') +
+    `<div class="cs ${i<st?'done':i===st?'now':'next'}">${petVis(cyc,i,fs)}<span class="cs-l">${sg[0]}</span></div>`).join('') + '</div>';
+}
+
+/* ================= 音效 ================= */
+let AC;
+function ac(){ if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(AC && AC.state==='suspended') AC.resume(); return AC; }
+function tone(f, t0, d, type='sine', g=.14){
+  const a = ac(); if(!a || !S.sound) return;
+  const o = a.createOscillator(), v = a.createGain(), n = a.currentTime;
+  o.type = type; o.frequency.value = f;
+  v.gain.setValueAtTime(0, n+t0); v.gain.linearRampToValueAtTime(g, n+t0+.02); v.gain.exponentialRampToValueAtTime(.001, n+t0+d);
+  o.connect(v).connect(a.destination); o.start(n+t0); o.stop(n+t0+d+.05);
+}
+const SFX = {
+  award(){ tone(660,0,.18); tone(990,.09,.28); },
+  evolve(){ [523,659,784,1047].forEach((f,i)=>tone(f,i*.11,.32,'triangle')); },
+  wake(){ tone(200,0,.3,'square',.05); tone(150,.15,.35,'square',.05); },
+  win(){ [523,659,784,659,784,1047].forEach((f,i)=>tone(f,i*.13,.35,'triangle')); },
+  oops(){ tone(330,0,.25,'triangle'); tone(262,.18,.35,'triangle'); }
+};
+function confetti(n=60){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cols = ['#2D7856','#EFAE36','#5BB07F','#F08A6E','#7FB3E0'];
+  for(let i=0;i<n;i++){
+    const d = document.createElement('i'); d.className='confetti';
+    d.style.left = Math.random()*100+'vw'; d.style.background = cols[i%cols.length];
+    d.style.animationDelay = Math.random()*.6+'s'; d.style.animationDuration = 1.8+Math.random()*1.4+'s';
+    document.body.appendChild(d); setTimeout(()=>d.remove(), 3600);
+  }
+}
+
+/* ================= 分頁 ================= */
+let tab = 'board';
+function setTab(t){
+  tab = t;
+  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===t));
+  ['board','quiet','settings'].forEach(k=>$('#tab-'+k).hidden = k!==t);
+  if(t==='settings') renderSettings();
+  if(t==='board') renderBoard();
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+document.addEventListener('click', e=>{ const g = e.target.closest('[data-goto]'); if(g) setTab(g.dataset.goto); });
+$('#fullBtn').onclick = ()=>{ const d=document; (d.fullscreenElement ? d.exitFullscreen() : d.documentElement.requestFullscreen()).catch(()=>{}); };
+
+/* ================= 夥伴成長 ================= */
+let multi = false, selected = new Set(), undoStack = [];
+function renderHeader(){
+  $('#classSel').innerHTML = S.classes.map(c=>`<option value="${c.id}" ${c.id===S.cur?'selected':''}>${esc(c.name)}</option>`).join('');
+  $('#soundBtn').textContent = S.sound ? '🔊 音效開' : '🔇 音效關';
+}
+$('#classSel').onchange = e => { S.cur = e.target.value; selected.clear(); undoStack=[]; save(); renderAll(); };
+$('#soundBtn').onclick = () => { S.sound = !S.sound; save(); renderHeader(); };
+
+function renderBoard(){
+  const c = C(), st = [...c.students].sort((a,b)=>a.seat-b.seat);
+  $('#sampleBanner').hidden = !c.sample;
+  const pct = Math.min(100, c.energy / Math.max(1,c.goal) * 100);
+  $('#energyFill').style.width = pct + '%';
+  $('#energyNum').textContent = `${c.energy} / ${c.goal}`;
+  $('#energyReward').textContent = c.reward ? '達成獎勵：' + c.reward : '';
+  // 棲地
+  document.querySelectorAll('#habitat .critter').forEach(x=>x.remove());
+  const n = st.length, hab = $('#habitat');
+  st.forEach((s,i)=>{
+    const b = document.createElement('button'); b.className='critter'; b.dataset.id = s.id;
+    const sg = stageOf(c, s.points);
+    b.style.left = ((i+.5)/n*92+4) + '%';
+    b.style.bottom = (i%2 ? 8 : 24) + '%';
+    b.style.animationDelay = (i*.37%3)+'s';
+    b.innerHTML = petVis(s.pet, sg, `calc(clamp(26px,3.4vw,46px)*${SIZES[sg]+.15})`) + `<span class="tag">${esc(s.name)}</span>`;
+    b.setAttribute('aria-label', s.name + ' 的' + CYCLES[s.pet].name);
+    hab.appendChild(b);
+  });
+  // 卡片
+  const g = $('#grid');
+  if(!n){ g.innerHTML = '<div class="empty" style="grid-column:1/-1"><h3>這個班還沒有學生</h3><p>到「設定」貼上名單，每位學生就會領到一隻生命週期夥伴。</p><button class="btn primary" data-goto="settings">前往設定</button></div>'; }
+  else g.innerHTML = st.map(s=>{
+    const sg = stageOf(c, s.points), cy = CYCLES[s.pet];
+    return `<button class="card ${selected.has(s.id)?'sel':''}" data-id="${s.id}">
+      ${petVis(s.pet, sg, `calc(4.4rem*${SIZES[sg]})`)}
+      <div class="nm"><span class="seat">${pad(s.seat)}</span>${esc(s.name)}</div>
+      <div class="stg">${cy.name}・${cy.stages[sg][0]}・${s.points} 點</div>
+      <div class="dots" aria-label="${sg<3?'離下一階段還差 '+(SPEEDS[c.speed].t[sg+1]-s.points)+' 點':'已長成'}">${dotsHTML(c, s.points)}</div>
+    </button>`;
+  }).join('');
+  $('#multiBtn').classList.toggle('on', multi);
+  $('#multiGo').hidden = !multi;
+  $('#multiGo').textContent = `給選取的 ${selected.size} 位加分`;
+  $('#multiGo').disabled = !selected.size;
+  $('#undoBtn').disabled = !undoStack.length;
+}
+document.addEventListener('click', e=>{
+  const card = e.target.closest('.card, .critter'); if(!card) return;
+  const id = card.dataset.id;
+  if(multi && card.classList.contains('card')){ selected.has(id) ? selected.delete(id) : selected.add(id); renderBoard(); return; }
+  openAward([id]);
+});
+$('#multiBtn').onclick = () => { multi = !multi; if(!multi) selected.clear(); renderBoard(); };
+$('#multiGo').onclick = () => selected.size && openAward([...selected]);
+$('#allBtn').onclick = () => C().students.length && openAward(C().students.map(s=>s.id));
+$('#undoBtn').onclick = () => {
+  const u = undoStack.pop(); if(!u) return;
+  const c = S.classes.find(x=>x.id===u.cid); if(!c) return;
+  u.deltas.forEach(([sid,p])=>{ const s=c.students.find(x=>x.id===sid); if(s) s.points = Math.max(0, s.points-p); });
+  c.energy = Math.max(0, c.energy - u.energy);
+  save(); renderBoard(); toast('已復原上一次加分');
+};
+
+/* ---- 視窗 ---- */
+const queue = [];
+function showOverlay(html, onBind){ queue.push([html,onBind]); if(queue.length===1) paintOverlay(); }
+function paintOverlay(){
+  const o = $('#overlay'); const it = queue[0];
+  if(!it){ o.hidden = true; o.innerHTML=''; return; }
+  o.innerHTML = it[0]; o.hidden = false; it[1] && it[1](o);
+  const f = o.querySelector('[data-autofocus]') || o.querySelector('button'); f && f.focus();
+}
+function closeOverlay(){ queue.shift(); paintOverlay(); }
+$('#overlay').addEventListener('click', e=>{ if(e.target.id==='overlay' || e.target.closest('[data-close]')) closeOverlay(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('#overlay').hidden) closeOverlay(); });
+function toast(msg){
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:12px;z-index:70';
+  document.body.appendChild(t); setTimeout(()=>t.remove(), 2000);
+}
+
+function openAward(ids){
+  const c = C(); const list = ids.map(id=>c.students.find(s=>s.id===id)).filter(Boolean);
+  if(!list.length) return;
+  const one = list.length===1 ? list[0] : null;
+  const head = one
+    ? `${petVis(one.pet, stageOf(c,one.points), '3.6rem')}<div><h3>${esc(one.name)}</h3><p>${CYCLES[one.pet].name}・${CYCLES[one.pet].stages[stageOf(c,one.points)][0]}・${one.points} 點</p></div>`
+    : `<span class="pet emo" style="--fs:3rem">🎉</span><div><h3>${list.length===c.students.length?'全班':'選取的'} ${list.length} 位</h3><p>每個人都加分</p></div>`;
+  const html = `<div class="sheet" role="dialog" aria-modal="true">
+    <div class="sh-head">${head}<button class="x" data-close aria-label="關閉">×</button></div>
+    ${one ? cycleHTML(one.pet, stageOf(c,one.points)) : ''}
+    <div class="behs">${c.behaviors.map((b,i)=>`<button class="beh" data-b="${i}"><span class="be emo">${esc(b.e)}</span><span class="bt">${esc(b.t)}</span><span class="bp">${b.p>0?'+':''}${b.p}</span></button>`).join('')}</div>
+    <div class="sh-foot"><span>點一下就加分，夥伴會長大</span>${one?'<button class="btn" data-minus>修正 −1</button>':''}</div>
+  </div>`;
+  showOverlay(html, o=>{
+    o.querySelectorAll('.beh').forEach(b=>b.onclick=()=>{ closeOverlay(); award(list.map(s=>s.id), c.behaviors[+b.dataset.b]); });
+    const m = o.querySelector('[data-minus]');
+    if(m) m.onclick = ()=>{ closeOverlay(); award([one.id], {e:'↩',t:'修正',p:-1}); };
+  });
+}
+
+function award(ids, beh){
+  const c = C(); const evolved = []; const deltas = []; let energy = 0;
+  const before = c.energy;
+  ids.forEach(id=>{
+    const s = c.students.find(x=>x.id===id); if(!s) return;
+    const from = stageOf(c, s.points);
+    const p = beh.p < 0 ? -Math.min(s.points, -beh.p) : beh.p;
+    s.points += p; deltas.push([id,p]);
+    if(p > 0) energy += p;
+    const to = stageOf(c, s.points);
+    if(to > from) evolved.push({s, from, to});
+  });
+  c.energy += energy;
+  undoStack.push({cid:c.id, deltas, energy}); if(undoStack.length>30) undoStack.shift();
+  save(); renderBoard();
+  // 卡片動畫
+  deltas.forEach(([id,p])=>{
+    const card = document.querySelector(`.card[data-id="${id}"]`); if(!card || !p) return;
+    card.classList.add('pop'); const f = document.createElement('span'); f.className='float';
+    f.textContent = (p>0?'+':'') + p; if(p<0) f.style.color='var(--alert)';
+    card.appendChild(f); setTimeout(()=>{ f.remove(); card.classList.remove('pop'); }, 1100);
+  });
+  if(beh.p > 0) SFX.award();
+  if(evolved.length) setTimeout(()=>showEvolve(evolved), 500);
+  if(before < c.goal && c.energy >= c.goal) setTimeout(showGoal, evolved.length ? 600 : 400);
+}
+
+function showEvolve(list){
+  SFX.evolve(); confetti(50);
+  let body;
+  if(list.length===1){
+    const {s,from,to} = list[0], cy = CYCLES[s.pet];
+    body = `<p class="evo-k">長大了！</p><h2>${esc(s.name)} 的${cy.name}</h2>
+      <div class="evo-row">${petVis(s.pet,from,'3.4rem')}<span class="cs-arr" style="font-size:2em">➜</span><span class="to">${petVis(s.pet,to,'6rem')}</span></div>
+      <p class="evo-t">${cy.stages[from][0]} → ${cy.stages[to][0]}</p>
+      ${cycleHTML(s.pet, to, '2rem')}
+      <p class="hint">${to===3?'🏆 完成整個生命週期！再加分可以拿星星。':'下一個階段是「'+cy.stages[to+1][0]+'」，繼續加油！'}</p>`;
+  } else {
+    body = `<p class="evo-k">一起長大了！</p><h2>${list.length} 位夥伴進化</h2><div class="evo-list">` +
+      list.map(({s,from,to})=>`<div class="evo-item"><b>${esc(s.name)}</b>${petVis(s.pet,from,'2rem')}<span class="cs-arr">➜</span>${petVis(s.pet,to,'2.8rem')}<span>${CYCLES[s.pet].stages[from][0]} → ${CYCLES[s.pet].stages[to][0]}</span></div>`).join('') + '</div>';
+  }
+  showOverlay(`<div class="sheet evo" role="dialog" aria-modal="true">${body}<button class="btn primary" data-close data-autofocus style="font-size:1.2em">太棒了！</button></div>`);
+}
+function showGoal(){
+  const c = C(); SFX.win(); confetti(90);
+  showOverlay(`<div class="sheet evo" role="dialog" aria-modal="true">
+    <p class="evo-k">全班一起做到了</p><h2>🌳 森林能量集滿 ${c.goal} 點！</h2>
+    <p class="evo-t">${esc(c.reward || '全班獎勵時間')}</p>
+    <div class="row" style="justify-content:center"><button class="btn primary" data-claim>領取獎勵，重新累積</button><button class="btn" data-close>先保留</button></div>
+  </div>`, o=>{ o.querySelector('[data-claim]').onclick = ()=>{ c.energy = Math.max(0, c.energy - c.goal); save(); closeOverlay(); renderBoard(); }; });
+}
+
+/* ================= 安靜挑戰 ================= */
+const Q = {running:false, paused:false, total:300, left:300, hearts:3, level:0, loudMs:0, cool:0, mic:null, an:null, buf:null, cal:null, ended:false, lock:null};
+const scene = $('#scene');
+function renderQSetup(){
+  const q = S.q;
+  $('#durChips').innerHTML = [3,5,10,15].map(m=>`<button class="chip" data-min="${m}" aria-pressed="${q.min===m}">${m} 分鐘</button>`).join('');
+  $('#heartChips').innerHTML = [1,2,3,4,5].map(h=>`<button class="chip" data-h="${h}" aria-pressed="${q.hearts===h}">${'❤️'.repeat(h)}</button>`).join('');
+  $('#qCustom').value = [3,5,10,15].includes(q.min) ? '' : q.min;
+  $('#thr').value = q.thr; $('#meterThr').style.left = q.thr + '%';
+  if(!Q.running){ Q.total = Q.left = q.min*60; Q.hearts = q.hearts; paintQ(); }
+}
+$('#durChips').onclick = e=>{ const b=e.target.closest('[data-min]'); if(!b) return; S.q.min=+b.dataset.min; save(); renderQSetup(); };
+$('#heartChips').onclick = e=>{ const b=e.target.closest('[data-h]'); if(!b) return; S.q.hearts=+b.dataset.h; save(); renderQSetup(); };
+$('#qCustom').onchange = e=>{ const v = Math.round(+e.target.value); if(v>=1 && v<=60){ S.q.min=v; save(); } renderQSetup(); };
+$('#thr').oninput = e=>{ S.q.thr = +e.target.value; $('#meterThr').style.left = S.q.thr+'%'; save(); };
+
+$('#micBtn').onclick = async ()=>{
+  if(Q.mic) return;
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    const a = ac(); const src = a.createMediaStreamSource(stream);
+    Q.an = a.createAnalyser(); Q.an.fftSize = 1024; Q.buf = new Float32Array(Q.an.fftSize);
+    src.connect(Q.an); Q.mic = stream;
+    $('#micBtn').textContent = '🎤 麥克風已開啟'; $('#micBtn').classList.add('on'); $('#calBtn').disabled = false;
+    $('#micStatus').textContent = '麥克風只在瀏覽器裡算音量，不錄音、不上傳。現在試試拍手看看！';
+  }catch(err){
+    $('#micStatus').textContent = '麥克風沒有開啟（可能被瀏覽器擋住）。還是可以開始挑戰，聽到吵鬧時按「手動吵醒一次」。';
+  }
+};
+$('#calBtn').onclick = ()=>{
+  Q.cal = {sum:0,n:0,until:performance.now()+3000};
+  $('#calBtn').disabled = true; $('#calBtn').textContent = '請大家安靜… 3 秒';
+};
+function readLevel(){
+  if(!Q.an) return 0;
+  Q.an.getFloatTimeDomainData(Q.buf);
+  let s = 0; for(let i=0;i<Q.buf.length;i++) s += Q.buf[i]*Q.buf[i];
+  const db = 20*Math.log10(Math.sqrt(s/Q.buf.length)+1e-8);
+  return Math.max(0, Math.min(100, (db+60)/50*100));
+}
+function fmt(sec){ sec = Math.max(0, Math.ceil(sec)); return pad(Math.floor(sec/60)) + ':' + pad(sec%60); }
+function mix(a,b,t){ const pa=a.match(/\w\w/g).map(h=>parseInt(h,16)), pb=b.match(/\w\w/g).map(h=>parseInt(h,16)); return '#'+pa.map((v,i)=>Math.round(v+(pb[i]-v)*t).toString(16).padStart(2,'0')).join(''); }
+function sky(p){
+  // 白天 → 黃昏 → 夜晚
+  const top = p<.6 ? mix('9CD3EE','A9C9E8',p/.6) : p<.85 ? mix('A9C9E8','F2A879',(p-.6)/.25) : mix('F2A879','2E3B6E',(p-.85)/.15);
+  const bot = p<.6 ? mix('D9F0F5','E6F0F2',p/.6) : p<.85 ? mix('E6F0F2','FAD9A6',(p-.6)/.25) : mix('FAD9A6','5A5F8F',(p-.85)/.15);
+  return `linear-gradient(${top},${bot})`;
+}
+function paintQ(){
+  const p = Q.total ? 1 - Q.left/Q.total : 0;
+  scene.style.background = sky(Q.ended==='ok' ? 1 : p);
+  const sp = Q.ended==='ok' ? 1 : p;
+  $('#sun').style.left = (10 + sp*80) + '%';
+  $('#sun').style.top = (70 - Math.sin(Math.PI*Math.min(sp,.98))*55 + (sp>.9?(sp-.9)*300:0)) + '%';
+  scene.classList.toggle('night', Q.ended==='ok' || p>.97);
+  $('#qTimer').textContent = fmt(Q.left);
+  const H = S.q.hearts;
+  $('#qHearts').innerHTML = Array.from({length:H},(_,i)=>`<span class="${i<Q.hearts?'':'lost'}">❤️</span>`).join('');
+}
+function setOwl(state, text){
+  scene.classList.remove('sleep','stir','awake','done-ok');
+  scene.classList.add(state);
+  if(text) $('#bubble').textContent = text;
+}
+const SLEEP_TXT = ['呼～呼～白天是我的睡覺時間','呼嚕… 夢到抓老鼠…','Zzz… 好安靜，好舒服'];
+let owlState = 'sleep', sleepTxtI = 0;
+function owl(state){
+  if(state===owlState) return; owlState = state;
+  if(state==='sleep'){ sleepTxtI=(sleepTxtI+1)%SLEEP_TXT.length; setOwl('sleep', SLEEP_TXT[sleepTxtI]); }
+  if(state==='stir') setOwl('stir','嗯…？好像有聲音…');
+  if(state==='awake') setOwl('awake','好吵！我被吵醒了！');
+}
+
+function startQ(){
+  ac();
+  Q.total = Q.left = S.q.min*60; Q.hearts = S.q.hearts; Q.running = true; Q.paused = false; Q.ended = false; Q.loudMs = 0; Q.cool = 0;
+  $('#qEnd').hidden = true; $('#qSetup').hidden = true; $('#qRun').hidden = false; $('#qPause').textContent = '⏸ 暫停';
+  owlState=''; owl('sleep'); paintQ();
+  try{ navigator.wakeLock && navigator.wakeLock.request('screen').then(l=>Q.lock=l).catch(()=>{}); }catch(e){}
+}
+function wake(){
+  if(Q.cool>0 || Q.ended) return;
+  Q.hearts--; Q.cool = 3; Q.loudMs = 0; owl('awake'); SFX.wake(); paintQ();
+  if(Q.hearts <= 0) endQ(false);
+}
+function endQ(ok){
+  Q.running = false; Q.ended = ok ? 'ok' : 'fail';
+  try{ Q.lock && Q.lock.release(); }catch(e){} Q.lock = null;
+  $('#qRun').hidden = true;
+  paintQ();
+  const box = $('#qEnd');
+  if(ok){
+    scene.classList.remove('sleep','stir','awake'); scene.classList.add('done-ok');
+    $('#bubble').textContent = '天黑了！謝謝大家讓我睡飽，我要出門抓老鼠囉～';
+    SFX.win(); confetti(90);
+    box.innerHTML = `<div class="q-end-box"><h2>🎉 挑戰成功！</h2><p>安靜了 ${fmt(Q.total)}，還剩 ${Q.hearts} 顆愛心</p>
+      <div class="row"><button class="btn primary" id="qAward">全班每人 +1 🌳</button><button class="btn" id="qAgain">再挑戰一次</button><button class="btn" id="qBack">回到設定</button></div></div>`;
+  } else {
+    owl('awake'); $('#bubble').textContent = '我被吵醒太多次了… 下次再陪我挑戰吧！';
+    SFX.oops();
+    box.innerHTML = `<div class="q-end-box"><h2>😵 貓頭鷹醒來了</h2><p>撐了 ${fmt(Q.total-Q.left)}，差一點點！</p>
+      <div class="row"><button class="btn primary" id="qAgain">再挑戰一次</button><button class="btn" id="qBack">回到設定</button></div></div>`;
+  }
+  box.hidden = false;
+  const aw = $('#qAward');
+  if(aw) aw.onclick = ()=>{ aw.disabled = true; aw.textContent = '已加分 ✓';
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    const c = C(); if(c.students.length) award(c.students.map(s=>s.id), {e:'🦉',t:'安靜挑戰成功',p:1}); };
+  $('#qAgain').onclick = startQ;
+  $('#qBack').onclick = resetQ;
+}
+function resetQ(){
+  Q.running = false; Q.ended = false; $('#qEnd').hidden = true; $('#qSetup').hidden = false; $('#qRun').hidden = true;
+  owlState=''; owl('sleep'); renderQSetup();
+}
+$('#qStart').onclick = startQ;
+$('#qPause').onclick = ()=>{ Q.paused = !Q.paused; $('#qPause').textContent = Q.paused ? '▶ 繼續' : '⏸ 暫停'; if(Q.paused) $('#bubble').textContent = '（暫停中）'; };
+$('#qStop').onclick = resetQ;
+$('#qPoke').onclick = wake;
+$('#sceneFs').onclick = ()=>{
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  else if(scene.requestFullscreen) scene.requestFullscreen().catch(()=>{});
+};
+document.addEventListener('fullscreenchange', ()=>scene.classList.toggle('fs', document.fullscreenElement===scene));
+
+let last = performance.now(), paintAcc = 0;
+function loop(now){
+  const dt = Math.min(.25, (now-last)/1000); last = now;
+  const raw = readLevel();
+  Q.level = raw > Q.level ? raw : Q.level*.85 + raw*.15;
+  const thr = S.q.thr;
+  if(Q.an){
+    $('#meterFill').style.width = Q.level + '%';
+    $('#meterFill').classList.toggle('hot', Q.level > thr);
+    $('#meterNum').textContent = `目前 ${Math.round(Q.level)} ／ 門檻 ${thr}`;
+  }
+  if(Q.cal){
+    Q.cal.sum += raw; Q.cal.n++;
+    if(now > Q.cal.until){
+      S.q.thr = Math.max(25, Math.min(95, Math.round(Q.cal.sum/Q.cal.n + 22)));
+      Q.cal = null; save(); renderQSetup();
+      $('#calBtn').disabled = false; $('#calBtn').textContent = '測環境音 3 秒';
+      toast('門檻已設為 ' + S.q.thr + '（環境音再加一點緩衝）');
+    }
+  }
+  if(Q.running && !Q.paused){
+    Q.left -= dt;
+    if(Q.cool > 0){ Q.cool -= dt; if(Q.cool <= 0) owl('sleep'); }
+    else if(Q.an){
+      if(Q.level > thr){ Q.loudMs += dt*1000; if(Q.loudMs > 500) wake(); }
+      else Q.loudMs = Math.max(0, Q.loudMs - dt*500);
+      if(Q.cool <= 0) owl(Q.level > thr*.8 || Q.loudMs > 0 ? 'stir' : 'sleep');
+    }
+    paintAcc += dt; if(paintAcc > .25){ paintAcc = 0; paintQ(); }
+    if(Q.left <= 0 && Q.running){ Q.left = 0; endQ(true); }
+  } else if(!Q.running && !Q.ended && Q.an){
+    // 設定時也讓貓頭鷹即時反應，方便調門檻
+    owl(Q.level > thr ? 'awake' : Q.level > thr*.8 ? 'stir' : 'sleep');
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ================= 設定 ================= */
+let armed = null;
+function armed2(btn, fn){
+  if(armed === btn){ armed = null; fn(); return; }
+  armed = btn; const old = btn.textContent; btn.textContent = '再按一次確認';
+  setTimeout(()=>{ if(armed===btn){ armed=null; btn.textContent = old; } }, 3000);
+}
+function renderSettings(){
+  const c = C();
+  const roster = [...c.students].sort((a,b)=>a.seat-b.seat).map(s=>`${pad(s.seat)} ${s.name}`).join('\n');
+  $('#settings').innerHTML = `
+  <div class="panel">
+    <h2>👩‍🏫 班級</h2>
+    <div class="field"><label for="className">班級名稱</label><input class="txt-in" id="className" value="${esc(c.name)}"></div>
+    <div class="row"><button class="btn" id="addClass">＋ 新增班級</button>${S.classes.length>1?'<button class="btn danger" id="delClass">刪除這個班級</button>':''}</div>
+    <div class="field">
+      <label for="roster">學生名單（一行一位，可以加座號）</label>
+      <textarea id="roster" placeholder="01 小安&#10;02 柏宇&#10;03 語晴">${esc(roster)}</textarea>
+      <p class="hint">名字一樣的學生會保留原本的分數和夥伴。</p>
+      <button class="btn primary" id="saveRoster">更新名單</button>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>🐣 生命週期夥伴</h2>
+    <p class="hint">每種夥伴都照真實的生命週期長大，加分就是在複習自然課。</p>
+    <div class="row">
+      <button class="btn" id="randPet">🎲 隨機分配</button>
+      <select class="txt-in" id="allPet" style="width:auto" aria-label="全部換成同一種"><option value="">全部換成…</option>${CYC_KEYS.map(k=>`<option value="${k}">${CYCLES[k].name}</option>`).join('')}</select>
+    </div>
+    <div class="pet-table">${[...c.students].sort((a,b)=>a.seat-b.seat).map(s=>`
+      <div class="pet-row"><span class="seat">${pad(s.seat)}</span><span>${esc(s.name)}</span>
+        <select data-pet="${s.id}" aria-label="${esc(s.name)} 的夥伴">${CYC_KEYS.map(k=>`<option value="${k}" ${k===s.pet?'selected':''}>${CYCLES[k].name}</option>`).join('')}</select>
+        ${petVis(s.pet, 3, '1.6rem')}</div>`).join('') || '<p class="hint">先在左邊貼上名單。</p>'}
+    </div>
+    <div class="field"><span class="lbl">五種週期一覽</span>${CYC_KEYS.map(k=>`<div><b>${CYCLES[k].name}</b>${cycleHTML(k,-1,'1.6rem').replace(/cs next/g,'cs')}</div>`).join('')}</div>
+  </div>
+  <div class="panel">
+    <h2>⭐ 加分規則</h2>
+    <div class="field"><span class="lbl">成長速度</span>
+      <div class="chips">${Object.entries(SPEEDS).map(([k,v])=>`<button class="chip" data-speed="${k}" aria-pressed="${c.speed===k}">${v.n}</button>`).join('')}</div>
+      <p class="hint">數字是進到第 2、3、4 階段需要的點數。中重度班建議用「快」，很快就能看到變化。</p>
+    </div>
+    <div class="field">
+      <label for="behs">加分項目（一行一個：圖示 名稱 分數）</label>
+      <textarea id="behs" style="min-height:220px">${esc(c.behaviors.map(b=>`${b.e} ${b.t} ${b.p}`).join('\n'))}</textarea>
+      <div class="row"><button class="btn primary" id="saveBehs">儲存加分項目</button><button class="btn" id="resetBehs">恢復預設</button></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>🌳 全班森林能量</h2>
+    <div class="field"><label for="goal">目標點數（全班加總）</label><input class="num-in" id="goal" type="number" min="5" max="999" value="${c.goal}"></div>
+    <div class="field"><label for="reward">達成獎勵</label><input class="txt-in" id="reward" value="${esc(c.reward)}" placeholder="例如：看一部動物紀錄片"></div>
+    <p class="hint">全班一起累積，比個人排名更適合特教班：大家是同一隊。</p>
+    <h2 style="margin-top:8px">🧺 資料</h2>
+    <p class="hint">資料存在這台電腦的瀏覽器。換電腦前先下載備份，到新電腦再匯入。</p>
+    <div class="row">
+      <button class="btn" id="exportBtn">⬇ 下載備份</button>
+      <label class="btn" for="importFile">⬆ 匯入備份</label><input type="file" id="importFile" accept=".json,application/json" hidden>
+    </div>
+    <div class="row"><button class="btn danger" id="zeroBtn">這班分數全部歸零</button></div>
+  </div>`;
+  bindSettings();
+}
+function bindSettings(){
+  const c = C();
+  $('#className').onchange = e=>{ c.name = e.target.value.trim() || c.name; save(); renderHeader(); };
+  $('#addClass').onclick = ()=>{
+    const id = uid();
+    S.classes.push({id,name:'新班級 '+(S.classes.length+1),speed:'fast',goal:40,reward:'',energy:0,sample:false,behaviors:DEFAULT_BEH.map(b=>({...b})),students:[]});
+    S.cur = id; save(); renderAll(); toast('已新增班級，請貼上名單');
+  };
+  const del = $('#delClass');
+  if(del) del.onclick = ()=>armed2(del, ()=>{ S.classes = S.classes.filter(x=>x.id!==c.id); S.cur = S.classes[0].id; save(); renderAll(); toast('已刪除班級'); });
+  $('#saveRoster').onclick = ()=>{
+    const lines = $('#roster').value.split(/\n/).map(l=>l.trim()).filter(Boolean);
+    const old = c.students; let i = 0;
+    c.students = lines.map((l,idx)=>{
+      const m = l.match(/^(\d+)[\s.、,，:：]*(.+)$/);
+      const seat = m ? +m[1] : idx+1, name = (m ? m[2] : l).trim();
+      const prev = old.find(s=>s.name===name);
+      return prev ? {...prev, seat} : {id:uid(), seat, name, pet:CYC_KEYS[(i++)%CYC_KEYS.length], points:0};
+    });
+    if(c.sample){ c.sample = false; c.students.forEach(s=>s.points=0); c.energy = 0; if(c.name==='範例班 自然課') c.name='我的班 自然課'; }
+    undoStack = []; save(); renderAll(); toast('名單已更新：' + c.students.length + ' 位');
+  };
+  document.querySelectorAll('[data-pet]').forEach(sel=>sel.onchange = ()=>{
+    const s = c.students.find(x=>x.id===sel.dataset.pet); if(s){ s.pet = sel.value; save(); renderSettings(); }
+  });
+  $('#randPet').onclick = ()=>{ c.students.forEach(s=>s.pet = CYC_KEYS[Math.floor(Math.random()*CYC_KEYS.length)]); save(); renderSettings(); };
+  $('#allPet').onchange = e=>{ if(!e.target.value) return; c.students.forEach(s=>s.pet = e.target.value); save(); renderSettings(); };
+  document.querySelectorAll('[data-speed]').forEach(b=>b.onclick = ()=>{ c.speed = b.dataset.speed; save(); renderSettings(); });
+  $('#saveBehs').onclick = ()=>{
+    const list = $('#behs').value.split(/\n/).map(l=>l.trim()).filter(Boolean).map(l=>{
+      const m = l.match(/^(\S+)\s+(.+?)\s+(-?\d+)$/) || l.match(/^(\S+)\s+(.+)$/);
+      return m ? {e:m[1], t:m[2], p: m[3]!==undefined ? Math.max(-5,Math.min(10,+m[3])) : 1} : null;
+    }).filter(Boolean);
+    if(!list.length){ toast('至少要有一個加分項目'); return; }
+    c.behaviors = list; save(); renderSettings(); toast('加分項目已儲存');
+  };
+  $('#resetBehs').onclick = ()=>{ c.behaviors = DEFAULT_BEH.map(b=>({...b})); save(); renderSettings(); };
+  $('#goal').onchange = e=>{ const v = Math.round(+e.target.value); if(v>=5){ c.goal = v; save(); } };
+  $('#reward').onchange = e=>{ c.reward = e.target.value.trim(); save(); };
+  $('#exportBtn').onclick = ()=>{
+    const blob = new Blob([JSON.stringify(S,null,1)], {type:'application/json'});
+    const a = document.createElement('a'); const d = new Date();
+    a.href = URL.createObjectURL(blob); a.download = `生命小森林備份-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}.json`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+  };
+  $('#importFile').onchange = e=>{
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ()=>{ try{ const d = JSON.parse(r.result); if(!Array.isArray(d.classes) || !d.classes.length) throw 0;
+      d.q = Object.assign({min:5,hearts:3,thr:65}, d.q||{}); if(!d.classes.some(x=>x.id===d.cur)) d.cur = d.classes[0].id;
+      S = d; save(); undoStack=[]; renderAll(); toast('備份已匯入'); }catch(err){ toast('這個檔案不是生命小森林的備份'); } };
+    r.readAsText(f);
+  };
+  const z = $('#zeroBtn');
+  z.onclick = ()=>armed2(z, ()=>{ c.students.forEach(s=>s.points=0); c.energy=0; undoStack=[]; save(); renderAll(); toast('分數已歸零'); });
+}
+
+function renderAll(){ renderHeader(); renderBoard(); renderQSetup(); if(tab==='settings') renderSettings(); }
+renderAll();
+</script>
+</body>
+</html>
