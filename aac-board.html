@@ -610,7 +610,11 @@ function applyName(){
   $('#boardName').textContent=t;document.title=t;$('#avatar').textContent=n?n[0]:'🐾';
 }
 
-function resolve(it){const [id,emo,label,type]=it;const o=OV[id]||{};return {id,emo:o.emo||emo,label:o.label||label,type:type||'n',photo:o.photo||'',hidden:!!o.hidden}}
+/* 預設寫實照片（Canva 生成）；老師自己拍的照片會蓋過去 */
+const PHOTOS={f_water:'aac-img/water.jpg',n_drink:'aac-img/water.jpg',k_water:'aac-img/water.jpg',f_rice:'aac-img/rice.jpg',w_eat:'aac-img/rice.jpg',
+  f_cookie:'aac-img/cookie.jpg',r_snack:'aac-img/cookie.jpg',f_noodle:'aac-img/noodle.jpg'};
+function resolve(it){const [id,emo,label,type]=it;const o=OV[id]||{};
+  return {id,emo:o.emo||emo,label:o.label||label,type:type||'n',photo:o.photo!==undefined?o.photo:(PHOTOS[id]||''),hidden:!!o.hidden}}
 function groupItems(gid){const g=GROUPS[gid];return [...g.items,...(ADDED[gid]||[])].map(resolve)}
 const ALL=new Map();
 function indexAll(){ALL.clear();Object.keys(GROUPS).forEach(g=>groupItems(g).forEach(r=>ALL.set(r.id,r)))}
@@ -960,7 +964,7 @@ $('#elist').addEventListener('change',async e=>{
 $('#elist').addEventListener('click',e=>{
   const b=e.target.closest('button[data-act]');if(!b)return;const id=b.closest('.erow').dataset.id;
   if(b.dataset.act==='hide')ov(id).hidden=!ov(id).hidden;
-  if(b.dataset.act==='nophoto')delete ov(id).photo;
+  if(b.dataset.act==='nophoto')ov(id).photo='';
   if(b.dataset.act==='reset')delete OV[id];
   if(b.dataset.act==='del'){ADDED[editGroup]=(ADDED[editGroup]||[]).filter(a=>a[0]!==id);delete OV[id]}
   save();renderEditor();
