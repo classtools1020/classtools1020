@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="m" x1="0" x2="1"><stop offset="0" stop-color="#9aa3ab"/><stop offset=".45" stop-color="#eef1f3"/><stop offset="1" stop-color="#8b949c"/></linearGradient>
+    <linearGradient id="b" x1="0" x2="1"><stop offset="0" stop-color="#1b1d20"/><stop offset=".5" stop-color="#3a3e44"/><stop offset="1" stop-color="#1b1d20"/></linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="18" fill="#ffffff"/>
+  <!-- cable -->
+  <rect x="92" y="160" width="16" height="40" fill="#26282b"/>
+  <path d="M84 146 H116 L110 170 H90 Z" fill="#26282b"/>
+  <!-- body -->
+  <path d="M60 86 H140 V136 Q140 150 126 150 H74 Q60 150 60 136 Z" fill="url(#b)"/>
+  <rect x="60" y="126" width="80" height="12" fill="#d9443a"/>
+  <text x="100" y="117" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" fill="#ffffff" letter-spacing="1">HDMI</text>
+  <!-- metal tip: front face -->
+  <rect x="70" y="48" width="60" height="40" fill="url(#m)" stroke="#6f7880" stroke-width="1.5"/>
+  <rect x="80" y="58" width="12" height="6" rx="1" fill="#7d868e"/>
+  <rect x="108" y="58" width="12" height="6" rx="1" fill="#7d868e"/>
+  <!-- end face: chamfered trapezoid opening -->
+  <path d="M70 48 V40 L76 32 H124 L130 40 V48 Z" fill="#c9cfd4" stroke="#6f7880" stroke-width="1.5"/>
+  <path d="M74 46 V41 L79 35 H121 L126 41 V46 Z" fill="#202225"/>
+  <rect x="80" y="38" width="40" height="4" rx="1" fill="#e2b94a"/>
+</svg>

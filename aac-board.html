@@ -614,7 +614,8 @@ function applyName(){
 
 /* 預設寫實照片（Canva 生成）；老師自己拍的照片會蓋過去 */
 const PHOTOS={f_water:'aac-img/water.jpg',n_drink:'aac-img/water.jpg',k_water:'aac-img/water.jpg',f_rice:'aac-img/rice.jpg',w_eat:'aac-img/rice.jpg',
-  f_cookie:'aac-img/cookie.jpg',r_snack:'aac-img/cookie.jpg',f_noodle:'aac-img/noodle.jpg'};
+  f_cookie:'aac-img/cookie.jpg',r_snack:'aac-img/cookie.jpg',f_noodle:'aac-img/noodle.jpg',
+  jc1:'aac-img/hdmi.svg',ja1:'aac-img/hdmi.svg',jc2:'aac-img/usb.svg',ja2:'aac-img/usb.svg'};
 function resolve(it){const [id,emo,label,type]=it;const o=OV[id]||{};
   return {id,emo:o.emo||emo,label:o.label||label,type:type||'n',photo:o.photo!==undefined?o.photo:(PHOTOS[id]||''),hidden:!!o.hidden}}
 function groupItems(gid){const g=GROUPS[gid];return [...g.items,...(ADDED[gid]||[])].map(resolve)}
