@@ -236,6 +236,30 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .rchar.digit{border-color:var(--ta-bd);background:var(--ta-bg)}
 .rgap{width:16px;flex:none}
 
+/* class mode */
+.cls{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:12px}
+.cls-main{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;min-height:0;overflow-y:auto}
+.cls-now{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--raised);border:4px solid var(--accent);border-radius:24px;padding:16px 24px;width:min(460px,100%)}
+.cls-now .emo{font-size:clamp(3.6rem,12vmin,6.5rem)}
+.cls-now b{font-family:var(--font-label);font-weight:400;font-size:clamp(1.5rem,4.5vmin,2.4rem);text-align:center}
+.now-tag{color:var(--muted);font-size:1rem}
+.page-no{font-family:var(--font-label);font-size:clamp(4rem,16vmin,8rem);line-height:1;font-variant-numeric:tabular-nums;color:var(--accent)}
+.cls-main .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.cls-main .sbtn{min-height:60px;font-family:var(--font-label);font-size:1.2rem}
+.cls-side{display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto}
+.cls-side h2{margin:0;font-size:.95rem;font-weight:500;color:var(--muted)}
+.cls-ans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cls-ans .card{min-height:92px}
+.cls-choice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cls-choice .card{min-height:130px;border-width:3px}
+.crow{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--raised)}
+.crow .emo{font-size:1.5rem}
+.crow .crow-l{flex:1;min-width:0}
+.crow .btn{padding:4px 10px}
+.pair{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px}
+.pair input{font:inherit;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--raised);color:var(--ink);min-width:0}
+
 /* teacher panel */
 .panel-wrap{position:fixed;inset:0;background:var(--scrim);display:flex;justify-content:flex-end;z-index:50}
 .panel{width:min(600px,100%);height:100%;background:var(--surface);display:flex;flex-direction:column;-webkit-user-select:text;user-select:text;
@@ -306,6 +330,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   .ft{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px}
   .ft-arrow{font-size:1.6rem}
   .sbtn.speak{padding:0 10px}
+  .cls{grid-template-columns:minmax(0,1fr);overflow-y:auto}
+  .cls-main,.cls-side{overflow:visible}
   .num{grid-template-columns:minmax(0,1fr);overflow-y:auto}
   .keypad{grid-auto-rows:64px;flex:none}
   .read-chars{flex:none}
@@ -330,6 +356,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     </div>
     <nav class="modes" role="tablist" aria-label="模式">
       <button class="mode" role="tab" data-mode="talk" aria-selected="true"><span class="emo" aria-hidden="true">💬</span>說話</button>
+      <button class="mode" role="tab" data-mode="cls" aria-selected="false"><span class="emo" aria-hidden="true">🏫</span>上課</button>
       <button class="mode" role="tab" data-mode="ft" aria-selected="false"><span class="emo" aria-hidden="true">➡️</span>先・再</button>
       <button class="mode" role="tab" data-mode="calm" aria-selected="false"><span class="emo" aria-hidden="true">🌿</span>冷靜一下</button>
       <button class="mode" role="tab" data-mode="help" aria-selected="false"><span class="emo" aria-hidden="true">🐶</span>小幫手</button>
@@ -354,6 +381,26 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <div class="board">
       <nav class="cats" id="cats" role="tablist" aria-label="分類"></nav>
       <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <!-- 上課 -->
+  <section class="view" id="view-cls" hidden>
+    <div class="cls">
+      <div class="cls-main">
+        <div class="step-strip" id="clsStrip" aria-hidden="true"></div>
+        <div class="cls-now" id="clsNow" aria-live="polite"></div>
+        <div class="row">
+          <button class="sbtn" id="clsSay"><span class="emo" aria-hidden="true">🔊</span>再聽一次</button>
+          <button class="sbtn speak hp-done" id="clsDone"><span class="emo" aria-hidden="true">✅</span>做好了</button>
+        </div>
+      </div>
+      <div class="cls-side">
+        <h2>我想說</h2>
+        <div class="cls-ans" id="clsAns"></div>
+        <h2>選一個</h2>
+        <div class="cls-choice" id="clsChoice"></div>
+      </div>
     </div>
   </section>
 
@@ -427,6 +474,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <button class="ptab" role="tab" data-p="voice" aria-selected="true">語音</button>
       <button class="ptab" role="tab" data-p="layout" aria-selected="false">版面</button>
       <button class="ptab" role="tab" data-p="cards" aria-selected="false">圖卡</button>
+      <button class="ptab" role="tab" data-p="cls" aria-selected="false">上課</button>
       <button class="ptab" role="tab" data-p="log" aria-selected="false">使用紀錄</button>
     </nav>
     <div class="pbody" id="p-voice">
@@ -486,6 +534,20 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
           <button class="btn primary" id="addBtn">新增</button>
         </div>
       </div>
+    </div>
+    <div class="pbody" id="p-cls" hidden>
+      <div class="field"><span class="flabel">這節課的流程</span>
+        <div class="elist" id="clsList"></div>
+        <span class="flabel" style="margin-top:6px">加一個步驟</span>
+        <div class="job-chips" id="clsAdd"></div>
+        <p class="hint">3～5 步就好。學生每做完一步按「做好了」，下一步會自動唸出來。把「自由寫數字」放在最後，就是「先上課、再寫數字」。</p></div>
+      <div class="field"><label for="clsPage">翻到第幾頁</label><input type="text" id="clsPage" inputmode="numeric" maxlength="4">
+        <p class="hint">用大大的數字顯示頁碼，學生用「數字配對」找到這一頁。</p></div>
+      <div class="field"><span class="flabel">選一個：課堂提問的兩個答案</span>
+        <div class="pair"><input type="text" id="clsAE" class="eemo" aria-label="答案一的 emoji"><input type="text" id="clsAL" aria-label="答案一"></div>
+        <div class="pair"><input type="text" id="clsBE" class="eemo" aria-label="答案二的 emoji"><input type="text" id="clsBL" aria-label="答案二"></div>
+        <p class="hint">例如「冷／熱」「會浮／會沉」「3／5」。學生一按，平板會大聲說出答案，全班都聽得到。</p></div>
+      <div class="row"><button class="btn" id="clsRestart">流程從頭開始</button></div>
     </div>
     <div class="pbody" id="p-log" hidden>
       <div class="stats" id="stats"></div>
@@ -596,8 +658,9 @@ JOBS.forEach(j=>GROUPS[j.id]={name:'小幫手任務：'+j.name,items:j.items});
 const KEY='aac-board-v2', LOGKEY='aac-board-log-v1';
 function readJSON(k,fb){try{const v=JSON.parse(localStorage.getItem(k));return v==null?fb:v}catch(e){return fb}}
 const saved=readJSON(KEY,{});
-const DEFAULTS={voiceURI:'',rate:0.85,pitch:1,volume:0.9,cols:3,level:'basic',strip:false,fitz:true,labels:true,debounce:true,keepSlots:true,speakBreath:true,wake:true,name:'',modes:{talk:true,ft:true,calm:true,help:true,num:true},helpJob:'job_close',waitSec:30,numMode:'whole',readText:'校車 3 號'};
-const S=Object.assign({},DEFAULTS,saved.settings||{});
+const DEFAULTS={voiceURI:'',rate:0.85,pitch:1,volume:0.9,cols:3,level:'basic',strip:false,fitz:true,labels:true,debounce:true,keepSlots:true,speakBreath:true,wake:true,name:'',modes:{talk:true,cls:true,ft:true,calm:true,help:true,num:true},
+  cls:{steps:['cs_look','cs_page','cs_do','cs_write','cs_free'],page:'23',a:{emo:'🧊',label:'冷'},b:{emo:'🔥',label:'熱'}},helpJob:'job_close',waitSec:30,numMode:'whole',readText:'校車 3 號'};
+const S=Object.assign(JSON.parse(JSON.stringify(DEFAULTS)),saved.settings||{});
 const OV=saved.ov||{};
 const ADDED=saved.added||{};
 let FT=Object.assign({first:null,then:null,target:'first',done:false},saved.ft||{});
@@ -854,19 +917,79 @@ $('#readChars').addEventListener('click',e=>{
 });
 $('#readAll').addEventListener('click',()=>{const t=$('#readText').value.trim();if(t)speak(t);else toast('請老師先在上面打字')});
 
+/* ---------- 上課：流程、頁碼、用平板回答 ---------- */
+const CLS_STEPS={cs_look:['👀','看大螢幕'],cs_page:['📖','翻課本'],cs_do:['🧪','動手做'],cs_write:['✏️','寫數字'],
+  cs_answer:['🙋','回答問題'],cs_help:['🐶','當小幫手：按下一頁'],cs_rest:['🛋️','休息一下'],cs_free:['🔢','自由寫數字'],cs_pack:['💻','收筆電']};
+const CLS_ANS=[['ca_yes','👍','是','s'],['ca_no','👎','不是','x'],['ca_done','✅','我做好了','s'],
+  ['ca_help','🤲','幫幫我','v'],['ca_look','👀','老師看我','s'],['ca_rest','😮‍💨','我要休息','v']];
+GROUPS.clsans={name:'上課：我想說',items:CLS_ANS};
+let CL={i:0};
+function clsSteps(){return (S.cls.steps||[]).filter(id=>CLS_STEPS[id])}
+function clsLabel(id){return id==='cs_page'?`翻到第 ${S.cls.page} 頁`:CLS_STEPS[id][1]}
+function renderCls(){
+  const steps=clsSteps(),now=$('#clsNow'),going=steps.length&&CL.i<steps.length;
+  $('#clsStrip').innerHTML=steps.map((id,i)=>`<span class="${i<CL.i?'did':i===CL.i?'now':''}">${CLS_STEPS[id][0]}</span>`).join('');
+  if(!steps.length)now.innerHTML='<span class="emo" aria-hidden="true">📝</span><b>老師還沒排流程</b><span class="now-tag">長按齒輪 →「上課」</span>';
+  else if(!going)now.innerHTML=`<span class="emo" aria-hidden="true">🎉</span><b>這節課完成了！</b><span class="now-tag">${esc(who())}好棒</span>`;
+  else{
+    const id=steps[CL.i],tag=`<span class="now-tag">現在（第 ${CL.i+1} 步／共 ${steps.length} 步）</span>`;
+    now.innerHTML=tag+(id==='cs_page'
+      ?`<span class="page-no">${esc(String(S.cls.page))}</span><b>翻到第 ${esc(String(S.cls.page))} 頁</b>`
+      :`<span class="emo" aria-hidden="true">${CLS_STEPS[id][0]}</span><b>${esc(CLS_STEPS[id][1])}</b>`);
+  }
+  $('#clsSay').hidden=!going;$('#clsDone').hidden=!going;
+  $('#clsAns').innerHTML=cardsHTML(groupItems('clsans'));
+  $('#clsChoice').innerHTML=['a','b'].map(k=>{const c=S.cls[k]||{};
+    return `<button class="card t-n" data-choice="${k}"><span class="emo" aria-hidden="true">${esc(c.emo||'❔')}</span><span class="lbl">${esc(c.label||'')}</span></button>`}).join('');
+}
+$('#clsSay').addEventListener('click',()=>{const s=clsSteps()[CL.i];if(s)speak(`現在，${clsLabel(s)}`)});
+$('#clsDone').addEventListener('click',()=>{
+  if(!tapOK('cls_done'))return;const steps=clsSteps();CL.i++;renderCls();
+  if(CL.i<steps.length)speak(`做得好！現在，${clsLabel(steps[CL.i])}`);
+  else{speak(`這節課完成了！${who()}好棒！`);log({id:'cls_end',label:'完成上課流程'},'cls')}
+});
+$('#clsAns').addEventListener('click',e=>onCard(e,'cls'));
+$('#clsChoice').addEventListener('click',e=>{
+  const b=e.target.closest('[data-choice]');if(!b)return;const c=S.cls[b.dataset.choice]||{};if(!c.label)return;
+  if(!tapOK('cc_'+b.dataset.choice))return;flash(b);speak(c.label);log({id:'cc_'+b.dataset.choice,label:'回答 '+c.label},'cls');
+});
+function renderClsPanel(){
+  const steps=clsSteps();
+  $('#clsList').innerHTML=steps.length?steps.map((id,i)=>`<div class="crow"><span class="emo" aria-hidden="true">${CLS_STEPS[id][0]}</span><span class="crow-l">${i+1}. ${esc(clsLabel(id))}</span>
+    <button class="btn" data-act="up" data-i="${i}" aria-label="往上移"${i?'':' disabled'}>↑</button><button class="btn" data-act="del" data-i="${i}" aria-label="移除">✕</button></div>`).join('')
+    :'<p class="empty">還沒有步驟，從下面點選加入。</p>';
+  $('#clsAdd').innerHTML=Object.entries(CLS_STEPS).map(([id,[e,l]])=>`<button data-add="${id}"><span class="emo" aria-hidden="true">${e}</span>${esc(l)}</button>`).join('');
+  $('#clsPage').value=S.cls.page;
+  $('#clsAE').value=S.cls.a.emo;$('#clsAL').value=S.cls.a.label;$('#clsBE').value=S.cls.b.emo;$('#clsBL').value=S.cls.b.label;
+}
+function setSteps(arr){S.cls=Object.assign({},S.cls,{steps:arr});CL.i=0;save();renderClsPanel()}
+$('#clsList').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-act]');if(!b)return;const i=+b.dataset.i,arr=clsSteps().slice();
+  if(b.dataset.act==='del')arr.splice(i,1);
+  if(b.dataset.act==='up'&&i>0)[arr[i-1],arr[i]]=[arr[i],arr[i-1]];
+  setSteps(arr);
+});
+$('#clsAdd').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b)return;if(clsSteps().length>=8){toast('步驟太多了，建議 3～5 步');return}setSteps([...clsSteps(),b.dataset.add])});
+$('#clsPage').addEventListener('input',e=>{S.cls=Object.assign({},S.cls,{page:e.target.value.trim()||'1'});save()});
+[['clsAE','a','emo'],['clsAL','a','label'],['clsBE','b','emo'],['clsBL','b','label']].forEach(([id,k,f])=>$('#'+id).addEventListener('input',e=>{
+  S.cls=Object.assign({},S.cls,{[k]:Object.assign({},S.cls[k],{[f]:e.target.value.trim()})});save();
+}));
+$('#clsRestart').addEventListener('click',()=>{CL.i=0;renderCls();toast('流程從第 1 步開始')});
+
 /* ---------- 模式切換 ---------- */
 let mode='talk';
 function setMode(m){
   mode=m;$$('.mode').forEach(b=>b.setAttribute('aria-selected',b.dataset.mode===m));
-  ['talk','ft','calm','help','num'].forEach(v=>$('#view-'+v).hidden=v!==m);
+  ['talk','cls','ft','calm','help','num'].forEach(v=>$('#view-'+v).hidden=v!==m);
   if(m!=='calm'&&breathing)stopBreath(false);
   if(m!=='help'){clearInterval(hpTimer);hpTimer=null;if(H.state==='later')H.state='wait'}
   if(m==='help')renderHelp();
+  if(m==='cls')renderCls();
 }
 $$('.mode').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
-const MODES=[['talk','💬 說話'],['ft','➡️ 先・再'],['calm','🌿 冷靜一下'],['help','🐶 小幫手'],['num','🔢 數字']];
+const MODES=[['talk','💬 說話'],['cls','🏫 上課'],['ft','➡️ 先・再'],['calm','🌿 冷靜一下'],['help','🐶 小幫手'],['num','🔢 數字']];
 function applyModes(){
-  const on=MODES.map(([m])=>m).filter(m=>S.modes&&S.modes[m]);
+  const on=MODES.map(([m])=>m).filter(m=>!S.modes||S.modes[m]!==false);
   if(!on.length)on.push('talk');
   $$('.mode').forEach(b=>b.hidden=!on.includes(b.dataset.mode));
   $('.modes').hidden=on.length<=1;
@@ -881,7 +1004,7 @@ gear.addEventListener('contextmenu',e=>e.preventDefault());
 gear.addEventListener('click',e=>{if(e.detail===0){openPanel();return}if(!openedByHold)toast('老師請長按 1.5 秒開啟設定')});
 
 function openPanel(){$('#panel').hidden=false;renderPanel();$('#closePanel').focus()}
-function closePanel(){$('#panel').hidden=true;applyBodyFlags();renderTalk();renderFT();renderCalm();if(mode==='help')renderHelp()}
+function closePanel(){$('#panel').hidden=true;applyBodyFlags();renderTalk();renderFT();renderCalm();renderCls();if(mode==='help')renderHelp()}
 $('#closePanel').addEventListener('click',closePanel);
 $('#panel').addEventListener('click',e=>{if(e.target.id==='panel')closePanel()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#panel').hidden)closePanel()});
@@ -895,7 +1018,8 @@ let ptab='voice';
 $$('.ptab').forEach(b=>b.addEventListener('click',()=>{ptab=b.dataset.p;renderPanel()}));
 function renderPanel(){
   $$('.ptab').forEach(b=>b.setAttribute('aria-selected',b.dataset.p===ptab));
-  ['voice','layout','cards','log'].forEach(p=>$('#p-'+p).hidden=p!==ptab);
+  ['voice','layout','cards','cls','log'].forEach(p=>$('#p-'+p).hidden=p!==ptab);
+  if(ptab==='cls')renderClsPanel();
   if(ptab==='voice')renderVoicePanel();
   if(ptab==='layout')renderLayoutPanel();
   if(ptab==='cards')renderEditor();
@@ -928,7 +1052,7 @@ $('#testBtn').addEventListener('click',()=>speak($('#testText').value||hello()))
 const TOGGLES={optStrip:'strip',optFitz:'fitz',optLabels:'labels',optDebounce:'debounce',optSlots:'keepSlots',optBreath:'speakBreath',optWake:'wake'};
 function renderLayoutPanel(){
   $('#levelSeg').innerHTML=[['basic','入門'],['full','進階']].map(([v,l])=>`<button data-v="${v}" aria-pressed="${S.level===v}">${l}</button>`).join('');
-  $('#modeSeg').innerHTML=MODES.map(([m,l])=>`<button data-m="${m}" aria-pressed="${!!S.modes[m]}">${l}</button>`).join('');
+  $('#modeSeg').innerHTML=MODES.map(([m,l])=>`<button data-m="${m}" aria-pressed="${S.modes[m]!==false}">${l}</button>`).join('');
   $('#optName').value=S.name||'';
   $('#waitSeg').innerHTML=[15,30,60,120].map(n=>`<button data-n="${n}" aria-pressed="${S.waitSec===n}">${n} 秒</button>`).join('');
   $('#colsSeg').innerHTML=[2,3,4,5,6].map(n=>`<button data-n="${n}" aria-pressed="${S.cols===n}">${n} 格</button>`).join('');
@@ -937,8 +1061,9 @@ function renderLayoutPanel(){
 $('#levelSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.level=b.dataset.v;save();renderLayoutPanel()});
 $('#modeSeg').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;const m=b.dataset.m;
-  if(S.modes[m]&&MODES.filter(([k])=>S.modes[k]).length===1){toast('至少要留一個模式');return}
-  S.modes=Object.assign({},S.modes,{[m]:!S.modes[m]});save();renderLayoutPanel();applyModes();
+  const isOn=k=>S.modes[k]!==false;
+  if(isOn(m)&&MODES.filter(([k])=>isOn(k)).length===1){toast('至少要留一個模式');return}
+  S.modes=Object.assign({},S.modes,{[m]:!isOn(m)});save();renderLayoutPanel();applyModes();
 });
 $('#optName').addEventListener('input',e=>{S.name=e.target.value.trim();save();applyName()});
 $('#waitSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;S.waitSec=+b.dataset.n;save();renderLayoutPanel()});
@@ -949,7 +1074,7 @@ Object.entries(TOGGLES).forEach(([id,k])=>$('#'+id).addEventListener('change',e=
 let editGroup='need';
 function renderEditor(){
   const sel=$('#editCat');
-  sel.innerHTML=[['core'],...CATS.map(c=>[c.id]),['calm'],['ftw'],['ftr'],['help'],...JOBS.map(j=>[j.id])].map(([g])=>`<option value="${g}"${g===editGroup?' selected':''}>${esc(GROUPS[g].name)}</option>`).join('');
+  sel.innerHTML=[['core'],...CATS.map(c=>[c.id]),['calm'],['ftw'],['ftr'],['clsans'],['help'],...JOBS.map(j=>[j.id])].map(([g])=>`<option value="${g}"${g===editGroup?' selected':''}>${esc(GROUPS[g].name)}</option>`).join('');
   const addedIds=new Set((ADDED[editGroup]||[]).map(a=>a[0]));
   $('#elist').innerHTML=groupItems(editGroup).map(r=>`
     <div class="erow${r.hidden?' off':''}" data-id="${r.id}">
@@ -1021,7 +1146,7 @@ function logText(){
   return [`${S.name?S.name+' ':''}AAC 使用紀錄（匯出 ${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${pad(now.getHours())}:${pad(now.getMinutes())}）`,
     `今天：${todayCount()} 次｜累計：${LOG.length} 次`,
     `最常用：${topList().map(([l,n])=>`${l} ${n}`).join('、')||'—'}`,'',
-    '時間\t詞彙\t模式',...LOG.slice(-200).map(x=>`${fmtT(x.t)}\t${x.label}\t${{talk:'說話',calm:'冷靜',help:'小幫手',num:'數字'}[x.src]||x.src}`)].join('\n');
+    '時間\t詞彙\t模式',...LOG.slice(-200).map(x=>`${fmtT(x.t)}\t${x.label}\t${{talk:'說話',cls:'上課',calm:'冷靜',help:'小幫手',num:'數字'}[x.src]||x.src}`)].join('\n');
 }
 $('#copyLog').addEventListener('click',()=>{
   const txt=logText(),box=$('#copyBox');
@@ -1037,7 +1162,7 @@ $('#clearLog').addEventListener('click',e=>twoStep(e.currentTarget,'清除紀錄
 $('#resetAll').addEventListener('click',e=>twoStep(e.currentTarget,'全部恢復預設（含照片與設定）',()=>{
   try{localStorage.removeItem(KEY)}catch(err){}
   Object.keys(OV).forEach(k=>delete OV[k]);Object.keys(ADDED).forEach(k=>delete ADDED[k]);
-  Object.assign(S,DEFAULTS);
+  Object.assign(S,JSON.parse(JSON.stringify(DEFAULTS)));CL.i=0;
   FT={first:null,then:null,target:'first',done:false};save();applyBodyFlags();renderPanel();toast('已恢復預設');
 }));
 
@@ -1051,7 +1176,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 /* ---------- 啟動 ---------- */
 $('#dateLine').textContent=new Date().toLocaleDateString('zh-TW',{month:'long',day:'numeric',weekday:'long'});
 applyBodyFlags();renderTalk();renderFT();renderCalm();
-applyName();$('#readText').value=S.readText;renderNum();renderRead();applyModes();
+applyName();$('#readText').value=S.readText;renderNum();renderRead();renderCls();applyModes();
 })();
 </script>
 </body>
