@@ -248,46 +248,86 @@ const BROWS={none:'',
   focus:'<path d="M-46,-46 L-20,-36"/><path d="M20,-36 L46,-46"/>',
   think:'<path d="M-46,-38 L-20,-38"/><path d="M18,-46 Q32,-56 46,-44"/>'};
 const S5=`stroke="${INK}" stroke-width="5" stroke-linejoin="round"`;
-function spikyPath(){const p=[];const N=13;for(let i=0;i<=N;i++){const a=(195+150*i/N)*Math.PI/180;const r=i%2?96:132;p.push([Math.cos(a)*r,Math.sin(a)*r])}
-  p.push([84,-30],[60,-52],[36,-36],[12,-60],[-14,-40],[-40,-62],[-64,-40],[-88,-26]);return 'M'+p.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' L')+'Z'}
-const SPIKY=spikyPath();
+/* ---- character art: every kid has an own silhouette, outfit and idle habit ---- */
+let kidUid=0;
+const BODY='M-48,-228 Q0,-240 48,-228 L56,-106 Q0,-94 -56,-106Z';
+const TSHADE='<path d="M30,-232 Q44,-230 48,-228 L56,-106 Q46,-101 36,-102Z" fill="rgba(0,0,0,.13)"/>';
+const SHOE=(col,sole)=>`<path d="M-17,96 Q-17,86 -5,86 L10,86 Q31,95 33,108 L33,115 L-19,115Z" fill="${col}" ${S5}/><path d="M-19,109 L33,109" stroke="${sole}" stroke-width="5"/>`;
+function legSVG(c,side){let s='';
+  if(c.legs==='pants')s=`<rect x="-15" y="-8" width="30" height="104" rx="10" fill="${c.pants}" ${S5}/>`+(c.cuff?`<rect x="-17" y="78" width="34" height="15" rx="5" fill="${c.cuff}" ${S5}/>`:'');
+  else if(c.legs==='shorts')s=`<rect x="-11" y="20" width="22" height="80" rx="9" fill="${SKIN}" ${S5}/><rect x="-12" y="68" width="24" height="26" fill="${c.sock||'#fff'}" ${S5}/><rect x="-17" y="-8" width="34" height="50" rx="9" fill="${c.pants}" ${S5}/>`;
+  else s=`<rect x="-11" y="0" width="22" height="100" rx="9" fill="${SKIN}" ${S5}/><rect x="-12" y="${c.old?76:50}" width="24" height="${c.old?20:44}" fill="${c.sock||'#fff'}" ${S5}/>`+(c.sockStripe?`<rect x="-12" y="56" width="24" height="6" fill="${c.sockStripe}"/>`:'');
+  return s+`<g transform="scale(${side<0?-1:1},1)">${SHOE(c.shoe||'#4a4258',c.sole||'#fff')}</g>`}
+function hipSVG(c){
+  if(c.legs==='skirt')return `<path d="M-46,-134 L46,-134 L${c.old?58:68},${c.old?-40:-62} Q0,${c.old?-30:-52} -${c.old?58:68},${c.old?-40:-62}Z" fill="${c.skirt}" ${S5}/>`+(c.old?'':`<path d="M-26,-130 L-38,-60 M0,-132 L0,-54 M26,-130 L38,-60" stroke="rgba(0,0,0,.25)" stroke-width="4" fill="none"/><path d="M-60,-74 Q0,-62 60,-74" stroke="${c.skirt2||'rgba(255,255,255,.35)'}" stroke-width="5" fill="none"/>`);
+  return `<rect x="-42" y="-138" width="84" height="36" rx="10" fill="${c.pants}" ${S5}/>`+(c.belt?`<rect x="-42" y="-136" width="84" height="10" fill="${c.belt}"/><rect x="-8" y="-138" width="16" height="13" rx="2" fill="#ffd04a" stroke="${INK}" stroke-width="3"/>`:'')}
+function torsoSVG(c){
+  if(c.top==='hoodie')return `<path d="M-58,-222 Q-68,-270 -24,-264 L24,-264 Q68,-270 58,-222Z" fill="${c.shirt2}" ${S5}/><path d="${BODY}" fill="${c.shirt}" ${S5}/>
+    <path d="M-36,-164 L36,-164 L44,-118 L-44,-118Z" fill="${c.shirt2}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M-12,-230 L-15,-190 M12,-230 L15,-190" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="-15" cy="-187" r="4.5" fill="#fff" stroke="${INK}" stroke-width="2"/><circle cx="15" cy="-187" r="4.5" fill="#fff" stroke="${INK}" stroke-width="2"/>
+    <g transform="translate(-30,-200)"><circle r="12" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="-2" cy="-2" r="5" fill="none" stroke="${INK}" stroke-width="2.5"/><path d="M2,2 L7,7" stroke="${INK}" stroke-width="3" stroke-linecap="round"/></g>`+TSHADE;
+  if(c.top==='cardigan')return `<path d="${BODY}" fill="${c.shirt}" ${S5}/><path d="M-20,-232 L0,-184 L20,-232Z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><path d="M0,-184 L0,-100" stroke="${INK}" stroke-width="3"/>
+    <g fill="#fff" stroke="${INK}" stroke-width="2.5"><circle cx="0" cy="-168" r="5"/><circle cx="0" cy="-144" r="5"/><circle cx="0" cy="-120" r="5"/></g>
+    <path transform="translate(-28,-150)" d="M0,9 C-15,-2 -9,-15 0,-7 C9,-15 15,-2 0,9Z" fill="#ff5fa2" stroke="${INK}" stroke-width="3"/>`+TSHADE;
+  if(c.top==='vest')return `<path d="${BODY}" fill="#fff" ${S5}/><path d="M-48,-228 L-22,-231 L0,-168 L22,-231 L48,-228 L56,-106 Q0,-94 -56,-106Z" fill="${c.shirt}" ${S5}/>
+    <g fill="${c.shirt2}"><path d="M-32,-184 l11,17 l-11,17 l-11,-17Z"/><path d="M32,-184 l11,17 l-11,17 l-11,-17Z"/><path d="M0,-150 l11,17 l-11,17 l-11,-17Z"/></g>
+    <path d="M-24,-233 L-9,-212 L0,-228 L9,-212 L24,-233" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+    <g transform="translate(0,-224)"><path d="M0,0 L-21,-12 L-21,12Z M0,0 L21,-12 L21,12Z" fill="#e5483b" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><circle r="6.5" fill="#e5483b" stroke="${INK}" stroke-width="3"/></g>`+TSHADE;
+  return `<path d="${BODY}" fill="${c.shirt}" ${S5}/><path d="M-18,-232 Q0,-212 18,-232" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/><circle cx="0" cy="-180" r="5" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="0" cy="-150" r="5" fill="#fff" stroke="${INK}" stroke-width="3"/>`}
+function armSVG(c){const sl=c.sleeve||c.shirt;
+  if(c.longSleeve)return `<rect x="-12" y="-12" width="24" height="94" rx="11" fill="${sl}" ${S5}/><rect x="-13" y="68" width="26" height="15" rx="5" fill="${c.shirt2||sl}" ${S5}/><circle cx="0" cy="90" r="15" fill="${SKIN}" ${S5}/>`;
+  return `<rect x="-10" y="30" width="20" height="56" rx="9" fill="${SKIN}" ${S5}/><circle cx="0" cy="90" r="15" fill="${SKIN}" ${S5}/><rect x="-13" y="-12" width="26" height="48" rx="12" fill="${sl}" ${S5}/>`}
+const HL='stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none" opacity=".4"';
 function headBack(c){
-  if(c.hair==='girl')return `<circle cx="-94" cy="-66" r="34" fill="${c.hairC}" ${S5}/><circle cx="94" cy="-66" r="34" fill="${c.hairC}" ${S5}/><path d="M-102,70 Q-112,-104 0,-104 Q112,-104 102,70 Q60,86 60,40 L-60,40 Q-60,86 -102,70Z" fill="${c.hairC}" ${S5}/>`;
+  if(c.hair==='pony')return `<circle cy="-8" r="99" fill="${c.hairC}" ${S5}/>`;
   if(c.hair==='bun')return `<circle cx="0" cy="-100" r="38" fill="${c.hairC}" ${S5}/>`;
-  return '';}
+  return ''}
 function headFront(c){
-  if(c.hair==='spiky')return `<path d="${SPIKY}" fill="${c.hairC}" ${S5}/>`;
-  if(c.hair==='girl')return `<path d="M-93,-4 Q-98,-100 0,-102 Q98,-100 93,-4 Q78,-48 46,-50 Q24,-64 2,-48 Q-22,-66 -46,-50 Q-76,-48 -93,-4Z" fill="${c.hairC}" ${S5}/><g transform="translate(70,-92) rotate(18)"><path d="M0,0 L-28,-17 L-28,17Z" fill="#ffd23f" ${S5}/><path d="M0,0 L28,-17 L28,17Z" fill="#ffd23f" ${S5}/><circle r="8" fill="#ffd23f" ${S5}/></g>`;
-  if(c.hair==='neat')return `<path d="M-95,-2 Q-100,-102 0,-105 Q100,-102 95,-2 Q88,-50 52,-58 Q12,-66 -16,-46 Q-30,-62 -58,-58 Q-88,-48 -95,-2Z" fill="${c.hairC}" ${S5}/>`;
+  if(c.hair==='cap')return `<path d="M-90,-34 L-118,-22 L-95,-10 L-112,8 L-88,2Z M90,-34 L118,-22 L95,-10 L112,8 L88,2Z" fill="${c.hairC}" ${S5}/>
+    <path d="M-76,-38 L-64,-14 L-50,-36 L-34,-10 L-20,-36 L-4,-12 L10,-36 L26,-12 L40,-36 L56,-14 L74,-38Z" fill="${c.hairC}" ${S5}/>
+    <path d="M-99,-32 Q-106,-122 0,-126 Q106,-122 99,-32 Q0,-56 -99,-32Z" fill="${c.cap}" ${S5}/>
+    <path d="M0,-126 L0,-78 M-58,-110 Q-52,-72 -54,-40 M58,-110 Q52,-72 54,-40" stroke="${c.cap2}" stroke-width="4" fill="none"/>
+    <path d="M-26,-42 Q0,-80 26,-42Z" fill="${c.hairC}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><path d="M-30,-43 Q0,-86 30,-43" stroke="${c.cap2}" stroke-width="6" fill="none"/>
+    <circle cy="-124" r="8" fill="${c.cap2}" stroke="${INK}" stroke-width="4"/><path d="M-66,-94 Q-36,-114 -4,-112" ${HL}/>`;
+  if(c.hair==='pony')return `<path d="M-94,0 Q-101,-104 0,-106 Q101,-104 94,0 Q90,-30 82,-38 L-82,-38 Q-90,-30 -94,0Z" fill="${c.hairC}" ${S5}/><path d="M-60,-84 Q-30,-100 6,-98" ${HL}/>
+    <g transform="rotate(-13) translate(14,-100)"><ellipse rx="88" ry="28" fill="${c.cap}" ${S5}/><path d="M-72,6 Q0,26 72,6" stroke="${c.cap2}" stroke-width="6" fill="none"/><circle cx="8" cy="-28" r="8" fill="${c.cap}" stroke="${INK}" stroke-width="4"/></g>
+    <path transform="translate(-64,-48) scale(.55)" d="M0,-20 L6,-6 L21,-6 L9,3 L13,18 L0,9 L-13,18 L-9,3 L-21,-6 L-6,-6Z" fill="#ffd23f" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>`;
+  if(c.hair==='bowl')return `<path d="M-98,2 Q-105,-110 0,-112 Q105,-110 98,2 L98,-26 Q52,-46 0,-46 Q-52,-46 -98,-26Z" fill="${c.hairC}" ${S5}/><path d="M-62,-90 Q-30,-106 8,-104" ${HL}/>`;
   if(c.hair==='bun')return `<path d="M-95,4 Q-102,-100 0,-102 Q102,-100 95,4 Q84,-58 0,-62 Q-84,-58 -95,4Z" fill="${c.hairC}" ${S5}/>`;
-  return '';}
-function lowerSVG(c){
-  const shoe=`<ellipse cx="-22" cy="-7" rx="25" ry="12" fill="#4a4258" ${S5}/><ellipse cx="22" cy="-7" rx="25" ry="12" fill="#4a4258" ${S5}/>`;
-  if(c.skirt)return `<rect x="-32" y="-80" width="22" height="74" rx="9" fill="${SKIN}" ${S5}/><rect x="10" y="-80" width="22" height="74" rx="9" fill="${SKIN}" ${S5}/><rect x="-32" y="-34" width="22" height="26" fill="#fff" ${S5}/><rect x="10" y="-34" width="22" height="26" fill="#fff" ${S5}/>${shoe}<path d="M-46,-132 L46,-132 L${c.old?58:66},${c.old?-40:-64} Q0,${c.old?-30:-54} -${c.old?58:66},${c.old?-40:-64}Z" fill="${c.pants}" ${S5}/>`;
-  return `<rect x="-36" y="-122" width="30" height="116" rx="10" fill="${c.pants}" ${S5}/><rect x="6" y="-122" width="30" height="116" rx="10" fill="${c.pants}" ${S5}/>${shoe}`;}
-function torsoSVG(c){return `<path d="M-48,-228 Q0,-240 48,-228 L56,-106 Q0,-94 -56,-106Z" fill="${c.shirt}" ${S5}/><path d="M-18,-232 Q0,-212 18,-232" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/>`+(c.old?'<circle cx="0" cy="-180" r="5" fill="#fff" stroke="'+INK+'" stroke-width="3"/><circle cx="0" cy="-150" r="5" fill="#fff" stroke="'+INK+'" stroke-width="3"/>':'')}
-function armSVG(c){return `<rect x="-10" y="30" width="20" height="56" rx="9" fill="${SKIN}" ${S5}/><circle cx="0" cy="90" r="15" fill="${SKIN}" ${S5}/><rect x="-13" y="-12" width="26" height="48" rx="12" fill="${c.shirt}" ${S5}/>`}
-const GLASSES=`<g fill="rgba(255,255,255,.2)" stroke="${INK}" stroke-width="5"><circle cx="-32" cy="0" r="27"/><circle cx="32" cy="0" r="27"/><path d="M-6,-2 Q0,-8 6,-2" fill="none"/><path d="M-59,-4 L-88,-12 M59,-4 L88,-12" fill="none"/></g>`;
+  return ''}
+const LASH=x=>{const d=x<0?-1:1;return `<path d="M${x+11*d},-10 L${x+19*d},-17 M${x+6*d},-13 L${x+11*d},-22" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`};
 
 class Kid{
   constructor(c,layer,video=true){
-    this.c=c;this.video=video;this.name=c.name;this.color=c.color;this.voice=c.voice;
-    Object.assign(this,{x:0,y:655,s:.92,sx:1,r:0,jy:0,sq:1,hr:0,aL:10,aR:-10,o:1});
+    this.c=c;this.video=video;this.name=c.name;this.color=c.color;this.voice=c.voice;const id=++kidUid;
+    Object.assign(this,{x:0,y:655,s:.92,sx:1,r:0,jy:0,sq:1,hr:0,aL:10,aR:-10,o:1,legA:0,wp:0});
     this.root=el('g',{class:'kid'},layer);
     this.body=el('g',null,this.root);
-    this.body.innerHTML=lowerSVG(c)+torsoSVG(c);
+    this.legL=g(legSVG(c,-1),this.body);this.legR=g(legSVG(c,1),this.body);
+    g(hipSVG(c)+torsoSVG(c),this.body);
     this.armL=el('g',null,this.body);this.armL.innerHTML=armSVG(c);this.handL=el('g',{transform:'translate(0,90)'},this.armL);
     this.armR=el('g',null,this.body);this.armR.innerHTML=armSVG(c);this.handR=el('g',{transform:'translate(0,90)'},this.armR);
     this.head=el('g',null,this.body);
-    this.head.innerHTML=headBack(c)+`<circle cx="-88" cy="6" r="17" fill="${SKIN}" ${S5}/><circle cx="88" cy="6" r="17" fill="${SKIN}" ${S5}/><circle r="92" fill="${SKIN}" ${S5}/><ellipse cx="-58" cy="28" rx="16" ry="9" fill="#ff9e9e" opacity=".7"/><ellipse cx="58" cy="28" rx="16" ry="9" fill="#ff9e9e" opacity=".7"/>`+headFront(c)+(c.old?`<path d="M-70,40 q8,6 16,0 M54,40 q8,6 16,0" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`:'');
+    if(c.hair==='pony')this.pony=g(`<path d="M0,0 Q76,-4 68,70 Q62,122 24,146 Q44,84 8,30Z" fill="${c.hairC}" ${S5}/><path d="M30,20 Q52,40 46,80" ${HL}/><ellipse cx="2" cy="4" rx="15" ry="19" fill="#ffd23f" stroke="${INK}" stroke-width="4"/>`,this.head);
+    g(headBack(c)+`<circle cx="-88" cy="6" r="17" fill="${SKIN}" ${S5}/><circle cx="88" cy="6" r="17" fill="${SKIN}" ${S5}/><circle r="92" fill="${SKIN}" ${S5}/>
+      <path d="M62,-68 A92,92 0 0,1 62,68 A118,118 0 0,0 62,-68Z" fill="rgba(214,130,100,.2)"/>
+      <ellipse cx="-58" cy="28" rx="16" ry="9" fill="#ff9e9e" opacity=".7"/><ellipse cx="58" cy="28" rx="16" ry="9" fill="#ff9e9e" opacity=".7"/>`+
+      (c.freckles?`<g fill="#d98a5a"><circle cx="-70" cy="16" r="2.8"/><circle cx="-61" cy="22" r="2.8"/><circle cx="-72" cy="26" r="2.8"/><circle cx="70" cy="16" r="2.8"/><circle cx="61" cy="22" r="2.8"/><circle cx="72" cy="26" r="2.8"/></g>`:'')+
+      headFront(c)+(c.old?`<path d="M-70,40 q8,6 16,0 M54,40 q8,6 16,0" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`:''),this.head);
+    if(c.ahoge)this.ahoge=g(`<path d="M0,0 Q-8,-44 26,-54 Q8,-32 12,0Z" fill="${c.hairC}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`,this.head);
     this.eyes=el('g',null,this.head);
     this.brows=el('g',{fill:'none',stroke:INK,'stroke-width':6,'stroke-linecap':'round'},this.head);
     this.mouth=el('g',null,this.head);
-    if(c.glasses)g(GLASSES,this.head);this.extra=el('g',null,this.head);
+    if(c.bandaid)g(`<g transform="translate(-60,46) rotate(28)"><rect x="-17" y="-7" width="34" height="14" rx="6" fill="#ffd9a8" stroke="${INK}" stroke-width="3"/><rect x="-5" y="-7" width="10" height="14" fill="#f2bf8a"/></g>`,this.head);
+    if(c.glasses){g(`<g fill="rgba(255,255,255,.2)" stroke="${c.frame||INK}" stroke-width="6"><circle cx="-33" cy="0" r="29"/><circle cx="33" cy="0" r="29"/><path d="M-6,-2 Q0,-8 6,-2" fill="none"/><path d="M-62,-4 L-90,-12 M62,-4 L90,-12" fill="none"/></g>`,this.head);
+      if(c.glare){el('clipPath',{id:'gl'+id},this.head).innerHTML='<circle cx="-33" cy="0" r="26"/><circle cx="33" cy="0" r="26"/>';
+        const cg=el('g',{'clip-path':`url(#gl${id})`},this.head);this.glare=g('<path d="M-12,-40 L4,-40 L-14,40 L-30,40Z" fill="#fff" opacity=".85"/><path d="M10,-40 L16,-40 L-2,40 L-8,40Z" fill="#fff" opacity=".7"/>',cg)}}
+    this.extra=el('g',null,this.head);
     this.phase=Math.random()*6;this.nextBlink=0;this.blinkUntil=0;this.blinking=false;this.talking=false;this.flap=false;this.lastFlap=0;
     this.e=this.m=this.b=null;this.face('n','smile','none');this.apply();KIDS.push(this);
   }
-  face(e,m,b){if(e&&e!==this.e){this.e=e;this.blinking=false;this.eyes.innerHTML=EYES[e](-32)+EYES[e](32)}
+  eyesHTML(e){const lash=this.c.lashes&&['n','star','up','happy','heart'].includes(e);return EYES[e](-32)+EYES[e](32)+(lash?LASH(-32)+LASH(32):'')}
+  face(e,m,b){if(e&&e!==this.e){this.e=e;this.blinking=false;this.eyes.innerHTML=this.eyesHTML(e)}
     if(m&&m!==this.m){this.m=m;if(!this.talking)this.mouth.innerHTML=MOUTH[m]}
     if(b!==undefined&&b!==this.b){this.b=b;this.brows.innerHTML=BROWS[b]||''}}
   talk(on){if(this.talking===on)return;this.talking=on;if(!on){this.flap=false;this.mouth.innerHTML=MOUTH[this.m]}}
@@ -296,7 +336,9 @@ class Kid{
     this.root.setAttribute('opacity',this.o);
     this.armL.setAttribute('transform',`translate(-46,-218) rotate(${this.aL.toFixed(1)})`);
     this.armR.setAttribute('transform',`translate(46,-218) rotate(${this.aR.toFixed(1)})`);
-    this.head.setAttribute('transform',`translate(0,-322) rotate(${this.hr.toFixed(1)})`);}
+    this.head.setAttribute('transform',`translate(0,-322) rotate(${this.hr.toFixed(1)})`);
+    if(!this.posed){this.posed=true;this.legL.setAttribute('transform','translate(-20,-118)');this.legR.setAttribute('transform','translate(20,-118)');
+      if(this.pony)this.pony.setAttribute('transform','translate(70,-82)');if(this.ahoge)this.ahoge.setAttribute('transform','translate(4,-108)');if(this.glare)this.glare.setAttribute('transform','translate(-200,0)')}}
   hold(side,node){const h=side==='L'?this.handL:this.handR;h.innerHTML='';h.appendChild(node);return node}
   unholdAll(){this.handL.innerHTML='';this.handR.innerHTML=''}
   headPt(){return [this.x,this.y+this.jy-322*this.s]}
@@ -304,21 +346,42 @@ class Kid{
     return [this.x+sg*46*s*this.sx+(-Math.sin(a))*d*s*this.sx,this.y+this.jy-218*s+Math.cos(a)*d*s]}
   ambient(t,playing){
     if(!this.root.isConnected)return;
-    if(playing||!this.video){const br=1+.013*Math.sin(t/420+this.phase);this.body.setAttribute('transform',`scale(1,${br.toFixed(4)})`)}
+    const live=playing||!this.video;
+    if(live){
+      /* legs: walk when sliding sideways, spread when airborne */
+      const vx=this.x-(this.px===undefined?this.x:this.px);this.px=this.x;const sp=Math.abs(vx);let la=0,lift=0;
+      if(this.jy<-6)la=16;else if(sp>.25){this.wp+=Math.min(sp,30)*.11;la=Math.sin(this.wp)*10;lift=Math.sin(this.wp)*14}
+      this.legA+=(la-this.legA)*.35;this.lift=(this.lift||0)+(lift-(this.lift||0))*.4;
+      this.legL.setAttribute('transform',`translate(-20,${(-118-Math.max(0,this.lift)).toFixed(1)}) rotate(${this.legA.toFixed(1)})`);
+      this.legR.setAttribute('transform',`translate(20,${(-118-Math.max(0,-this.lift)).toFixed(1)}) rotate(${(this.jy<-6?-this.legA:this.legA).toFixed(1)})`);
+      /* idle habits */
+      const idle=this.c.idle;let by=0,tilt=0;
+      if(idle==='bounce')by=-Math.abs(Math.sin(t/230+this.phase))*4;
+      if(idle==='sway')tilt=Math.sin(t/900+this.phase)*3.5;
+      if(this.pony)this.pony.setAttribute('transform',`translate(70,-82) rotate(${(Math.sin(t/480+this.phase)*8).toFixed(1)})`);
+      if(this.ahoge)this.ahoge.setAttribute('transform',`translate(4,-108) rotate(${(Math.sin(t/260)*12).toFixed(1)})`);
+      if(this.glare){const p=(t%3600)/420;this.glare.setAttribute('transform',`translate(${p<1?(-70+150*p).toFixed(1):-200},0)`)}
+      const br=1+.013*Math.sin(t/420+this.phase);
+      this.body.setAttribute('transform',`translate(0,${by.toFixed(2)}) scale(1,${br.toFixed(4)})`);
+      this.head.setAttribute('transform',`translate(0,-322) rotate(${(this.hr+tilt).toFixed(1)})`);
+    }
     if(['n','star','up'].includes(this.e)){
       if(!this.blinking&&t>this.nextBlink){this.blinking=true;this.blinkUntil=t+130;this.eyes.innerHTML=EYES.closed(-32)+EYES.closed(32)}
-      else if(this.blinking&&t>this.blinkUntil){this.blinking=false;this.nextBlink=t+rand(2200,5200);this.eyes.innerHTML=EYES[this.e](-32)+EYES[this.e](32)}
+      else if(this.blinking&&t>this.blinkUntil){this.blinking=false;this.nextBlink=t+rand(2200,5200);this.eyes.innerHTML=this.eyesHTML(this.e)}
     }
-    if(this.talking&&(playing||!this.video)&&t-this.lastFlap>125){this.lastFlap=t;this.flap=!this.flap;
+    if(this.talking&&live&&t-this.lastFlap>125){this.lastFlap=t;this.flap=!this.flap;
       const open=['grin','wow','drool'].includes(this.m)?'o':(this.m==='talk'?'smile':'talk');
       this.mouth.innerHTML=MOUTH[this.flap?open:this.m];}
   }
 }
 const CFG={
-  L:{name:'阿亮',color:'#d9601c',shirt:'#ff8a3d',pants:'#3f6fd1',hair:'spiky',hairC:'#5a3a22',voice:{sex:'m',pitch:1.35,rate:1.05}},
-  Q:{name:'小晴',color:'#d63a83',shirt:'#ff7fb6',pants:'#7b6cf0',skirt:true,hair:'girl',hairC:'#2b2320',voice:{sex:'f2',pitch:1.3,rate:1}},
-  Z:{name:'阿哲',color:'#23894a',shirt:'#3fbf73',pants:'#4b4f63',hair:'neat',hairC:'#2b2320',glasses:true,voice:{sex:'m',pitch:1.0,rate:.98}},
-  G:{name:'阿嬤',color:'#7a56c2',shirt:'#a98be0',pants:'#6b5a8e',skirt:true,old:true,hair:'bun',hairC:'#d4d4dc',glasses:true,voice:{sex:'f',pitch:.75,rate:.9}}
+  L:{name:'阿亮',color:'#d9601c',top:'hoodie',shirt:'#ff8a3d',shirt2:'#e8692a',longSleeve:true,legs:'pants',pants:'#3f6fd1',cuff:'#86a8ee',shoe:'#e5483b',sole:'#fff',
+     hair:'cap',hairC:'#5a3a22',cap:'#e5483b',cap2:'#a92c24',freckles:true,bandaid:true,idle:'bounce',voice:{sex:'m',pitch:1.35,rate:1.05}},
+  Q:{name:'小晴',color:'#d63a83',top:'cardigan',shirt:'#ff8cc0',shirt2:'#ff6fae',longSleeve:true,legs:'skirt',skirt:'#3b4a8a',skirt2:'#e5483b',sock:'#fff',sockStripe:'#7b5cd6',shoe:'#ff5fa2',
+     hair:'pony',hairC:'#2b2320',cap:'#7b5cd6',cap2:'#5e43b5',lashes:true,idle:'sway',voice:{sex:'f2',pitch:1.3,rate:1}},
+  Z:{name:'阿哲',color:'#1f8a6e',top:'vest',shirt:'#3aa58a',shirt2:'#7fd6bd',sleeve:'#fff',legs:'shorts',pants:'#a07c55',belt:'#5a4030',sock:'#fff',shoe:'#6b4a2a',sole:'#3b2a20',
+     hair:'bowl',hairC:'#3b2a20',glasses:true,glare:true,ahoge:true,idle:'glare',voice:{sex:'m',pitch:1.0,rate:.98}},
+  G:{name:'阿嬤',color:'#7a56c2',top:'blouse',shirt:'#a98be0',legs:'skirt',skirt:'#6b5a8e',old:true,shoe:'#8e6bd1',hair:'bun',hairC:'#d4d4dc',glasses:true,voice:{sex:'f',pitch:.75,rate:.9}}
 };
 const N={name:'旁白',color:TEAL,voice:{sex:'f',pitch:1.05,rate:1}};
 const L=new Kid(CFG.L,ACTORS),Q=new Kid(CFG.Q,ACTORS),Z=new Kid(CFG.Z,ACTORS);
@@ -364,7 +427,7 @@ const MAGITEM=`<g transform="translate(40,-6) rotate(100)">${magGlass(24)}</g>`;
 /* ================= speech ================= */
 const Sound={on:true,tts:'speechSynthesis' in window,mode:'rec'};
 /* pre-recorded neural voices (one file per line); browser speech is only the fallback */
-const AUD=/*AUDIO*/{"旁白|放大鏡偵探隊，集合！":"822ce7e251.mp3","阿亮|阿亮，到！":"gf20c48798.mp3","小晴|小晴，到！":"g05fc0362e.mp3","阿哲|阿哲，到！":"g1768b9ed4.mp3","旁白|今天的任務：看清楚很小很小的東西！":"8f5ba4af6e.mp3","小晴|咦？有一封神秘的信！":"g82a7fd024.mp3","阿亮|我來打開！":"g5f0272ef5.mp3","阿亮|好小好小……我看不清楚！":"g0b97e7c09.mp3","小晴|我也看不到！":"gfc62ceec0.mp3","阿哲|看不清楚的時候，怎麼辦呢？":"g17f3e23f5.mp3","旁白|阿嬤看藥袋上的小字……":"5b21784a18.mp3","阿嬤|用這個，就看得很清楚喔！":"68c332760f.mp3","阿亮|我知道了！用放大鏡！":"g9043d83ba.mp3","大家|放大鏡偵探，出動！":"c7e5f2ca51.mp3","旁白|放大鏡偵探，開始！":"15c640196c.mp3","旁白|第一步，拿起放大鏡。":"0b89857323.mp3","旁白|第二步，放在圖片上。":"66a62a10ae.mp3","旁白|第三步，慢慢往上……":"9b1fa90612.mp3","阿亮|哇！是一台校車！":"g1b3e40244.mp3","旁白|第四步，眼睛看著，數到五。":"ff27761a31.mp3","旁白|第五步，說：":"4eb82b31ea.mp3","大家|看到了！":"c37aaacc28.mp3","旁白|放大鏡，讓小東西看起來變大！":"95d76f59d3.mp3","大家|放大鏡，讓小東西看起來變大！":"c9c1b637bd.mp3","旁白|放大鏡要拿多高，才最清楚呢？":"ff2b68fc4f.mp3","阿亮|太近了，沒有變大。":"g9925ddbb6.mp3","小晴|太遠了，模模糊糊的～":"g602d85d37.mp3","大家|又大又清楚！":"c85f89e0ae.mp3","旁白|慢慢往上，找到最清楚的地方！":"f5bcb23dca.mp3","旁白|如果把放大鏡拿開呢？":"3641d04db3.mp3","阿亮|咦？校車變回小小的！":"g62e8dfb48.mp3","旁白|放上去，變大。拿開，變小。":"296881a1b4.mp3","旁白|校車沒有真的變大，是看起來變大！":"abe0f3034e.mp3","小晴|我懂了！":"g1d3ff5efa.mp3","阿哲|偵探拿工具之前，要先知道三個規則！":"gc9a4b72a7.mp3","阿哲|放大鏡會把陽光集中在一點，很燙，會燒起來！":"gbcf35826f.mp3","旁白|規則一：不照太陽！":"ef6386c110.mp3","旁白|規則二：不照眼睛！":"9b992b7c65.mp3","旁白|規則三：用完放回家！":"b8b4f4f3ef.mp3","大家|我們是守規則的偵探！":"c6b92a590f.mp3","阿亮|是點心！我要吃～！":"ga6c9e3716.mp3","小晴|等一下！吃之前，要先看保存期限！":"g56a69bc2e.mp3","旁白|保存期限的字，很小很小。用放大鏡看一看！":"c0b98c2804.mp3","旁白|保存期限，二零二七年，三月十五日。":"7400d50be0.mp3","旁白|今天是，二零二六年，十月二十一日。":"91a3ae674e.mp3","小晴|日期還沒到，可以吃！":"g3bd80ca0a.mp3","旁白|這一包呢？保存期限，二零二六年，九月一日。":"82a1299574.mp3","小晴|日期已經過了，不能吃！":"g050efb457.mp3","小晴|可以吃的點心，先收進書包，下課再吃！":"g4a10a8eed.mp3","阿亮|好～下課再吃！":"g72983ca23.mp3","旁白|偵探任務完成！大家一起說！":"4ff8684dbd.mp3","大家|放大鏡，讓小東西變大！":"cc6b10c8a4.mp3","旁白|接下來，換你們當放大鏡偵探囉！":"b528050196.mp3","大家|偵探們，出動！":"c5451fe2fa.mp3","旁白|一":"6491d45c90.mp3","旁白|二":"59c8c2c3ff.mp3","旁白|三":"0ea11f62fa.mp3","旁白|四":"f03c32b398.mp3","旁白|五":"7c089f1fde.mp3","阿亮|很小的東西看不清楚，可以用什麼幫忙？":"g2ae290c13.mp3","阿亮|答對了！放大鏡可以幫我們看清楚。":"g8b4d79595.mp3","阿亮|放大鏡":"ga071987ea.mp3","阿亮|剪刀":"g5ae53134d.mp3","阿亮|皮球":"g3d51962fa.mp3","小晴|放大鏡放在校車圖上，校車看起來會怎樣？":"g4ef4381cf.mp3","小晴|對！放大鏡，讓小東西看起來變大！":"gde307a529.mp3","小晴|變大":"gf7936859b.mp3","小晴|變小":"ged34af5a0.mp3","阿哲|哪一個又大又清楚？":"gbdc0f7b4b.mp3","阿哲|對！慢慢往上，找到最清楚的地方。":"g697c8e3a1.mp3","阿哲|太近":"gfd26be070.mp3","阿哲|剛剛好":"g1eb76c544.mp3","阿哲|太遠":"gff6194b6f.mp3","阿亮|把放大鏡拿開，校車會怎樣？":"gfcc6aaf1e.mp3","阿亮|對！校車沒有真的變大，是看起來變大。":"g6db3b00a5.mp3","阿亮|變回小小的":"gaa9dd24de.mp3","阿亮|一直很大":"g31e6f3cea.mp3","阿哲|放大鏡可以照太陽嗎？":"g1ab1a59e0.mp3","阿哲|對！陽光集中會很燙，不照太陽！":"g2242d35fe.mp3","阿哲|可以":"g8bfcbe334.mp3","阿哲|不可以":"g39d617dfa.mp3","小晴|放大鏡可以照眼睛嗎？":"g77f8f8981.mp3","小晴|對！保護眼睛，不照眼睛！":"g07c9c8279.mp3","小晴|可以":"g99e551fef.mp3","小晴|不可以":"gbad8cc0da.mp3","阿亮|放大鏡用完，要放在哪裡？":"g02542c856.mp3","阿亮|對！用完放回家！":"gd404c04ab.mp3","阿亮|放回盒子":"g1f1655fe0.mp3","阿亮|丟在地上":"g43d12069d.mp3","小晴|吃點心之前，要先找什麼？":"g0371e4126.mp3","小晴|對！吃之前，先看保存期限。":"g66dca071a.mp3","小晴|保存期限":"g5e29c970e.mp3","小晴|包裝的顏色":"g37769df50.mp3","阿哲|日期還沒到，點心可以吃嗎？":"ga0e9abc8a.mp3","阿哲|對！日期還沒到，可以吃！":"g917896221.mp3","阿哲|可以吃":"g24aedf322.mp3","阿哲|不能吃":"g352b00825.mp3","阿亮|再想一想":"gc413ef2f9.mp3","小晴|再想一想":"gef4f1b8d6.mp3","阿哲|再想一想":"g1821e2f14.mp3","旁白|放大鏡偵探，認證成功！放大鏡，讓小東西變大！":"10d621d79c.mp3","汪探長|汪！":"96f3054652.mp3","汪探長|汪？":"70caab6990.mp3","旁白|還有偵探狗，汪探長！":"cfb304e676.mp3","汪探長|汪汪！":"d06c9bb47e.mp3"}/*END*/;const AUD_BASE='magnifier-audio/';
+const AUD=/*AUDIO*/{"旁白|放大鏡偵探隊，集合！":"822ce7e251.mp3","阿亮|阿亮，到！":"gf20c48798.mp3","小晴|小晴，到！":"g05fc0362e.mp3","阿哲|阿哲，到！":"g1768b9ed4.mp3","旁白|今天的任務：看清楚很小很小的東西！":"8f5ba4af6e.mp3","小晴|咦？有一封神秘的信！":"g82a7fd024.mp3","阿亮|我來打開！":"g5f0272ef5.mp3","阿亮|好小好小……我看不清楚！":"g0b97e7c09.mp3","小晴|我也看不到！":"gfc62ceec0.mp3","阿哲|看不清楚的時候，怎麼辦呢？":"g17f3e23f5.mp3","旁白|阿嬤看藥袋上的小字……":"5b21784a18.mp3","阿嬤|用這個，就看得很清楚喔！":"68c332760f.mp3","阿亮|我知道了！用放大鏡！":"g9043d83ba.mp3","大家|放大鏡偵探，出動！":"c7e5f2ca51.mp3","旁白|放大鏡偵探，開始！":"15c640196c.mp3","旁白|第一步，拿起放大鏡。":"0b89857323.mp3","旁白|第二步，放在圖片上。":"66a62a10ae.mp3","旁白|第三步，慢慢往上……":"9b1fa90612.mp3","阿亮|哇！是一台校車！":"g1b3e40244.mp3","旁白|第四步，眼睛看著，數到五。":"ff27761a31.mp3","旁白|第五步，說：":"4eb82b31ea.mp3","大家|看到了！":"c37aaacc28.mp3","旁白|放大鏡，讓小東西看起來變大！":"95d76f59d3.mp3","大家|放大鏡，讓小東西看起來變大！":"c9c1b637bd.mp3","旁白|放大鏡要拿多高，才最清楚呢？":"ff2b68fc4f.mp3","阿亮|太近了，沒有變大。":"g9925ddbb6.mp3","小晴|太遠了，模模糊糊的～":"g602d85d37.mp3","大家|又大又清楚！":"c85f89e0ae.mp3","旁白|慢慢往上，找到最清楚的地方！":"f5bcb23dca.mp3","旁白|如果把放大鏡拿開呢？":"3641d04db3.mp3","阿亮|咦？校車變回小小的！":"g62e8dfb48.mp3","旁白|放上去，變大。拿開，變小。":"296881a1b4.mp3","旁白|校車沒有真的變大，是看起來變大！":"abe0f3034e.mp3","小晴|我懂了！":"g1d3ff5efa.mp3","阿哲|偵探拿工具之前，要先知道三個規則！":"gc9a4b72a7.mp3","阿哲|放大鏡會把陽光集中在一點，很燙，會燒起來！":"gbcf35826f.mp3","旁白|規則一：不照太陽！":"ef6386c110.mp3","旁白|規則二：不照眼睛！":"9b992b7c65.mp3","旁白|規則三：用完放回家！":"b8b4f4f3ef.mp3","大家|我們是守規則的偵探！":"c6b92a590f.mp3","阿亮|是點心！我要吃～！":"ga6c9e3716.mp3","小晴|等一下！吃之前，要先看保存期限！":"g56a69bc2e.mp3","旁白|保存期限的字，很小很小。用放大鏡看一看！":"c0b98c2804.mp3","旁白|保存期限，二零二七年，三月十五日。":"7400d50be0.mp3","旁白|今天是，二零二六年，十月二十一日。":"91a3ae674e.mp3","小晴|日期還沒到，可以吃！":"g3bd80ca0a.mp3","旁白|這一包呢？保存期限，二零二六年，九月一日。":"82a1299574.mp3","小晴|日期已經過了，不能吃！":"g050efb457.mp3","小晴|可以吃的點心，先收進書包，下課再吃！":"g4a10a8eed.mp3","阿亮|好～下課再吃！":"g72983ca23.mp3","旁白|偵探任務完成！大家一起說！":"4ff8684dbd.mp3","大家|放大鏡，讓小東西變大！":"cc6b10c8a4.mp3","旁白|接下來，換你們當放大鏡偵探囉！":"b528050196.mp3","大家|偵探們，出動！":"c5451fe2fa.mp3","旁白|一":"6491d45c90.mp3","旁白|二":"59c8c2c3ff.mp3","旁白|三":"0ea11f62fa.mp3","旁白|四":"f03c32b398.mp3","旁白|五":"7c089f1fde.mp3","阿亮|很小的東西看不清楚，可以用什麼幫忙？":"g2ae290c13.mp3","阿亮|答對了！放大鏡可以幫我們看清楚。":"g8b4d79595.mp3","阿亮|放大鏡":"ga071987ea.mp3","阿亮|剪刀":"g5ae53134d.mp3","阿亮|皮球":"g3d51962fa.mp3","小晴|放大鏡放在校車圖上，校車看起來會怎樣？":"g4ef4381cf.mp3","小晴|對！放大鏡，讓小東西看起來變大！":"gde307a529.mp3","小晴|變大":"gf7936859b.mp3","小晴|變小":"ged34af5a0.mp3","阿哲|哪一個又大又清楚？":"gbdc0f7b4b.mp3","阿哲|對！慢慢往上，找到最清楚的地方。":"g697c8e3a1.mp3","阿哲|太近":"gfd26be070.mp3","阿哲|剛剛好":"g1eb76c544.mp3","阿哲|太遠":"gff6194b6f.mp3","阿亮|把放大鏡拿開，校車會怎樣？":"gfcc6aaf1e.mp3","阿亮|對！校車沒有真的變大，是看起來變大。":"g6db3b00a5.mp3","阿亮|變回小小的":"gaa9dd24de.mp3","阿亮|一直很大":"g31e6f3cea.mp3","阿哲|放大鏡可以照太陽嗎？":"g1ab1a59e0.mp3","阿哲|對！陽光集中會很燙，不照太陽！":"g2242d35fe.mp3","阿哲|可以":"g8bfcbe334.mp3","阿哲|不可以":"g39d617dfa.mp3","小晴|放大鏡可以照眼睛嗎？":"g77f8f8981.mp3","小晴|對！保護眼睛，不照眼睛！":"g07c9c8279.mp3","小晴|可以":"g99e551fef.mp3","小晴|不可以":"gbad8cc0da.mp3","阿亮|放大鏡用完，要放在哪裡？":"g02542c856.mp3","阿亮|對！用完放回家！":"gd404c04ab.mp3","阿亮|放回盒子":"g1f1655fe0.mp3","阿亮|丟在地上":"g43d12069d.mp3","小晴|吃點心之前，要先找什麼？":"g0371e4126.mp3","小晴|對！吃之前，先看保存期限。":"g66dca071a.mp3","小晴|保存期限":"g5e29c970e.mp3","小晴|包裝的顏色":"g37769df50.mp3","阿哲|日期還沒到，點心可以吃嗎？":"ga0e9abc8a.mp3","阿哲|對！日期還沒到，可以吃！":"g917896221.mp3","阿哲|可以吃":"g24aedf322.mp3","阿哲|不能吃":"g352b00825.mp3","阿亮|再想一想":"gc413ef2f9.mp3","小晴|再想一想":"gef4f1b8d6.mp3","阿哲|再想一想":"g1821e2f14.mp3","旁白|放大鏡偵探，認證成功！放大鏡，讓小東西變大！":"10d621d79c.mp3","汪探長|汪！":"96f3054652.mp3","汪探長|汪？":"70caab6990.mp3","旁白|還有偵探狗，汪探長！":"cfb304e676.mp3","汪探長|汪汪！":"d06c9bb47e.mp3","旁白|第二步，放大鏡貼在圖片上。":"593eb8483e.mp3","旁白|第三步，慢慢拿起來，往眼睛靠近……":"7c2d7e9552.mp3","旁白|看到又大又清楚，就停！":"1188efd960.mp3","旁白|放大鏡要離圖片多遠，才最清楚呢？":"d5124a4d1f.mp3","旁白|慢慢拿起來，看到又大又清楚，就停！":"fe1ec8b1cb.mp3","阿哲|對！看到又大又清楚，就停！":"3f58983457.mp3"}/*END*/;const AUD_BASE='magnifier-audio/';
 const audioCache={};let curAudio=null;
 function audioFor(name,plain){if(Sound.mode!=='rec')return null;const f=AUD[name+'|'+plain];if(!f)return null;let a=audioCache[f];if(!a){a=new Audio(AUD_BASE+f);a.preload='auto';audioCache[f]=a}return a}
 function preloadAudio(){Object.keys(AUD).forEach(k=>{const [n,...t]=k.split('|');audioFor(n,t.join('|'))})}
@@ -550,11 +613,19 @@ function makeBox(){const back=g(`<rect x="-120" y="-56" width="240" height="40" 
   const holder=el('g',null,PROPS);
   const front=g(`<rect x="-126" y="-30" width="252" height="96" rx="10" fill="#c98d55" stroke="${INK}" stroke-width="6"/><text y="10" text-anchor="middle" dominant-baseline="central" class="fd" font-size="30" fill="#fff" stroke="${INK}" stroke-width="5" paint-order="stroke">放大鏡的家</text><g class="fd" font-size="14" fill="${INK}">${[...Array(8)].map((_,i)=>`<circle cx="${-98+i*28}" cy="48" r="10" fill="#fff" stroke="${INK}" stroke-width="2.5"/><text x="${-98+i*28}" y="49" text-anchor="middle" dominant-baseline="central">${i+1}</text>`).join('')}</g>`,PROPS);
   front.setAttribute('transform','translate(1060,600)');const a=new Act(holder);return {holder,front,back}}
-function makeGauge(){const n=g(`<rect x="-26" y="-214" width="52" height="428" rx="26" fill="#fff" stroke="${INK}" stroke-width="5"/>
-  <rect x="-20" y="-208" width="40" height="80" rx="18" fill="#ffb4a8"/><rect x="-20" y="-126" width="40" height="190" fill="#bfe8cd"/><rect x="-20" y="66" width="40" height="142" rx="18" fill="#dfe6ea"/>
-  <text x="-44" y="-168" text-anchor="end" dominant-baseline="central" class="fd" font-size="26" fill="${INK}">太遠</text><text x="-44" y="-30" text-anchor="end" dominant-baseline="central" class="fd" font-size="26" fill="${LEAF}">剛剛好</text><text x="-44" y="138" text-anchor="end" dominant-baseline="central" class="fd" font-size="26" fill="${INK}">太近</text>`,HUD);
-  n.setAttribute('transform','translate(1196,380)');const p=g(`<path d="M30,0 L58,-18 L58,18Z" fill="${CORAL}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><line x1="-26" y1="0" x2="26" y2="0" stroke="${CORAL}" stroke-width="6"/>`,n);
-  return {set(h){p.setAttribute('transform',`translate(0,${(200-h*400).toFixed(1)})`)}}}
+function makeGauge(){/* side view: eye on top, picture at the bottom, magnifier travels between them */
+  const n=g(`<rect x="-122" y="112" width="244" height="424" rx="22" fill="#fff" stroke="${INK}" stroke-width="5"/>
+  <text y="142" text-anchor="middle" dominant-baseline="central" class="fd" font-size="24" fill="${TEAL}">從旁邊看</text>
+  <rect x="-70" y="390" width="140" height="104" fill="#e6ebee"/><rect x="-70" y="264" width="140" height="126" fill="#c9eed6"/><rect x="-70" y="206" width="140" height="58" fill="#ffd3cb"/>
+  <text x="-116" y="442" dominant-baseline="central" class="fd" font-size="17" fill="${INK}">太近</text><text x="-116" y="327" dominant-baseline="central" class="fd" font-size="17" fill="${LEAF}">剛剛好</text><text x="-116" y="235" dominant-baseline="central" class="fd" font-size="17" fill="#c0392b">太遠</text>
+  <line x1="0" y1="196" x2="0" y2="494" stroke="#9fb7bd" stroke-width="3" stroke-dasharray="7 6"/>
+  <g transform="translate(0,180)"><path d="M-30,0 Q0,-22 30,0 Q0,22 -30,0Z" fill="#fff" stroke="${INK}" stroke-width="4"/><circle cy="4" r="9" fill="${INK}"/></g>
+  <text x="40" y="180" dominant-baseline="central" class="fd" font-size="20" fill="${INK}">眼睛</text>
+  <rect x="-80" y="494" width="160" height="10" rx="3" fill="#fff" stroke="${INK}" stroke-width="4"/><text y="522" text-anchor="middle" dominant-baseline="central" class="fd" font-size="20" fill="${INK}">圖片</text>`,HUD);
+  n.setAttribute('transform','translate(1150,0)');
+  const lens=g(`<rect x="44" y="-5" width="54" height="10" rx="5" fill="#8a5a2b" stroke="${INK}" stroke-width="3"/><ellipse rx="46" ry="9" fill="rgba(170,220,255,.85)" stroke="#3a3f47" stroke-width="4"/>`,n);
+  const arrow=g(`<path d="M76,-46 L76,-14 M66,-36 L76,-48 L86,-36" stroke="${CORAL}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,lens);
+  return {set(h){lens.setAttribute('transform',`translate(0,${(486-h*280).toFixed(1)})`);arrow.setAttribute('opacity',h<.66?1:0)}}}
 
 /* ================= stage helpers ================= */
 function placeKid(k,o){k.unholdAll();if(k.extra)k.extra.innerHTML='';k.talk(false);Object.assign(k,{x:0,y:655,s:.92,sx:1,r:0,jy:0,sq:1,hr:0,aL:10,aR:-10,o:1},o||{});k.face('n','smile','none');k.apply()}
@@ -633,21 +704,21 @@ const SCENES=[
   await say(L,'我知道了！用【放大鏡】！');T.focus=false;
   await fetchGag();await giantEye();L.face('star','grin','up');Q.face('star','wow','up');Z.face('star','grin','up');
   const sp=say(ALL,'放大鏡偵探，出動！');await jumpAll([L,Q,Z,D]);await sp}},
-{name:'變大了！',setup(){showClass(false);rig=makeLensRig(buildPaper,4.3);Object.assign(rig,{x:1180,y:-200,h:.35});rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400})},
+{name:'變大了！',setup(){showClass(false);rig=makeLensRig(buildPaper,4.3);Object.assign(rig,{x:1180,y:-200,h:.35});rig.gauge=makeGauge();rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400})},
  async play(){await say(N,'放大鏡偵探，開始！');popText('咻！',1010,120,{size:54});await tween(rig,{x:470,y:250},800,E.back);
-  await say(N,'第一步，【拿起】放大鏡。');const sp=say(N,'第二步，【放在】圖片上。');await tween(rig,{x:640,y:362,h:0},900,E.io);await sp;
-  const sp2=say(N,'第三步，【慢慢往上】……');await tween(rig,{h:.7},2600,E.io);await sp2;
-  sparkles(rig.x,rig.y-30,10,FX,170);popText('叮！',830,150,{size:60,color:'#ffb800'});T.focus=true;L.face('star','wow','up');Q.face('star','wow','up');mark(L,'!');mark(Q,'!');
+  await say(N,'第一步，【拿起】放大鏡。');const sp=say(N,'第二步，放大鏡【貼在】圖片上。');await tween(rig,{x:640,y:362,h:0},900,E.io);await sp;
+  const sp2=say(N,'第三步，慢慢拿起來，【往眼睛靠近】……');await tween(rig,{h:.7},3000,E.io);await sp2;
+  sparkles(rig.x,rig.y-30,10,FX,170);popText('停！',830,150,{size:72,color:LEAF});sfx('ding');await say(N,'看到【又大又清楚】，就停！');T.focus=true;L.face('star','wow','up');Q.face('star','wow','up');mark(L,'!');mark(Q,'!');
   await say(L,'哇！是一台【校車】！');T.focus=false;
   await say(N,'第四步，眼睛看著，數到五。');for(let i=1;i<=5;i++){popNum(i);await say(N,'一二三四五'[i-1])}
   L.face('happy','grin');Q.face('happy','grin');await say(N,'第五步，說：');await say(ALL,'看到了！');
   banner('放大鏡，讓小東西看起來【變大】！',80);await say(N,'放大鏡，讓小東西看起來【變大】！');L.face('star','grin','up');Q.face('star','grin','up');await say(ALL,'放大鏡，讓小東西看起來變大！');await levelUp(2,'放大鏡操作')}},
 {name:'最清楚',setup(){showClass(false);rig=makeLensRig(buildPaper,4.3);Object.assign(rig,{x:640,y:362,h:.7});rig.gauge=makeGauge();rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400})},
- async play(){L.face('up','o','think');await say(N,'放大鏡要拿多高，才最清楚呢？');
+ async play(){L.face('up','o','think');await say(N,'放大鏡要離圖片多遠，才最清楚呢？');
   await tween(rig,{h:.04},1300,E.io);let p=pill('太近',640,70,'#7c8a90');L.face('n','flat','think');await say(L,'太近了，【沒有變大】。');await tween(p,{s:0},200,E.in);
   await tween(rig,{h:1},1500,E.io);p=pill('太遠',640,70,CORAL);Q.face('dizzy','wavy','worry');mark(Q,'sweat');await say(Q,'太遠了，【模模糊糊】的～');await tween(p,{s:0},200,E.in);
   Q.face('n','smile','none');await tween(rig,{h:.68},1500,E.io);pill('剛剛好',640,70,LEAF);sparkles(rig.x,rig.y-30,10,FX,170);stamp(true,175,290);
-  L.face('star','grin','up');Q.face('star','grin','up');await say(ALL,'又大又清楚！');await say(N,'慢慢往上，找到【最清楚】的地方！');await levelUp(3,'找到最清楚')}},
+  L.face('star','grin','up');Q.face('star','grin','up');await say(ALL,'又大又清楚！');await say(N,'慢慢拿起來，看到【又大又清楚】，就停！');await levelUp(3,'找到最清楚')}},
 {name:'拿開看看',setup(){showClass(false);rig=makeLensRig(buildPaper,4.3);Object.assign(rig,{x:640,y:362,h:.68});rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400})},
  async play(){L.face('up','o','think');await say(N,'如果把放大鏡【拿開】呢？');popText('咻～',900,140,{size:52});await tween(rig,{x:1500,y:-220},700,E.in);
   T.shake=12;L.face('shock','wow','up');Q.face('shock','o','up');mark(L,'!');mark(Q,'!');await tween(cam,{x:260,y:560,s:2},260,E.out);T.focus=true;popText('蛤？！',330,470,{size:56,layer:FX});await wait(700);T.focus=false;await tween(cam,{x:640,y:360,s:1},300,E.io);await say(L,'咦？校車【變回小小的】！');
@@ -795,7 +866,7 @@ const ICON={
 const QUIZ=[
   {host:'L',q:'很小的東西看不清楚，可以用什麼幫忙？',opts:[['放大鏡','mag',1],['剪刀','scissors'],['皮球','ball']],ok:'答對了！【放大鏡】可以幫我們看清楚。'},
   {host:'Q',q:'放大鏡放在校車圖上，校車看起來會怎樣？',opts:[['變大','big',1],['變小','small']],ok:'對！放大鏡，讓小東西看起來【變大】！'},
-  {host:'Z',q:'哪一個又大又清楚？',opts:[['太近','near'],['剛剛好','ok',1],['太遠','far']],ok:'對！慢慢往上，找到【最清楚】的地方。'},
+  {host:'Z',q:'哪一個又大又清楚？',opts:[['太近','near'],['剛剛好','ok',1],['太遠','far']],ok:'對！看到【又大又清楚】，就停！'},
   {host:'L',q:'把放大鏡拿開，校車會怎樣？',opts:[['變回小小的','small',1],['一直很大','big']],ok:'對！校車沒有真的變大，是【看起來】變大。'},
   {host:'Z',q:'放大鏡可以照太陽嗎？',pic:'sunQ',opts:[['可以','yes'],['不可以','no',1]],ok:'對！陽光集中會很燙，【不照太陽】！'},
   {host:'Q',q:'放大鏡可以照眼睛嗎？',pic:'eyeQ',opts:[['可以','yes'],['不可以','no',1]],ok:'對！保護眼睛，【不照眼睛】！'},
