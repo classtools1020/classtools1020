@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>放大鏡偵探出動</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=LXGW+WenKai+TC:wght@700&family=Noto+Sans+TC:wght@500;700;900&display=swap">
+<style>
+/* Layout: one stage-first column — a 16:9 cartoon player with chapter strip; the quiz swaps into the same column */
+:root{
+  --sky:#e2eff3;
+  --panel:#ffffff;
+  --ink:#2b2320;
+  --muted:#53646a;
+  --sun:#ffc83d;
+  --teal:#1f7f86;
+  --coral:#ff6b57;
+  --leaf:#2f9e5b;
+  --wash:#fff6d8;
+  --f-display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-chalk:"LXGW WenKai TC","Kaiti TC","BiauKai","DFKai-SB",serif;
+  color-scheme:light;
+}
+html,body{background:var(--sky);color:var(--ink)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.6;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px}
+*{box-sizing:border-box}
+.fd{font-family:var(--f-display)}
+.fc{font-family:var(--f-chalk)}
+.app{max-width:1120px;margin:0 auto;display:grid;gap:14px}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand svg{flex:none}
+.brand h1{font-family:var(--f-display);font-size:clamp(24px,4.2vw,38px);line-height:1.15;margin:0;font-weight:400;text-wrap:balance}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.tabs{display:flex;gap:4px;background:var(--panel);padding:5px;border-radius:999px;border:3px solid var(--ink);box-shadow:0 3px 0 var(--ink)}
+.tab{font-family:var(--f-display);font-size:18px;border:0;background:transparent;padding:8px 18px;border-radius:999px;cursor:pointer;color:var(--ink);display:inline-flex;align-items:center;gap:6px;min-height:44px}
+.tab[aria-selected="true"]{background:var(--sun)}
+.tab:focus-visible,.btn:focus-visible,.chip:focus-visible,.opt-main:focus-visible,.spk:focus-visible{outline:4px solid var(--teal);outline-offset:2px}
+
+.stage-wrap{position:relative;aspect-ratio:16/9;width:100%;max-width:100%;border:4px solid var(--ink);border-radius:22px;overflow:hidden;background:#fbf0d9;box-shadow:0 6px 0 var(--ink)}
+.stage-wrap:fullscreen{border:0;border-radius:0;background:#1b1715;box-shadow:none}
+#stage{position:absolute;inset:0;width:100%;height:100%;display:block;user-select:none;-webkit-user-select:none}
+.sub{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);max-width:94%;width:max-content;background:rgba(255,255,255,.96);border:3px solid var(--ink);border-radius:16px;padding:.3em .75em;font-family:var(--f-display);font-size:clamp(15px,2.9vw,34px);line-height:1.35;display:flex;gap:.5em;align-items:center;box-shadow:0 4px 0 var(--ink);pointer-events:none}
+.sub .who{font-size:.58em;color:#fff;padding:.2em .7em;border-radius:999px;white-space:nowrap;flex:none}
+.sub mark{background:linear-gradient(transparent 52%,#ffe06b 52%);color:inherit;padding:0 .05em}
+.cover,.endcard{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:14px;background:rgba(43,35,32,.28);text-align:center}
+.bigplay{width:clamp(84px,14vw,140px);aspect-ratio:1;border-radius:50%;border:5px solid var(--ink);background:var(--sun);box-shadow:0 7px 0 var(--ink);cursor:pointer;display:grid;place-items:center;transition:transform .15s}
+.bigplay:hover{transform:scale(1.06) rotate(-4deg)}
+.bigplay:active{transform:translateY(4px);box-shadow:0 3px 0 var(--ink)}
+.cover-label{font-family:var(--f-display);font-size:clamp(16px,2.6vw,26px);background:#fff;border:3px solid var(--ink);border-radius:999px;padding:.2em 1em;box-shadow:0 3px 0 var(--ink)}
+.endcard h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,6vw,64px);margin:0;color:#fff;-webkit-text-stroke:2px var(--ink);text-shadow:0 5px 0 var(--ink)}
+.endcard .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.controls .spacer{flex:1 1 0}
+.btn{font-family:var(--f-display);font-size:17px;border:3px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:14px;padding:6px 14px;box-shadow:0 3px 0 var(--ink);cursor:pointer;display:inline-flex;gap:6px;align-items:center;min-height:48px;line-height:1.2}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.btn.primary{background:var(--sun)}
+.btn.go{background:var(--teal);color:#fff}
+.btn[aria-pressed="false"]{background:#eef3f4;color:var(--muted)}
+.btn svg{flex:none}
+.chapters{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin}
+.chip{flex:none;font-family:var(--f-display);font-size:16px;border:3px solid var(--ink);background:var(--panel);border-radius:999px;padding:4px 14px 4px 5px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;min-height:44px;color:var(--ink)}
+.chip b{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--wash);border:2px solid var(--ink);font-weight:400;font-variant-numeric:tabular-nums}
+.chip.on{background:var(--teal);color:#fff}
+.chip.on b{background:var(--sun);color:var(--ink)}
+.note{background:var(--panel);border:2px dashed #9fb7bd;border-radius:14px;padding:10px 14px;color:var(--muted);font-size:15px}
+.note b{color:var(--ink)}
+
+/* quiz */
+.quiz{display:grid;gap:14px}
+.qhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.prog{display:flex;gap:6px;flex-wrap:wrap}
+.prog span{width:34px;height:34px;display:grid;place-items:center}
+.qcard{background:var(--panel);border:4px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:18px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:18px;align-items:start}
+.host{position:relative}
+.host svg{width:100%;height:auto;display:block}
+.host.jump svg{animation:hop .6s cubic-bezier(.3,1.6,.5,1)}
+.host .think{position:absolute;right:4%;top:2%;font-family:var(--f-display);font-size:54px;color:#2f8fd8;-webkit-text-stroke:2px var(--ink);opacity:0;transform:scale(.4);transition:all .25s}
+.host.puzzled .think{opacity:1;transform:scale(1) rotate(10deg)}
+@keyframes hop{0%{transform:translateY(0)}35%{transform:translateY(-26px) scaleY(1.04)}70%{transform:translateY(0) scaleY(.95)}100%{transform:none}}
+.qmain{display:grid;gap:14px;min-width:0}
+.qno{font-family:var(--f-display);color:var(--teal);font-size:18px}
+.qtext{font-family:var(--f-display);font-size:clamp(23px,3.6vw,38px);line-height:1.3;margin:0;display:flex;gap:10px;align-items:flex-start;text-wrap:balance}
+.qtext mark{background:linear-gradient(transparent 55%,#ffe06b 55%);color:inherit}
+.qpic{background:var(--wash);border:3px solid var(--ink);border-radius:16px;max-width:380px}
+.qpic svg{display:block;width:100%;height:auto}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.opt{position:relative}
+.opt-main{width:100%;font-family:var(--f-display);font-size:clamp(20px,2.6vw,28px);border:4px solid var(--ink);background:#fff;border-radius:20px;box-shadow:0 5px 0 var(--ink);cursor:pointer;padding:10px 10px 12px;display:grid;gap:4px;justify-items:center;color:var(--ink);transition:background .2s,opacity .2s}
+.opt-main svg{width:100%;max-width:220px;height:auto}
+.opt-main:hover{background:#fffaf0}
+.opt-main:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.opt.wrong .opt-main{opacity:.45;animation:nope .45s}
+.opt.right .opt-main{background:#dcf3e4;border-color:var(--leaf);box-shadow:0 5px 0 var(--leaf)}
+.opt.hint .opt-main{animation:glow 1.1s ease-in-out infinite}
+@keyframes nope{0%,100%{transform:none}20%{transform:translateX(-10px) rotate(-2deg)}40%{transform:translateX(9px) rotate(2deg)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+@keyframes glow{0%,100%{box-shadow:0 5px 0 var(--ink),0 0 0 0 rgba(255,200,61,.9)}50%{box-shadow:0 5px 0 var(--ink),0 0 0 12px rgba(255,200,61,.55)}}
+.spk{position:absolute;top:8px;right:8px;width:44px;height:44px;border-radius:50%;border:3px solid var(--ink);background:var(--sun);cursor:pointer;display:grid;place-items:center;padding:0}
+.feedback{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:#dcf3e4;border:3px solid var(--leaf);border-radius:18px;padding:10px 14px;font-family:var(--f-display);font-size:clamp(18px,2.4vw,26px)}
+.feedback.try{background:#fff3d6;border-color:#e0a100}
+.feedback mark{background:linear-gradient(transparent 55%,#ffe06b 55%);color:inherit}
+.qstart,.qdone{background:var(--panel);border:4px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:22px;display:grid;gap:14px;justify-items:center;text-align:center}
+.qstart h2,.qdone h2{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,5vw,46px);margin:0}
+.qstart p,.qdone p{margin:0;color:var(--muted);font-size:17px;max-width:40em}
+.badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.confetti i{position:absolute;top:-20px;width:12px;height:8px;border-radius:2px;animation:fall var(--d) linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--r))}}
+.toggles{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:640px){
+  .qcard{grid-template-columns:1fr}
+  .host{max-width:150px;justify-self:center}
+  .btn{font-size:15px;padding:6px 10px}
+  .btn .lbl{display:none}
+  .opts{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  .host.jump svg,.opt.wrong .opt-main,.opt.hint .opt-main,.confetti i{animation:none}
+}
+</style>
+</head>
+<body>
+
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg width="58" height="58" viewBox="0 0 100 100" aria-hidden="true"><circle cx="42" cy="42" r="30" fill="#d9f0ff" stroke="#2b2320" stroke-width="7"/><circle cx="42" cy="42" r="30" fill="none" stroke="#ffc83d" stroke-width="3"/><path d="M28 32 Q34 22 46 22" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/><rect x="62" y="60" width="16" height="36" rx="7" transform="rotate(-45 70 78)" fill="#8a5a2b" stroke="#2b2320" stroke-width="6"/></svg>
+      <div>
+        <h1>放大鏡偵探出動！</h1>
+        <p>特教乙班自然｜IEP 1-2｜放大鏡，讓小東西看起來變大</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="切換">
+      <button class="tab" role="tab" id="tabVideo" aria-selected="true">看動畫</button>
+      <button class="tab" role="tab" id="tabQuiz" aria-selected="false">偵探問答</button>
+    </nav>
+  </header>
+
+  <section id="viewVideo" class="quiz" aria-label="動畫">
+    <div class="stage-wrap" id="stageWrap">
+      <svg id="stage" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet" role="img" aria-label="放大鏡偵探動畫">
+        <defs>
+          <clipPath id="winClip"><rect x="933" y="83" width="284" height="244"/></clipPath>
+          <filter id="lensBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur id="lensBlurN" stdDeviation="0"/></filter>
+          <radialGradient id="hot"><stop offset="0" stop-color="#fff7b0"/><stop offset=".45" stop-color="#ff9a1f"/><stop offset="1" stop-color="#ff5a1f" stop-opacity="0"/></radialGradient>
+        </defs>
+        <g id="cam"><g id="bg"></g><g id="props"></g><g id="actors"></g><g id="fx"></g></g>
+        <g id="focus"></g>
+        <g id="hud"></g>
+        <g id="wipe"></g>
+      </svg>
+      <div class="sub" id="sub" hidden></div>
+      <div class="cover" id="cover">
+        <button class="bigplay" id="bigPlay" aria-label="播放動畫"><svg width="46%" viewBox="0 0 40 40" aria-hidden="true"><path d="M12 6 L34 20 L12 34Z" fill="#2b2320" stroke="#2b2320" stroke-width="4" stroke-linejoin="round"/></svg></button>
+        <span class="cover-label">按我播放（約 4 分鐘，有配音）</span>
+      </div>
+      <div class="endcard" id="endcard" hidden>
+        <h2>偵探任務完成！</h2>
+        <div class="row">
+          <button class="btn" id="againBtn">再看一次</button>
+          <button class="btn go" id="toQuizBtn">去偵探問答 →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="prevBtn" aria-label="上一段"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4v16M19 4 8 12l11 8Z" fill="#2b2320" stroke="#2b2320" stroke-width="2.5" stroke-linejoin="round"/></svg><span class="lbl">上一段</span></button>
+      <button class="btn primary" id="playBtn" aria-label="播放"><svg id="playIco" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4 20 12 7 20Z" fill="#2b2320" stroke="#2b2320" stroke-width="2.5" stroke-linejoin="round"/></svg><span class="lbl" id="playLbl">播放</span></button>
+      <button class="btn" id="nextBtn" aria-label="下一段"><span class="lbl">下一段</span><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 4v16M5 4l11 8-11 8Z" fill="#2b2320" stroke="#2b2320" stroke-width="2.5" stroke-linejoin="round"/></svg></button>
+      <span class="spacer"></span>
+      <div class="toggles">
+        <button class="btn" id="soundBtn" aria-pressed="true">配音：開</button>
+        <button class="btn" id="voiceBtn">聲音：AI 錄音</button>
+        <button class="btn" id="slowBtn" aria-pressed="false">慢速：關</button>
+        <button class="btn" id="subBtn" aria-pressed="true">字幕：開</button>
+        <button class="btn" id="fsBtn">全螢幕</button>
+      </div>
+    </div>
+    <div class="chapters" id="chapters" role="list"></div>
+    <p class="note"><b>上課怎麼播：</b>神秘信封後播第 2–6 段（發現問題 → 放大鏡操作）；發放大鏡前播第 7 段「安全規則」；生活任務前播第 8 段「保存期限」；統整時播第 9 段，接著到「偵探問答」。每段都可以單獨重播。</p>
+  </section>
+
+  <section id="viewQuiz" class="quiz" aria-label="偵探問答" hidden>
+    <div class="qhead">
+      <div class="prog" id="prog" aria-label="進度"></div>
+      <div class="toggles">
+        <button class="btn" id="qReadBtn" aria-pressed="true">自動唸題：開</button>
+        <button class="btn" id="qRestart">重新開始</button>
+      </div>
+    </div>
+    <div id="quizBody"></div>
+  </section>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const NS='http://www.w3.org/2000/svg';
+const INK='#2b2320',SKIN='#ffdcbc',SUN='#ffc83d',CORAL='#ff6b57',TEAL='#1f7f86',LEAF='#2f9e5b';
+const $=id=>document.getElementById(id);
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);if(attrs)for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function g(html,parent){const n=el('g',null,parent);n.innerHTML=html;return n}
+const rand=(a,b)=>a+Math.random()*(b-a);
+const _now=new Date(),TODAY={y:_now.getFullYear(),m:_now.getMonth()+1,d:_now.getDate()};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ================= engine ================= */
+const T={clock:0,playing:false,gen:0,tweens:[],timers:[],waiters:[],mul:1,speechRate:1,shake:0,focus:false,last:0};
+const E={lin:t=>t,out:t=>1-Math.pow(1-t,3),in:t=>t*t*t,io:t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,
+  back:t=>{const c1=1.9,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)},
+  bounce:t=>{const n=7.5625,d=2.75;if(t<1/d)return n*t*t;if(t<2/d)return n*(t-=1.5/d)*t+.75;if(t<2.5/d)return n*(t-=2.25/d)*t+.9375;return n*(t-=2.625/d)*t+.984375}};
+function tween(obj,to,dur=400,ease=E.out){const gg=T.gen;return new Promise(res=>{const from={};for(const k in to)from[k]=obj[k];T.tweens.push({obj,from,to,t0:T.clock,dur,ease,res,g:gg})})}
+function wait(ms){const gg=T.gen;return new Promise(res=>T.timers.push({t:T.clock+ms,res,g:gg}))}
+const par=(...p)=>Promise.all(p);
+
+class Act{constructor(node,o){this.node=node;this.x=0;this.y=0;this.s=1;this.r=0;this.o=1;this.sy=1;Object.assign(this,o||{});this.apply()}
+  apply(){this.node.setAttribute('transform',`translate(${this.x.toFixed(2)},${this.y.toFixed(2)}) rotate(${this.r.toFixed(2)}) scale(${this.s.toFixed(4)},${(this.s*this.sy).toFixed(4)})`);this.node.setAttribute('opacity',Math.max(0,Math.min(1,this.o)).toFixed(3))}}
+
+const STAGE=$('stage'),CAMG=$('cam'),BG=$('bg'),PROPS=$('props'),ACTORS=$('actors'),FX=$('fx'),FOCUS=$('focus'),HUD=$('hud'),WIPE=$('wipe');
+const cam={x:640,y:360,s:1,apply(){let ox=0,oy=0;if(T.shake>.3&&!reduce){ox=rand(-T.shake,T.shake);oy=rand(-T.shake,T.shake)}CAMG.setAttribute('transform',`translate(${640+ox},${360+oy}) scale(${this.s}) translate(${-this.x},${-this.y})`)}};
+
+/* ================= characters ================= */
+const KIDS=[];
+const EYES={
+  n:x=>`<ellipse cx="${x}" cy="0" rx="9" ry="13" fill="${INK}"/><circle cx="${x-3}" cy="-5" r="3.6" fill="#fff"/>`,
+  star:x=>`<ellipse cx="${x}" cy="0" rx="12" ry="15" fill="${INK}"/><circle cx="${x-4}" cy="-6" r="5" fill="#fff"/><circle cx="${x+4}" cy="5" r="2.6" fill="#fff"/>`,
+  happy:x=>`<path d="M${x-12},5 Q${x},-12 ${x+12},5" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`,
+  shock:x=>`<circle cx="${x}" cy="-2" r="20" fill="#fff" stroke="${INK}" stroke-width="4"/><circle cx="${x}" cy="-2" r="6" fill="${INK}"/>`,
+  squint:x=>{const d=x<0?1:-1;return `<path d="M${x-12*d},-9 L${x+10*d},0 L${x-12*d},9" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`},
+  closed:x=>`<path d="M${x-12},2 L${x+12},2" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`,
+  meh:x=>`<path d="M${x-11},-3 A11,9 0 0,0 ${x+11},-3Z" fill="${INK}"/><path d="M${x-15},-4 L${x+15},-4" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>`,
+  heart:x=>`<path transform="translate(${x},2) scale(1.15)" d="M0,10 C-22,-6 -12,-22 0,-11 C12,-22 22,-6 0,10Z" fill="#ff4d6d" stroke="${INK}" stroke-width="3"/>`,
+  up:x=>`<ellipse cx="${x}" cy="0" rx="11" ry="15" fill="#fff" stroke="${INK}" stroke-width="3.5"/><circle cx="${x+3}" cy="-7" r="6" fill="${INK}"/>`,
+  dizzy:x=>`<path d="M${x-11},-11 L${x+11},11 M${x+11},-11 L${x-11},11" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`
+};
+const MP='fill="none" stroke="'+INK+'" stroke-width="5" stroke-linecap="round"';
+const MOUTH={
+  smile:`<path d="M-18,38 Q0,55 18,38" ${MP}/>`,
+  grin:`<path d="M-26,34 Q0,31 26,34 Q22,66 0,68 Q-22,66 -26,34Z" fill="#b8343a" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/><path d="M-12,58 Q0,50 12,58 Q6,66 0,66 Q-6,66 -12,58Z" fill="#ff8a8f"/>`,
+  talk:`<path d="M-15,38 Q0,36 15,38 Q11,57 0,58 Q-11,57 -15,38Z" fill="#b8343a" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/>`,
+  o:`<ellipse cx="0" cy="47" rx="9" ry="11" fill="#b8343a" stroke="${INK}" stroke-width="4.5"/>`,
+  wow:`<ellipse cx="0" cy="50" rx="17" ry="23" fill="#b8343a" stroke="${INK}" stroke-width="4.5"/><ellipse cx="0" cy="63" rx="9" ry="6" fill="#ff8a8f"/>`,
+  frown:`<path d="M-16,54 Q0,38 16,54" ${MP}/>`,
+  flat:`<path d="M-14,47 L14,47" ${MP}/>`,
+  wavy:`<path d="M-22,47 q5.5,-7 11,0 t11,0 t11,0 t11,0" ${MP}/>`,
+  drool:`<path d="M-26,34 Q0,31 26,34 Q22,66 0,68 Q-22,66 -26,34Z" fill="#b8343a" stroke="${INK}" stroke-width="4.5"/><path d="M16,60 q8,16 0,26 q-8,-10 0,-26Z" fill="#8fd3ff" stroke="${INK}" stroke-width="2.5"/>`
+};
+const BROWS={none:'',
+  up:'<path d="M-46,-42 Q-32,-54 -18,-44"/><path d="M18,-44 Q32,-54 46,-42"/>',
+  worry:'<path d="M-46,-34 L-20,-44"/><path d="M20,-44 L46,-34"/>',
+  focus:'<path d="M-46,-46 L-20,-36"/><path d="M20,-36 L46,-46"/>',
+  think:'<path d="M-46,-38 L-20,-38"/><path d="M18,-46 Q32,-56 46,-44"/>'};
+const S5=`stroke="${INK}" stroke-width="5" stroke-linejoin="round"`;
+/* ---- character art: every kid has an own silhouette, outfit and idle habit ---- */
+let kidUid=0;
+const BODY='M-48,-228 Q0,-240 48,-228 L56,-106 Q0,-94 -56,-106Z';
+const TSHADE='<path d="M30,-232 Q44,-230 48,-228 L56,-106 Q46,-101 36,-102Z" fill="rgba(0,0,0,.13)"/>';
+const SHOE=(col,sole)=>`<path d="M-17,96 Q-17,86 -5,86 L10,86 Q31,95 33,108 L33,115 L-19,115Z" fill="${col}" ${S5}/><path d="M-19,109 L33,109" stroke="${sole}" stroke-width="5"/>`;
+function legSVG(c,side){let s='';
+  if(c.legs==='pants')s=`<rect x="-15" y="-8" width="30" height="104" rx="10" fill="${c.pants}" ${S5}/>`+(c.cuff?`<rect x="-17" y="78" width="34" height="15" rx="5" fill="${c.cuff}" ${S5}/>`:'');
+  else if(c.legs==='shorts')s=`<rect x="-11" y="20" width="22" height="80" rx="9" fill="${SKIN}" ${S5}/><rect x="-12" y="68" width="24" height="26" fill="${c.sock||'#fff'}" ${S5}/><rect x="-17" y="-8" width="34" height="50" rx="9" fill="${c.pants}" ${S5}/>`;
+  else s=`<rect x="-11" y="0" width="22" height="100" rx="9" fill="${SKIN}" ${S5}/><rect x="-12" y="${c.old?76:50}" width="24" height="${c.old?20:44}" fill="${c.sock||'#fff'}" ${S5}/>`+(c.sockStripe?`<rect x="-12" y="56" width="24" height="6" fill="${c.sockStripe}"/>`:'');
+  return s+`<g transform="scale(${side<0?-1:1},1)">${SHOE(c.shoe||'#4a4258',c.sole||'#fff')}</g>`}
+function hipSVG(c){
+  if(c.legs==='skirt')return `<path d="M-46,-134 L46,-134 L${c.old?58:68},${c.old?-40:-62} Q0,${c.old?-30:-52} -${c.old?58:68},${c.old?-40:-62}Z" fill="${c.skirt}" ${S5}/>`+(c.old?'':`<path d="M-26,-130 L-38,-60 M0,-132 L0,-54 M26,-130 L38,-60" stroke="rgba(0,0,0,.25)" stroke-width="4" fill="none"/><path d="M-60,-74 Q0,-62 60,-74" stroke="${c.skirt2||'rgba(255,255,255,.35)'}" stroke-width="5" fill="none"/>`);
+  return `<rect x="-42" y="-138" width="84" height="36" rx="10" fill="${c.pants}" ${S5}/>`+(c.belt?`<rect x="-42" y="-136" width="84" height="10" fill="${c.belt}"/><rect x="-8" y="-138" width="16" height="13" rx="2" fill="#ffd04a" stroke="${INK}" stroke-width="3"/>`:'')}
+function torsoSVG(c){
+  if(c.top==='hoodie')return `<path d="M-58,-222 Q-68,-270 -24,-264 L24,-264 Q68,-270 58,-222Z" fill="${c.shirt2}" ${S5}/><path d="${BODY}" fill="${c.shirt}" ${S5}/>
+    <path d="M-36,-164 L36,-164 L44,-118 L-44,-118Z" fill="${c.shirt2}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M-12,-230 L-15,-190 M12,-230 L15,-190" stroke="#fff" stroke-width="5" stroke-linecap="round"/><circle cx="-15" cy="-187" r="4.5" fill="#fff" stroke="${INK}" stroke-width="2"/><circle cx="15" cy="-187" r="4.5" fill="#fff" stroke="${INK}" stroke-width="2"/>
+    <g transform="translate(-30,-200)"><circle r="12" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="-2" cy="-2" r="5" fill="none" stroke="${INK}" stroke-width="2.5"/><path d="M2,2 L7,7" stroke="${INK}" stroke-width="3" stroke-linecap="round"/></g>`+TSHADE;
+  if(c.top==='cardigan')return `<path d="${BODY}" fill="${c.shirt}" ${S5}/><path d="M-20,-232 L0,-184 L20,-232Z" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><path d="M0,-184 L0,-100" stroke="${INK}" stroke-width="3"/>
+    <g fill="#fff" stroke="${INK}" stroke-width="2.5"><circle cx="0" cy="-168" r="5"/><circle cx="0" cy="-144" r="5"/><circle cx="0" cy="-120" r="5"/></g>
+    <path transform="translate(-28,-150)" d="M0,9 C-15,-2 -9,-15 0,-7 C9,-15 15,-2 0,9Z" fill="#ff5fa2" stroke="${INK}" stroke-width="3"/>`+TSHADE;
+  if(c.top==='vest')return `<path d="${BODY}" fill="#fff" ${S5}/><path d="M-48,-228 L-22,-231 L0,-168 L22,-231 L48,-228 L56,-106 Q0,-94 -56,-106Z" fill="${c.shirt}" ${S5}/>
+    <g fill="${c.shirt2}"><path d="M-32,-184 l11,17 l-11,17 l-11,-17Z"/><path d="M32,-184 l11,17 l-11,17 l-11,-17Z"/><path d="M0,-150 l11,17 l-11,17 l-11,-17Z"/></g>
+    <path d="M-24,-233 L-9,-212 L0,-228 L9,-212 L24,-233" fill="#fff" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+    <g transform="translate(0,-224)"><path d="M0,0 L-21,-12 L-21,12Z M0,0 L21,-12 L21,12Z" fill="#e5483b" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><circle r="6.5" fill="#e5483b" stroke="${INK}" stroke-width="3"/></g>`+TSHADE;
+  return `<path d="${BODY}" fill="${c.shirt}" ${S5}/><path d="M-18,-232 Q0,-212 18,-232" fill="none" stroke="${INK}" stroke-width="4.5" stroke-linecap="round"/><circle cx="0" cy="-180" r="5" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="0" cy="-150" r="5" fill="#fff" stroke="${INK}" stroke-width="3"/>`}
+function armSVG(c){const sl=c.sleeve||c.shirt;
+  if(c.longSleeve)return `<rect x="-12" y="-12" width="24" height="94" rx="11" fill="${sl}" ${S5}/><rect x="-13" y="68" width="26" height="15" rx="5" fill="${c.shirt2||sl}" ${S5}/><circle cx="0" cy="90" r="15" fill="${SKIN}" ${S5}/>`;
+  return `<rect x="-10" y="30" width="20" height="56" rx="9" fill="${SKIN}" ${S5}/><circle cx="0" cy="90" r="15" fill="${SKIN}" ${S5}/><rect x="-13" y="-12" width="26" height="48" rx="12" fill="${sl}" ${S5}/>`}
+const HL='stroke="#fff" stroke-width="6" stroke-linecap="round" fill="none" opacity=".4"';
+function headBack(c){
+  if(c.hair==='pony')return `<circle cy="-8" r="99" fill="${c.hairC}" ${S5}/>`;
+  if(c.hair==='bun')return `<circle cx="0" cy="-100" r="38" fill="${c.hairC}" ${S5}/>`;
+  return ''}
+function headFront(c){
+  if(c.hair==='cap')return `<path d="M-90,-34 L-118,-22 L-95,-10 L-112,8 L-88,2Z M90,-34 L118,-22 L95,-10 L112,8 L88,2Z" fill="${c.hairC}" ${S5}/>
+    <path d="M-76,-38 L-64,-14 L-50,-36 L-34,-10 L-20,-36 L-4,-12 L10,-36 L26,-12 L40,-36 L56,-14 L74,-38Z" fill="${c.hairC}" ${S5}/>
+    <path d="M-99,-32 Q-106,-122 0,-126 Q106,-122 99,-32 Q0,-56 -99,-32Z" fill="${c.cap}" ${S5}/>
+    <path d="M0,-126 L0,-78 M-58,-110 Q-52,-72 -54,-40 M58,-110 Q52,-72 54,-40" stroke="${c.cap2}" stroke-width="4" fill="none"/>
+    <path d="M-26,-42 Q0,-80 26,-42Z" fill="${c.hairC}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><path d="M-30,-43 Q0,-86 30,-43" stroke="${c.cap2}" stroke-width="6" fill="none"/>
+    <circle cy="-124" r="8" fill="${c.cap2}" stroke="${INK}" stroke-width="4"/><path d="M-66,-94 Q-36,-114 -4,-112" ${HL}/>`;
+  if(c.hair==='pony')return `<path d="M-94,0 Q-101,-104 0,-106 Q101,-104 94,0 Q90,-30 82,-38 L-82,-38 Q-90,-30 -94,0Z" fill="${c.hairC}" ${S5}/><path d="M-60,-84 Q-30,-100 6,-98" ${HL}/>
+    <g transform="rotate(-13) translate(14,-100)"><ellipse rx="88" ry="28" fill="${c.cap}" ${S5}/><path d="M-72,6 Q0,26 72,6" stroke="${c.cap2}" stroke-width="6" fill="none"/><circle cx="8" cy="-28" r="8" fill="${c.cap}" stroke="${INK}" stroke-width="4"/></g>
+    <path transform="translate(-64,-48) scale(.55)" d="M0,-20 L6,-6 L21,-6 L9,3 L13,18 L0,9 L-13,18 L-9,3 L-21,-6 L-6,-6Z" fill="#ffd23f" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>`;
+  if(c.hair==='bowl')return `<path d="M-98,2 Q-105,-110 0,-112 Q105,-110 98,2 L98,-26 Q52,-46 0,-46 Q-52,-46 -98,-26Z" fill="${c.hairC}" ${S5}/><path d="M-62,-90 Q-30,-106 8,-104" ${HL}/>`;
+  if(c.hair==='bun')return `<path d="M-95,4 Q-102,-100 0,-102 Q102,-100 95,4 Q84,-58 0,-62 Q-84,-58 -95,4Z" fill="${c.hairC}" ${S5}/>`;
+  return ''}
+const LASH=x=>{const d=x<0?-1:1;return `<path d="M${x+11*d},-10 L${x+19*d},-17 M${x+6*d},-13 L${x+11*d},-22" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`};
+
+class Kid{
+  constructor(c,layer,video=true){
+    this.c=c;this.video=video;this.name=c.name;this.color=c.color;this.voice=c.voice;const id=++kidUid;
+    Object.assign(this,{x:0,y:655,s:.92,sx:1,r:0,jy:0,sq:1,hr:0,aL:10,aR:-10,o:1,legA:0,wp:0});
+    this.root=el('g',{class:'kid'},layer);
+    this.body=el('g',null,this.root);
+    this.legL=g(legSVG(c,-1),this.body);this.legR=g(legSVG(c,1),this.body);
+    g(hipSVG(c)+torsoSVG(c),this.body);
+    this.armL=el('g',null,this.body);this.armL.innerHTML=armSVG(c);this.handL=el('g',{transform:'translate(0,90)'},this.armL);
+    this.armR=el('g',null,this.body);this.armR.innerHTML=armSVG(c);this.handR=el('g',{transform:'translate(0,90)'},this.armR);
+    this.head=el('g',null,this.body);
+    if(c.hair==='pony')this.pony=g(`<path d="M0,0 Q76,-4 68,70 Q62,122 24,146 Q44,84 8,30Z" fill="${c.hairC}" ${S5}/><path d="M30,20 Q52,40 46,80" ${HL}/><ellipse cx="2" cy="4" rx="15" ry="19" fill="#ffd23f" stroke="${INK}" stroke-width="4"/>`,this.head);
+    g(headBack(c)+`<circle cx="-88" cy="6" r="17" fill="${SKIN}" ${S5}/><circle cx="88" cy="6" r="17" fill="${SKIN}" ${S5}/><circle r="92" fill="${SKIN}" ${S5}/>
+      <path d="M62,-68 A92,92 0 0,1 62,68 A118,118 0 0,0 62,-68Z" fill="rgba(214,130,100,.2)"/>
+      <ellipse cx="-58" cy="28" rx="16" ry="9" fill="#ff9e9e" opacity=".7"/><ellipse cx="58" cy="28" rx="16" ry="9" fill="#ff9e9e" opacity=".7"/>`+
+      (c.freckles?`<g fill="#d98a5a"><circle cx="-70" cy="16" r="2.8"/><circle cx="-61" cy="22" r="2.8"/><circle cx="-72" cy="26" r="2.8"/><circle cx="70" cy="16" r="2.8"/><circle cx="61" cy="22" r="2.8"/><circle cx="72" cy="26" r="2.8"/></g>`:'')+
+      headFront(c)+(c.old?`<path d="M-70,40 q8,6 16,0 M54,40 q8,6 16,0" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`:''),this.head);
+    if(c.ahoge)this.ahoge=g(`<path d="M0,0 Q-8,-44 26,-54 Q8,-32 12,0Z" fill="${c.hairC}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`,this.head);
+    this.eyes=el('g',null,this.head);
+    this.brows=el('g',{fill:'none',stroke:INK,'stroke-width':6,'stroke-linecap':'round'},this.head);
+    this.mouth=el('g',null,this.head);
+    if(c.bandaid)g(`<g transform="translate(-60,46) rotate(28)"><rect x="-17" y="-7" width="34" height="14" rx="6" fill="#ffd9a8" stroke="${INK}" stroke-width="3"/><rect x="-5" y="-7" width="10" height="14" fill="#f2bf8a"/></g>`,this.head);
+    if(c.glasses){g(`<g fill="rgba(255,255,255,.2)" stroke="${c.frame||INK}" stroke-width="6"><circle cx="-33" cy="0" r="29"/><circle cx="33" cy="0" r="29"/><path d="M-6,-2 Q0,-8 6,-2" fill="none"/><path d="M-62,-4 L-90,-12 M62,-4 L90,-12" fill="none"/></g>`,this.head);
+      if(c.glare){el('clipPath',{id:'gl'+id},this.head).innerHTML='<circle cx="-33" cy="0" r="26"/><circle cx="33" cy="0" r="26"/>';
+        const cg=el('g',{'clip-path':`url(#gl${id})`},this.head);this.glare=g('<path d="M-12,-40 L4,-40 L-14,40 L-30,40Z" fill="#fff" opacity=".85"/><path d="M10,-40 L16,-40 L-2,40 L-8,40Z" fill="#fff" opacity=".7"/>',cg)}}
+    this.extra=el('g',null,this.head);
+    this.phase=Math.random()*6;this.nextBlink=0;this.blinkUntil=0;this.blinking=false;this.talking=false;this.flap=false;this.lastFlap=0;
+    this.e=this.m=this.b=null;this.face('n','smile','none');this.apply();KIDS.push(this);
+  }
+  eyesHTML(e){const lash=this.c.lashes&&['n','star','up','happy','heart'].includes(e);return EYES[e](-32)+EYES[e](32)+(lash?LASH(-32)+LASH(32):'')}
+  face(e,m,b){if(e&&e!==this.e){this.e=e;this.blinking=false;this.eyes.innerHTML=this.eyesHTML(e)}
+    if(m&&m!==this.m){this.m=m;if(!this.talking)this.mouth.innerHTML=MOUTH[m]}
+    if(b!==undefined&&b!==this.b){this.b=b;this.brows.innerHTML=BROWS[b]||''}}
+  talk(on){if(this.talking===on)return;this.talking=on;if(!on){this.flap=false;this.mouth.innerHTML=MOUTH[this.m]}}
+  apply(){const k=1+(1-this.sq)*.8;
+    this.root.setAttribute('transform',`translate(${this.x.toFixed(2)},${(this.y+this.jy).toFixed(2)}) rotate(${this.r.toFixed(2)}) scale(${(this.s*this.sx*k).toFixed(4)},${(this.s*this.sq).toFixed(4)})`);
+    this.root.setAttribute('opacity',this.o);
+    this.armL.setAttribute('transform',`translate(-46,-218) rotate(${this.aL.toFixed(1)})`);
+    this.armR.setAttribute('transform',`translate(46,-218) rotate(${this.aR.toFixed(1)})`);
+    this.head.setAttribute('transform',`translate(0,-322) rotate(${this.hr.toFixed(1)})`);
+    if(!this.posed){this.posed=true;this.legL.setAttribute('transform','translate(-20,-118)');this.legR.setAttribute('transform','translate(20,-118)');
+      if(this.pony)this.pony.setAttribute('transform','translate(70,-82)');if(this.ahoge)this.ahoge.setAttribute('transform','translate(4,-108)');if(this.glare)this.glare.setAttribute('transform','translate(-200,0)')}}
+  hold(side,node){const h=side==='L'?this.handL:this.handR;h.innerHTML='';h.appendChild(node);return node}
+  unholdAll(){this.handL.innerHTML='';this.handR.innerHTML=''}
+  headPt(){return [this.x,this.y+this.jy-322*this.s]}
+  armPt(side,d){const a=(side==='R'?this.aR:this.aL)*Math.PI/180,sg=side==='R'?1:-1,s=this.s;
+    return [this.x+sg*46*s*this.sx+(-Math.sin(a))*d*s*this.sx,this.y+this.jy-218*s+Math.cos(a)*d*s]}
+  ambient(t,playing){
+    if(!this.root.isConnected)return;
+    const live=playing||!this.video;
+    if(live){
+      /* legs: walk when sliding sideways, spread when airborne */
+      const vx=this.x-(this.px===undefined?this.x:this.px);this.px=this.x;const sp=Math.abs(vx);let la=0,lift=0;
+      if(this.jy<-6)la=16;else if(sp>.25){this.wp+=Math.min(sp,30)*.11;la=Math.sin(this.wp)*10;lift=Math.sin(this.wp)*14}
+      this.legA+=(la-this.legA)*.35;this.lift=(this.lift||0)+(lift-(this.lift||0))*.4;
+      this.legL.setAttribute('transform',`translate(-20,${(-118-Math.max(0,this.lift)).toFixed(1)}) rotate(${this.legA.toFixed(1)})`);
+      this.legR.setAttribute('transform',`translate(20,${(-118-Math.max(0,-this.lift)).toFixed(1)}) rotate(${(this.jy<-6?-this.legA:this.legA).toFixed(1)})`);
+      /* idle habits */
+      const idle=this.c.idle;let by=0,tilt=0;
+      if(idle==='bounce')by=-Math.abs(Math.sin(t/230+this.phase))*4;
+      if(idle==='sway')tilt=Math.sin(t/900+this.phase)*3.5;
+      if(this.pony)this.pony.setAttribute('transform',`translate(70,-82) rotate(${(Math.sin(t/480+this.phase)*8).toFixed(1)})`);
+      if(this.ahoge)this.ahoge.setAttribute('transform',`translate(4,-108) rotate(${(Math.sin(t/260)*12).toFixed(1)})`);
+      if(this.glare){const p=(t%3600)/420;this.glare.setAttribute('transform',`translate(${p<1?(-70+150*p).toFixed(1):-200},0)`)}
+      const br=1+.013*Math.sin(t/420+this.phase);
+      this.body.setAttribute('transform',`translate(0,${by.toFixed(2)}) scale(1,${br.toFixed(4)})`);
+      this.head.setAttribute('transform',`translate(0,-322) rotate(${(this.hr+tilt).toFixed(1)})`);
+    }
+    if(['n','star','up'].includes(this.e)){
+      if(!this.blinking&&t>this.nextBlink){this.blinking=true;this.blinkUntil=t+130;this.eyes.innerHTML=EYES.closed(-32)+EYES.closed(32)}
+      else if(this.blinking&&t>this.blinkUntil){this.blinking=false;this.nextBlink=t+rand(2200,5200);this.eyes.innerHTML=this.eyesHTML(this.e)}
+    }
+    if(this.talking&&live&&t-this.lastFlap>125){this.lastFlap=t;this.flap=!this.flap;
+      const open=['grin','wow','drool'].includes(this.m)?'o':(this.m==='talk'?'smile':'talk');
+      this.mouth.innerHTML=MOUTH[this.flap?open:this.m];}
+  }
+}
+const CFG={
+  L:{name:'阿亮',color:'#d9601c',top:'hoodie',shirt:'#ff8a3d',shirt2:'#e8692a',longSleeve:true,legs:'pants',pants:'#3f6fd1',cuff:'#86a8ee',shoe:'#e5483b',sole:'#fff',
+     hair:'cap',hairC:'#5a3a22',cap:'#e5483b',cap2:'#a92c24',freckles:true,bandaid:true,idle:'bounce',voice:{sex:'m',pitch:1.35,rate:1.05}},
+  Q:{name:'小晴',color:'#d63a83',top:'cardigan',shirt:'#ff8cc0',shirt2:'#ff6fae',longSleeve:true,legs:'skirt',skirt:'#3b4a8a',skirt2:'#e5483b',sock:'#fff',sockStripe:'#7b5cd6',shoe:'#ff5fa2',
+     hair:'pony',hairC:'#2b2320',cap:'#7b5cd6',cap2:'#5e43b5',lashes:true,idle:'sway',voice:{sex:'f2',pitch:1.3,rate:1}},
+  Z:{name:'阿哲',color:'#1f8a6e',top:'vest',shirt:'#3aa58a',shirt2:'#7fd6bd',sleeve:'#fff',legs:'shorts',pants:'#a07c55',belt:'#5a4030',sock:'#fff',shoe:'#6b4a2a',sole:'#3b2a20',
+     hair:'bowl',hairC:'#3b2a20',glasses:true,glare:true,ahoge:true,idle:'glare',voice:{sex:'m',pitch:1.0,rate:.98}},
+  G:{name:'阿嬤',color:'#7a56c2',top:'blouse',shirt:'#a98be0',legs:'skirt',skirt:'#6b5a8e',old:true,shoe:'#8e6bd1',hair:'bun',hairC:'#d4d4dc',glasses:true,voice:{sex:'f',pitch:.75,rate:.9}}
+};
+const N={name:'旁白',color:TEAL,voice:{sex:'f',pitch:1.05,rate:1}};
+const L=new Kid(CFG.L,ACTORS),Q=new Kid(CFG.Q,ACTORS),Z=new Kid(CFG.Z,ACTORS);
+const ALL={name:'大家',color:'#d9483a',voice:{sex:'f',pitch:1.35,rate:1},kids:[L,Q,Z]};
+/* ---- 汪探長: an original detective puppy ---- */
+const DOGM={smile:`<path d="M-16,26 q8,10 16,0 q8,10 16,0" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`,
+  bark:`<path d="M-15,24 Q0,56 15,24Z" fill="#b8343a" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><ellipse cx="0" cy="42" rx="7" ry="5" fill="#ff8a8f"/>`,
+  drool:`<path d="M-16,26 q8,10 16,0 q8,10 16,0" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M-7,32 q7,26 14,0Z" fill="#ff8a8f" stroke="${INK}" stroke-width="3"/>`};
+class Dog{
+  constructor(layer){this.name='汪探長';this.color='#a8661c';this.voice={sex:'m',pitch:1.6,rate:1.1};this.video=true;
+    Object.assign(this,{x:0,y:655,s:.85,sx:1,r:0,jy:0,sq:1,hr:0,o:1});
+    this.root=el('g',{class:'dog'},layer);
+    this.tail=g(`<path d="M0,0 Q-30,-20 -24,-56" fill="none" stroke="${INK}" stroke-width="22" stroke-linecap="round"/><path d="M0,0 Q-30,-20 -24,-56" fill="none" stroke="#e8b26a" stroke-width="12" stroke-linecap="round"/>`,this.root);
+    g(`<g fill="#e8b26a" stroke="${INK}" stroke-width="5"><rect x="-36" y="-34" width="18" height="32" rx="8"/><rect x="18" y="-34" width="18" height="32" rx="8"/><ellipse cx="0" cy="-52" rx="48" ry="40"/></g>
+      <ellipse cx="0" cy="-42" rx="26" ry="24" fill="#fff6e6"/><g fill="#fff" stroke="${INK}" stroke-width="4"><ellipse cx="-27" cy="-4" rx="15" ry="8"/><ellipse cx="27" cy="-4" rx="15" ry="8"/></g>
+      <path d="M-34,-86 Q0,-72 34,-86 L34,-74 Q0,-60 -34,-74Z" fill="#e5483b" stroke="${INK}" stroke-width="4"/><circle cx="0" cy="-66" r="10" fill="#ffd04a" stroke="${INK}" stroke-width="3"/><circle cx="-1" cy="-67" r="4" fill="none" stroke="${INK}" stroke-width="2"/>`,this.root);
+    this.head=el('g',null,this.root);
+    this.head.innerHTML=`<ellipse cx="-54" cy="0" rx="19" ry="40" transform="rotate(18 -54 0)" fill="#9c5a22" stroke="${INK}" stroke-width="5"/><ellipse cx="54" cy="0" rx="19" ry="40" transform="rotate(-18 54 0)" fill="#9c5a22" stroke="${INK}" stroke-width="5"/>
+      <circle r="60" fill="#e8b26a" stroke="${INK}" stroke-width="5"/><ellipse cx="0" cy="24" rx="36" ry="26" fill="#fff6e6"/><ellipse cx="-40" cy="16" rx="11" ry="7" fill="#ff9e9e" opacity=".7"/><ellipse cx="40" cy="16" rx="11" ry="7" fill="#ff9e9e" opacity=".7"/>
+      <path d="M-52,-26 Q-48,-80 0,-82 Q48,-80 52,-26Z" fill="#a3814f" stroke="${INK}" stroke-width="5"/><path d="M-40,-30 Q0,-44 40,-30 M-26,-74 L-34,-30 M0,-82 L0,-40 M26,-74 L34,-30" fill="none" stroke="#7d6038" stroke-width="3"/>
+      <path d="M-34,-30 Q0,-16 34,-30 L28,-18 Q0,-6 -28,-18Z" fill="#7d6038" stroke="${INK}" stroke-width="4"/>`;
+    this.eyes=el('g',{transform:'translate(0,-2) scale(.78)'},this.head);
+    g(`<ellipse cx="0" cy="10" rx="12" ry="8" fill="${INK}"/><ellipse cx="-3" cy="7" rx="4" ry="2.5" fill="#fff"/>`,this.head);
+    this.mouth=el('g',null,this.head);this.item=el('g',{transform:'translate(0,36)'},this.head);
+    this.phase=Math.random()*6;this.nextBlink=0;this.blinking=false;this.talking=false;this.flap=false;this.lastFlap=0;this.e=this.m=null;
+    this.face('n','smile');this.apply();KIDS.push(this)}
+  face(e,m){if(e&&e!==this.e){this.e=e;this.blinking=false;this.eyes.innerHTML=EYES[e](-30)+EYES[e](30)}
+    if(m){m=DOGM[m]?m:(m==='o'||m==='wow'||m==='grin'?'bark':'smile');if(m!==this.m){this.m=m;if(!this.talking)this.mouth.innerHTML=DOGM[m]}}}
+  talk(on){if(this.talking===on)return;this.talking=on;if(!on){this.flap=false;this.mouth.innerHTML=DOGM[this.m]}}
+  apply(){const k=1+(1-this.sq)*.8;this.root.setAttribute('transform',`translate(${this.x.toFixed(2)},${(this.y+this.jy).toFixed(2)}) rotate(${this.r.toFixed(2)}) scale(${(this.s*this.sx*k).toFixed(4)},${(this.s*this.sq).toFixed(4)})`);this.root.setAttribute('opacity',this.o);this.head.setAttribute('transform',`translate(0,-126) rotate(${this.hr.toFixed(1)})`)}
+  headPt(){return [this.x,this.y+this.jy-126*this.s]}
+  ambient(t,playing){if(!this.root.isConnected)return;
+    if(playing)this.tail.setAttribute('transform',`translate(-40,-60) rotate(${(Math.sin(t/85)*24).toFixed(1)})`);
+    if(['n','star'].includes(this.e)){if(!this.blinking&&t>this.nextBlink){this.blinking=true;this.blinkUntil=t+130;this.eyes.innerHTML=EYES.closed(-30)+EYES.closed(30)}
+      else if(this.blinking&&t>this.blinkUntil){this.blinking=false;this.nextBlink=t+rand(2000,4500);this.eyes.innerHTML=EYES[this.e](-30)+EYES[this.e](30)}}
+    if(this.talking&&playing&&t-this.lastFlap>110){this.lastFlap=t;this.flap=!this.flap;this.mouth.innerHTML=DOGM[this.flap?'bark':this.m]}}
+}
+const D=new Dog(ACTORS);
+const BANANA=`<g transform="translate(0,10) scale(1.35) rotate(-8)"><path d="M-50,-14 Q-40,40 50,-6 Q46,-2 44,4 Q-24,34 -38,-14Z" fill="#ffe14a" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><path d="M-30,0 Q0,22 32,4" fill="none" stroke="#e8b700" stroke-width="4" stroke-linecap="round"/><path d="M-44,-14 l-4,-10 l10,0Z" fill="#6b4a1e" stroke="${INK}" stroke-width="3"/><circle cx="48" cy="-2" r="4" fill="#6b4a1e"/></g>`;
+const MAGITEM=`<g transform="translate(40,-6) rotate(100)">${magGlass(24)}</g>`;
+
+
+/* ================= speech ================= */
+const Sound={on:true,tts:'speechSynthesis' in window,mode:'rec'};
+/* pre-recorded neural voices (one file per line); browser speech is only the fallback */
+const AUD=/*AUDIO*/{"旁白|放大鏡偵探隊，集合！":"822ce7e251.mp3","阿亮|阿亮，到！":"gf20c48798.mp3","小晴|小晴，到！":"g05fc0362e.mp3","阿哲|阿哲，到！":"g1768b9ed4.mp3","旁白|今天的任務：看清楚很小很小的東西！":"gacaf4743c.mp3","小晴|咦？有一封神秘的信！":"g82a7fd024.mp3","阿亮|我來打開！":"g5f0272ef5.mp3","阿亮|好小好小……我看不清楚！":"g0b97e7c09.mp3","小晴|我也看不到！":"gfc62ceec0.mp3","阿哲|看不清楚的時候，怎麼辦呢？":"g17f3e23f5.mp3","旁白|阿嬤看藥袋上的小字……":"g148b9e523.mp3","阿嬤|用這個，就看得很清楚喔！":"gcdc9b90cf.mp3","阿亮|我知道了！用放大鏡！":"g9043d83ba.mp3","大家|放大鏡偵探，出動！":"c7e5f2ca51.mp3","旁白|放大鏡偵探，開始！":"g549f74629.mp3","旁白|第一步，拿起放大鏡。":"g35c05fab8.mp3","旁白|第二步，放在圖片上。":"66a62a10ae.mp3","旁白|第三步，慢慢往上……":"9b1fa90612.mp3","阿亮|哇！是一台校車！":"g1b3e40244.mp3","旁白|第四步，眼睛看著，數到五。":"gcebf0fc55.mp3","旁白|第五步，說：":"ged8d9d3be.mp3","大家|看到了！":"c37aaacc28.mp3","旁白|放大鏡，讓小東西看起來變大！":"g32ab8f665.mp3","大家|放大鏡，讓小東西看起來變大！":"c9c1b637bd.mp3","旁白|放大鏡要拿多高，才最清楚呢？":"ff2b68fc4f.mp3","阿亮|太近了，沒有變大。":"g9925ddbb6.mp3","小晴|太遠了，模模糊糊的～":"g602d85d37.mp3","大家|又大又清楚！":"c85f89e0ae.mp3","旁白|慢慢往上，找到最清楚的地方！":"f5bcb23dca.mp3","旁白|如果把放大鏡拿開呢？":"g18a3707bc.mp3","阿亮|咦？校車變回小小的！":"g62e8dfb48.mp3","旁白|放上去，變大。拿開，變小。":"gb16500bad.mp3","旁白|校車沒有真的變大，是看起來變大！":"gfae10e3fd.mp3","小晴|我懂了！":"g1d3ff5efa.mp3","阿哲|偵探拿工具之前，要先知道三個規則！":"gc9a4b72a7.mp3","阿哲|放大鏡會把陽光集中在一點，很燙，會燒起來！":"gbcf35826f.mp3","旁白|規則一：不照太陽！":"gd47725215.mp3","旁白|規則二：不照眼睛！":"gf80786ccd.mp3","旁白|規則三：用完放回家！":"g81c669ba9.mp3","大家|我們是守規則的偵探！":"c6b92a590f.mp3","阿亮|是點心！我要吃～！":"ga6c9e3716.mp3","小晴|等一下！吃之前，要先看保存期限！":"g56a69bc2e.mp3","旁白|保存期限的字，很小很小。用放大鏡看一看！":"gbc5edb087.mp3","旁白|保存期限，二零二七年，三月十五日。":"g8784d294b.mp3","旁白|今天是，二零二六年，十月二十一日。":"gf721ec97a.mp3","小晴|日期還沒到，可以吃！":"g3bd80ca0a.mp3","旁白|這一包呢？保存期限，二零二六年，九月一日。":"g8f1b3e35a.mp3","小晴|日期已經過了，不能吃！":"g050efb457.mp3","小晴|可以吃的點心，先收進書包，下課再吃！":"g4a10a8eed.mp3","阿亮|好～下課再吃！":"g72983ca23.mp3","旁白|偵探任務完成！大家一起說！":"gc635fb4b0.mp3","大家|放大鏡，讓小東西變大！":"cc6b10c8a4.mp3","旁白|接下來，換你們當放大鏡偵探囉！":"g93e6580aa.mp3","大家|偵探們，出動！":"c5451fe2fa.mp3","旁白|一":"g60755a9ad.mp3","旁白|二":"g2585a4441.mp3","旁白|三":"g4d6377dd1.mp3","旁白|四":"ga3b323e63.mp3","旁白|五":"gdd6af5cc5.mp3","阿亮|很小的東西看不清楚，可以用什麼幫忙？":"g2ae290c13.mp3","阿亮|答對了！放大鏡可以幫我們看清楚。":"g8b4d79595.mp3","阿亮|放大鏡":"ga071987ea.mp3","阿亮|剪刀":"g5ae53134d.mp3","阿亮|皮球":"g3d51962fa.mp3","小晴|放大鏡放在校車圖上，校車看起來會怎樣？":"g4ef4381cf.mp3","小晴|對！放大鏡，讓小東西看起來變大！":"gde307a529.mp3","小晴|變大":"gf7936859b.mp3","小晴|變小":"ged34af5a0.mp3","阿哲|哪一個又大又清楚？":"gbdc0f7b4b.mp3","阿哲|對！慢慢往上，找到最清楚的地方。":"g697c8e3a1.mp3","阿哲|太近":"gfd26be070.mp3","阿哲|剛剛好":"g1eb76c544.mp3","阿哲|太遠":"gff6194b6f.mp3","阿亮|把放大鏡拿開，校車會怎樣？":"gfcc6aaf1e.mp3","阿亮|對！校車沒有真的變大，是看起來變大。":"g6db3b00a5.mp3","阿亮|變回小小的":"gaa9dd24de.mp3","阿亮|一直很大":"g31e6f3cea.mp3","阿哲|放大鏡可以照太陽嗎？":"g1ab1a59e0.mp3","阿哲|對！陽光集中會很燙，不照太陽！":"g2242d35fe.mp3","阿哲|可以":"g8bfcbe334.mp3","阿哲|不可以":"g39d617dfa.mp3","小晴|放大鏡可以照眼睛嗎？":"g77f8f8981.mp3","小晴|對！保護眼睛，不照眼睛！":"g07c9c8279.mp3","小晴|可以":"g99e551fef.mp3","小晴|不可以":"gbad8cc0da.mp3","阿亮|放大鏡用完，要放在哪裡？":"g02542c856.mp3","阿亮|對！用完放回家！":"gd404c04ab.mp3","阿亮|放回盒子":"g1f1655fe0.mp3","阿亮|丟在地上":"g43d12069d.mp3","小晴|吃點心之前，要先找什麼？":"g0371e4126.mp3","小晴|對！吃之前，先看保存期限。":"g66dca071a.mp3","小晴|保存期限":"g5e29c970e.mp3","小晴|包裝的顏色":"g37769df50.mp3","阿哲|日期還沒到，點心可以吃嗎？":"ga0e9abc8a.mp3","阿哲|對！日期還沒到，可以吃！":"g917896221.mp3","阿哲|可以吃":"g24aedf322.mp3","阿哲|不能吃":"g352b00825.mp3","阿亮|再想一想":"gc413ef2f9.mp3","小晴|再想一想":"gef4f1b8d6.mp3","阿哲|再想一想":"g1821e2f14.mp3","旁白|放大鏡偵探，認證成功！放大鏡，讓小東西變大！":"g8f3b35896.mp3","汪探長|汪！":"gd7f6fcf27.mp3","汪探長|汪？":"gb69300902.mp3","旁白|還有偵探狗，汪探長！":"cfb304e676.mp3","汪探長|汪汪！":"g1b9b7420d.mp3","旁白|第二步，放大鏡貼在圖片上。":"g0c1dab6b0.mp3","旁白|第三步，慢慢拿起來，往眼睛靠近……":"ge7c0304a4.mp3","旁白|看到又大又清楚，就停！":"g112640e4d.mp3","旁白|放大鏡要離圖片多遠，才最清楚呢？":"g115f30dd6.mp3","旁白|慢慢拿起來，看到又大又清楚，就停！":"g41cda2e67.mp3","阿哲|對！看到又大又清楚，就停！":"g0308aae63.mp3","旁白|今天是……":"gf166a52ff.mp3"}/*END*/;const AUD_BASE='magnifier-audio/';
+const audioCache={};let curAudio=null;
+function audioFor(name,plain){if(Sound.mode!=='rec')return null;const f=AUD[name+'|'+plain];if(!f)return null;let a=audioCache[f];if(!a){a=new Audio(AUD_BASE+f);a.preload='auto';audioCache[f]=a}return a}
+function preloadAudio(){Object.keys(AUD).forEach(k=>{const [n,...t]=k.split('|');audioFor(n,t.join('|'))})}
+function setMode(m){Sound.mode=m;syncVoiceBtn()}
+function syncVoiceBtn(){const b=document.getElementById('voiceBtn');if(!b)return;b.textContent=Sound.mode==='rec'?'聲音：AI 錄音':(VO.twNatural?'聲音：Edge 臺灣腔':'聲音：這台電腦');b.title=Sound.mode==='rec'?'預錄好的角色配音，每台電腦都一樣':'使用這台電腦的語音；用 Edge 開啟會是臺灣腔'}
+function stopAudio(fireEnd){const a=curAudio;if(!a)return;curAudio=null;try{a.pause()}catch(e){}if(fireEnd&&a.onended)a.onended()}
+const VO={f:null,f2:null,m:null,twNatural:false};
+function pickVoices(){if(!Sound.tts)return;const vs=speechSynthesis.getVoices();const zh=vs.filter(v=>/^(zh|cmn)/i.test(v.lang));
+  const tw=zh.filter(v=>/TW|Hant/i.test(v.lang)||/臺灣|台灣|Taiwan/i.test(v.name));const pool=(tw.length?tw:zh).slice();
+  const score=v=>(/Natural|Online/i.test(v.name)?3:0)+(/Google/i.test(v.name)?2:0)+(v.localService?0:1);pool.sort((a,b)=>score(b)-score(a));
+  const isM=v=>!/female|女/i.test(v.name)&&/\bmale\b|男|Zhiwei|YunJhe|Yunjhe|Kangkang|Yunxi|Yunyang/i.test(v.name);
+  VO.m=pool.find(isM)||null;const fs=pool.filter(v=>!isM(v));VO.f=fs[0]||null;VO.f2=fs[1]||VO.f;
+  const twN=pool.some(v=>/TW/i.test(v.lang)&&/Natural|Online/i.test(v.name));
+  if(twN&&!VO.twNatural){VO.twNatural=true;if(!Sound.userPicked)setMode('tts')}
+  syncVoiceBtn()}
+if(Sound.tts){pickVoices();speechSynthesis.addEventListener?.('voiceschanged',pickVoices)}
+function utter(text,voice,rateMul=1){const u=new SpeechSynthesisUtterance(text);u.lang='zh-TW';const v=voice.sex==='m'?(VO.m||VO.f):voice.sex==='f2'?(VO.f2||VO.f||VO.m):(VO.f||VO.m);if(v)u.voice=v;
+  u.pitch=voice.pitch;u.rate=Math.max(.5,Math.min(1.6,voice.rate*rateMul));return u}
+function fmt(t){return t.replace(/【(.+?)】/g,'<mark>$1</mark>')}
+const SUB=$('sub');let subOn=true;
+function showSub(who,text){SUB.innerHTML=`<span class="who" style="background:${who.color}">${who.name}</span><span>${fmt(text)}</span>`;SUB.hidden=!subOn}
+function hideSub(){SUB.hidden=true;SUB.innerHTML=''}
+function say(who,text,spoken){
+  const gg=T.gen;const plain=(spoken||text).replace(/[【】]/g,'');showSub(who,text);
+  const ks=who.kids||(typeof who.talk==='function'?[who]:[]);ks.forEach(k=>k.talk(true));
+  const n=plain.replace(/[，。！？、…～：:\s]/g,'').length+(plain.match(/[，。！？…：]/g)||[]).length*1.4;
+  const st={ended:false,endAt:0};const t0=T.clock;const rec=Sound.on?audioFor(who.name,plain):null;const tts=Sound.on&&(rec||Sound.tts);
+  const fin=()=>{if(gg!==T.gen)return;st.ended=true;st.endAt=T.clock;ks.forEach(k=>k.talk(false))};
+  if(rec){try{rec.currentTime=0}catch(e){}rec.playbackRate=T.speechRate<1?.82:1;rec.onended=rec.onerror=()=>{if(curAudio===rec)curAudio=null;fin()};curAudio=rec;rec.play().catch(fin)}
+  else if(tts){try{const u=utter(plain,who.voice,T.speechRate);u.onend=u.onerror=fin;speechSynthesis.speak(u)}catch(e){fin()}}
+  const base=(n*240/T.speechRate+550);
+  return new Promise(res=>T.waiters.push({g:gg,res,test(){const el=T.clock-t0;
+    if(tts){if(st.ended)return T.clock-st.endAt>=160&&el>=n*110;return el>=n*520/T.speechRate+3500}
+    return el>=base},done(){ks.forEach(k=>k.talk(false))}}));
+}
+function stopSpeech(){stopAudio();if(Sound.tts)try{speechSynthesis.cancel()}catch(e){}}
+
+/* ================= fx ================= */
+/* ---- sound effects, synthesized (no files) ---- */
+let ACX=null;
+function ac(){if(!ACX){try{ACX=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(ACX.state==='suspended')ACX.resume();return ACX}
+function tone(f0,f1,dur,type='sine',vol=.18,delay=0){const a=ac();if(!a)return;const t=a.currentTime+delay;const o=a.createOscillator(),gn=a.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(gn).connect(a.destination);o.start(t);o.stop(t+dur+.03)}
+function noise(dur,f0,f1,vol=.2){const a=ac();if(!a)return;const t=a.currentTime;const b=a.createBuffer(1,Math.ceil(a.sampleRate*dur),a.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  const src=a.createBufferSource();src.buffer=b;const f=a.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,t+dur);const gn=a.createGain();gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.001,t+dur);src.connect(f).connect(gn).connect(a.destination);src.start(t)}
+const SFX={pop:()=>tone(520,1150,.12,'sine',.16),whoosh:()=>noise(.4,300,3200,.25),dash:()=>noise(.16,1800,6500,.22),
+  ding:()=>{tone(1320,1318,.55,'triangle',.16);tone(1980,1978,.4,'sine',.06)},thud:()=>{tone(170,45,.25,'sine',.35);noise(.08,260,90,.2)},
+  stamp:()=>{tone(130,38,.32,'sine',.42);noise(.14,400,80,.28)},boing:()=>{tone(150,420,.12,'sine',.22);tone(420,170,.25,'sine',.18,.12)},
+  tada:()=>[523,659,784,1047].forEach((f,i)=>tone(f,f,.22,'triangle',.14,i*.08)),levelup:()=>[392,523,659,784,1047,1319].forEach((f,i)=>tone(f,f,.13,'square',.05,i*.065))};
+function sfx(n){if(!Sound.on||reduce&&n==='whoosh')return;try{SFX[n]&&SFX[n]()}catch(e){}}
+function sfxFor(t){if(/咻/.test(t))sfx('whoosh');else if(/叮/.test(t))sfx('ding');else if(/登登/.test(t))sfx('tada');else if(/咚|啪|喀|滋/.test(t))sfx('thud');else if(/閃身/.test(t))sfx('dash');else sfx('pop')}
+
+const particles=[];
+function textMark(txt,size,fill){return `<text class="fd" text-anchor="middle" dominant-baseline="central" font-size="${size}" fill="${INK}" stroke="${INK}" stroke-width="${size*.26}" stroke-linejoin="round">${txt}</text><text class="fd" text-anchor="middle" dominant-baseline="central" font-size="${size}" fill="${fill}" stroke="#fff" stroke-width="${size*.11}" stroke-linejoin="round" paint-order="stroke">${txt}</text>`}
+async function flash(node,{x=0,y=0,s=1,r=0,hold=700,inD=280,outD=260,rise=0}={}){const a=new Act(node,{x,y,s:0,r});await tween(a,{s},inD,E.back);await wait(hold);await tween(a,{o:0,y:y-rise},outD,E.in);node.remove()}
+function popText(txt,x,y,{size=64,color=CORAL,rot=-8,hold=650,layer=HUD}={}){sfxFor(txt);const n=g(textMark(txt,size,color),layer);return flash(n,{x,y,r:rot,hold,rise:20})}
+function sparkles(x,y,n=8,layer=FX,spread=120){for(let i=0;i<n;i++){const s=g(`<path d="M0,-22 Q3,-3 22,0 Q3,3 0,22 Q-3,3 -22,0 Q-3,-3 0,-22Z" fill="${['#ffd23f','#fff','#7fd8ff','#ff9ec7'][i%4]}" stroke="${INK}" stroke-width="3"/>`,layer);
+  const a=Math.random()*Math.PI*2,d=rand(spread*.4,spread);flash(s,{x:x+Math.cos(a)*d,y:y+Math.sin(a)*d,s:rand(.5,1.2),r:rand(0,90),hold:rand(250,600),inD:240})}}
+function dust(x,y,n=4){for(let i=0;i<n;i++){const c=g(`<circle r="18" fill="#efe4d0" stroke="${INK}" stroke-width="3"/>`,FX);flash(c,{x:x+rand(-40,40),y:y+rand(-14,6),s:rand(.5,1),hold:120,inD:200,outD:400,rise:30})}}
+function confetti(n=90){if(reduce)n=25;const cols=['#ffc83d','#ff6b57','#1f7f86','#7fd8ff','#ff9ec7','#3fbf73'];for(let i=0;i<n;i++){const r=el('rect',{x:-8,y:-5,width:16,height:10,rx:2,fill:cols[i%cols.length]},HUD);
+  particles.push({node:r,x:rand(0,1280),y:rand(-300,-20),vx:rand(-60,60),vy:rand(120,260),r:rand(0,360),vr:rand(-300,300),life:4500})}}
+function stepParticles(dt){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.life-=dt;p.x+=p.vx*dt/1000;p.y+=p.vy*dt/1000;p.r+=p.vr*dt/1000;
+  p.node.setAttribute('transform',`translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${p.r.toFixed(0)})`);if(p.life<=0||p.y>760){p.node.remove();particles.splice(i,1)}}}
+let focusT=0;
+function drawFocus(){let d='';const cx=640,cy=360;for(let i=0;i<70;i++){const a=i/70*Math.PI*2+rand(-.03,.03),w=rand(.006,.016),r0=rand(330,430),r1=900;
+  d+=`M${(cx+Math.cos(a-w)*r1).toFixed(0)},${(cy+Math.sin(a-w)*r1).toFixed(0)} L${(cx+Math.cos(a)*r0).toFixed(0)},${(cy+Math.sin(a)*r0*.75).toFixed(0)} L${(cx+Math.cos(a+w)*r1).toFixed(0)},${(cy+Math.sin(a+w)*r1).toFixed(0)}Z `}
+  FOCUS.innerHTML=`<path d="${d}" fill="${INK}" opacity=".55"/>`}
+const MARKS={
+  '!':`<path d="M-11,-62 L11,-62 L6,0 L-6,0Z" fill="#ff4b3e" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><circle cy="20" r="9" fill="#ff4b3e" stroke="${INK}" stroke-width="4"/>`,
+  '?':`<g transform="translate(-34,0) rotate(-14)">${textMark('?',70,'#2f8fd8')}</g><g transform="translate(26,-22) rotate(12)">${textMark('?',54,'#2f8fd8')}</g>`,
+  sweat:`<path d="M0,-26 Q18,0 12,14 Q0,26 -12,14 Q-18,0 0,-26Z" fill="#8fd3ff" stroke="${INK}" stroke-width="4"/><path d="M-5,6 Q-6,-2 -2,-8" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  bulb:`<g stroke="${INK}" stroke-width="5" stroke-linecap="round"><path d="M-58,-10 L-82,-14 M58,-10 L82,-14 M-42,-52 L-60,-70 M42,-52 L60,-70 M0,-70 L0,-96" stroke="#ffb800" stroke-width="8"/></g><path d="M-30,-14 A34,34 0 1,1 30,-14 Q18,4 16,20 L-16,20 Q-18,4 -30,-14Z" fill="#fff27a" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/><rect x="-16" y="20" width="32" height="16" rx="4" fill="#b9c2cc" stroke="${INK}" stroke-width="5"/>`,
+  heart:`<path d="M0,16 C-34,-8 -18,-34 0,-16 C18,-34 34,-8 0,16Z" fill="#ff4d6d" stroke="${INK}" stroke-width="4"/>`
+};
+function mark(k,type){const [hx,hy]=k.headPt();const s=k.s;const n=g(MARKS[type],FX);
+  if(type==='sweat'){const a=new Act(n,{x:hx+86*s*k.sx,y:hy-50*s,s:0});tween(a,{s:1},200,E.back).then(()=>tween(a,{y:hy+10*s,o:0},1100,E.in)).then(()=>n.remove());return}
+  if(type==='heart'){for(let i=0;i<3;i++){const h=g(MARKS.heart,FX);flash(h,{x:hx+rand(-80,80)*s,y:hy-130*s-i*30,s:rand(.6,1),hold:500+i*120,rise:60})}n.remove();return}
+  flash(n,{x:hx+(type==='?'?70*s:0),y:hy-(type==='bulb'?150:142)*s,s:s*1.05,hold:type==='bulb'?1300:900})}
+function stamp(ok,x=640,y=380,label){sfx('stamp');const col=ok?LEAF:'#e5483b';const n=g((ok?`<circle r="105" fill="none" stroke="${col}" stroke-width="26"/>`:`<path d="M-90,-90 L90,90 M90,-90 L-90,90" stroke="${col}" stroke-width="30" stroke-linecap="round"/>`)+(label?`<g transform="translate(0,150)"><rect x="-170" y="-40" width="340" height="80" rx="40" fill="${col}" stroke="${INK}" stroke-width="5"/><text class="fd" text-anchor="middle" dominant-baseline="central" font-size="46" fill="#fff">${label}</text></g>`:''),HUD);
+  const a=new Act(n,{x,y,s:2.6,o:0,r:-12});tween(a,{s:1,o:.94},320,E.out).then(()=>{T.shake=14});return a}
+function banner(text,y=92,fill=SUN){const n=g('',HUD);const w=Math.min(1200,text.replace(/[【】]/g,'').length*54+120);
+  const t=text.replace(/【(.+?)】/g,`<tspan fill="${CORAL}">$1</tspan>`);
+  n.innerHTML=`<rect x="${-w/2}" y="-56" width="${w}" height="112" rx="30" fill="${fill}" stroke="${INK}" stroke-width="6"/><text class="fd" text-anchor="middle" dominant-baseline="central" font-size="52" fill="${INK}">${t}</text>`;
+  const a=new Act(n,{x:640,y,s:0});tween(a,{s:1},420,E.back);return a}
+function pill(text,x,y,col){const n=g(`<rect x="-120" y="-42" width="240" height="84" rx="42" fill="${col}" stroke="${INK}" stroke-width="6"/><text class="fd" text-anchor="middle" dominant-baseline="central" font-size="46" fill="#fff">${text}</text>`,HUD);const a=new Act(n,{x,y,s:0});tween(a,{s:1},320,E.back);return a}
+
+/* ================= props ================= */
+const BUS=`<rect x="-160" y="-82" width="320" height="132" rx="24" fill="#ffc21a" stroke="${INK}" stroke-width="7"/>
+<g fill="#bfe6ff" stroke="${INK}" stroke-width="6"><rect x="-140" y="-64" width="52" height="44" rx="8"/><rect x="-78" y="-64" width="52" height="44" rx="8"/><rect x="-16" y="-64" width="52" height="44" rx="8"/><rect x="46" y="-64" width="44" height="44" rx="8"/><rect x="104" y="-64" width="42" height="74" rx="8"/></g>
+<rect x="-160" y="22" width="264" height="12" fill="${INK}"/><text x="-40" y="2" text-anchor="middle" dominant-baseline="central" font-size="30" font-weight="900" fill="${INK}" font-family="Noto Sans TC,sans-serif">校車</text>
+<circle cx="152" cy="28" r="9" fill="#fff6b0" stroke="${INK}" stroke-width="4"/><path d="M-174,-20 h14 v34 h-14z" fill="#e5483b" stroke="${INK}" stroke-width="4"/>
+<g stroke="${INK}" stroke-width="7"><circle cx="-92" cy="52" r="30" fill="${INK}"/><circle cx="92" cy="52" r="30" fill="${INK}"/></g><circle cx="-92" cy="52" r="11" fill="#c9ced6"/><circle cx="92" cy="52" r="11" fill="#c9ced6"/>`;
+function magGlass(r=44,handle=true){return (handle?`<g transform="rotate(-45)"><rect x="${-r*.25}" y="${r+4}" width="${r*.5}" height="${r*.36}" fill="#ffd04a" stroke="${INK}" stroke-width="${Math.min(5,r*.12)}"/><rect x="${-r*.3}" y="${r*1.36+4}" width="${r*.6}" height="${r*1.4}" rx="${r*.27}" fill="#8a5a2b" stroke="${INK}" stroke-width="${Math.min(5,r*.12)}"/></g>`:'')+
+  `<circle r="${r}" fill="rgba(190,230,255,.45)" stroke="#3a3f47" stroke-width="${r*.24}"/><circle r="${r}" fill="none" stroke="#ffd04a" stroke-width="${r*.07}"/><path d="M${-r*.62},${-r*.18} Q${-r*.56},${-r*.6} ${-r*.14},${-r*.66}" fill="none" stroke="#fff" stroke-width="${r*.14}" stroke-linecap="round"/>`}
+function heldMag(){const n=el('g');n.innerHTML=`<rect x="-9" y="4" width="18" height="60" rx="8" fill="#8a5a2b" ${S5}/><rect x="-11" y="58" width="22" height="12" fill="#ffd04a" ${S5}/><g transform="translate(0,112)">${magGlass(44,false)}</g><circle r="15" fill="${SKIN}" ${S5}/>`;return n}
+
+function buildClassroom(){
+  const c=el('g',{id:'classroom'},BG);
+  let ticks='';for(let i=0;i<12;i++)ticks+=`<line x1="0" y1="-44" x2="0" y2="${i%3?-38:-34}" transform="rotate(${i*30})" stroke="${INK}" stroke-width="${i%3?3:5}"/>`;
+  let joints='';[[150,564,612],[520,564,612],[900,564,612],[330,612,664],[760,612,664],[1120,612,664],[90,664,712],[600,664,712],[1010,664,712]].forEach(([x,a,b])=>joints+=`<line x1="${x}" y1="${a}" x2="${x}" y2="${b}"/>`);
+  c.innerHTML=`<rect width="1280" height="560" fill="#fbf0d9"/><rect width="1280" height="36" fill="#f1dfba"/>
+  <rect y="548" width="1280" height="16" fill="#b9824f"/><rect y="564" width="1280" height="156" fill="#e3b47e"/>
+  <g stroke="#c9965f" stroke-width="3"><line x1="0" y1="612" x2="1280" y2="612"/><line x1="0" y1="664" x2="1280" y2="664"/><line x1="0" y1="712" x2="1280" y2="712"/>${joints}</g>
+  <g transform="translate(111,120)"><circle r="52" fill="#fff" stroke="${INK}" stroke-width="6"/>${ticks}<line x1="0" y1="0" x2="0" y2="-38" transform="rotate(30)" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><line x1="0" y1="0" x2="0" y2="-25" transform="rotate(332.5)" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><circle r="6" fill="${CORAL}"/></g>
+  <text x="111" y="204" text-anchor="middle" class="fd" font-size="21" fill="${INK}">今天的任務</text><g id="sched"></g>
+  <rect x="250" y="70" width="600" height="270" rx="12" fill="#8a5a32" stroke="${INK}" stroke-width="6"/><rect x="264" y="84" width="572" height="242" rx="4" fill="#2f5e4c"/>
+  <path d="M290,300 q40,-14 80,0" stroke="#f6f3e8" stroke-width="3" fill="none" opacity=".35"/><g transform="translate(790,130) rotate(-20)" opacity=".5"><circle r="20" fill="none" stroke="#f6f3e8" stroke-width="4"/><line x1="14" y1="14" x2="34" y2="34" stroke="#f6f3e8" stroke-width="6" stroke-linecap="round"/></g>
+  <text id="chalk" x="550" y="210" text-anchor="middle" dominant-baseline="central" class="fc" font-size="54" font-weight="700" fill="#f6f3e8"></text>
+  <rect x="256" y="336" width="588" height="14" rx="4" fill="#a56c3d" stroke="${INK}" stroke-width="4"/><rect x="300" y="327" width="30" height="9" rx="3" fill="#fff"/><rect x="345" y="328" width="22" height="8" rx="3" fill="#ffd0e0"/>
+  <rect x="930" y="80" width="290" height="250" rx="6" fill="#a9dcf7" stroke="${INK}" stroke-width="6"/>
+  <g clip-path="url(#winClip)"><g id="clouds"><g fill="#fff"><ellipse cx="990" cy="250" rx="46" ry="20"/><ellipse cx="1020" cy="236" rx="30" ry="22"/><ellipse cx="1130" cy="280" rx="40" ry="16"/><ellipse cx="1150" cy="270" rx="24" ry="18"/></g></g>
+  <g id="winSun"><circle cx="1160" cy="140" r="30" fill="#ffd23f" stroke="#f2a900" stroke-width="5"/></g></g>
+  <path d="M1075,80 V330 M930,205 H1220" stroke="${INK}" stroke-width="6"/>
+  <path d="M928,74 L1080,74 Q1060,140 1074,200 Q1056,260 1080,336 L928,336Z" fill="#ffb3a7" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/><path d="M970,80 Q960,200 975,330 M1020,80 Q1012,200 1028,330" stroke="#e98f82" stroke-width="4" fill="none"/>
+  <rect x="918" y="330" width="314" height="16" rx="4" fill="#fff" stroke="${INK}" stroke-width="5"/>`;
+  const sc=c.querySelector('#sched');['簽到','神秘信封','放大鏡偵探','生活任務','收拾'].forEach((t,i)=>{
+    const y=220+i*64;g(`<rect class="card" x="36" y="${y}" width="150" height="54" rx="12" fill="#fff" stroke="${INK}" stroke-width="4"/><circle class="dot" cx="62" cy="${y+27}" r="15" fill="#f1dfba" stroke="${INK}" stroke-width="3"/><text class="num fd" x="62" y="${y+28}" text-anchor="middle" dominant-baseline="central" font-size="18" fill="${INK}">${i+1}</text><text class="fd" x="84" y="${y+28}" dominant-baseline="central" font-size="${t.length>4?19:22}" fill="${INK}">${t}</text>`,sc)});
+  return c;}
+const CLASS=buildClassroom();
+function setChalk(t){const n=$('chalk');n.textContent=t;n.setAttribute('font-size',t.length>9?44:54)}
+function setTask(i){[...document.querySelectorAll('#sched > g')].forEach((n,k)=>{n.querySelector('.card').setAttribute('fill',k===i?SUN:(k<i?'#e2f4e8':'#fff'));n.querySelector('.dot').setAttribute('fill',k<i?LEAF:(k===i?'#fff':'#f1dfba'));const num=n.querySelector('.num');num.textContent=k<i?'✓':String(k+1);num.setAttribute('fill',k<i?'#fff':INK)})}
+
+/* ---- lens rig: a real magnifier over any drawn surface ---- */
+let uid=0;
+function makeLensRig(build,kMax=4.3,R=118){
+  const id=++uid;const root=el('g',null,PROPS);
+  build(el('g',null,root));
+  const shadow=el('ellipse',{rx:R*.95,ry:R*.32,fill:'rgba(43,35,32,.2)'},root);
+  const cp=el('clipPath',{id:'lc'+id},root);const cc=el('circle',{r:R},cp);
+  const view=el('g',{'clip-path':`url(#lc${id})`},root);const mag=el('g',null,view);build(mag);
+  const glass=g(magGlass(R),root);
+  const rig={x:640,y:360,h:0,o:1,kMax,gauge:null,
+    apply(){const h=this.h,lift=h*34,sc=1+h*.08,cx=this.x,cy=this.y-lift;
+      const k=1+(this.kMax-1)*Math.min(h,.7)/.7;const blur=Math.max(0,h-.78)*42/k;
+      cc.setAttribute('cx',cx);cc.setAttribute('cy',cy);cc.setAttribute('r',R*sc*.93);
+      mag.setAttribute('transform',`translate(${cx},${cy}) scale(${k}) translate(${-this.x},${-this.y})`);
+      if(blur>.15){$('lensBlurN').setAttribute('stdDeviation',blur.toFixed(2));mag.setAttribute('filter','url(#lensBlur)')}else mag.removeAttribute('filter');
+      glass.setAttribute('transform',`translate(${cx},${cy}) scale(${sc})`);
+      shadow.setAttribute('cx',this.x+h*60);shadow.setAttribute('cy',this.y+R*.2+h*70);shadow.setAttribute('opacity',(.9-h*.5)*this.o);
+      root.setAttribute('opacity',this.o);
+      if(this.gauge)this.gauge.set(h);}};
+  rig.apply();return rig;}
+function desk(n){g(`<rect x="-10" y="-10" width="1300" height="740" fill="#c98d55"/><g stroke="#b07740" stroke-width="4">${[90,230,370,510,650].map(y=>`<line x1="0" y1="${y}" x2="1280" y2="${y}"/>`).join('')}</g>`,n)}
+function buildPaper(n){desk(n);
+  g(`<rect x="306" y="80" width="680" height="560" rx="6" fill="rgba(0,0,0,.18)"/><rect x="296" y="68" width="680" height="560" rx="6" fill="#fff" stroke="${INK}" stroke-width="5"/>
+  <text x="636" y="128" text-anchor="middle" class="fd" font-size="42" fill="${INK}">放大鏡學習單</text><text x="636" y="178" text-anchor="middle" class="fd" font-size="24" fill="#6a7a80">用放大鏡，找一找神秘小圖！</text>
+  <rect x="586" y="330" width="108" height="64" rx="6" fill="none" stroke="#9fb7bd" stroke-width="2" stroke-dasharray="6 5"/>
+  <g transform="translate(640,362) scale(.15)">${BUS}</g>
+  <g transform="translate(430,500) scale(.14)"><path d="M0,-90 L26,-28 L92,-28 L38,12 L58,78 L0,38 L-58,78 L-38,12 L-92,-28 L-26,-28Z" fill="#ffd23f" stroke="${INK}" stroke-width="10"/></g>
+  <g transform="translate(850,505) scale(.14)"><g fill="#ff9ec7" stroke="${INK}" stroke-width="10"><circle cx="0" cy="-50" r="40"/><circle cx="48" cy="-14" r="40"/><circle cx="30" cy="42" r="40"/><circle cx="-30" cy="42" r="40"/><circle cx="-48" cy="-14" r="40"/></g><circle r="30" fill="#ffd23f" stroke="${INK}" stroke-width="10"/></g>
+  <text x="430" y="572" text-anchor="middle" class="fd" font-size="20" fill="#6a7a80">星星</text><text x="850" y="572" text-anchor="middle" class="fd" font-size="20" fill="#6a7a80">花</text>`,n)}
+function buildSnack(color,date,dateSay){return n=>{desk(n);
+  g(`<path d="M352,92 l25,-22 l25,22 l25,-22 l25,22 l25,-22 l25,22 l25,-22 l25,22 l25,-22 l25,22 l25,-22 l25,22 l25,-22 l25,22 l25,-22 l25,22 l25,-22 l25,22 l25,-22 l25,22 l25,-22 l25,22 l25,-22 l25,22 V640 H352Z" fill="${color}" stroke="${INK}" stroke-width="7" stroke-linejoin="round"/>
+  <text x="652" y="196" text-anchor="middle" class="fd" font-size="88" fill="#fff" stroke="${INK}" stroke-width="7" paint-order="stroke">餅乾</text>
+  <g fill="#d99a5b" stroke="${INK}" stroke-width="5"><circle cx="440" cy="300" r="34"/><circle cx="870" cy="290" r="30"/></g><g fill="${INK}"><circle cx="430" cy="292" r="5"/><circle cx="450" cy="310" r="5"/><circle cx="866" cy="282" r="5"/><circle cx="878" cy="298" r="5"/></g>
+  <rect x="482" y="330" width="340" height="230" rx="16" fill="#fff" stroke="${INK}" stroke-width="5"/>
+  <text x="652" y="362" text-anchor="middle" font-size="12" fill="#6a7a80" font-family="Noto Sans TC,sans-serif">成分：小麥粉、砂糖、植物油、奶粉、鹽</text>
+  <text x="652" y="380" text-anchor="middle" font-size="12" fill="#6a7a80" font-family="Noto Sans TC,sans-serif">內容量：30 公克　產地：臺灣</text>
+  <text x="652" y="414" text-anchor="middle" font-size="12.5" font-weight="700" fill="${INK}" font-family="Noto Sans TC,sans-serif">保存期限</text>
+  <text x="652" y="434" text-anchor="middle" font-size="13" font-weight="900" fill="#d23b2f" font-family="Noto Sans TC,sans-serif">${date}</text>
+  <text x="652" y="470" text-anchor="middle" font-size="12" fill="#6a7a80" font-family="Noto Sans TC,sans-serif">請存放於陰涼乾燥處，開封後請盡快食用</text>
+  <g transform="translate(560,500)">${[...Array(30)].map((_,i)=>`<rect x="${i*6.4}" y="0" width="${i%3?2:4}" height="34" fill="${INK}"/>`).join('')}</g>`,n)}}
+function makeEnvelope(){const n=el('g',null,PROPS);
+  const cardG=g(`<rect x="-64" y="-44" width="128" height="88" rx="6" fill="#fff" stroke="${INK}" stroke-width="5"/><g transform="scale(.1)">${BUS}</g>`,n);
+  g(`<rect x="-92" y="-60" width="184" height="120" rx="10" fill="#fff0cf" stroke="${INK}" stroke-width="6"/><path d="M-92,60 L0,-4 L92,60" fill="none" stroke="${INK}" stroke-width="5"/>`,n);
+  const flapG=g(`<path d="M-92,-60 L0,12 L92,-60Z" fill="#ffe0a3" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/><circle cy="4" r="18" fill="#e5483b" stroke="${INK}" stroke-width="4"/><text y="5" text-anchor="middle" dominant-baseline="central" class="fd" font-size="24" fill="#fff">?</text>`,n);
+  const env=new Act(n);env.card=new Act(cardG,{s:.9});
+  env.flap={sy:1,apply(){flapG.setAttribute('transform',`translate(0,-60) scale(1,${this.sy}) translate(0,60)`);if(this.sy<0&&flapG!==n.firstChild)n.insertBefore(flapG,n.firstChild)}};
+  return env}
+function makeSnackBag(color,label){const n=g(`<path d="M-80,-96 l10,-12 l10,12 l10,-12 l10,12 l10,-12 l10,12 l10,-12 l10,12 l10,-12 l10,12 l10,-12 l10,12 l10,-12 l10,12 l10,-12 l10,12 V100 H-80Z" fill="${color}" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/><text y="-30" text-anchor="middle" class="fd" font-size="40" fill="#fff" stroke="${INK}" stroke-width="5" paint-order="stroke">${label}</text><circle cx="-26" cy="30" r="24" fill="#d99a5b" stroke="${INK}" stroke-width="5"/><circle cx="28" cy="40" r="20" fill="#d99a5b" stroke="${INK}" stroke-width="5"/><rect x="10" y="66" width="56" height="22" rx="4" fill="#fff" stroke="${INK}" stroke-width="3"/>`,PROPS);return new Act(n)}
+function makeThoughtCloud(){const n=el('g',null,HUD);const circles=[[-200,10,92],[-110,-72,100],[30,-90,108],[160,-48,98],[210,52,84],[96,98,92],[-56,100,96],[-180,84,74],[0,10,135],[-110,25,100],[110,15,115]];
+  g(circles.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff8ea" stroke="${INK}" stroke-width="12"/>`).join('')+circles.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff8ea"/>`).join(''),n);
+  const inner=el('g',null,n);
+  g(`<rect x="10" y="-70" width="120" height="150" rx="10" fill="#fff" stroke="${INK}" stroke-width="5"/><rect x="10" y="-70" width="120" height="34" rx="10" fill="#7fc8a9" stroke="${INK}" stroke-width="5"/><text x="70" y="-52" text-anchor="middle" dominant-baseline="central" class="fd" font-size="22" fill="#fff">藥袋</text><text x="70" y="10" text-anchor="middle" font-size="9" fill="${INK}" font-family="Noto Sans TC,sans-serif">一天三次　飯後吃</text><g stroke="#c9ced6" stroke-width="3"><line x1="28" y1="30" x2="112" y2="30"/><line x1="28" y1="44" x2="112" y2="44"/><line x1="28" y1="58" x2="96" y2="58"/></g>`,inner);
+  const G=new Kid(CFG.G,inner);Object.assign(G,{x:-120,y:128,s:.4,aR:-30});G.apply();
+  const lensN=g(`<g transform="rotate(-45)"><rect x="-8" y="44" width="16" height="50" rx="7" fill="#8a5a2b" stroke="${INK}" stroke-width="4"/></g><circle r="44" fill="#fff" stroke="#3a3f47" stroke-width="10"/><text y="2" text-anchor="middle" dominant-baseline="central" font-size="24" font-weight="900" fill="${INK}" font-family="Noto Sans TC,sans-serif">飯後吃</text>`,inner);
+  const cl=new Act(n,{x:610,y:235,s:0});cl.G=G;cl.lens=new Act(lensN,{x:-40,y:60,s:.35});return cl}
+function ruleCard(n,text,icon,x){const node=g(`<rect x="-210" y="-58" width="420" height="116" rx="24" fill="#fff" stroke="${INK}" stroke-width="6"/><circle cx="-158" cy="0" r="34" fill="${SUN}" stroke="${INK}" stroke-width="5"/><text x="-158" y="2" text-anchor="middle" dominant-baseline="central" class="fd" font-size="40" fill="${INK}">${n}</text><g transform="translate(-82,0)">${icon}</g><text x="-28" y="2" dominant-baseline="central" class="fd" font-size="42" fill="${INK}">${text}</text>`,HUD);
+  const a=new Act(node,{x,y:110,s:0});tween(a,{s:.85},420,E.back);return a}
+const ICO_SUN=`<circle r="22" fill="#ffd23f" stroke="${INK}" stroke-width="4"/><g stroke="#f2a900" stroke-width="5" stroke-linecap="round">${[0,45,90,135,180,225,270,315].map(a=>`<line x1="0" y1="-29" x2="0" y2="-38" transform="rotate(${a})"/>`).join('')}</g><path d="M-30,-30 L30,30" stroke="#e5483b" stroke-width="8" stroke-linecap="round"/>`;
+const ICO_EYE=`<path d="M-36,0 Q0,-30 36,0 Q0,30 -36,0Z" fill="#fff" stroke="${INK}" stroke-width="4"/><circle r="12" fill="${INK}"/><path d="M-30,-30 L30,30" stroke="#e5483b" stroke-width="8" stroke-linecap="round"/>`;
+const ICO_BOX=`<path d="M-34,-6 H34 V30 H-34Z" fill="#c98d55" stroke="${INK}" stroke-width="4"/><g transform="translate(-4,-22) scale(.32)">${magGlass(40)}</g><path d="M-38,-6 H38" stroke="${INK}" stroke-width="5"/>`;
+function makeBox(){const back=g(`<rect x="-120" y="-56" width="240" height="40" rx="6" fill="#9b6436" stroke="${INK}" stroke-width="5"/>`,PROPS);back.setAttribute('transform','translate(1060,600)');
+  const holder=el('g',null,PROPS);
+  const front=g(`<rect x="-126" y="-30" width="252" height="96" rx="10" fill="#c98d55" stroke="${INK}" stroke-width="6"/><text y="10" text-anchor="middle" dominant-baseline="central" class="fd" font-size="30" fill="#fff" stroke="${INK}" stroke-width="5" paint-order="stroke">放大鏡的家</text><g class="fd" font-size="14" fill="${INK}">${[...Array(8)].map((_,i)=>`<circle cx="${-98+i*28}" cy="48" r="10" fill="#fff" stroke="${INK}" stroke-width="2.5"/><text x="${-98+i*28}" y="49" text-anchor="middle" dominant-baseline="central">${i+1}</text>`).join('')}</g>`,PROPS);
+  front.setAttribute('transform','translate(1060,600)');const a=new Act(holder);return {holder,front,back}}
+function makeGauge(){/* side view: eye on top, picture at the bottom, magnifier travels between them */
+  const n=g(`<rect x="-122" y="112" width="244" height="424" rx="22" fill="#fff" stroke="${INK}" stroke-width="5"/>
+  <text y="142" text-anchor="middle" dominant-baseline="central" class="fd" font-size="24" fill="${TEAL}">從旁邊看</text>
+  <rect x="-70" y="390" width="140" height="104" fill="#e6ebee"/><rect x="-70" y="264" width="140" height="126" fill="#c9eed6"/><rect x="-70" y="206" width="140" height="58" fill="#ffd3cb"/>
+  <text x="-116" y="442" dominant-baseline="central" class="fd" font-size="17" fill="${INK}">太近</text><text x="-116" y="327" dominant-baseline="central" class="fd" font-size="17" fill="${LEAF}">剛剛好</text><text x="-116" y="235" dominant-baseline="central" class="fd" font-size="17" fill="#c0392b">太遠</text>
+  <line x1="0" y1="196" x2="0" y2="494" stroke="#9fb7bd" stroke-width="3" stroke-dasharray="7 6"/>
+  <g transform="translate(0,180)"><path d="M-30,0 Q0,-22 30,0 Q0,22 -30,0Z" fill="#fff" stroke="${INK}" stroke-width="4"/><circle cy="4" r="9" fill="${INK}"/></g>
+  <text x="40" y="180" dominant-baseline="central" class="fd" font-size="20" fill="${INK}">眼睛</text>
+  <rect x="-80" y="494" width="160" height="10" rx="3" fill="#fff" stroke="${INK}" stroke-width="4"/><text y="522" text-anchor="middle" dominant-baseline="central" class="fd" font-size="20" fill="${INK}">圖片</text>`,HUD);
+  n.setAttribute('transform','translate(1150,0)');
+  const lens=g(`<rect x="44" y="-5" width="54" height="10" rx="5" fill="#8a5a2b" stroke="${INK}" stroke-width="3"/><ellipse rx="46" ry="9" fill="rgba(170,220,255,.85)" stroke="#3a3f47" stroke-width="4"/>`,n);
+  const arrow=g(`<path d="M76,-46 L76,-14 M66,-36 L76,-48 L86,-36" stroke="${CORAL}" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,lens);
+  return {set(h){lens.setAttribute('transform',`translate(0,${(486-h*280).toFixed(1)})`);arrow.setAttribute('opacity',h<.66?1:0)}}}
+
+/* ================= stage helpers ================= */
+function placeKid(k,o){k.unholdAll();if(k.extra)k.extra.innerHTML='';k.talk(false);Object.assign(k,{x:0,y:655,s:.92,sx:1,r:0,jy:0,sq:1,hr:0,aL:10,aR:-10,o:1},o||{});k.face('n','smile','none');k.apply()}
+function showClass(on){CLASS.style.display=on?'':'none';if(!on){D.o=0;D.apply()}}
+function placeDog(o){D.item.innerHTML='';D.talk(false);Object.assign(D,{x:1130,y:655,s:.85,sx:1,r:0,jy:0,sq:1,hr:0,o:1},o||{});D.face('n','smile');D.apply()}
+function ghost(k){const c=k.root.cloneNode(true);c.removeAttribute('class');FX.appendChild(c);const a={o:.5,apply(){c.setAttribute('opacity',this.o)}};a.apply();tween(a,{o:0},420,E.lin).then(()=>c.remove())}
+/* 閃身步: a snappy side-flash with afterimages */
+async function flashStep(k,dx=130,times=2){const x0=k.x;for(let i=0;i<times;i++)for(const dir of [1,-1]){ghost(k);sfx('dash');await tween(k,{x:x0+dir*dx,r:dir*-9},100,E.out);await wait(120)}ghost(k);await tween(k,{x:x0,r:0},120,E.out)}
+function caution(){const n=g(`<text class="fd" x="0" y="0" font-size="22" fill="#fff" stroke="${INK}" stroke-width="6" paint-order="stroke">※ 偵探特技，請勿模仿（小心膝蓋）</text>`,HUD);const a=new Act(n,{x:24,y:40,o:0});tween(a,{o:1},250).then(()=>wait(2600)).then(()=>tween(a,{o:0},400)).then(()=>n.remove())}
+async function levelUp(lv,skill){sfx('levelup');const n=g(`<rect x="-270" y="-98" width="540" height="196" rx="26" fill="#1d2440" stroke="${SUN}" stroke-width="8"/>
+  <g transform="translate(0,-44)">${textMark('LEVEL UP!',62,SUN)}</g><text class="fd" y="14" text-anchor="middle" dominant-baseline="central" font-size="40" fill="#fff">偵探等級 Lv.${lv}</text>
+  <text class="fd" y="52" text-anchor="middle" dominant-baseline="central" font-size="26" fill="#9fe3ff">獲得技能：${skill}</text><rect x="-200" y="72" width="400" height="14" rx="7" fill="#39406a"/>`,HUD);
+  const bar=el('rect',{x:-200,y:72,width:0,height:14,rx:7,fill:SUN},n);const b={w:0,apply(){bar.setAttribute('width',this.w)}};
+  const a=new Act(n,{x:640,y:330,s:0});sparkles(640,330,10,HUD,300);await tween(a,{s:1},380,E.back);await tween(b,{w:400},900,E.out);await wait(700);await tween(a,{s:0,o:0},260,E.in);n.remove()}
+async function fetchGag(){
+  D.face('star','bark');await say(D,'汪！');dust(D.x,D.y);sfx('dash');await tween(D,{x:1500},330,E.in);await wait(450);
+  D.item.innerHTML=BANANA;sfx('dash');await tween(D,{x:1130},380,E.out);land(D);D.face('happy','smile');await wait(350);
+  [L,Q,Z].forEach(k=>k.face('meh','flat','none'));sfx('boing');popText('那是香蕉啦！',880,240,{size:62,color:'#e0a100'});await wait(1400);
+  D.face('shock','bark');mark(D,'sweat');await say(D,'汪？');dust(D.x,D.y);sfx('dash');await tween(D,{x:1500},300,E.in);await wait(400);
+  D.item.innerHTML=MAGITEM;sfx('dash');await tween(D,{x:1130},380,E.out);land(D);D.face('star','smile');sparkles(1130,500,6);await wait(250);
+  D.item.innerHTML='';const fm=new Act(g(magGlass(36),FX),{x:1160,y:520,s:.8});popText('咻～',780,180,{size:50});
+  const target=()=>L.armPt('R',202);await par(tween(fm,{x:target()[0],r:720},800,E.io),tween(fm,{y:200},400,E.out).then(()=>tween(fm,{y:target()[1]+40},400,E.in)));fm.node.remove();
+  L.hold('R',heldMag());L.face('star','grin','up');await tween(L,{aR:-165},280,E.back);const [mx,my]=L.armPt('R',202);sparkles(mx,my,8);popText('登登！',560,150,{size:58});
+  Q.face('star','wow','up');Z.face('star','grin','up');D.face('happy','smile')}
+async function giantEye(){const [hx,hy]=L.headPt();await tween(cam,{x:hx+40,y:hy+10,s:2.4},450,E.io);
+  const eye=g(`<circle r="46" fill="#fff"/><circle r="40" fill="#fff" stroke="${INK}" stroke-width="4"/><circle cx="4" cy="4" r="24" fill="#6b4a2a"/><circle cx="4" cy="4" r="12" fill="${INK}"/><circle cx="-6" cy="-6" r="7" fill="#fff"/>${magGlass(46)}`,FX);
+  const a=new Act(eye,{x:hx+32*L.s,y:hy,s:0});sfx('boing');await tween(a,{s:1},320,E.back);popText('噗！',hx+150,hy-110,{size:46,layer:FX});await wait(1000);
+  await tween(a,{s:0},200,E.in);eye.remove();await tween(cam,{x:640,y:360,s:1},400,E.io);Q.face('happy','grin');Z.face('happy','grin');popText('哈哈哈！',760,230,{size:54,color:'#ff8a3d'});await wait(500)}
+
+function classSetup(chalk,task){showClass(true);setChalk(chalk);setTask(task);placeKid(L,{x:360});placeKid(Q,{x:640});placeKid(Z,{x:920});placeDog()}
+function peek(k,side){placeKid(k,{x:side==='L'?150:1130,y:1003,s:1.1,sx:side==='L'?1:-1})}
+function resetStage(){FX.innerHTML='';HUD.innerHTML='';PROPS.innerHTML='';FOCUS.innerHTML='';T.focus=false;T.shake=0;particles.length=0;
+  Object.assign(cam,{x:640,y:360,s:1});cam.apply();hideSub();for(let i=KIDS.length-1;i>=0;i--)if(!KIDS[i].root.isConnected)KIDS.splice(i,1)}
+function arc(k,h,d){return tween(k,{jy:-h},d/2,E.out).then(()=>tween(k,{jy:0},d/2,E.in)).then(()=>land(k))}
+function land(k){k.sq=.84;k.apply();tween(k,{sq:1},260,E.back)}
+async function hopTo(k,x,n=2,dur=800,h=80){const x0=k.x;for(let i=1;i<=n;i++){await par(tween(k,{x:x0+(x-x0)*i/n},dur/n,E.lin),arc(k,h,dur/n));dust(k.x,k.y)}}
+const jumpAll=(ks,h=70,d=440)=>par(...ks.map((k,i)=>wait(i*60).then(()=>arc(k,h,d))));
+function popNum(i){const n=g(`<circle r="62" fill="${SUN}" stroke="${INK}" stroke-width="7"/>${textMark(String(i),84,'#fff')}`,HUD);return flash(n,{x:960+((i-1)%5)*0,y:150,hold:300,inD:200,outD:150})}
+let current=null;
+
+/* ================= scenes ================= */
+let title,env,rig,snack,box,cards=[];
+function makeTitle(){const n=g(`<g transform="scale(1.45,1)"><polygon points="${[...Array(32)].map((_,i)=>{const a=i/32*Math.PI*2,r=i%2?178:236;return (Math.cos(a)*r).toFixed(1)+','+(Math.sin(a)*r).toFixed(1)}).join(' ')}" fill="${SUN}" stroke="${INK}" stroke-width="7"/></g>
+  <g transform="translate(0,-38)">${textMark('放大鏡偵探',112,CORAL)}</g><g transform="translate(0,84) rotate(-4)">${textMark('出動！',92,TEAL)}</g><g transform="translate(300,-150) rotate(-18) scale(.9)">${magGlass(46)}</g>`,HUD);return new Act(n,{x:640,y:250,s:0})}
+const SCENES=[
+{name:'集合',setup(){classSetup('',0);placeKid(L,{x:-220});placeKid(Q,{x:640,jy:-900});placeKid(Z,{x:1500});placeDog({x:1500});title=makeTitle()},
+ async play(){await wait(250);popText('登登！',1010,90,{size:58,rot:10});await tween(title,{s:1},700,E.back);sparkles(640,250,10,HUD,330);
+  await say(N,'放大鏡偵探隊，【集合】！');await tween(title,{y:150,s:.6},500,E.io);
+  L.face('star','grin','up');await hopTo(L,360,2,800,90);tween(L,{aR:-165},260,E.back);popText('到！',470,300,{size:60,color:'#ff8a3d'});await say(L,'阿亮，到！');tween(L,{aR:-10},300);
+  Q.face('shock','o','up');await tween(Q,{jy:0},900,E.bounce);land(Q);dust(640,655,5);Q.face('happy','grin','none');popText('到！',760,300,{size:60,color:'#ff5fa2'});await say(Q,'小晴，到！');
+  dust(1100,650,3);await tween(Z,{x:920},700,E.out);dust(980,650,3);Z.face('n','smile','focus');await tween(Z,{aR:150},260,E.back);popText('到！',1030,300,{size:60,color:'#2f9e5b'});await say(Z,'阿哲，到！');tween(Z,{aR:-10},300);
+  const sg=g(`<g fill="${INK}"><rect x="-74" y="-14" width="148" height="12"/><rect x="-66" y="-4" width="56" height="26"/><rect x="-58" y="22" width="40" height="8"/><rect x="10" y="-4" width="56" height="26"/><rect x="18" y="22" width="40" height="8"/></g><g fill="#fff"><rect x="-58" y="2" width="8" height="8"/><rect x="-50" y="10" width="8" height="8"/><rect x="18" y="2" width="8" height="8"/><rect x="26" y="10" width="8" height="8"/></g>`,Z.extra);
+  const sga=new Act(sg,{y:-320});await tween(sga,{y:0},600,E.bounce);sfx('thud');Z.face(null,'smile','none');popText('酷',1040,240,{size:52,color:'#2b2320',rot:8});
+  dust(1400,650,2);await say(N,'還有偵探狗，汪探長！');ghost(D);sfx('dash');await tween(D,{x:1300},90,E.out);ghost(D);await tween(D,{x:1200},90,E.out);ghost(D);await tween(D,{x:1130},90,E.out);land(D);
+  D.face('star','bark');popText('汪！',1220,420,{size:56,color:'#a8661c'});await say(D,'汪汪！');D.face('star','smile');
+  [L,Q,Z].forEach(k=>k.face('star','grin','up'));sparkles(640,360,8);
+  const sp=say(N,'今天的任務：看清楚【很小很小】的東西！');await jumpAll([L,Q,Z,D]);await jumpAll([L,Q,Z,D]);await sp;await tween(title,{s:0},300,E.in)}},
+{name:'神秘信封',setup(){classSetup('任務：神秘信封',1);env=makeEnvelope();Object.assign(env,{x:640,y:-160,r:-200});env.apply()},
+ async play(){await wait(300);popText('咻～',820,140,{size:52,rot:6});await tween(env,{y:420,r:6},1000,E.back);
+  popText('登登！',640,290,{size:64});sparkles(640,420,8);[L,Q,Z,D].forEach(k=>{k.face('shock','o','up');mark(k,'!')});T.shake=10;await wait(500);
+  await say(Q,'咦？有一封【神秘的信】！');L.face('star','grin','focus');await say(L,'我來打開！');
+  await par(hopTo(L,500,1,450,60),tween(env,{x:650,y:455,r:0},500,E.out));await tween(L,{aR:-72},250);
+  popText('啪！',760,380,{size:50});await tween(env.flap,{sy:-1},300,E.out);await tween(env.card,{y:-104,s:1},550,E.back);
+  await tween(cam,{x:565,y:372,s:2.3},650,E.io);L.face('squint','wavy','worry');mark(L,'sweat');mark(L,'?');
+  await say(L,'好小好小……我【看不清楚】！');await tween(cam,{x:640,y:360,s:1},500,E.io);
+  Q.face('squint','frown','worry');await tween(Q,{r:-4},300);await say(Q,'我也看不到！');Z.face('up','flat','think');mark(Z,'?');await wait(700)}},
+{name:'想辦法',setup(){classSetup('看不清楚，怎麼辦？',1)},
+ async play(){Z.face('up','flat','think');await tween(Z,{aR:134},320,E.out);mark(Z,'?');
+  await say(Z,'看不清楚的時候，【怎麼辦】呢？');
+  for(const [x,y,r] of [[860,250,12],[830,222,18]]){flash(g(`<circle r="${r}" fill="#fff8ea" stroke="${INK}" stroke-width="6"/>`,HUD),{x,y,hold:3800,inD:200});await wait(150)}
+  const cl=makeThoughtCloud();await tween(cl,{s:1},500,E.back);
+  await say(N,'阿嬤看藥袋上的小字……');await par(tween(cl.lens,{x:70,y:4,s:1},1000,E.io),tween(cl.G,{aR:-80},700,E.io));
+  sparkles(680,240,6,HUD,90);cl.G.face('happy','grin');await say(cl.G,'用這個，就看得很清楚喔！');
+  await tween(cl,{s:0,o:0},350,E.in);Z.face('n','smile','none');tween(Z,{aR:-10},300);
+  mark(L,'bulb');popText('叮！',520,170,{size:60,color:'#ffb800'});T.focus=true;L.face('star','grin','up');await arc(L,70,400);
+  await say(L,'我知道了！用【放大鏡】！');T.focus=false;
+  await fetchGag();await giantEye();L.face('star','grin','up');Q.face('star','wow','up');Z.face('star','grin','up');
+  const sp=say(ALL,'放大鏡偵探，出動！');await jumpAll([L,Q,Z,D]);await sp}},
+{name:'變大了！',setup(){showClass(false);rig=makeLensRig(buildPaper,4.3);Object.assign(rig,{x:1180,y:-200,h:.35});rig.gauge=makeGauge();rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400})},
+ async play(){await say(N,'放大鏡偵探，開始！');popText('咻！',1010,120,{size:54});await tween(rig,{x:470,y:250},800,E.back);
+  await say(N,'第一步，【拿起】放大鏡。');const sp=say(N,'第二步，放大鏡【貼在】圖片上。');await tween(rig,{x:640,y:362,h:0},900,E.io);await sp;
+  const sp2=say(N,'第三步，慢慢拿起來，【往眼睛靠近】……');await tween(rig,{h:.7},3000,E.io);await sp2;
+  sparkles(rig.x,rig.y-30,10,FX,170);popText('停！',830,150,{size:72,color:LEAF});sfx('ding');await say(N,'看到【又大又清楚】，就停！');T.focus=true;L.face('star','wow','up');Q.face('star','wow','up');mark(L,'!');mark(Q,'!');
+  await say(L,'哇！是一台【校車】！');T.focus=false;
+  await say(N,'第四步，眼睛看著，數到五。');for(let i=1;i<=5;i++){popNum(i);await say(N,'一二三四五'[i-1])}
+  L.face('happy','grin');Q.face('happy','grin');await say(N,'第五步，說：');await say(ALL,'看到了！');
+  banner('放大鏡，讓小東西看起來【變大】！',80);await say(N,'放大鏡，讓小東西看起來【變大】！');L.face('star','grin','up');Q.face('star','grin','up');await say(ALL,'放大鏡，讓小東西看起來變大！');await levelUp(2,'放大鏡操作')}},
+{name:'最清楚',setup(){showClass(false);rig=makeLensRig(buildPaper,4.3);Object.assign(rig,{x:640,y:362,h:.7});rig.gauge=makeGauge();rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400})},
+ async play(){L.face('up','o','think');await say(N,'放大鏡要離圖片多遠，才最清楚呢？');
+  await tween(rig,{h:.04},1300,E.io);let p=pill('太近',640,70,'#7c8a90');L.face('n','flat','think');await say(L,'太近了，【沒有變大】。');await tween(p,{s:0},200,E.in);
+  await tween(rig,{h:1},1500,E.io);p=pill('太遠',640,70,CORAL);Q.face('dizzy','wavy','worry');mark(Q,'sweat');await say(Q,'太遠了，【模模糊糊】的～');await tween(p,{s:0},200,E.in);
+  Q.face('n','smile','none');await tween(rig,{h:.68},1500,E.io);pill('剛剛好',640,70,LEAF);sparkles(rig.x,rig.y-30,10,FX,170);stamp(true,175,290);
+  L.face('star','grin','up');Q.face('star','grin','up');await say(ALL,'又大又清楚！');await say(N,'慢慢拿起來，看到【又大又清楚】，就停！');await levelUp(3,'找到最清楚')}},
+{name:'拿開看看',setup(){showClass(false);rig=makeLensRig(buildPaper,4.3);Object.assign(rig,{x:640,y:362,h:.68});rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400})},
+ async play(){L.face('up','o','think');await say(N,'如果把放大鏡【拿開】呢？');popText('咻～',900,140,{size:52});await tween(rig,{x:1500,y:-220},700,E.in);
+  T.shake=12;L.face('shock','wow','up');Q.face('shock','o','up');mark(L,'!');mark(Q,'!');await tween(cam,{x:260,y:560,s:2},260,E.out);T.focus=true;popText('蛤？！',330,470,{size:56,layer:FX});await wait(700);T.focus=false;await tween(cam,{x:640,y:360,s:1},300,E.io);await say(L,'咦？校車【變回小小的】！');
+  const sp=say(N,'放上去，變大。拿開，變小。');
+  for(let i=0;i<2;i++){await tween(rig,{x:640,y:362},550,E.io);popText('變大！',870,200,{size:56,color:LEAF});L.face('star','grin');await wait(500);await tween(rig,{x:1010,y:150},500,E.io);popText('變小！',380,200,{size:56,color:'#7c8a90'});L.face('shock','o');await wait(450)}
+  await sp;await tween(rig,{x:1500,y:-220},400,E.in);L.face('happy','smile');Q.face('happy','smile');
+  banner('校車沒有真的變大，是【看起來】變大！',80);await say(N,'校車沒有真的變大，是【看起來】變大！');await say(Q,'我懂了！')}},
+{name:'安全規則',setup(){classSetup('偵探三個規則',2);placeKid(Z,{x:250});placeKid(Q,{x:520});placeKid(L,{x:780});placeDog({x:1228,s:.78});Z.hold('R',heldMag());cards=[]},
+ async play(){Z.face('n','grin','focus');await tween(Z,{aR:-165},300,E.back);await say(Z,'偵探拿工具之前，要先知道【三個規則】！');tween(Z,{aR:-10},300);
+  cards.push(ruleCard(1,'不照太陽',ICO_SUN,250));L.hold('R',heldMag());await tween(L,{aR:-92},500,E.io);
+  const paper=g(`<path d="M-60,-14 L56,-18 L66,14 L-52,18Z" fill="#fff" stroke="${INK}" stroke-width="4"/>`,PROPS);paper.setAttribute('transform','translate(905,655)');
+  const [lx,ly]=L.armPt('R',202);const sx=1160,sy=140,px=905,py=652;
+  const dx=lx-sx,dy=ly-sy,len=Math.hypot(dx,dy),nx=-dy/len,ny=dx/len;
+  const beam=g(`<polygon points="${sx+nx*26},${sy+ny*26} ${lx+nx*40},${ly+ny*40} ${lx-nx*40},${ly-ny*40} ${sx-nx*26},${sy-ny*26}" fill="rgba(255,226,90,.5)"/><polygon points="${lx+nx*40},${ly+ny*40} ${px},${py} ${lx-nx*40},${ly-ny*40}" fill="rgba(255,190,40,.6)"/>`,FX);
+  const ba=new Act(beam,{o:0});await tween(ba,{o:1},600);
+  const spot=g(`<circle r="26" fill="url(#hot)"/>`,FX);const spA=new Act(spot,{x:px,y:py,s:.3});await tween(spA,{s:1.4},700,E.out);
+  for(let i=0;i<5;i++)flash(g(`<circle r="16" fill="#c9c9c9" stroke="${INK}" stroke-width="3"/>`,FX),{x:px+rand(-16,16),y:py-30-i*24,s:rand(.6,1.1),hold:300+i*100,rise:60});
+  popText('滋滋～',1010,560,{size:48,color:'#ff9a1f'});await wait(300);
+  L.face('shock','wow','up');T.shake=14;mark(L,'!');popText('好燙！',640,250,{size:64});await arc(L,70,420);
+  await say(Z,'放大鏡會把陽光集中在一點，很燙，會【燒起來】！');stamp(false,1050,390,'不照太陽');await say(N,'規則一：【不照太陽】！');
+  await tween(ba,{o:0},300);beam.remove();spot.remove();paper.remove();HUD.lastChild.remove();L.unholdAll();L.face('n','smile','none');tween(L,{aR:-10},300);
+  cards.push(ruleCard(2,'不照眼睛',ICO_EYE,640));Q.hold('R',heldMag());Q.face('n','grin','none');await tween(Q,{aR:-110},500,E.io);
+  L.face('shock','wow','up');popText('閃身步！',930,190,{size:62,color:TEAL});caution();await flashStep(L,110,2);L.face('squint','wavy','worry');await par(tween(L,{aL:-157,aR:157},300,E.out),tween(L,{r:6},300));mark(L,'sweat');popText('哇啊！',900,230,{size:54});await wait(400);
+  stamp(false,640,360,'不照眼睛');await say(N,'規則二：【不照眼睛】！');
+  HUD.lastChild.remove();Q.unholdAll();Q.face('happy','smile','none');par(tween(Q,{aR:-10},300),tween(L,{aL:10,aR:-10,r:0},300));L.face('n','smile','none');
+  cards.push(ruleCard(3,'用完放回家',ICO_BOX,1030));box=makeBox();Z.face('n','grin','focus');await tween(Z,{aR:-130},300);
+  const [zx,zy]=Z.armPt('R',202);Z.unholdAll();const fm=new Act(g(`<g transform="rotate(-30)">${magGlass(40)}</g>`,box.holder),{x:zx,y:zy,s:.92});
+  popText('咻～',560,190,{size:52});await par(tween(fm,{x:1060,r:720},1100,E.io),tween(fm,{y:230},550,E.out).then(()=>tween(fm,{y:560},550,E.in)));
+  await tween(fm,{y:620,s:.7},250,E.in);popText('喀！',1180,520,{size:50,color:TEAL});T.shake=8;sparkles(1060,560,6);
+  stamp(true,1060,380);await say(N,'規則三：用完【放回家】！');tween(Z,{aR:-10},300);HUD.lastChild.remove();
+  [L,Q,Z].forEach(k=>{k.face('star','grin','up')});await par(tween(L,{aR:-140},300,E.back),tween(Q,{aR:-140},300,E.back),tween(Z,{aR:-140},300,E.back));
+  const sp=say(ALL,'我們是守規則的偵探！');await jumpAll([L,Q,Z,D]);await sp;await levelUp(4,'安全守則')}},
+{name:'保存期限',setup(){classSetup('生活任務：保存期限',3);snack=makeSnackBag('#ff9f43','餅乾');Object.assign(snack,{x:520,y:-200,r:-30});snack.apply()},
+ async play(){popText('咚！',700,300,{size:56});await tween(snack,{y:470,r:0},800,E.bounce);sparkles(520,470,6);
+  L.face('heart','drool','up');mark(L,'heart');D.face('heart','drool');mark(D,'heart');await say(L,'是點心！我要吃～！');
+  await tween(L,{x:455,r:10},500,E.in);
+  T.focus=true;Q.face('n','talk','focus');await tween(Q,{aL:95},180,E.back);popText('停！',760,200,{size:84});T.shake=12;
+  L.face('shock','o','up');D.face('shock','bark');sfx('thud');await tween(L,{x:400,r:-12},300,E.out);dust(420,655,4);T.focus=false;tween(L,{r:0},300);
+  await say(Q,'等一下！吃之前，要先看【保存期限】！');tween(Q,{aL:10},300);
+  await wipeOut('stripes');resetStage();showClass(false);
+  rig=makeLensRig(buildSnack('#ff9f43','2027.03.15'),2.5);Object.assign(rig,{x:1180,y:-200,h:.3});rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400});L.face('heart','smile','up');
+  await wipeIn('stripes');
+  await say(N,'保存期限的字，很小很小。用放大鏡看一看！');await tween(rig,{x:652,y:425,h:0},900,E.io);await tween(rig,{h:.68},1600,E.io);sparkles(652,400,8,FX,160);
+  await say(N,'保存期限：2027年3月15日。','保存期限，二零二七年，三月十五日。');
+  const cal=g(`<rect x="-120" y="-80" width="240" height="160" rx="16" fill="#fff" stroke="${INK}" stroke-width="6"/><rect x="-120" y="-80" width="240" height="50" rx="16" fill="${CORAL}" stroke="${INK}" stroke-width="6"/><text y="-54" text-anchor="middle" dominant-baseline="central" class="fd" font-size="30" fill="#fff">今天</text><text y="2" text-anchor="middle" dominant-baseline="central" class="fd" font-size="34" fill="${INK}">${TODAY.y}年</text><text y="44" text-anchor="middle" dominant-baseline="central" class="fd" font-size="34" fill="${INK}">${TODAY.m}月${TODAY.d}日</text>`,HUD);
+  const ca=new Act(cal,{x:1120,y:140,s:0});await tween(ca,{s:1},400,E.back);sparkles(1120,140,8,HUD,140);await say(N,'今天是……');await wait(600);
+  stamp(true,300,330,'可以吃');Q.face('happy','grin');L.face('star','grin','up');await say(Q,'日期【還沒到】，可以吃！');
+  popText('咻～',900,120,{size:50});await tween(rig,{x:1500,y:-220},500,E.in);await wipeOut('iris');PROPS.innerHTML='';HUD.innerHTML='';FX.innerHTML='';
+  rig=makeLensRig(buildSnack('#9aa5b1','2026.09.01'),2.5);Object.assign(rig,{x:652,y:425,h:.68});rig.apply();HUD.appendChild(cal);
+  await wipeIn('iris');await say(N,'這一包呢？保存期限：2026年9月1日。','這一包呢？保存期限，二零二六年，九月一日。');
+  stamp(false,300,330,'不能吃');Q.face('n','talk','focus');await say(Q,'日期【已經過了】，不能吃！');
+  L.face('dizzy','wavy','worry');popText('啊～～',380,420,{size:56,color:'#7c8a90'});await par(tween(L,{hr:-40,y:1080},900,E.in));
+  await wipeOut('stripes');resetStage();classSetup('生活任務：保存期限',3);snack=makeSnackBag('#ff9f43','餅乾');Object.assign(snack,{x:520,y:470});snack.apply();await wipeIn('stripes');
+  Q.face('happy','grin');await say(Q,'可以吃的點心，先收進書包，下課再吃！');L.face('happy','grin','none');await tween(snack,{x:360,y:560,s:.4},500,E.io);snack.node.remove();await say(L,'好～下課再吃！');await levelUp(5,'看保存期限')}},
+{name:'偵探口號',setup(){classSetup('放大鏡，讓小東西變大！',4);placeKid(L,{x:400});placeKid(Q,{x:640});placeKid(Z,{x:880});placeDog({x:1110})},
+ async play(){[L,Q,Z].forEach(k=>k.face('star','grin','up'));D.face('star','smile');await levelUp('MAX','放大鏡偵探');await say(N,'偵探任務完成！大家一起說！');
+  confetti(90);banner('放大鏡，讓小東西【變大】！',92);await par(tween(L,{aR:-165},300,E.back),tween(Q,{aR:-165,aL:165},300,E.back),tween(Z,{aL:165},300,E.back));
+  const sp=say(ALL,'放大鏡，讓小東西變大！');popText('閃身步！',640,250,{size:66,color:TEAL});caution();await par(flashStep(L,70,2),flashStep(Q,70,2),flashStep(Z,70,2),flashStep(D,60,2));await jumpAll([L,Q,Z,D],80,460);await sp;
+  await say(N,'接下來，換你們當【放大鏡偵探】囉！');[L,Q,Z].forEach(k=>k.face('happy','grin','none'));
+  const wave=async k=>{for(let i=0;i<3;i++){await tween(k,{aR:-120},220);await tween(k,{aR:-160},220)}};
+  const sp2=say(ALL,'偵探們，出動！');await par(wave(L),wave(Q),wave(Z));await sp2}}
+];
+
+/* ================= transitions ================= */
+async function wipeOut(type){WIPE.innerHTML='';sfx('whoosh');if(type==='iris'){const p=el('path',{fill:INK,'fill-rule':'evenodd'},WIPE);const o={r:820,apply(){const r=Math.max(0,this.r);p.setAttribute('d',`M-10,-10H1290V730H-10Z M${640-r},360 a${r},${r} 0 1,0 ${2*r},0 a${r},${r} 0 1,0 ${-2*r},0Z`)}};o.apply();WIPE.iris=o;await tween(o,{r:0},550,E.in)}
+  else{const cols=[SUN,CORAL,TEAL,'#7fd8ff',SUN,CORAL];const bands=cols.map((c,i)=>{const b=el('polygon',{points:'0,0 300,0 200,760 -100,760',fill:c,stroke:INK,'stroke-width':6},WIPE);return new Act(b,{x:-420-i*20,y:-20})});WIPE.bands=bands;
+    await par(...bands.map((b,i)=>wait(i*60).then(()=>tween(b,{x:i*230-60},380,E.out))))}}
+async function wipeIn(type){if(type==='iris'&&WIPE.iris){await tween(WIPE.iris,{r:820},600,E.out)}else if(WIPE.bands){await par(...WIPE.bands.map((b,i)=>wait(i*50).then(()=>tween(b,{x:1500},380,E.in))))}WIPE.innerHTML='';WIPE.iris=null;WIPE.bands=null}
+
+/* ================= player ================= */
+const P={idx:0,started:false};
+const chapters=$('chapters');
+SCENES.forEach((s,i)=>{const b=document.createElement('button');b.className='chip';b.setAttribute('role','listitem');b.innerHTML=`<b>${i+1}</b>${s.name}`;b.onclick=()=>{start(i)};chapters.appendChild(b)});
+function markChip(i){[...chapters.children].forEach((c,k)=>c.classList.toggle('on',k===i));const on=chapters.children[i];if(on)on.scrollIntoView?.({block:'nearest',inline:'nearest'})}
+async function runFrom(i){const gg=++T.gen;T.tweens.length=0;T.timers.length=0;T.waiters.length=0;stopSpeech();KIDS.forEach(k=>k.talk(false));WIPE.innerHTML='';
+  $('endcard').hidden=true;$('cover').hidden=true;
+  for(let k=i;k<SCENES.length;k++){P.idx=k;markChip(k);
+    if(k>i){await wipeOut(k%2?'iris':'stripes');if(gg!==T.gen)return}
+    resetStage();SCENES[k].setup();
+    if(k>i)await wipeIn(k%2?'iris':'stripes');
+    await SCENES[k].play();if(gg!==T.gen)return;await wait(600);hideSub()}
+  setPlaying(false);$('endcard').hidden=false}
+function start(i){preloadAudio();if(Sound.tts&&Sound.on){try{speechSynthesis.cancel();speechSynthesis.resume();const u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u)}catch(e){}}
+  P.started=true;setPlaying(true);runFrom(Math.max(0,Math.min(SCENES.length-1,i)))}
+function setPlaying(on){T.playing=on;if(curAudio){try{on?curAudio.play().catch(()=>{}):curAudio.pause()}catch(e){}}if(Sound.tts){try{on?speechSynthesis.resume():speechSynthesis.pause()}catch(e){}}
+  $('playLbl').textContent=on?'暫停':'播放';$('playBtn').setAttribute('aria-label',on?'暫停':'播放');
+  $('playIco').innerHTML=on?'<rect x="5" y="4" width="5" height="16" rx="1.5" fill="#2b2320"/><rect x="14" y="4" width="5" height="16" rx="1.5" fill="#2b2320"/>':'<path d="M7 4 20 12 7 20Z" fill="#2b2320" stroke="#2b2320" stroke-width="2.5" stroke-linejoin="round"/>'}
+$('bigPlay').onclick=()=>start(0);
+$('playBtn').onclick=()=>{if(!P.started||!$('endcard').hidden){start(!$('endcard').hidden?0:P.idx);return}setPlaying(!T.playing)};
+$('prevBtn').onclick=()=>start(P.started?P.idx-1:0);
+$('nextBtn').onclick=()=>start(P.started?P.idx+1:1);
+$('againBtn').onclick=()=>start(0);
+$('toQuizBtn').onclick=()=>showView('quiz');
+function toggleBtn(id,state,labels){const b=$(id);b.setAttribute('aria-pressed',state);b.textContent=labels[state?1:0]}
+$('soundBtn').onclick=()=>{Sound.on=!Sound.on;if(!Sound.on){stopAudio(true);if(Sound.tts)try{speechSynthesis.cancel()}catch(e){}}toggleBtn('soundBtn',Sound.on,['配音：關','配音：開'])};
+$('voiceBtn').onclick=()=>{Sound.userPicked=true;stopAudio(true);if(Sound.tts)try{speechSynthesis.cancel()}catch(e){}setMode(Sound.mode==='rec'&&Sound.tts?'tts':'rec')};
+syncVoiceBtn();
+$('slowBtn').onclick=()=>{const on=T.mul===1;T.mul=on?.85:1;T.speechRate=on?.78:1;toggleBtn('slowBtn',on,['慢速：關','慢速：開'])};
+$('subBtn').onclick=()=>{subOn=!subOn;if(SUB.innerHTML)SUB.hidden=!subOn;toggleBtn('subBtn',subOn,['字幕：關','字幕：開'])};
+$('fsBtn').onclick=()=>{const w=$('stageWrap');try{if(document.fullscreenElement)document.exitFullscreen();else (w.requestFullscreen||w.webkitRequestFullscreen).call(w)}catch(e){}};
+document.addEventListener('keydown',e=>{if($('viewVideo').hidden||e.target.closest('input,textarea'))return;if(e.code==='Space'&&e.target===document.body){e.preventDefault();$('playBtn').click()}else if(e.key==='ArrowRight')$('nextBtn').click();else if(e.key==='ArrowLeft')$('prevBtn').click()});
+
+/* poster frame at rest */
+function poster(){resetStage();classSetup('',0);[L,Q,Z].forEach(k=>k.face('star','grin','up'));L.aR=-165;L.hold('R',heldMag());Z.aR=150;Q.aL=60;[L,Q,Z].forEach(k=>k.apply());const t=makeTitle();t.s=.6;t.y=150;t.apply();markChip(-1)}
+poster();
+
+/* ================= main loop ================= */
+function frame(now){const dt=Math.min(60,now-(T.last||now));T.last=now;
+  if(T.playing){T.clock+=dt*T.mul;const cdt=dt*T.mul;
+    for(let i=T.tweens.length-1;i>=0;i--){const w=T.tweens[i];if(w.g!==T.gen){T.tweens.splice(i,1);continue}const p=w.dur<=0?1:Math.min(1,(T.clock-w.t0)/w.dur);const e=w.ease(p);
+      for(const k in w.to)w.obj[k]=w.from[k]+(w.to[k]-w.from[k])*e;if(w.obj.apply)w.obj.apply();if(p>=1){T.tweens.splice(i,1);w.res()}}
+    for(let i=T.timers.length-1;i>=0;i--){const w=T.timers[i];if(w.g!==T.gen){T.timers.splice(i,1);continue}if(T.clock>=w.t){T.timers.splice(i,1);w.res()}}
+    for(let i=T.waiters.length-1;i>=0;i--){const w=T.waiters[i];if(w.g!==T.gen){T.waiters.splice(i,1);continue}if(w.test()){T.waiters.splice(i,1);w.done();w.res()}}
+    stepParticles(cdt);
+    if(T.focus&&!reduce){if(T.clock-focusT>90){focusT=T.clock;drawFocus()}}else if(FOCUS.firstChild)FOCUS.innerHTML='';
+    T.shake*=.88;const cl=$('clouds');if(cl)cl.setAttribute('transform',`translate(${((T.clock/90)%340)-60},0)`);
+  }
+  cam.apply();
+  for(const k of KIDS)k.ambient(k.video?T.clock:now,T.playing);
+  requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+
+/* ================= quiz ================= */
+const BUSI=(s,blur)=>`<g transform="translate(100,72) scale(${s})" ${blur?'filter="url(#qb)"':''}>${BUS}</g>`;
+const LENSI=(inner,blur)=>`<defs><filter id="qb" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter><clipPath id="qc${blur?1:0}${inner.length}"><circle cx="100" cy="72" r="58"/></clipPath></defs><circle cx="100" cy="72" r="58" fill="#fff"/><g clip-path="url(#qc${blur?1:0}${inner.length})">${inner}</g><g transform="translate(100,72)">${magGlass(58)}</g>`;
+const ICON={
+  mag:`<g transform="translate(92,66) rotate(-10)">${magGlass(44)}</g>`,
+  scissors:`<g transform="translate(100,75) rotate(-30)" stroke="${INK}" stroke-width="6" stroke-linejoin="round"><path d="M-6,-6 L60,-30 L64,-20Z" fill="#c9ced6"/><path d="M-6,6 L60,30 L64,20Z" fill="#c9ced6"/><circle cx="-34" cy="-20" r="20" fill="none" stroke="${CORAL}" stroke-width="10"/><circle cx="-34" cy="20" r="20" fill="none" stroke="${CORAL}" stroke-width="10"/></g>`,
+  ball:`<g transform="translate(100,74)"><circle r="54" fill="${CORAL}" stroke="${INK}" stroke-width="6"/><path d="M-54,0 Q0,-30 54,0 M-30,-44 Q0,0 -30,44 M30,-44 Q0,0 30,44" fill="none" stroke="#fff" stroke-width="6"/></g>`,
+  big:`<rect x="18" y="12" width="164" height="120" rx="12" fill="#fff" stroke="${INK}" stroke-width="4"/>${BUSI(.42)}`,
+  small:`<rect x="18" y="12" width="164" height="120" rx="12" fill="#fff" stroke="${INK}" stroke-width="4"/>${BUSI(.1)}`,
+  near:LENSI(BUSI(.14)),ok:LENSI(BUSI(.32)),far:LENSI(BUSI(.36,true),true),
+  sunQ:`<rect width="200" height="140" fill="#cfeefc"/><g transform="translate(160,32)"><circle r="22" fill="#ffd23f" stroke="${INK}" stroke-width="4"/></g><polygon points="146,46 82,52 112,84" fill="rgba(255,200,60,.55)"/><g transform="translate(96,66) rotate(30)">${magGlass(22)}</g><path d="M50,120 L100,112 L106,128 L56,134Z" fill="#fff" stroke="${INK}" stroke-width="3"/><circle cx="80" cy="122" r="9" fill="url(#qhot)"/><defs><radialGradient id="qhot"><stop offset="0" stop-color="#fff7b0"/><stop offset=".5" stop-color="#ff8a1f"/><stop offset="1" stop-color="#ff5a1f" stop-opacity="0"/></radialGradient></defs>`,
+  eyeQ:`<rect width="200" height="140" fill="#fff6d8"/><path d="M28,70 Q70,30 112,70 Q70,110 28,70Z" fill="#fff" stroke="${INK}" stroke-width="5"/><circle cx="70" cy="70" r="17" fill="${INK}"/><circle cx="64" cy="64" r="5" fill="#fff"/><g transform="translate(150,70)">${magGlass(26)}</g>`,
+  yes:`<circle cx="100" cy="72" r="46" fill="none" stroke="${INK}" stroke-width="16"/>`,
+  no:`<path d="M62,34 L138,110 M138,34 L62,110" stroke="${INK}" stroke-width="16" stroke-linecap="round"/>`,
+  box:`<g transform="translate(100,82)"><rect x="-70" y="-12" width="140" height="56" rx="8" fill="#c98d55" stroke="${INK}" stroke-width="5"/><g transform="translate(-6,-34) rotate(-20) scale(.62)">${magGlass(40)}</g><rect x="-74" y="-16" width="148" height="18" rx="4" fill="#9b6436" stroke="${INK}" stroke-width="5"/><text y="24" text-anchor="middle" dominant-baseline="central" class="fd" font-size="20" fill="#fff" stroke="${INK}" stroke-width="4" paint-order="stroke">放大鏡的家</text></g>`,
+  floor:`<rect y="96" width="200" height="54" fill="#e3b47e"/><line x1="0" y1="118" x2="200" y2="118" stroke="#c9965f" stroke-width="3"/><g transform="translate(96,96) rotate(70) scale(.7)">${magGlass(40)}</g><path d="M40,60 l10,10 M160,56 l-10,12 M150,30 l-6,12" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`,
+  dateQ:`<g transform="translate(100,70)"><rect x="-60" y="-60" width="120" height="124" rx="12" fill="#ff9f43" stroke="${INK}" stroke-width="5"/><rect x="-44" y="10" width="88" height="40" rx="6" fill="#fff" stroke="${INK}" stroke-width="3"/><text y="31" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="900" fill="#d23b2f" font-family="Noto Sans TC,sans-serif">2027.03.15</text><ellipse cx="0" cy="30" rx="52" ry="26" fill="none" stroke="${CORAL}" stroke-width="5"/><text y="-26" text-anchor="middle" class="fd" font-size="26" fill="#fff" stroke="${INK}" stroke-width="4" paint-order="stroke">餅乾</text></g>`,
+  colorQ:`<g transform="translate(100,70)"><rect x="-60" y="-60" width="120" height="124" rx="12" fill="#ff9f43" stroke="${INK}" stroke-width="5"/><g stroke="${INK}" stroke-width="3"><circle cx="-30" cy="22" r="14" fill="#ff6b57"/><circle cx="0" cy="22" r="14" fill="#3fbf73"/><circle cx="30" cy="22" r="14" fill="#5b8cff"/></g><text y="-26" text-anchor="middle" class="fd" font-size="26" fill="#fff" stroke="${INK}" stroke-width="4" paint-order="stroke">餅乾</text></g>`,
+  calQ:`<g transform="translate(52,72)"><rect x="-44" y="-50" width="88" height="100" rx="10" fill="#fff" stroke="${INK}" stroke-width="4"/><rect x="-44" y="-50" width="88" height="30" rx="10" fill="${CORAL}" stroke="${INK}" stroke-width="4"/><text y="-35" text-anchor="middle" dominant-baseline="central" class="fd" font-size="17" fill="#fff">今天</text><text y="2" text-anchor="middle" class="fd" font-size="17" fill="${INK}">${TODAY.y}年</text><text y="26" text-anchor="middle" class="fd" font-size="17" fill="${INK}">${TODAY.m}月${TODAY.d}日</text></g><g transform="translate(148,72)"><rect x="-44" y="-50" width="88" height="100" rx="10" fill="#ff9f43" stroke="${INK}" stroke-width="4"/><rect x="-36" y="-6" width="72" height="44" rx="6" fill="#fff" stroke="${INK}" stroke-width="3"/><text y="8" text-anchor="middle" font-size="12" fill="${INK}" font-family="Noto Sans TC,sans-serif">保存期限</text><text y="28" text-anchor="middle" font-size="13" font-weight="900" fill="#d23b2f" font-family="Noto Sans TC,sans-serif">2027年3月</text></g>`,
+  eat:`<g transform="translate(100,74)"><circle r="52" fill="#ffe7a8" stroke="${INK}" stroke-width="5"/><path d="M-22,-10 q8,-10 16,0 M6,-10 q8,-10 16,0" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><path d="M-24,12 Q0,40 24,12Z" fill="#b8343a" stroke="${INK}" stroke-width="4"/><circle cx="46" cy="34" r="20" fill="#d99a5b" stroke="${INK}" stroke-width="4"/></g>`,
+  noeat:`<g transform="translate(100,74)"><circle r="40" fill="#d99a5b" stroke="${INK}" stroke-width="5"/><circle cx="-12" cy="-8" r="5" fill="${INK}"/><circle cx="12" cy="10" r="5" fill="${INK}"/><path d="M-56,-56 L56,56" stroke="#e5483b" stroke-width="12" stroke-linecap="round"/><circle r="60" fill="none" stroke="#e5483b" stroke-width="10"/></g>`
+};
+const QUIZ=[
+  {host:'L',q:'很小的東西看不清楚，可以用什麼幫忙？',opts:[['放大鏡','mag',1],['剪刀','scissors'],['皮球','ball']],ok:'答對了！【放大鏡】可以幫我們看清楚。'},
+  {host:'Q',q:'放大鏡放在校車圖上，校車看起來會怎樣？',opts:[['變大','big',1],['變小','small']],ok:'對！放大鏡，讓小東西看起來【變大】！'},
+  {host:'Z',q:'哪一個又大又清楚？',opts:[['太近','near'],['剛剛好','ok',1],['太遠','far']],ok:'對！看到【又大又清楚】，就停！'},
+  {host:'L',q:'把放大鏡拿開，校車會怎樣？',opts:[['變回小小的','small',1],['一直很大','big']],ok:'對！校車沒有真的變大，是【看起來】變大。'},
+  {host:'Z',q:'放大鏡可以照太陽嗎？',pic:'sunQ',opts:[['可以','yes'],['不可以','no',1]],ok:'對！陽光集中會很燙，【不照太陽】！'},
+  {host:'Q',q:'放大鏡可以照眼睛嗎？',pic:'eyeQ',opts:[['可以','yes'],['不可以','no',1]],ok:'對！保護眼睛，【不照眼睛】！'},
+  {host:'L',q:'放大鏡用完，要放在哪裡？',opts:[['放回盒子','box',1],['丟在地上','floor']],ok:'對！用完【放回家】！'},
+  {host:'Q',q:'吃點心之前，要先找什麼？',opts:[['保存期限','dateQ',1],['包裝的顏色','colorQ']],ok:'對！吃之前，先看【保存期限】。'},
+  {host:'Z',q:'日期還沒到，點心可以吃嗎？',pic:'calQ',opts:[['可以吃','eat',1],['不能吃','noeat']],ok:'對！日期【還沒到】，可以吃！'}
+];
+const QZ={i:0,tries:0,first:[],read:true,lock:false};
+const qb=$('quizBody'),prog=$('prog');
+const hostSvg=`<svg viewBox="-150 -470 300 480" aria-hidden="true"><g id="hostLayer"></g></svg>`;
+let HOSTS=null,hostWrap=null;
+function ensureHosts(container){container.innerHTML=hostSvg+'<span class="think">?</span>';const layer=container.querySelector('#hostLayer');
+  HOSTS={L:new Kid(CFG.L,layer,false),Q:new Kid(CFG.Q,layer,false),Z:new Kid(CFG.Z,layer,false)};
+  Object.values(HOSTS).forEach(k=>{Object.assign(k,{x:0,y:0,s:1});k.apply()})}
+function showHost(key,e='n',m='smile',b='none'){Object.entries(HOSTS).forEach(([k,kid])=>{kid.root.style.display=k===key?'':'none'});HOSTS[key].face(e,m,b)}
+let speakTimer=0;
+function speak(text,who){if(!Sound.on)return;stopAudio();const plain=text.replace(/[【】]/g,'');const rec=audioFor(who?who.name:N.name,plain);const kk=who&&who.talk?[who]:[];
+  if(rec){if(Sound.tts)try{speechSynthesis.cancel()}catch(e){}try{rec.currentTime=0}catch(e){}rec.playbackRate=1;kk.forEach(k=>k.talk(true));rec.onended=rec.onerror=()=>{if(curAudio===rec)curAudio=null;kk.forEach(k=>k.talk(false))};curAudio=rec;rec.play().catch(()=>kk.forEach(k=>k.talk(false)));return}
+  if(!Sound.tts)return;try{speechSynthesis.cancel();speechSynthesis.resume();const u=utter(plain,who?who.voice:N.voice);
+  const ks=who&&who.talk?[who]:[];ks.forEach(k=>k.talk(true));u.onend=u.onerror=()=>ks.forEach(k=>k.talk(false));clearTimeout(speakTimer);speakTimer=setTimeout(()=>ks.forEach(k=>k.talk(false)),plain.length*450+2500);speechSynthesis.speak(u)}catch(e){}}
+const SPK=`<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3Z" fill="#2b2320"/><path d="M16 8q3 4 0 8M19 5q5 7 0 14" stroke="#2b2320" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`;
+function drawProg(){prog.innerHTML=QUIZ.map((_,i)=>{const done=i<QZ.i||(i===QZ.i&&QZ.lock),cur=i===QZ.i&&!QZ.lock;return `<span title="第${i+1}題"><svg width="32" height="32" viewBox="-50 -50 100 100"><g transform="scale(.66) translate(-10,-10)">${magGlass(40)}</g>${done?`<circle cx="-7" cy="-7" r="20" fill="${SUN}" stroke="${INK}" stroke-width="5"/><path d="M-17,-7 l7,7 l13,-13" stroke="${INK}" stroke-width="6" fill="none" stroke-linecap="round"/>`:cur?`<circle cx="-7" cy="-7" r="20" fill="#fff" stroke="${TEAL}" stroke-width="6"/>`:''}</svg></span>`}).join('')}
+function shuffle(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function quizStart(){QZ.i=0;QZ.first=[];prog.innerHTML='';
+  qb.innerHTML=`<div class="qstart"><div class="host" id="hostBox" style="max-width:340px;width:100%"></div><h2>偵探問答</h2><p>看完動畫，換你回答！一共 9 題，每一題都可以按喇叭再聽一次。答錯沒關係，再試一次就好。</p><button class="btn primary" id="qGo" style="font-size:22px;padding:10px 26px">開始問答</button></div>`;
+  const hb=$('hostBox');hb.innerHTML=`<svg viewBox="-520 -470 1040 480" aria-hidden="true"><g id="hostLayer"></g></svg>`;const layer=hb.querySelector('#hostLayer');
+  const trio=[new Kid(CFG.L,layer,false),new Kid(CFG.Q,layer,false),new Kid(CFG.Z,layer,false)];trio.forEach((k,i)=>{Object.assign(k,{x:(i-1)*310,y:0,s:1});k.face('star','grin','up');k.apply()});trio[0].aR=-160;trio[2].aL=160;trio.forEach(k=>k.apply());
+  $('qGo').onclick=()=>{trio.forEach(k=>k.root.remove());renderQ()}}
+function renderQ(){const d=QUIZ[QZ.i];QZ.tries=0;QZ.lock=false;drawProg();
+  const opts=shuffle(d.opts);
+  qb.innerHTML=`<div class="qcard"><div class="host" id="hostBox"></div><div class="qmain"><div class="qno">第 ${QZ.i+1} 題／共 ${QUIZ.length} 題</div>
+  <h2 class="qtext"><span>${d.q}</span><button class="spk" id="qSpk" style="position:static;flex:none" aria-label="再聽一次題目">${SPK}</button></h2>
+  ${d.pic?`<div class="qpic"><svg viewBox="0 0 200 140" role="img" aria-label="題目圖">${ICON[d.pic]}</svg></div>`:''}
+  <div class="opts">${opts.map((o,i)=>`<div class="opt" data-ok="${o[2]?1:0}" data-label="${o[0]}"><button class="opt-main" id="opt${i}"><svg viewBox="0 0 200 145" aria-hidden="true">${ICON[o[1]]}</svg><span>${o[0]}</span></button><button class="spk" aria-label="聽：${o[0]}">${SPK}</button></div>`).join('')}</div>
+  <div id="fb"></div></div></div>`;
+  ensureHosts($('hostBox'));hostWrap=$('hostBox');const host=HOSTS[d.host];showHost(d.host,'n','smile','none');
+  $('qSpk').onclick=()=>speak(d.q,host);
+  qb.querySelectorAll('.opt').forEach(o=>{o.querySelector('.spk').onclick=()=>speak(o.dataset.label,host);o.querySelector('.opt-main').onclick=()=>answer(o,d,host)});
+  if(QZ.read)setTimeout(()=>speak(d.q,host),250)}
+function answer(o,d,host){if(QZ.lock||o.classList.contains('wrong'))return;QZ.tries++;
+  if(o.dataset.ok==='1'){sfx('tada');QZ.lock=true;if(QZ.tries===1)QZ.first.push(QZ.i);o.classList.add('right');qb.querySelectorAll('.opt').forEach(x=>x.classList.remove('hint'));
+    hostWrap.classList.remove('puzzled','jump');void hostWrap.offsetWidth;hostWrap.classList.add('jump');showHost(d.host,'star','grin','up');drawProg();burst();
+    const last=QZ.i===QUIZ.length-1;$('fb').innerHTML=`<div class="feedback"><span>${fmt(d.ok)}</span><button class="btn go" id="qNext">${last?'看偵探成績':'下一題 →'}</button></div>`;
+    $('qNext').onclick=()=>{QZ.i++;if(QZ.i>=QUIZ.length)done();else renderQ()};$('qNext').focus({preventScroll:true});speak(d.ok,host)}
+  else{sfx('boing');o.classList.add('wrong');hostWrap.classList.add('puzzled');showHost(d.host,'up','flat','think');
+    const left=[...qb.querySelectorAll('.opt:not(.wrong)')];
+    if(QZ.tries>=2||left.length===1)left.filter(x=>x.dataset.ok==='1').forEach(x=>x.classList.add('hint'));
+    $('fb').innerHTML=`<div class="feedback try"><span>再想一想～${QZ.tries>=2||left.length===1?'看看發光的那一個！':''}</span></div>`;speak('再想一想',host)}}
+function burst(){if(reduce)return;const box=document.createElement('div');box.className='confetti';const cols=['#ffc83d','#ff6b57','#1f7f86','#7fd8ff','#ff9ec7','#3fbf73'];
+  for(let i=0;i<46;i++){const c=document.createElement('i');c.style.left=rand(5,95)+'vw';c.style.background=cols[i%cols.length];c.style.setProperty('--d',rand(1.2,2.2)+'s');c.style.setProperty('--dx',rand(-120,120)+'px');c.style.setProperty('--r',rand(-540,540)+'deg');c.style.animationDelay=rand(0,.3)+'s';box.appendChild(c)}
+  document.body.appendChild(box);setTimeout(()=>box.remove(),2800)}
+function done(){drawProg();const n=QZ.first.length;
+  qb.innerHTML=`<div class="qdone"><div class="host" id="hostBox" style="max-width:340px;width:100%"></div><h2>放大鏡偵探，認證成功！</h2>
+  <div class="badges">${QUIZ.map(()=>`<svg width="54" height="54" viewBox="-60 -60 120 120"><circle r="54" fill="${SUN}" stroke="${INK}" stroke-width="6"/><g transform="scale(.62) translate(-8,-8)">${magGlass(40)}</g></svg>`).join('')}</div>
+  <p>9 題全部完成！第一次就答對 <b>${n}</b> 題。記住偵探口號：放大鏡，讓小東西變大！</p><div class="toggles" style="justify-content:center"><button class="btn primary" id="qAgain">再玩一次</button><button class="btn" id="qBack">回去看動畫</button></div></div>`;
+  const hb=$('hostBox');hb.innerHTML=`<svg viewBox="-520 -470 1040 480" aria-hidden="true"><g id="hostLayer"></g></svg>`;const layer=hb.querySelector('#hostLayer');
+  const trio=[new Kid(CFG.L,layer,false),new Kid(CFG.Q,layer,false),new Kid(CFG.Z,layer,false)];trio.forEach((k,i)=>{Object.assign(k,{x:(i-1)*310,y:0,s:1,aR:-160,aL:i===1?160:10});k.face('happy','grin','none');k.apply()});
+  burst();speak('放大鏡偵探，認證成功！放大鏡，讓小東西變大！',N);$('qAgain').onclick=quizStart;$('qBack').onclick=()=>showView('video')}
+$('qRestart').onclick=quizStart;
+$('qReadBtn').onclick=()=>{QZ.read=!QZ.read;toggleBtn('qReadBtn',QZ.read,['自動唸題：關','自動唸題：開'])};
+
+/* ================= views ================= */
+let quizInit=false;
+function showView(v){preloadAudio();const q=v==='quiz';$('viewVideo').hidden=q;$('viewQuiz').hidden=!q;$('tabVideo').setAttribute('aria-selected',!q);$('tabQuiz').setAttribute('aria-selected',q);
+  if(q){if(T.playing)setPlaying(false);stopSpeech();if(!quizInit){quizInit=true;quizStart()}}
+  try{history.replaceState(null,'',q?'#quiz':'#video')}catch(e){}}
+$('tabVideo').onclick=()=>showView('video');$('tabQuiz').onclick=()=>showView('quiz');
+if(location.hash==='#quiz')showView('quiz');
+window.__md={T,SCENES,start,runFrom,Sound,setPlaying,D};
+})();
+</script>
+
+</body>
+</html>

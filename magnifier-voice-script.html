@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>放大鏡偵探配音腳本</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@500;700;900&display=swap">
+<style>
+/* Layout: single reading column — numbered how-to steps, then one card per voice role */
+:root{--bg:#e2eff3;--panel:#fff;--ink:#2b2320;--muted:#53646a;--sun:#ffc83d;--teal:#1f7f86;--wash:#fff6d8;
+--f-display:"Huninn","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;--f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color-scheme:light}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.7;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+*{box-sizing:border-box}
+main{max-width:820px;margin:0 auto;display:grid;gap:18px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,5vw,40px);margin:0;line-height:1.2;text-wrap:balance}
+.lead{margin:4px 0 0;color:var(--muted)}
+h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:8px 0 0}
+ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;display:grid;gap:10px}
+ol.steps li{counter-increment:s;background:var(--panel);border:3px solid var(--ink);border-radius:16px;padding:12px 14px 12px 60px;position:relative;box-shadow:0 3px 0 var(--ink)}
+ol.steps li::before{content:counter(s);position:absolute;left:12px;top:12px;width:34px;height:34px;border-radius:50%;background:var(--sun);border:3px solid var(--ink);display:grid;place-items:center;font-family:var(--f-display);font-size:18px}
+ol.steps b{font-weight:900}
+.tip{background:var(--wash);border:2px dashed #d9b44a;border-radius:14px;padding:10px 14px}
+.card{background:var(--panel);border:3px solid var(--ink);border-radius:18px;box-shadow:0 4px 0 var(--ink);padding:14px;display:grid;gap:10px}
+.card header{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between}
+.who{font-family:var(--f-display);font-size:24px;color:#fff;background:var(--c);border:3px solid var(--ink);border-radius:999px;padding:0 16px}
+.meta{color:var(--muted)}
+.row{display:grid;grid-template-columns:84px minmax(0,1fr);gap:10px;align-items:start}
+.lab{font-weight:900;color:var(--c);padding-top:2px}
+.box{position:relative;min-width:0}
+pre{margin:0;white-space:pre-wrap;word-break:break-word;font-family:var(--f-body);background:#f4f8f9;border:2px solid #cfdfe3;border-radius:12px;padding:10px 12px 10px;font-size:15px}
+pre.script{max-height:220px;overflow:auto}
+.cp{margin-top:6px;font-family:var(--f-display);font-size:16px;border:3px solid var(--ink);background:var(--sun);border-radius:12px;padding:4px 14px;min-height:44px;cursor:pointer;box-shadow:0 2px 0 var(--ink);color:var(--ink)}
+.cp:focus-visible{outline:4px solid var(--teal);outline-offset:2px}
+@media (max-width:560px){.row{grid-template-columns:1fr;gap:4px}}
+</style>
+</head>
+<body>
+
+<main>
+<div><h1>放大鏡偵探・配音腳本</h1><p class="lead">用 Google AI Studio 錄臺灣腔配音：每個角色錄<b>一個</b>音檔就好，我會幫你自動切成一句一句接進動畫。</p></div>
+<h2>一步一步做</h2>
+<ol class="steps">
+<li>用電腦（比手機好操作）開 <b>aistudio.google.com</b>，用你的 Google 帳號登入。第一次登入會跳出同意條款，按同意。</li>
+<li>點左側選單最上面的「<b>Playground</b>」。進去後，在上方或右側的<b>模型選單</b>裡，選名字有「<b>TTS</b>」的模型（例如 Gemini 3.8 Flash TTS）；如果上方有「Speech」或「Audio」分頁，點它也可以。找不到的話，直接在網址列輸入 <b>aistudio.google.com/generate-speech</b> 試試看。</li>
+<li>選<b>單一講者</b>（Single-speaker）模式，在聲音（Voice）選單挑下面卡片建議的聲音。名字不同也沒關係，挑描述接近的就好。</li>
+<li>把卡片上的「<b>風格指令</b>」按「複製風格」，貼到<b>風格／Style instructions</b> 的欄位。注意：不要把風格貼進台詞框，不然它會把指令也唸出來。</li>
+<li>按「<b>複製台詞</b>」，貼到主要的文字框，然後按 <b>Run</b>，等它生成。</li>
+<li>按播放<b>先聽一遍</b>：口音、語氣可以嗎？句子之間有沒有停頓？不滿意就改風格指令或換聲音，再按 Run 一次。</li>
+<li>滿意後，在播放器旁找<b>下載</b>圖示（或播放器右邊的 ⋮ 選單），把檔案存成卡片上寫的名字，例如 <b>阿亮.wav</b>。</li>
+<li>5 個角色都做完後，把 5 個音檔<b>拖進跟 Claude 的對話框</b>傳給我，我會切句、對齊，接進動畫和問答。</li>
+</ol>
+<p class="tip"><b>小提醒：</b>不用一次做完 5 個。先做出場最多的<b>阿亮、小晴、阿哲</b>，旁白和阿嬤可以繼續用現在的 AI 錄音。「大家」一起喊的口號，我會把三個小偵探的聲音疊起來變成合唱，你不用另外錄。如果某一句唸錯，只要那一句重錄一個小檔案就好。</p>
+<h2>還要錄的聲音</h2>
+<p class="tip"><b>已完成 ✓</b> 阿亮、小晴、阿哲、汪探長、阿嬤的配音，和旁白 32 句裡的 30 句，都接進動畫了。「大家」的口號是三個人的合唱。</p><article class="card" style="--c:#1f7f86">
+<header><span class="who">旁白</span><span class="meta">只差 2 句・存成 <b>旁白補錄.wav</b></span></header>
+<div class="row"><div class="lab">建議聲音</div><div>Sulafat（溫暖）或 Kore（穩重）</div></div>
+<div class="row"><div class="lab">風格指令</div><div class="box"><pre id="st0">用臺灣國語口音，溫柔、清楚、語速稍慢，像國中特教班老師在說故事給學生聽。每一行是一句獨立的台詞，每句之間停頓兩秒。</pre><button class="cp" data-t="st0">複製風格</button></div></div>
+<div class="row"><div class="lab">台詞</div><div class="box"><pre id="sc0" class="script">放大鏡偵探隊，集合！
+
+還有偵探狗，汪探長！</pre><button class="cp" data-t="sc0">複製台詞</button></div></div>
+</article>
+</main>
+<script>
+document.querySelectorAll('.cp').forEach(b=>b.addEventListener('click',()=>{const el=document.getElementById(b.dataset.t);const t=el.textContent;
+const ok=()=>{const o=b.textContent;b.textContent='已複製 ✓';setTimeout(()=>b.textContent=o,1500)};
+const sel=()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='已選取，按 Ctrl+C 複製';setTimeout(()=>b.textContent=b.dataset.t.startsWith('st')?'複製風格':'複製台詞',2500)};
+try{navigator.clipboard.writeText(t).then(ok,sel)}catch(e){sel()}}));
+</script>
+</body>
+</html>
