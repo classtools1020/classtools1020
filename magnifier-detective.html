@@ -150,7 +150,7 @@ body{font-family:var(--f-body);font-size:16px;line-height:1.6;padding-left:max(1
       <div class="sub" id="sub" hidden></div>
       <div class="cover" id="cover">
         <button class="bigplay" id="bigPlay" aria-label="播放動畫"><svg width="46%" viewBox="0 0 40 40" aria-hidden="true"><path d="M12 6 L34 20 L12 34Z" fill="#2b2320" stroke="#2b2320" stroke-width="4" stroke-linejoin="round"/></svg></button>
-        <span class="cover-label">按我播放（約 3 分鐘，有配音）</span>
+        <span class="cover-label">按我播放（約 4 分鐘，有配音）</span>
       </div>
       <div class="endcard" id="endcard" hidden>
         <h2>偵探任務完成！</h2>
@@ -225,6 +225,7 @@ const EYES={
   shock:x=>`<circle cx="${x}" cy="-2" r="20" fill="#fff" stroke="${INK}" stroke-width="4"/><circle cx="${x}" cy="-2" r="6" fill="${INK}"/>`,
   squint:x=>{const d=x<0?1:-1;return `<path d="M${x-12*d},-9 L${x+10*d},0 L${x-12*d},9" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>`},
   closed:x=>`<path d="M${x-12},2 L${x+12},2" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`,
+  meh:x=>`<path d="M${x-11},-3 A11,9 0 0,0 ${x+11},-3Z" fill="${INK}"/><path d="M${x-15},-4 L${x+15},-4" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>`,
   heart:x=>`<path transform="translate(${x},2) scale(1.15)" d="M0,10 C-22,-6 -12,-22 0,-11 C12,-22 22,-6 0,10Z" fill="#ff4d6d" stroke="${INK}" stroke-width="3"/>`,
   up:x=>`<ellipse cx="${x}" cy="0" rx="11" ry="15" fill="#fff" stroke="${INK}" stroke-width="3.5"/><circle cx="${x+3}" cy="-7" r="6" fill="${INK}"/>`,
   dizzy:x=>`<path d="M${x-11},-11 L${x+11},11 M${x+11},-11 L${x-11},11" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`
@@ -282,7 +283,7 @@ class Kid{
     this.eyes=el('g',null,this.head);
     this.brows=el('g',{fill:'none',stroke:INK,'stroke-width':6,'stroke-linecap':'round'},this.head);
     this.mouth=el('g',null,this.head);
-    if(c.glasses)g(GLASSES,this.head);
+    if(c.glasses)g(GLASSES,this.head);this.extra=el('g',null,this.head);
     this.phase=Math.random()*6;this.nextBlink=0;this.blinkUntil=0;this.blinking=false;this.talking=false;this.flap=false;this.lastFlap=0;
     this.e=this.m=this.b=null;this.face('n','smile','none');this.apply();KIDS.push(this);
   }
@@ -322,11 +323,48 @@ const CFG={
 const N={name:'旁白',color:TEAL,voice:{sex:'f',pitch:1.05,rate:1}};
 const L=new Kid(CFG.L,ACTORS),Q=new Kid(CFG.Q,ACTORS),Z=new Kid(CFG.Z,ACTORS);
 const ALL={name:'大家',color:'#d9483a',voice:{sex:'f',pitch:1.35,rate:1},kids:[L,Q,Z]};
+/* ---- 汪探長: an original detective puppy ---- */
+const DOGM={smile:`<path d="M-16,26 q8,10 16,0 q8,10 16,0" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`,
+  bark:`<path d="M-15,24 Q0,56 15,24Z" fill="#b8343a" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><ellipse cx="0" cy="42" rx="7" ry="5" fill="#ff8a8f"/>`,
+  drool:`<path d="M-16,26 q8,10 16,0 q8,10 16,0" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><path d="M-7,32 q7,26 14,0Z" fill="#ff8a8f" stroke="${INK}" stroke-width="3"/>`};
+class Dog{
+  constructor(layer){this.name='汪探長';this.color='#a8661c';this.voice={sex:'m',pitch:1.6,rate:1.1};this.video=true;
+    Object.assign(this,{x:0,y:655,s:.85,sx:1,r:0,jy:0,sq:1,hr:0,o:1});
+    this.root=el('g',{class:'dog'},layer);
+    this.tail=g(`<path d="M0,0 Q-30,-20 -24,-56" fill="none" stroke="${INK}" stroke-width="22" stroke-linecap="round"/><path d="M0,0 Q-30,-20 -24,-56" fill="none" stroke="#e8b26a" stroke-width="12" stroke-linecap="round"/>`,this.root);
+    g(`<g fill="#e8b26a" stroke="${INK}" stroke-width="5"><rect x="-36" y="-34" width="18" height="32" rx="8"/><rect x="18" y="-34" width="18" height="32" rx="8"/><ellipse cx="0" cy="-52" rx="48" ry="40"/></g>
+      <ellipse cx="0" cy="-42" rx="26" ry="24" fill="#fff6e6"/><g fill="#fff" stroke="${INK}" stroke-width="4"><ellipse cx="-27" cy="-4" rx="15" ry="8"/><ellipse cx="27" cy="-4" rx="15" ry="8"/></g>
+      <path d="M-34,-86 Q0,-72 34,-86 L34,-74 Q0,-60 -34,-74Z" fill="#e5483b" stroke="${INK}" stroke-width="4"/><circle cx="0" cy="-66" r="10" fill="#ffd04a" stroke="${INK}" stroke-width="3"/><circle cx="-1" cy="-67" r="4" fill="none" stroke="${INK}" stroke-width="2"/>`,this.root);
+    this.head=el('g',null,this.root);
+    this.head.innerHTML=`<ellipse cx="-54" cy="0" rx="19" ry="40" transform="rotate(18 -54 0)" fill="#9c5a22" stroke="${INK}" stroke-width="5"/><ellipse cx="54" cy="0" rx="19" ry="40" transform="rotate(-18 54 0)" fill="#9c5a22" stroke="${INK}" stroke-width="5"/>
+      <circle r="60" fill="#e8b26a" stroke="${INK}" stroke-width="5"/><ellipse cx="0" cy="24" rx="36" ry="26" fill="#fff6e6"/><ellipse cx="-40" cy="16" rx="11" ry="7" fill="#ff9e9e" opacity=".7"/><ellipse cx="40" cy="16" rx="11" ry="7" fill="#ff9e9e" opacity=".7"/>
+      <path d="M-52,-26 Q-48,-80 0,-82 Q48,-80 52,-26Z" fill="#a3814f" stroke="${INK}" stroke-width="5"/><path d="M-40,-30 Q0,-44 40,-30 M-26,-74 L-34,-30 M0,-82 L0,-40 M26,-74 L34,-30" fill="none" stroke="#7d6038" stroke-width="3"/>
+      <path d="M-34,-30 Q0,-16 34,-30 L28,-18 Q0,-6 -28,-18Z" fill="#7d6038" stroke="${INK}" stroke-width="4"/>`;
+    this.eyes=el('g',{transform:'translate(0,-2) scale(.78)'},this.head);
+    g(`<ellipse cx="0" cy="10" rx="12" ry="8" fill="${INK}"/><ellipse cx="-3" cy="7" rx="4" ry="2.5" fill="#fff"/>`,this.head);
+    this.mouth=el('g',null,this.head);this.item=el('g',{transform:'translate(0,36)'},this.head);
+    this.phase=Math.random()*6;this.nextBlink=0;this.blinking=false;this.talking=false;this.flap=false;this.lastFlap=0;this.e=this.m=null;
+    this.face('n','smile');this.apply();KIDS.push(this)}
+  face(e,m){if(e&&e!==this.e){this.e=e;this.blinking=false;this.eyes.innerHTML=EYES[e](-30)+EYES[e](30)}
+    if(m){m=DOGM[m]?m:(m==='o'||m==='wow'||m==='grin'?'bark':'smile');if(m!==this.m){this.m=m;if(!this.talking)this.mouth.innerHTML=DOGM[m]}}}
+  talk(on){if(this.talking===on)return;this.talking=on;if(!on){this.flap=false;this.mouth.innerHTML=DOGM[this.m]}}
+  apply(){const k=1+(1-this.sq)*.8;this.root.setAttribute('transform',`translate(${this.x.toFixed(2)},${(this.y+this.jy).toFixed(2)}) rotate(${this.r.toFixed(2)}) scale(${(this.s*this.sx*k).toFixed(4)},${(this.s*this.sq).toFixed(4)})`);this.root.setAttribute('opacity',this.o);this.head.setAttribute('transform',`translate(0,-126) rotate(${this.hr.toFixed(1)})`)}
+  headPt(){return [this.x,this.y+this.jy-126*this.s]}
+  ambient(t,playing){if(!this.root.isConnected)return;
+    if(playing)this.tail.setAttribute('transform',`translate(-40,-60) rotate(${(Math.sin(t/85)*24).toFixed(1)})`);
+    if(['n','star'].includes(this.e)){if(!this.blinking&&t>this.nextBlink){this.blinking=true;this.blinkUntil=t+130;this.eyes.innerHTML=EYES.closed(-30)+EYES.closed(30)}
+      else if(this.blinking&&t>this.blinkUntil){this.blinking=false;this.nextBlink=t+rand(2000,4500);this.eyes.innerHTML=EYES[this.e](-30)+EYES[this.e](30)}}
+    if(this.talking&&playing&&t-this.lastFlap>110){this.lastFlap=t;this.flap=!this.flap;this.mouth.innerHTML=DOGM[this.flap?'bark':this.m]}}
+}
+const D=new Dog(ACTORS);
+const BANANA=`<g transform="translate(0,10) scale(1.35) rotate(-8)"><path d="M-50,-14 Q-40,40 50,-6 Q46,-2 44,4 Q-24,34 -38,-14Z" fill="#ffe14a" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/><path d="M-30,0 Q0,22 32,4" fill="none" stroke="#e8b700" stroke-width="4" stroke-linecap="round"/><path d="M-44,-14 l-4,-10 l10,0Z" fill="#6b4a1e" stroke="${INK}" stroke-width="3"/><circle cx="48" cy="-2" r="4" fill="#6b4a1e"/></g>`;
+const MAGITEM=`<g transform="translate(40,-6) rotate(100)">${magGlass(24)}</g>`;
+
 
 /* ================= speech ================= */
 const Sound={on:true,tts:'speechSynthesis' in window,mode:'rec'};
 /* pre-recorded neural voices (one file per line); browser speech is only the fallback */
-const AUD=/*AUDIO*/{"旁白|放大鏡偵探隊，集合！":"822ce7e251.mp3","阿亮|阿亮，到！":"gf20c48798.mp3","小晴|小晴，到！":"99231745f1.mp3","阿哲|阿哲，到！":"9aed9e321b.mp3","旁白|今天的任務：看清楚很小很小的東西！":"8f5ba4af6e.mp3","小晴|咦？有一封神秘的信！":"da1231ec25.mp3","阿亮|我來打開！":"g5f0272ef5.mp3","阿亮|好小好小……我看不清楚！":"g0b97e7c09.mp3","小晴|我也看不到！":"8fdbe24984.mp3","阿哲|看不清楚的時候，怎麼辦呢？":"0d939e853a.mp3","旁白|阿嬤看藥袋上的小字……":"5b21784a18.mp3","阿嬤|用這個，就看得很清楚喔！":"68c332760f.mp3","阿亮|我知道了！用放大鏡！":"g9043d83ba.mp3","大家|放大鏡偵探，出動！":"1a55e1c45b.mp3","旁白|放大鏡偵探，開始！":"15c640196c.mp3","旁白|第一步，拿起放大鏡。":"0b89857323.mp3","旁白|第二步，放在圖片上。":"66a62a10ae.mp3","旁白|第三步，慢慢往上……":"9b1fa90612.mp3","阿亮|哇！是一台校車！":"g1b3e40244.mp3","旁白|第四步，眼睛看著，數到五。":"ff27761a31.mp3","旁白|第五步，說：":"4eb82b31ea.mp3","大家|看到了！":"d8a1fdab9f.mp3","旁白|放大鏡，讓小東西看起來變大！":"95d76f59d3.mp3","大家|放大鏡，讓小東西看起來變大！":"fb661a82e1.mp3","旁白|放大鏡要拿多高，才最清楚呢？":"ff2b68fc4f.mp3","阿亮|太近了，沒有變大。":"g9925ddbb6.mp3","小晴|太遠了，模模糊糊的～":"a477fb7859.mp3","大家|又大又清楚！":"a5b57de0a9.mp3","旁白|慢慢往上，找到最清楚的地方！":"f5bcb23dca.mp3","旁白|如果把放大鏡拿開呢？":"3641d04db3.mp3","阿亮|咦？校車變回小小的！":"g62e8dfb48.mp3","旁白|放上去，變大。拿開，變小。":"296881a1b4.mp3","旁白|校車沒有真的變大，是看起來變大！":"abe0f3034e.mp3","小晴|我懂了！":"0776b4d966.mp3","阿哲|偵探拿工具之前，要先知道三個規則！":"67acaf5dc9.mp3","阿哲|放大鏡會把陽光集中在一點，很燙，會燒起來！":"a6cb1923f3.mp3","旁白|規則一：不照太陽！":"ef6386c110.mp3","旁白|規則二：不照眼睛！":"9b992b7c65.mp3","旁白|規則三：用完放回家！":"b8b4f4f3ef.mp3","大家|我們是守規則的偵探！":"492802348f.mp3","阿亮|是點心！我要吃～！":"ga6c9e3716.mp3","小晴|等一下！吃之前，要先看保存期限！":"2160bbb483.mp3","旁白|保存期限的字，很小很小。用放大鏡看一看！":"c0b98c2804.mp3","旁白|保存期限，二零二七年，三月十五日。":"7400d50be0.mp3","旁白|今天是，二零二六年，十月二十一日。":"91a3ae674e.mp3","小晴|日期還沒到，可以吃！":"b4329fc045.mp3","旁白|這一包呢？保存期限，二零二六年，九月一日。":"82a1299574.mp3","小晴|日期已經過了，不能吃！":"2fd437182f.mp3","小晴|可以吃的點心，先收進書包，下課再吃！":"bb8010c849.mp3","阿亮|好～下課再吃！":"g72983ca23.mp3","旁白|偵探任務完成！大家一起說！":"4ff8684dbd.mp3","大家|放大鏡，讓小東西變大！":"7c0a1ce4cc.mp3","旁白|接下來，換你們當放大鏡偵探囉！":"b528050196.mp3","大家|偵探們，出動！":"03d387e594.mp3","旁白|一":"6491d45c90.mp3","旁白|二":"59c8c2c3ff.mp3","旁白|三":"0ea11f62fa.mp3","旁白|四":"f03c32b398.mp3","旁白|五":"7c089f1fde.mp3","阿亮|很小的東西看不清楚，可以用什麼幫忙？":"g2ae290c13.mp3","阿亮|答對了！放大鏡可以幫我們看清楚。":"g8b4d79595.mp3","阿亮|放大鏡":"ga071987ea.mp3","阿亮|剪刀":"g5ae53134d.mp3","阿亮|皮球":"g3d51962fa.mp3","小晴|放大鏡放在校車圖上，校車看起來會怎樣？":"c048cf66c7.mp3","小晴|對！放大鏡，讓小東西看起來變大！":"becf539c14.mp3","小晴|變大":"6a367e6c82.mp3","小晴|變小":"37c36b9ec7.mp3","阿哲|哪一個又大又清楚？":"974bf219d2.mp3","阿哲|對！慢慢往上，找到最清楚的地方。":"c62053c4b8.mp3","阿哲|太近":"261f52e05d.mp3","阿哲|剛剛好":"c1973f6876.mp3","阿哲|太遠":"f76e517208.mp3","阿亮|把放大鏡拿開，校車會怎樣？":"gfcc6aaf1e.mp3","阿亮|對！校車沒有真的變大，是看起來變大。":"g6db3b00a5.mp3","阿亮|變回小小的":"gaa9dd24de.mp3","阿亮|一直很大":"g31e6f3cea.mp3","阿哲|放大鏡可以照太陽嗎？":"a474425f90.mp3","阿哲|對！陽光集中會很燙，不照太陽！":"930ffb9145.mp3","阿哲|可以":"5f69062941.mp3","阿哲|不可以":"9100ed176b.mp3","小晴|放大鏡可以照眼睛嗎？":"ef397c00a7.mp3","小晴|對！保護眼睛，不照眼睛！":"dc7e377d5f.mp3","小晴|可以":"8ab239d712.mp3","小晴|不可以":"61c7bcbfe0.mp3","阿亮|放大鏡用完，要放在哪裡？":"g02542c856.mp3","阿亮|對！用完放回家！":"gd404c04ab.mp3","阿亮|放回盒子":"g1f1655fe0.mp3","阿亮|丟在地上":"g43d12069d.mp3","小晴|吃點心之前，要先找什麼？":"5191fe22bd.mp3","小晴|對！吃之前，先看保存期限。":"a321d45a34.mp3","小晴|保存期限":"4228cf1085.mp3","小晴|包裝的顏色":"a5984198e4.mp3","阿哲|日期還沒到，點心可以吃嗎？":"e414104d07.mp3","阿哲|對！日期還沒到，可以吃！":"8a56a3efe9.mp3","阿哲|可以吃":"e5f259c8d1.mp3","阿哲|不能吃":"baec743a6f.mp3","阿亮|再想一想":"gc413ef2f9.mp3","小晴|再想一想":"a4f3d2c17c.mp3","阿哲|再想一想":"fdb0ff1374.mp3","旁白|放大鏡偵探，認證成功！放大鏡，讓小東西變大！":"10d621d79c.mp3"}/*END*/;const AUD_BASE='magnifier-audio/';
+const AUD=/*AUDIO*/{"旁白|放大鏡偵探隊，集合！":"822ce7e251.mp3","阿亮|阿亮，到！":"gf20c48798.mp3","小晴|小晴，到！":"g05fc0362e.mp3","阿哲|阿哲，到！":"9aed9e321b.mp3","旁白|今天的任務：看清楚很小很小的東西！":"8f5ba4af6e.mp3","小晴|咦？有一封神秘的信！":"g82a7fd024.mp3","阿亮|我來打開！":"g5f0272ef5.mp3","阿亮|好小好小……我看不清楚！":"g0b97e7c09.mp3","小晴|我也看不到！":"gfc62ceec0.mp3","阿哲|看不清楚的時候，怎麼辦呢？":"0d939e853a.mp3","旁白|阿嬤看藥袋上的小字……":"5b21784a18.mp3","阿嬤|用這個，就看得很清楚喔！":"68c332760f.mp3","阿亮|我知道了！用放大鏡！":"g9043d83ba.mp3","大家|放大鏡偵探，出動！":"1a55e1c45b.mp3","旁白|放大鏡偵探，開始！":"15c640196c.mp3","旁白|第一步，拿起放大鏡。":"0b89857323.mp3","旁白|第二步，放在圖片上。":"66a62a10ae.mp3","旁白|第三步，慢慢往上……":"9b1fa90612.mp3","阿亮|哇！是一台校車！":"g1b3e40244.mp3","旁白|第四步，眼睛看著，數到五。":"ff27761a31.mp3","旁白|第五步，說：":"4eb82b31ea.mp3","大家|看到了！":"d8a1fdab9f.mp3","旁白|放大鏡，讓小東西看起來變大！":"95d76f59d3.mp3","大家|放大鏡，讓小東西看起來變大！":"fb661a82e1.mp3","旁白|放大鏡要拿多高，才最清楚呢？":"ff2b68fc4f.mp3","阿亮|太近了，沒有變大。":"g9925ddbb6.mp3","小晴|太遠了，模模糊糊的～":"g602d85d37.mp3","大家|又大又清楚！":"a5b57de0a9.mp3","旁白|慢慢往上，找到最清楚的地方！":"f5bcb23dca.mp3","旁白|如果把放大鏡拿開呢？":"3641d04db3.mp3","阿亮|咦？校車變回小小的！":"g62e8dfb48.mp3","旁白|放上去，變大。拿開，變小。":"296881a1b4.mp3","旁白|校車沒有真的變大，是看起來變大！":"abe0f3034e.mp3","小晴|我懂了！":"g1d3ff5efa.mp3","阿哲|偵探拿工具之前，要先知道三個規則！":"67acaf5dc9.mp3","阿哲|放大鏡會把陽光集中在一點，很燙，會燒起來！":"a6cb1923f3.mp3","旁白|規則一：不照太陽！":"ef6386c110.mp3","旁白|規則二：不照眼睛！":"9b992b7c65.mp3","旁白|規則三：用完放回家！":"b8b4f4f3ef.mp3","大家|我們是守規則的偵探！":"492802348f.mp3","阿亮|是點心！我要吃～！":"ga6c9e3716.mp3","小晴|等一下！吃之前，要先看保存期限！":"g56a69bc2e.mp3","旁白|保存期限的字，很小很小。用放大鏡看一看！":"c0b98c2804.mp3","旁白|保存期限，二零二七年，三月十五日。":"7400d50be0.mp3","旁白|今天是，二零二六年，十月二十一日。":"91a3ae674e.mp3","小晴|日期還沒到，可以吃！":"g3bd80ca0a.mp3","旁白|這一包呢？保存期限，二零二六年，九月一日。":"82a1299574.mp3","小晴|日期已經過了，不能吃！":"g050efb457.mp3","小晴|可以吃的點心，先收進書包，下課再吃！":"g4a10a8eed.mp3","阿亮|好～下課再吃！":"g72983ca23.mp3","旁白|偵探任務完成！大家一起說！":"4ff8684dbd.mp3","大家|放大鏡，讓小東西變大！":"7c0a1ce4cc.mp3","旁白|接下來，換你們當放大鏡偵探囉！":"b528050196.mp3","大家|偵探們，出動！":"03d387e594.mp3","旁白|一":"6491d45c90.mp3","旁白|二":"59c8c2c3ff.mp3","旁白|三":"0ea11f62fa.mp3","旁白|四":"f03c32b398.mp3","旁白|五":"7c089f1fde.mp3","阿亮|很小的東西看不清楚，可以用什麼幫忙？":"g2ae290c13.mp3","阿亮|答對了！放大鏡可以幫我們看清楚。":"g8b4d79595.mp3","阿亮|放大鏡":"ga071987ea.mp3","阿亮|剪刀":"g5ae53134d.mp3","阿亮|皮球":"g3d51962fa.mp3","小晴|放大鏡放在校車圖上，校車看起來會怎樣？":"g4ef4381cf.mp3","小晴|對！放大鏡，讓小東西看起來變大！":"gde307a529.mp3","小晴|變大":"gf7936859b.mp3","小晴|變小":"ged34af5a0.mp3","阿哲|哪一個又大又清楚？":"974bf219d2.mp3","阿哲|對！慢慢往上，找到最清楚的地方。":"c62053c4b8.mp3","阿哲|太近":"261f52e05d.mp3","阿哲|剛剛好":"c1973f6876.mp3","阿哲|太遠":"f76e517208.mp3","阿亮|把放大鏡拿開，校車會怎樣？":"gfcc6aaf1e.mp3","阿亮|對！校車沒有真的變大，是看起來變大。":"g6db3b00a5.mp3","阿亮|變回小小的":"gaa9dd24de.mp3","阿亮|一直很大":"g31e6f3cea.mp3","阿哲|放大鏡可以照太陽嗎？":"a474425f90.mp3","阿哲|對！陽光集中會很燙，不照太陽！":"930ffb9145.mp3","阿哲|可以":"5f69062941.mp3","阿哲|不可以":"9100ed176b.mp3","小晴|放大鏡可以照眼睛嗎？":"g77f8f8981.mp3","小晴|對！保護眼睛，不照眼睛！":"g07c9c8279.mp3","小晴|可以":"g99e551fef.mp3","小晴|不可以":"gbad8cc0da.mp3","阿亮|放大鏡用完，要放在哪裡？":"g02542c856.mp3","阿亮|對！用完放回家！":"gd404c04ab.mp3","阿亮|放回盒子":"g1f1655fe0.mp3","阿亮|丟在地上":"g43d12069d.mp3","小晴|吃點心之前，要先找什麼？":"g0371e4126.mp3","小晴|對！吃之前，先看保存期限。":"g66dca071a.mp3","小晴|保存期限":"g5e29c970e.mp3","小晴|包裝的顏色":"g37769df50.mp3","阿哲|日期還沒到，點心可以吃嗎？":"e414104d07.mp3","阿哲|對！日期還沒到，可以吃！":"8a56a3efe9.mp3","阿哲|可以吃":"e5f259c8d1.mp3","阿哲|不能吃":"baec743a6f.mp3","阿亮|再想一想":"gc413ef2f9.mp3","小晴|再想一想":"gef4f1b8d6.mp3","阿哲|再想一想":"fdb0ff1374.mp3","旁白|放大鏡偵探，認證成功！放大鏡，讓小東西變大！":"10d621d79c.mp3","汪探長|汪！":"96f3054652.mp3","汪探長|汪？":"70caab6990.mp3","旁白|還有偵探狗，汪探長！":"cfb304e676.mp3","汪探長|汪汪！":"d06c9bb47e.mp3"}/*END*/;const AUD_BASE='magnifier-audio/';
 const audioCache={};let curAudio=null;
 function audioFor(name,plain){if(Sound.mode!=='rec')return null;const f=AUD[name+'|'+plain];if(!f)return null;let a=audioCache[f];if(!a){a=new Audio(AUD_BASE+f);a.preload='auto';audioCache[f]=a}return a}
 function preloadAudio(){Object.keys(AUD).forEach(k=>{const [n,...t]=k.split('|');audioFor(n,t.join('|'))})}
@@ -351,7 +389,7 @@ function showSub(who,text){SUB.innerHTML=`<span class="who" style="background:${
 function hideSub(){SUB.hidden=true;SUB.innerHTML=''}
 function say(who,text,spoken){
   const gg=T.gen;const plain=(spoken||text).replace(/[【】]/g,'');showSub(who,text);
-  const ks=who.kids||(who instanceof Kid?[who]:[]);ks.forEach(k=>k.talk(true));
+  const ks=who.kids||(typeof who.talk==='function'?[who]:[]);ks.forEach(k=>k.talk(true));
   const n=plain.replace(/[，。！？、…～：:\s]/g,'').length+(plain.match(/[，。！？…：]/g)||[]).length*1.4;
   const st={ended:false,endAt:0};const t0=T.clock;const rec=Sound.on?audioFor(who.name,plain):null;const tts=Sound.on&&(rec||Sound.tts);
   const fin=()=>{if(gg!==T.gen)return;st.ended=true;st.endAt=T.clock;ks.forEach(k=>k.talk(false))};
@@ -365,10 +403,23 @@ function say(who,text,spoken){
 function stopSpeech(){stopAudio();if(Sound.tts)try{speechSynthesis.cancel()}catch(e){}}
 
 /* ================= fx ================= */
+/* ---- sound effects, synthesized (no files) ---- */
+let ACX=null;
+function ac(){if(!ACX){try{ACX=new (window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(ACX.state==='suspended')ACX.resume();return ACX}
+function tone(f0,f1,dur,type='sine',vol=.18,delay=0){const a=ac();if(!a)return;const t=a.currentTime+delay;const o=a.createOscillator(),gn=a.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(gn).connect(a.destination);o.start(t);o.stop(t+dur+.03)}
+function noise(dur,f0,f1,vol=.2){const a=ac();if(!a)return;const t=a.currentTime;const b=a.createBuffer(1,Math.ceil(a.sampleRate*dur),a.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  const src=a.createBufferSource();src.buffer=b;const f=a.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,t+dur);const gn=a.createGain();gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.001,t+dur);src.connect(f).connect(gn).connect(a.destination);src.start(t)}
+const SFX={pop:()=>tone(520,1150,.12,'sine',.16),whoosh:()=>noise(.4,300,3200,.25),dash:()=>noise(.16,1800,6500,.22),
+  ding:()=>{tone(1320,1318,.55,'triangle',.16);tone(1980,1978,.4,'sine',.06)},thud:()=>{tone(170,45,.25,'sine',.35);noise(.08,260,90,.2)},
+  stamp:()=>{tone(130,38,.32,'sine',.42);noise(.14,400,80,.28)},boing:()=>{tone(150,420,.12,'sine',.22);tone(420,170,.25,'sine',.18,.12)},
+  tada:()=>[523,659,784,1047].forEach((f,i)=>tone(f,f,.22,'triangle',.14,i*.08)),levelup:()=>[392,523,659,784,1047,1319].forEach((f,i)=>tone(f,f,.13,'square',.05,i*.065))};
+function sfx(n){if(!Sound.on||reduce&&n==='whoosh')return;try{SFX[n]&&SFX[n]()}catch(e){}}
+function sfxFor(t){if(/咻/.test(t))sfx('whoosh');else if(/叮/.test(t))sfx('ding');else if(/登登/.test(t))sfx('tada');else if(/咚|啪|喀|滋/.test(t))sfx('thud');else if(/閃身/.test(t))sfx('dash');else sfx('pop')}
+
 const particles=[];
 function textMark(txt,size,fill){return `<text class="fd" text-anchor="middle" dominant-baseline="central" font-size="${size}" fill="${INK}" stroke="${INK}" stroke-width="${size*.26}" stroke-linejoin="round">${txt}</text><text class="fd" text-anchor="middle" dominant-baseline="central" font-size="${size}" fill="${fill}" stroke="#fff" stroke-width="${size*.11}" stroke-linejoin="round" paint-order="stroke">${txt}</text>`}
 async function flash(node,{x=0,y=0,s=1,r=0,hold=700,inD=280,outD=260,rise=0}={}){const a=new Act(node,{x,y,s:0,r});await tween(a,{s},inD,E.back);await wait(hold);await tween(a,{o:0,y:y-rise},outD,E.in);node.remove()}
-function popText(txt,x,y,{size=64,color=CORAL,rot=-8,hold=650,layer=HUD}={}){const n=g(textMark(txt,size,color),layer);return flash(n,{x,y,r:rot,hold,rise:20})}
+function popText(txt,x,y,{size=64,color=CORAL,rot=-8,hold=650,layer=HUD}={}){sfxFor(txt);const n=g(textMark(txt,size,color),layer);return flash(n,{x,y,r:rot,hold,rise:20})}
 function sparkles(x,y,n=8,layer=FX,spread=120){for(let i=0;i<n;i++){const s=g(`<path d="M0,-22 Q3,-3 22,0 Q3,3 0,22 Q-3,3 -22,0 Q-3,-3 0,-22Z" fill="${['#ffd23f','#fff','#7fd8ff','#ff9ec7'][i%4]}" stroke="${INK}" stroke-width="3"/>`,layer);
   const a=Math.random()*Math.PI*2,d=rand(spread*.4,spread);flash(s,{x:x+Math.cos(a)*d,y:y+Math.sin(a)*d,s:rand(.5,1.2),r:rand(0,90),hold:rand(250,600),inD:240})}}
 function dust(x,y,n=4){for(let i=0;i<n;i++){const c=g(`<circle r="18" fill="#efe4d0" stroke="${INK}" stroke-width="3"/>`,FX);flash(c,{x:x+rand(-40,40),y:y+rand(-14,6),s:rand(.5,1),hold:120,inD:200,outD:400,rise:30})}}
@@ -391,7 +442,7 @@ function mark(k,type){const [hx,hy]=k.headPt();const s=k.s;const n=g(MARKS[type]
   if(type==='sweat'){const a=new Act(n,{x:hx+86*s*k.sx,y:hy-50*s,s:0});tween(a,{s:1},200,E.back).then(()=>tween(a,{y:hy+10*s,o:0},1100,E.in)).then(()=>n.remove());return}
   if(type==='heart'){for(let i=0;i<3;i++){const h=g(MARKS.heart,FX);flash(h,{x:hx+rand(-80,80)*s,y:hy-130*s-i*30,s:rand(.6,1),hold:500+i*120,rise:60})}n.remove();return}
   flash(n,{x:hx+(type==='?'?70*s:0),y:hy-(type==='bulb'?150:142)*s,s:s*1.05,hold:type==='bulb'?1300:900})}
-function stamp(ok,x=640,y=380,label){const col=ok?LEAF:'#e5483b';const n=g((ok?`<circle r="105" fill="none" stroke="${col}" stroke-width="26"/>`:`<path d="M-90,-90 L90,90 M90,-90 L-90,90" stroke="${col}" stroke-width="30" stroke-linecap="round"/>`)+(label?`<g transform="translate(0,150)"><rect x="-170" y="-40" width="340" height="80" rx="40" fill="${col}" stroke="${INK}" stroke-width="5"/><text class="fd" text-anchor="middle" dominant-baseline="central" font-size="46" fill="#fff">${label}</text></g>`:''),HUD);
+function stamp(ok,x=640,y=380,label){sfx('stamp');const col=ok?LEAF:'#e5483b';const n=g((ok?`<circle r="105" fill="none" stroke="${col}" stroke-width="26"/>`:`<path d="M-90,-90 L90,90 M90,-90 L-90,90" stroke="${col}" stroke-width="30" stroke-linecap="round"/>`)+(label?`<g transform="translate(0,150)"><rect x="-170" y="-40" width="340" height="80" rx="40" fill="${col}" stroke="${INK}" stroke-width="5"/><text class="fd" text-anchor="middle" dominant-baseline="central" font-size="46" fill="#fff">${label}</text></g>`:''),HUD);
   const a=new Act(n,{x,y,s:2.6,o:0,r:-12});tween(a,{s:1,o:.94},320,E.out).then(()=>{T.shake=14});return a}
 function banner(text,y=92,fill=SUN){const n=g('',HUD);const w=Math.min(1200,text.replace(/[【】]/g,'').length*54+120);
   const t=text.replace(/【(.+?)】/g,`<tspan fill="${CORAL}">$1</tspan>`);
@@ -506,9 +557,34 @@ function makeGauge(){const n=g(`<rect x="-26" y="-214" width="52" height="428" r
   return {set(h){p.setAttribute('transform',`translate(0,${(200-h*400).toFixed(1)})`)}}}
 
 /* ================= stage helpers ================= */
-function placeKid(k,o){k.unholdAll();k.talk(false);Object.assign(k,{x:0,y:655,s:.92,sx:1,r:0,jy:0,sq:1,hr:0,aL:10,aR:-10,o:1},o||{});k.face('n','smile','none');k.apply()}
-function showClass(on){CLASS.style.display=on?'':'none'}
-function classSetup(chalk,task){showClass(true);setChalk(chalk);setTask(task);placeKid(L,{x:360});placeKid(Q,{x:640});placeKid(Z,{x:920})}
+function placeKid(k,o){k.unholdAll();if(k.extra)k.extra.innerHTML='';k.talk(false);Object.assign(k,{x:0,y:655,s:.92,sx:1,r:0,jy:0,sq:1,hr:0,aL:10,aR:-10,o:1},o||{});k.face('n','smile','none');k.apply()}
+function showClass(on){CLASS.style.display=on?'':'none';if(!on){D.o=0;D.apply()}}
+function placeDog(o){D.item.innerHTML='';D.talk(false);Object.assign(D,{x:1130,y:655,s:.85,sx:1,r:0,jy:0,sq:1,hr:0,o:1},o||{});D.face('n','smile');D.apply()}
+function ghost(k){const c=k.root.cloneNode(true);c.removeAttribute('class');FX.appendChild(c);const a={o:.5,apply(){c.setAttribute('opacity',this.o)}};a.apply();tween(a,{o:0},420,E.lin).then(()=>c.remove())}
+/* 閃身步: a snappy side-flash with afterimages */
+async function flashStep(k,dx=130,times=2){const x0=k.x;for(let i=0;i<times;i++)for(const dir of [1,-1]){ghost(k);sfx('dash');await tween(k,{x:x0+dir*dx,r:dir*-9},100,E.out);await wait(120)}ghost(k);await tween(k,{x:x0,r:0},120,E.out)}
+function caution(){const n=g(`<text class="fd" x="0" y="0" font-size="22" fill="#fff" stroke="${INK}" stroke-width="6" paint-order="stroke">※ 偵探特技，請勿模仿（小心膝蓋）</text>`,HUD);const a=new Act(n,{x:24,y:40,o:0});tween(a,{o:1},250).then(()=>wait(2600)).then(()=>tween(a,{o:0},400)).then(()=>n.remove())}
+async function levelUp(lv,skill){sfx('levelup');const n=g(`<rect x="-270" y="-98" width="540" height="196" rx="26" fill="#1d2440" stroke="${SUN}" stroke-width="8"/>
+  <g transform="translate(0,-44)">${textMark('LEVEL UP!',62,SUN)}</g><text class="fd" y="14" text-anchor="middle" dominant-baseline="central" font-size="40" fill="#fff">偵探等級 Lv.${lv}</text>
+  <text class="fd" y="52" text-anchor="middle" dominant-baseline="central" font-size="26" fill="#9fe3ff">獲得技能：${skill}</text><rect x="-200" y="72" width="400" height="14" rx="7" fill="#39406a"/>`,HUD);
+  const bar=el('rect',{x:-200,y:72,width:0,height:14,rx:7,fill:SUN},n);const b={w:0,apply(){bar.setAttribute('width',this.w)}};
+  const a=new Act(n,{x:640,y:330,s:0});sparkles(640,330,10,HUD,300);await tween(a,{s:1},380,E.back);await tween(b,{w:400},900,E.out);await wait(700);await tween(a,{s:0,o:0},260,E.in);n.remove()}
+async function fetchGag(){
+  D.face('star','bark');await say(D,'汪！');dust(D.x,D.y);sfx('dash');await tween(D,{x:1500},330,E.in);await wait(450);
+  D.item.innerHTML=BANANA;sfx('dash');await tween(D,{x:1130},380,E.out);land(D);D.face('happy','smile');await wait(350);
+  [L,Q,Z].forEach(k=>k.face('meh','flat','none'));sfx('boing');popText('那是香蕉啦！',880,240,{size:62,color:'#e0a100'});await wait(1400);
+  D.face('shock','bark');mark(D,'sweat');await say(D,'汪？');dust(D.x,D.y);sfx('dash');await tween(D,{x:1500},300,E.in);await wait(400);
+  D.item.innerHTML=MAGITEM;sfx('dash');await tween(D,{x:1130},380,E.out);land(D);D.face('star','smile');sparkles(1130,500,6);await wait(250);
+  D.item.innerHTML='';const fm=new Act(g(magGlass(36),FX),{x:1160,y:520,s:.8});popText('咻～',780,180,{size:50});
+  const target=()=>L.armPt('R',202);await par(tween(fm,{x:target()[0],r:720},800,E.io),tween(fm,{y:200},400,E.out).then(()=>tween(fm,{y:target()[1]+40},400,E.in)));fm.node.remove();
+  L.hold('R',heldMag());L.face('star','grin','up');await tween(L,{aR:-165},280,E.back);const [mx,my]=L.armPt('R',202);sparkles(mx,my,8);popText('登登！',560,150,{size:58});
+  Q.face('star','wow','up');Z.face('star','grin','up');D.face('happy','smile')}
+async function giantEye(){const [hx,hy]=L.headPt();await tween(cam,{x:hx+40,y:hy+10,s:2.4},450,E.io);
+  const eye=g(`<circle r="46" fill="#fff"/><circle r="40" fill="#fff" stroke="${INK}" stroke-width="4"/><circle cx="4" cy="4" r="24" fill="#6b4a2a"/><circle cx="4" cy="4" r="12" fill="${INK}"/><circle cx="-6" cy="-6" r="7" fill="#fff"/>${magGlass(46)}`,FX);
+  const a=new Act(eye,{x:hx+32*L.s,y:hy,s:0});sfx('boing');await tween(a,{s:1},320,E.back);popText('噗！',hx+150,hy-110,{size:46,layer:FX});await wait(1000);
+  await tween(a,{s:0},200,E.in);eye.remove();await tween(cam,{x:640,y:360,s:1},400,E.io);Q.face('happy','grin');Z.face('happy','grin');popText('哈哈哈！',760,230,{size:54,color:'#ff8a3d'});await wait(500)}
+
+function classSetup(chalk,task){showClass(true);setChalk(chalk);setTask(task);placeKid(L,{x:360});placeKid(Q,{x:640});placeKid(Z,{x:920});placeDog()}
 function peek(k,side){placeKid(k,{x:side==='L'?150:1130,y:1003,s:1.1,sx:side==='L'?1:-1})}
 function resetStage(){FX.innerHTML='';HUD.innerHTML='';PROPS.innerHTML='';FOCUS.innerHTML='';T.focus=false;T.shake=0;particles.length=0;
   Object.assign(cam,{x:640,y:360,s:1});cam.apply();hideSub();for(let i=KIDS.length-1;i>=0;i--)if(!KIDS[i].root.isConnected)KIDS.splice(i,1)}
@@ -524,17 +600,21 @@ let title,env,rig,snack,box,cards=[];
 function makeTitle(){const n=g(`<g transform="scale(1.45,1)"><polygon points="${[...Array(32)].map((_,i)=>{const a=i/32*Math.PI*2,r=i%2?178:236;return (Math.cos(a)*r).toFixed(1)+','+(Math.sin(a)*r).toFixed(1)}).join(' ')}" fill="${SUN}" stroke="${INK}" stroke-width="7"/></g>
   <g transform="translate(0,-38)">${textMark('放大鏡偵探',112,CORAL)}</g><g transform="translate(0,84) rotate(-4)">${textMark('出動！',92,TEAL)}</g><g transform="translate(300,-150) rotate(-18) scale(.9)">${magGlass(46)}</g>`,HUD);return new Act(n,{x:640,y:250,s:0})}
 const SCENES=[
-{name:'集合',setup(){classSetup('',0);placeKid(L,{x:-220});placeKid(Q,{x:640,jy:-900});placeKid(Z,{x:1500});title=makeTitle()},
+{name:'集合',setup(){classSetup('',0);placeKid(L,{x:-220});placeKid(Q,{x:640,jy:-900});placeKid(Z,{x:1500});placeDog({x:1500});title=makeTitle()},
  async play(){await wait(250);popText('登登！',1010,90,{size:58,rot:10});await tween(title,{s:1},700,E.back);sparkles(640,250,10,HUD,330);
   await say(N,'放大鏡偵探隊，【集合】！');await tween(title,{y:150,s:.6},500,E.io);
   L.face('star','grin','up');await hopTo(L,360,2,800,90);tween(L,{aR:-165},260,E.back);popText('到！',470,300,{size:60,color:'#ff8a3d'});await say(L,'阿亮，到！');tween(L,{aR:-10},300);
   Q.face('shock','o','up');await tween(Q,{jy:0},900,E.bounce);land(Q);dust(640,655,5);Q.face('happy','grin','none');popText('到！',760,300,{size:60,color:'#ff5fa2'});await say(Q,'小晴，到！');
   dust(1100,650,3);await tween(Z,{x:920},700,E.out);dust(980,650,3);Z.face('n','smile','focus');await tween(Z,{aR:150},260,E.back);popText('到！',1030,300,{size:60,color:'#2f9e5b'});await say(Z,'阿哲，到！');tween(Z,{aR:-10},300);
+  const sg=g(`<g fill="${INK}"><rect x="-74" y="-14" width="148" height="12"/><rect x="-66" y="-4" width="56" height="26"/><rect x="-58" y="22" width="40" height="8"/><rect x="10" y="-4" width="56" height="26"/><rect x="18" y="22" width="40" height="8"/></g><g fill="#fff"><rect x="-58" y="2" width="8" height="8"/><rect x="-50" y="10" width="8" height="8"/><rect x="18" y="2" width="8" height="8"/><rect x="26" y="10" width="8" height="8"/></g>`,Z.extra);
+  const sga=new Act(sg,{y:-320});await tween(sga,{y:0},600,E.bounce);sfx('thud');Z.face(null,'smile','none');popText('酷',1040,240,{size:52,color:'#2b2320',rot:8});
+  dust(1400,650,2);await say(N,'還有偵探狗，汪探長！');ghost(D);sfx('dash');await tween(D,{x:1300},90,E.out);ghost(D);await tween(D,{x:1200},90,E.out);ghost(D);await tween(D,{x:1130},90,E.out);land(D);
+  D.face('star','bark');popText('汪！',1220,420,{size:56,color:'#a8661c'});await say(D,'汪汪！');D.face('star','smile');
   [L,Q,Z].forEach(k=>k.face('star','grin','up'));sparkles(640,360,8);
-  const sp=say(N,'今天的任務：看清楚【很小很小】的東西！');await jumpAll([L,Q,Z]);await jumpAll([L,Q,Z]);await sp;await tween(title,{s:0},300,E.in)}},
+  const sp=say(N,'今天的任務：看清楚【很小很小】的東西！');await jumpAll([L,Q,Z,D]);await jumpAll([L,Q,Z,D]);await sp;await tween(title,{s:0},300,E.in)}},
 {name:'神秘信封',setup(){classSetup('任務：神秘信封',1);env=makeEnvelope();Object.assign(env,{x:640,y:-160,r:-200});env.apply()},
  async play(){await wait(300);popText('咻～',820,140,{size:52,rot:6});await tween(env,{y:420,r:6},1000,E.back);
-  popText('登登！',640,290,{size:64});sparkles(640,420,8);[L,Q,Z].forEach(k=>{k.face('shock','o','up');mark(k,'!')});T.shake=10;await wait(500);
+  popText('登登！',640,290,{size:64});sparkles(640,420,8);[L,Q,Z,D].forEach(k=>{k.face('shock','o','up');mark(k,'!')});T.shake=10;await wait(500);
   await say(Q,'咦？有一封【神秘的信】！');L.face('star','grin','focus');await say(L,'我來打開！');
   await par(hopTo(L,500,1,450,60),tween(env,{x:650,y:455,r:0},500,E.out));await tween(L,{aR:-72},250);
   popText('啪！',760,380,{size:50});await tween(env.flap,{sy:-1},300,E.out);await tween(env.card,{y:-104,s:1},550,E.back);
@@ -550,9 +630,9 @@ const SCENES=[
   sparkles(680,240,6,HUD,90);cl.G.face('happy','grin');await say(cl.G,'用這個，就看得很清楚喔！');
   await tween(cl,{s:0,o:0},350,E.in);Z.face('n','smile','none');tween(Z,{aR:-10},300);
   mark(L,'bulb');popText('叮！',520,170,{size:60,color:'#ffb800'});T.focus=true;L.face('star','grin','up');await arc(L,70,400);
-  L.hold('R',heldMag());await tween(L,{aR:-165},300,E.back);const [mx,my]=L.armPt('R',202);sparkles(mx,my,8);
-  await say(L,'我知道了！用【放大鏡】！');T.focus=false;popText('登登！',560,150,{size:58});Q.face('star','wow','up');Z.face('star','grin','up');
-  const sp=say(ALL,'放大鏡偵探，出動！');await jumpAll([L,Q,Z]);await sp}},
+  await say(L,'我知道了！用【放大鏡】！');T.focus=false;
+  await fetchGag();await giantEye();L.face('star','grin','up');Q.face('star','wow','up');Z.face('star','grin','up');
+  const sp=say(ALL,'放大鏡偵探，出動！');await jumpAll([L,Q,Z,D]);await sp}},
 {name:'變大了！',setup(){showClass(false);rig=makeLensRig(buildPaper,4.3);Object.assign(rig,{x:1180,y:-200,h:.35});rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400})},
  async play(){await say(N,'放大鏡偵探，開始！');popText('咻！',1010,120,{size:54});await tween(rig,{x:470,y:250},800,E.back);
   await say(N,'第一步，【拿起】放大鏡。');const sp=say(N,'第二步，【放在】圖片上。');await tween(rig,{x:640,y:362,h:0},900,E.io);await sp;
@@ -561,21 +641,21 @@ const SCENES=[
   await say(L,'哇！是一台【校車】！');T.focus=false;
   await say(N,'第四步，眼睛看著，數到五。');for(let i=1;i<=5;i++){popNum(i);await say(N,'一二三四五'[i-1])}
   L.face('happy','grin');Q.face('happy','grin');await say(N,'第五步，說：');await say(ALL,'看到了！');
-  banner('放大鏡，讓小東西看起來【變大】！',80);await say(N,'放大鏡，讓小東西看起來【變大】！');L.face('star','grin','up');Q.face('star','grin','up');await say(ALL,'放大鏡，讓小東西看起來變大！')}},
+  banner('放大鏡，讓小東西看起來【變大】！',80);await say(N,'放大鏡，讓小東西看起來【變大】！');L.face('star','grin','up');Q.face('star','grin','up');await say(ALL,'放大鏡，讓小東西看起來變大！');await levelUp(2,'放大鏡操作')}},
 {name:'最清楚',setup(){showClass(false);rig=makeLensRig(buildPaper,4.3);Object.assign(rig,{x:640,y:362,h:.7});rig.gauge=makeGauge();rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400})},
  async play(){L.face('up','o','think');await say(N,'放大鏡要拿多高，才最清楚呢？');
   await tween(rig,{h:.04},1300,E.io);let p=pill('太近',640,70,'#7c8a90');L.face('n','flat','think');await say(L,'太近了，【沒有變大】。');await tween(p,{s:0},200,E.in);
   await tween(rig,{h:1},1500,E.io);p=pill('太遠',640,70,CORAL);Q.face('dizzy','wavy','worry');mark(Q,'sweat');await say(Q,'太遠了，【模模糊糊】的～');await tween(p,{s:0},200,E.in);
   Q.face('n','smile','none');await tween(rig,{h:.68},1500,E.io);pill('剛剛好',640,70,LEAF);sparkles(rig.x,rig.y-30,10,FX,170);stamp(true,175,290);
-  L.face('star','grin','up');Q.face('star','grin','up');await say(ALL,'又大又清楚！');await say(N,'慢慢往上，找到【最清楚】的地方！')}},
+  L.face('star','grin','up');Q.face('star','grin','up');await say(ALL,'又大又清楚！');await say(N,'慢慢往上，找到【最清楚】的地方！');await levelUp(3,'找到最清楚')}},
 {name:'拿開看看',setup(){showClass(false);rig=makeLensRig(buildPaper,4.3);Object.assign(rig,{x:640,y:362,h:.68});rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400})},
  async play(){L.face('up','o','think');await say(N,'如果把放大鏡【拿開】呢？');popText('咻～',900,140,{size:52});await tween(rig,{x:1500,y:-220},700,E.in);
-  T.shake=12;L.face('shock','wow','up');Q.face('shock','o','up');mark(L,'!');mark(Q,'!');await say(L,'咦？校車【變回小小的】！');
+  T.shake=12;L.face('shock','wow','up');Q.face('shock','o','up');mark(L,'!');mark(Q,'!');await tween(cam,{x:260,y:560,s:2},260,E.out);T.focus=true;popText('蛤？！',330,470,{size:56,layer:FX});await wait(700);T.focus=false;await tween(cam,{x:640,y:360,s:1},300,E.io);await say(L,'咦？校車【變回小小的】！');
   const sp=say(N,'放上去，變大。拿開，變小。');
   for(let i=0;i<2;i++){await tween(rig,{x:640,y:362},550,E.io);popText('變大！',870,200,{size:56,color:LEAF});L.face('star','grin');await wait(500);await tween(rig,{x:1010,y:150},500,E.io);popText('變小！',380,200,{size:56,color:'#7c8a90'});L.face('shock','o');await wait(450)}
   await sp;await tween(rig,{x:1500,y:-220},400,E.in);L.face('happy','smile');Q.face('happy','smile');
   banner('校車沒有真的變大，是【看起來】變大！',80);await say(N,'校車沒有真的變大，是【看起來】變大！');await say(Q,'我懂了！')}},
-{name:'安全規則',setup(){classSetup('偵探三個規則',2);placeKid(Z,{x:250});placeKid(Q,{x:520});placeKid(L,{x:780});Z.hold('R',heldMag());cards=[]},
+{name:'安全規則',setup(){classSetup('偵探三個規則',2);placeKid(Z,{x:250});placeKid(Q,{x:520});placeKid(L,{x:780});placeDog({x:1228,s:.78});Z.hold('R',heldMag());cards=[]},
  async play(){Z.face('n','grin','focus');await tween(Z,{aR:-165},300,E.back);await say(Z,'偵探拿工具之前，要先知道【三個規則】！');tween(Z,{aR:-10},300);
   cards.push(ruleCard(1,'不照太陽',ICO_SUN,250));L.hold('R',heldMag());await tween(L,{aR:-92},500,E.io);
   const paper=g(`<path d="M-60,-14 L56,-18 L66,14 L-52,18Z" fill="#fff" stroke="${INK}" stroke-width="4"/>`,PROPS);paper.setAttribute('transform','translate(905,655)');
@@ -590,7 +670,7 @@ const SCENES=[
   await say(Z,'放大鏡會把陽光集中在一點，很燙，會【燒起來】！');stamp(false,1050,390,'不照太陽');await say(N,'規則一：【不照太陽】！');
   await tween(ba,{o:0},300);beam.remove();spot.remove();paper.remove();HUD.lastChild.remove();L.unholdAll();L.face('n','smile','none');tween(L,{aR:-10},300);
   cards.push(ruleCard(2,'不照眼睛',ICO_EYE,640));Q.hold('R',heldMag());Q.face('n','grin','none');await tween(Q,{aR:-110},500,E.io);
-  L.face('squint','wavy','worry');await par(tween(L,{aL:-157,aR:157},300,E.out),tween(L,{r:6},300));mark(L,'sweat');popText('哇啊！',900,230,{size:54});await wait(500);
+  L.face('shock','wow','up');popText('閃身步！',930,190,{size:62,color:TEAL});caution();await flashStep(L,110,2);L.face('squint','wavy','worry');await par(tween(L,{aL:-157,aR:157},300,E.out),tween(L,{r:6},300));mark(L,'sweat');popText('哇啊！',900,230,{size:54});await wait(400);
   stamp(false,640,360,'不照眼睛');await say(N,'規則二：【不照眼睛】！');
   HUD.lastChild.remove();Q.unholdAll();Q.face('happy','smile','none');par(tween(Q,{aR:-10},300),tween(L,{aL:10,aR:-10,r:0},300));L.face('n','smile','none');
   cards.push(ruleCard(3,'用完放回家',ICO_BOX,1030));box=makeBox();Z.face('n','grin','focus');await tween(Z,{aR:-130},300);
@@ -599,13 +679,13 @@ const SCENES=[
   await tween(fm,{y:620,s:.7},250,E.in);popText('喀！',1180,520,{size:50,color:TEAL});T.shake=8;sparkles(1060,560,6);
   stamp(true,1060,380);await say(N,'規則三：用完【放回家】！');tween(Z,{aR:-10},300);HUD.lastChild.remove();
   [L,Q,Z].forEach(k=>{k.face('star','grin','up')});await par(tween(L,{aR:-140},300,E.back),tween(Q,{aR:-140},300,E.back),tween(Z,{aR:-140},300,E.back));
-  const sp=say(ALL,'我們是守規則的偵探！');await jumpAll([L,Q,Z]);await sp}},
+  const sp=say(ALL,'我們是守規則的偵探！');await jumpAll([L,Q,Z,D]);await sp;await levelUp(4,'安全守則')}},
 {name:'保存期限',setup(){classSetup('生活任務：保存期限',3);snack=makeSnackBag('#ff9f43','餅乾');Object.assign(snack,{x:520,y:-200,r:-30});snack.apply()},
  async play(){popText('咚！',700,300,{size:56});await tween(snack,{y:470,r:0},800,E.bounce);sparkles(520,470,6);
-  L.face('heart','drool','up');mark(L,'heart');await say(L,'是點心！我要吃～！');
+  L.face('heart','drool','up');mark(L,'heart');D.face('heart','drool');mark(D,'heart');await say(L,'是點心！我要吃～！');
   await tween(L,{x:455,r:10},500,E.in);
   T.focus=true;Q.face('n','talk','focus');await tween(Q,{aL:95},180,E.back);popText('停！',760,200,{size:84});T.shake=12;
-  L.face('shock','o','up');await tween(L,{x:400,r:-12},300,E.out);dust(420,655,4);T.focus=false;tween(L,{r:0},300);
+  L.face('shock','o','up');D.face('shock','bark');sfx('thud');await tween(L,{x:400,r:-12},300,E.out);dust(420,655,4);T.focus=false;tween(L,{r:0},300);
   await say(Q,'等一下！吃之前，要先看【保存期限】！');tween(Q,{aL:10},300);
   await wipeOut('stripes');resetStage();showClass(false);
   rig=makeLensRig(buildSnack('#ff9f43','2027.03.15'),2.5);Object.assign(rig,{x:1180,y:-200,h:.3});rig.apply();peek(L,'L');peek(Q,'R');placeKid(Z,{x:-400});L.face('heart','smile','up');
@@ -621,18 +701,18 @@ const SCENES=[
   stamp(false,300,330,'不能吃');Q.face('n','talk','focus');await say(Q,'日期【已經過了】，不能吃！');
   L.face('dizzy','wavy','worry');popText('啊～～',380,420,{size:56,color:'#7c8a90'});await par(tween(L,{hr:-40,y:1080},900,E.in));
   await wipeOut('stripes');resetStage();classSetup('生活任務：保存期限',3);snack=makeSnackBag('#ff9f43','餅乾');Object.assign(snack,{x:520,y:470});snack.apply();await wipeIn('stripes');
-  Q.face('happy','grin');await say(Q,'可以吃的點心，先收進書包，下課再吃！');L.face('happy','grin','none');await tween(snack,{x:360,y:560,s:.4},500,E.io);snack.node.remove();await say(L,'好～下課再吃！')}},
-{name:'偵探口號',setup(){classSetup('放大鏡，讓小東西變大！',4);placeKid(L,{x:400});placeKid(Q,{x:640});placeKid(Z,{x:880})},
- async play(){[L,Q,Z].forEach(k=>k.face('star','grin','up'));await say(N,'偵探任務完成！大家一起說！');
+  Q.face('happy','grin');await say(Q,'可以吃的點心，先收進書包，下課再吃！');L.face('happy','grin','none');await tween(snack,{x:360,y:560,s:.4},500,E.io);snack.node.remove();await say(L,'好～下課再吃！');await levelUp(5,'看保存期限')}},
+{name:'偵探口號',setup(){classSetup('放大鏡，讓小東西變大！',4);placeKid(L,{x:400});placeKid(Q,{x:640});placeKid(Z,{x:880});placeDog({x:1110})},
+ async play(){[L,Q,Z].forEach(k=>k.face('star','grin','up'));D.face('star','smile');await levelUp('MAX','放大鏡偵探');await say(N,'偵探任務完成！大家一起說！');
   confetti(90);banner('放大鏡，讓小東西【變大】！',92);await par(tween(L,{aR:-165},300,E.back),tween(Q,{aR:-165,aL:165},300,E.back),tween(Z,{aL:165},300,E.back));
-  const sp=say(ALL,'放大鏡，讓小東西變大！');await jumpAll([L,Q,Z],80,460);await jumpAll([L,Q,Z],80,460);await sp;
+  const sp=say(ALL,'放大鏡，讓小東西變大！');popText('閃身步！',640,250,{size:66,color:TEAL});caution();await par(flashStep(L,70,2),flashStep(Q,70,2),flashStep(Z,70,2),flashStep(D,60,2));await jumpAll([L,Q,Z,D],80,460);await sp;
   await say(N,'接下來，換你們當【放大鏡偵探】囉！');[L,Q,Z].forEach(k=>k.face('happy','grin','none'));
   const wave=async k=>{for(let i=0;i<3;i++){await tween(k,{aR:-120},220);await tween(k,{aR:-160},220)}};
   const sp2=say(ALL,'偵探們，出動！');await par(wave(L),wave(Q),wave(Z));await sp2}}
 ];
 
 /* ================= transitions ================= */
-async function wipeOut(type){WIPE.innerHTML='';if(type==='iris'){const p=el('path',{fill:INK,'fill-rule':'evenodd'},WIPE);const o={r:820,apply(){const r=Math.max(0,this.r);p.setAttribute('d',`M-10,-10H1290V730H-10Z M${640-r},360 a${r},${r} 0 1,0 ${2*r},0 a${r},${r} 0 1,0 ${-2*r},0Z`)}};o.apply();WIPE.iris=o;await tween(o,{r:0},550,E.in)}
+async function wipeOut(type){WIPE.innerHTML='';sfx('whoosh');if(type==='iris'){const p=el('path',{fill:INK,'fill-rule':'evenodd'},WIPE);const o={r:820,apply(){const r=Math.max(0,this.r);p.setAttribute('d',`M-10,-10H1290V730H-10Z M${640-r},360 a${r},${r} 0 1,0 ${2*r},0 a${r},${r} 0 1,0 ${-2*r},0Z`)}};o.apply();WIPE.iris=o;await tween(o,{r:0},550,E.in)}
   else{const cols=[SUN,CORAL,TEAL,'#7fd8ff',SUN,CORAL];const bands=cols.map((c,i)=>{const b=el('polygon',{points:'0,0 300,0 200,760 -100,760',fill:c,stroke:INK,'stroke-width':6},WIPE);return new Act(b,{x:-420-i*20,y:-20})});WIPE.bands=bands;
     await par(...bands.map((b,i)=>wait(i*60).then(()=>tween(b,{x:i*230-60},380,E.out))))}}
 async function wipeIn(type){if(type==='iris'&&WIPE.iris){await tween(WIPE.iris,{r:820},600,E.out)}else if(WIPE.bands){await par(...WIPE.bands.map((b,i)=>wait(i*50).then(()=>tween(b,{x:1500},380,E.in))))}WIPE.innerHTML='';WIPE.iris=null;WIPE.bands=null}
@@ -756,11 +836,11 @@ function renderQ(){const d=QUIZ[QZ.i];QZ.tries=0;QZ.lock=false;drawProg();
   qb.querySelectorAll('.opt').forEach(o=>{o.querySelector('.spk').onclick=()=>speak(o.dataset.label,host);o.querySelector('.opt-main').onclick=()=>answer(o,d,host)});
   if(QZ.read)setTimeout(()=>speak(d.q,host),250)}
 function answer(o,d,host){if(QZ.lock||o.classList.contains('wrong'))return;QZ.tries++;
-  if(o.dataset.ok==='1'){QZ.lock=true;if(QZ.tries===1)QZ.first.push(QZ.i);o.classList.add('right');qb.querySelectorAll('.opt').forEach(x=>x.classList.remove('hint'));
+  if(o.dataset.ok==='1'){sfx('tada');QZ.lock=true;if(QZ.tries===1)QZ.first.push(QZ.i);o.classList.add('right');qb.querySelectorAll('.opt').forEach(x=>x.classList.remove('hint'));
     hostWrap.classList.remove('puzzled','jump');void hostWrap.offsetWidth;hostWrap.classList.add('jump');showHost(d.host,'star','grin','up');drawProg();burst();
     const last=QZ.i===QUIZ.length-1;$('fb').innerHTML=`<div class="feedback"><span>${fmt(d.ok)}</span><button class="btn go" id="qNext">${last?'看偵探成績':'下一題 →'}</button></div>`;
     $('qNext').onclick=()=>{QZ.i++;if(QZ.i>=QUIZ.length)done();else renderQ()};$('qNext').focus({preventScroll:true});speak(d.ok,host)}
-  else{o.classList.add('wrong');hostWrap.classList.add('puzzled');showHost(d.host,'up','flat','think');
+  else{sfx('boing');o.classList.add('wrong');hostWrap.classList.add('puzzled');showHost(d.host,'up','flat','think');
     const left=[...qb.querySelectorAll('.opt:not(.wrong)')];
     if(QZ.tries>=2||left.length===1)left.filter(x=>x.dataset.ok==='1').forEach(x=>x.classList.add('hint'));
     $('fb').innerHTML=`<div class="feedback try"><span>再想一想～${QZ.tries>=2||left.length===1?'看看發光的那一個！':''}</span></div>`;speak('再想一想',host)}}
@@ -784,6 +864,6 @@ function showView(v){preloadAudio();const q=v==='quiz';$('viewVideo').hidden=q;$
   try{history.replaceState(null,'',q?'#quiz':'#video')}catch(e){}}
 $('tabVideo').onclick=()=>showView('video');$('tabQuiz').onclick=()=>showView('quiz');
 if(location.hash==='#quiz')showView('quiz');
-window.__md={T,SCENES,start,runFrom,Sound,setPlaying};
+window.__md={T,SCENES,start,runFrom,Sound,setPlaying,D};
 })();
 </script>
