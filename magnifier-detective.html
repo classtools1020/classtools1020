@@ -168,6 +168,7 @@ body{font-family:var(--f-body);font-size:16px;line-height:1.6;padding-left:max(1
       <span class="spacer"></span>
       <div class="toggles">
         <button class="btn" id="soundBtn" aria-pressed="true">配音：開</button>
+        <button class="btn" id="voiceBtn">聲音：AI 錄音</button>
         <button class="btn" id="slowBtn" aria-pressed="false">慢速：關</button>
         <button class="btn" id="subBtn" aria-pressed="true">字幕：開</button>
         <button class="btn" id="fsBtn">全螢幕</button>
@@ -314,7 +315,7 @@ class Kid{
 }
 const CFG={
   L:{name:'阿亮',color:'#d9601c',shirt:'#ff8a3d',pants:'#3f6fd1',hair:'spiky',hairC:'#5a3a22',voice:{sex:'m',pitch:1.35,rate:1.05}},
-  Q:{name:'小晴',color:'#d63a83',shirt:'#ff7fb6',pants:'#7b6cf0',skirt:true,hair:'girl',hairC:'#2b2320',voice:{sex:'f',pitch:1.45,rate:1}},
+  Q:{name:'小晴',color:'#d63a83',shirt:'#ff7fb6',pants:'#7b6cf0',skirt:true,hair:'girl',hairC:'#2b2320',voice:{sex:'f2',pitch:1.3,rate:1}},
   Z:{name:'阿哲',color:'#23894a',shirt:'#3fbf73',pants:'#4b4f63',hair:'neat',hairC:'#2b2320',glasses:true,voice:{sex:'m',pitch:1.0,rate:.98}},
   G:{name:'阿嬤',color:'#7a56c2',shirt:'#a98be0',pants:'#6b5a8e',skirt:true,old:true,hair:'bun',hairC:'#d4d4dc',glasses:true,voice:{sex:'f',pitch:.75,rate:.9}}
 };
@@ -323,21 +324,26 @@ const L=new Kid(CFG.L,ACTORS),Q=new Kid(CFG.Q,ACTORS),Z=new Kid(CFG.Z,ACTORS);
 const ALL={name:'大家',color:'#d9483a',voice:{sex:'f',pitch:1.35,rate:1},kids:[L,Q,Z]};
 
 /* ================= speech ================= */
-const Sound={on:true,tts:'speechSynthesis' in window};
+const Sound={on:true,tts:'speechSynthesis' in window,mode:'rec'};
 /* pre-recorded neural voices (one file per line); browser speech is only the fallback */
 const AUD=/*AUDIO*/{"旁白|放大鏡偵探隊，集合！":"822ce7e251.mp3","阿亮|阿亮，到！":"c45db75b56.mp3","小晴|小晴，到！":"99231745f1.mp3","阿哲|阿哲，到！":"9aed9e321b.mp3","旁白|今天的任務：看清楚很小很小的東西！":"8f5ba4af6e.mp3","小晴|咦？有一封神秘的信！":"da1231ec25.mp3","阿亮|我來打開！":"3e02c78df4.mp3","阿亮|好小好小……我看不清楚！":"f0a78b4c36.mp3","小晴|我也看不到！":"8fdbe24984.mp3","阿哲|看不清楚的時候，怎麼辦呢？":"0d939e853a.mp3","旁白|阿嬤看藥袋上的小字……":"5b21784a18.mp3","阿嬤|用這個，就看得很清楚喔！":"68c332760f.mp3","阿亮|我知道了！用放大鏡！":"18699785cc.mp3","大家|放大鏡偵探，出動！":"1a55e1c45b.mp3","旁白|放大鏡偵探，開始！":"15c640196c.mp3","旁白|第一步，拿起放大鏡。":"0b89857323.mp3","旁白|第二步，放在圖片上。":"66a62a10ae.mp3","旁白|第三步，慢慢往上……":"9b1fa90612.mp3","阿亮|哇！是一台校車！":"c26733f0b9.mp3","旁白|第四步，眼睛看著，數到五。":"ff27761a31.mp3","旁白|第五步，說：":"4eb82b31ea.mp3","大家|看到了！":"d8a1fdab9f.mp3","旁白|放大鏡，讓小東西看起來變大！":"95d76f59d3.mp3","大家|放大鏡，讓小東西看起來變大！":"fb661a82e1.mp3","旁白|放大鏡要拿多高，才最清楚呢？":"ff2b68fc4f.mp3","阿亮|太近了，沒有變大。":"4eae444cc4.mp3","小晴|太遠了，模模糊糊的～":"a477fb7859.mp3","大家|又大又清楚！":"a5b57de0a9.mp3","旁白|慢慢往上，找到最清楚的地方！":"f5bcb23dca.mp3","旁白|如果把放大鏡拿開呢？":"3641d04db3.mp3","阿亮|咦？校車變回小小的！":"0a1a599b46.mp3","旁白|放上去，變大。拿開，變小。":"296881a1b4.mp3","旁白|校車沒有真的變大，是看起來變大！":"abe0f3034e.mp3","小晴|我懂了！":"0776b4d966.mp3","阿哲|偵探拿工具之前，要先知道三個規則！":"67acaf5dc9.mp3","阿哲|放大鏡會把陽光集中在一點，很燙，會燒起來！":"a6cb1923f3.mp3","旁白|規則一：不照太陽！":"ef6386c110.mp3","旁白|規則二：不照眼睛！":"9b992b7c65.mp3","旁白|規則三：用完放回家！":"b8b4f4f3ef.mp3","大家|我們是守規則的偵探！":"492802348f.mp3","阿亮|是點心！我要吃～！":"9a9ac054c3.mp3","小晴|等一下！吃之前，要先看保存期限！":"2160bbb483.mp3","旁白|保存期限的字，很小很小。用放大鏡看一看！":"c0b98c2804.mp3","旁白|保存期限，二零二七年，三月十五日。":"7400d50be0.mp3","旁白|今天是，二零二六年，十月二十一日。":"91a3ae674e.mp3","小晴|日期還沒到，可以吃！":"b4329fc045.mp3","旁白|這一包呢？保存期限，二零二六年，九月一日。":"82a1299574.mp3","小晴|日期已經過了，不能吃！":"2fd437182f.mp3","小晴|可以吃的點心，先收進書包，下課再吃！":"bb8010c849.mp3","阿亮|好～下課再吃！":"c3261b1bd4.mp3","旁白|偵探任務完成！大家一起說！":"4ff8684dbd.mp3","大家|放大鏡，讓小東西變大！":"7c0a1ce4cc.mp3","旁白|接下來，換你們當放大鏡偵探囉！":"b528050196.mp3","大家|偵探們，出動！":"03d387e594.mp3","旁白|一":"6491d45c90.mp3","旁白|二":"59c8c2c3ff.mp3","旁白|三":"0ea11f62fa.mp3","旁白|四":"f03c32b398.mp3","旁白|五":"7c089f1fde.mp3","阿亮|很小的東西看不清楚，可以用什麼幫忙？":"5c444cdb03.mp3","阿亮|答對了！放大鏡可以幫我們看清楚。":"1fe805177a.mp3","阿亮|放大鏡":"3a08f92369.mp3","阿亮|剪刀":"5dcc97949a.mp3","阿亮|皮球":"af63875a2a.mp3","小晴|放大鏡放在校車圖上，校車看起來會怎樣？":"c048cf66c7.mp3","小晴|對！放大鏡，讓小東西看起來變大！":"becf539c14.mp3","小晴|變大":"6a367e6c82.mp3","小晴|變小":"37c36b9ec7.mp3","阿哲|哪一個又大又清楚？":"974bf219d2.mp3","阿哲|對！慢慢往上，找到最清楚的地方。":"c62053c4b8.mp3","阿哲|太近":"261f52e05d.mp3","阿哲|剛剛好":"c1973f6876.mp3","阿哲|太遠":"f76e517208.mp3","阿亮|把放大鏡拿開，校車會怎樣？":"d3459d735c.mp3","阿亮|對！校車沒有真的變大，是看起來變大。":"2890b9d417.mp3","阿亮|變回小小的":"89cd477d79.mp3","阿亮|一直很大":"de0f9c672f.mp3","阿哲|放大鏡可以照太陽嗎？":"a474425f90.mp3","阿哲|對！陽光集中會很燙，不照太陽！":"930ffb9145.mp3","阿哲|可以":"5f69062941.mp3","阿哲|不可以":"9100ed176b.mp3","小晴|放大鏡可以照眼睛嗎？":"ef397c00a7.mp3","小晴|對！保護眼睛，不照眼睛！":"dc7e377d5f.mp3","小晴|可以":"8ab239d712.mp3","小晴|不可以":"61c7bcbfe0.mp3","阿亮|放大鏡用完，要放在哪裡？":"a9efae4ae9.mp3","阿亮|對！用完放回家！":"785f2757b5.mp3","阿亮|放回盒子":"be8fadfb4e.mp3","阿亮|丟在地上":"bb79bed45d.mp3","小晴|吃點心之前，要先找什麼？":"5191fe22bd.mp3","小晴|對！吃之前，先看保存期限。":"a321d45a34.mp3","小晴|保存期限":"4228cf1085.mp3","小晴|包裝的顏色":"a5984198e4.mp3","阿哲|日期還沒到，點心可以吃嗎？":"e414104d07.mp3","阿哲|對！日期還沒到，可以吃！":"8a56a3efe9.mp3","阿哲|可以吃":"e5f259c8d1.mp3","阿哲|不能吃":"baec743a6f.mp3","阿亮|再想一想":"400dd6eece.mp3","小晴|再想一想":"a4f3d2c17c.mp3","阿哲|再想一想":"fdb0ff1374.mp3","旁白|放大鏡偵探，認證成功！放大鏡，讓小東西變大！":"10d621d79c.mp3"}/*END*/;const AUD_BASE='magnifier-audio/';
 const audioCache={};let curAudio=null;
-function audioFor(name,plain){const f=AUD[name+'|'+plain];if(!f)return null;let a=audioCache[f];if(!a){a=new Audio(AUD_BASE+f);a.preload='auto';audioCache[f]=a}return a}
+function audioFor(name,plain){if(Sound.mode!=='rec')return null;const f=AUD[name+'|'+plain];if(!f)return null;let a=audioCache[f];if(!a){a=new Audio(AUD_BASE+f);a.preload='auto';audioCache[f]=a}return a}
 function preloadAudio(){Object.keys(AUD).forEach(k=>{const [n,...t]=k.split('|');audioFor(n,t.join('|'))})}
+function setMode(m){Sound.mode=m;syncVoiceBtn()}
+function syncVoiceBtn(){const b=document.getElementById('voiceBtn');if(!b)return;b.textContent=Sound.mode==='rec'?'聲音：AI 錄音':(VO.twNatural?'聲音：Edge 臺灣腔':'聲音：這台電腦');b.title=Sound.mode==='rec'?'預錄好的角色配音，每台電腦都一樣':'使用這台電腦的語音；用 Edge 開啟會是臺灣腔'}
 function stopAudio(fireEnd){const a=curAudio;if(!a)return;curAudio=null;try{a.pause()}catch(e){}if(fireEnd&&a.onended)a.onended()}
-const VO={f:null,m:null};
+const VO={f:null,f2:null,m:null,twNatural:false};
 function pickVoices(){if(!Sound.tts)return;const vs=speechSynthesis.getVoices();const zh=vs.filter(v=>/^(zh|cmn)/i.test(v.lang));
   const tw=zh.filter(v=>/TW|Hant/i.test(v.lang)||/臺灣|台灣|Taiwan/i.test(v.name));const pool=(tw.length?tw:zh).slice();
   const score=v=>(/Natural|Online/i.test(v.name)?3:0)+(/Google/i.test(v.name)?2:0)+(v.localService?0:1);pool.sort((a,b)=>score(b)-score(a));
   const isM=v=>!/female|女/i.test(v.name)&&/\bmale\b|男|Zhiwei|YunJhe|Yunjhe|Kangkang|Yunxi|Yunyang/i.test(v.name);
-  VO.m=pool.find(isM)||null;VO.f=pool.find(v=>!isM(v))||null;}
+  VO.m=pool.find(isM)||null;const fs=pool.filter(v=>!isM(v));VO.f=fs[0]||null;VO.f2=fs[1]||VO.f;
+  const twN=pool.some(v=>/TW/i.test(v.lang)&&/Natural|Online/i.test(v.name));
+  if(twN&&!VO.twNatural){VO.twNatural=true;if(!Sound.userPicked)setMode('tts')}
+  syncVoiceBtn()}
 if(Sound.tts){pickVoices();speechSynthesis.addEventListener?.('voiceschanged',pickVoices)}
-function utter(text,voice,rateMul=1){const u=new SpeechSynthesisUtterance(text);u.lang='zh-TW';const v=voice.sex==='m'?(VO.m||VO.f):(VO.f||VO.m);if(v)u.voice=v;
+function utter(text,voice,rateMul=1){const u=new SpeechSynthesisUtterance(text);u.lang='zh-TW';const v=voice.sex==='m'?(VO.m||VO.f):voice.sex==='f2'?(VO.f2||VO.f||VO.m):(VO.f||VO.m);if(v)u.voice=v;
   u.pitch=voice.pitch;u.rate=Math.max(.5,Math.min(1.6,voice.rate*rateMul));return u}
 function fmt(t){return t.replace(/【(.+?)】/g,'<mark>$1</mark>')}
 const SUB=$('sub');let subOn=true;
@@ -657,6 +663,8 @@ $('againBtn').onclick=()=>start(0);
 $('toQuizBtn').onclick=()=>showView('quiz');
 function toggleBtn(id,state,labels){const b=$(id);b.setAttribute('aria-pressed',state);b.textContent=labels[state?1:0]}
 $('soundBtn').onclick=()=>{Sound.on=!Sound.on;if(!Sound.on){stopAudio(true);if(Sound.tts)try{speechSynthesis.cancel()}catch(e){}}toggleBtn('soundBtn',Sound.on,['配音：關','配音：開'])};
+$('voiceBtn').onclick=()=>{Sound.userPicked=true;stopAudio(true);if(Sound.tts)try{speechSynthesis.cancel()}catch(e){}setMode(Sound.mode==='rec'&&Sound.tts?'tts':'rec')};
+syncVoiceBtn();
 $('slowBtn').onclick=()=>{const on=T.mul===1;T.mul=on?.85:1;T.speechRate=on?.78:1;toggleBtn('slowBtn',on,['慢速：關','慢速：開'])};
 $('subBtn').onclick=()=>{subOn=!subOn;if(SUB.innerHTML)SUB.hidden=!subOn;toggleBtn('subBtn',subOn,['字幕：關','字幕：開'])};
 $('fsBtn').onclick=()=>{const w=$('stageWrap');try{if(document.fullscreenElement)document.exitFullscreen();else (w.requestFullscreen||w.webkitRequestFullscreen).call(w)}catch(e){}};
