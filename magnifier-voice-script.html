@@ -1,3 +1,9 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>放大鏡偵探配音腳本</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@500;700;900&display=swap">
@@ -30,6 +36,9 @@ pre.script{max-height:220px;overflow:auto}
 .cp:focus-visible{outline:4px solid var(--teal);outline-offset:2px}
 @media (max-width:560px){.row{grid-template-columns:1fr;gap:4px}}
 </style>
+</head>
+<body>
+
 <main>
 <div><h1>放大鏡偵探・配音腳本</h1><p class="lead">用 Google AI Studio 錄臺灣腔配音：每個角色錄<b>一個</b>音檔就好，我會幫你自動切成一句一句接進動畫。</p></div>
 <h2>一步一步做</h2>
@@ -60,3 +69,5 @@ const ok=()=>{const o=b.textContent;b.textContent='已複製 ✓';setTimeout(()=
 const sel=()=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='已選取，按 Ctrl+C 複製';setTimeout(()=>b.textContent=b.dataset.t.startsWith('st')?'複製風格':'複製台詞',2500)};
 try{navigator.clipboard.writeText(t).then(ok,sel)}catch(e){sel()}}));
 </script>
+</body>
+</html>
